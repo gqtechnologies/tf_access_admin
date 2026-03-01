@@ -68,3 +68,7 @@ end
 gem "devise", "~> 5.0"
 
 gem "pundit", "~> 2.5"
+
+gem "inertia_rails", "~> 3.17"
+
+gem "vite_rails", "~> 3.0"
