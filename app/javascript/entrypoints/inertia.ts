@@ -1,5 +1,6 @@
 import { createInertiaApp } from '@inertiajs/vue3'
 import { createApp, DefineComponent, h } from 'vue'
+import AdminLayout from "@/layouts/admin.vue"
 
 createInertiaApp({
   // Set default page title
@@ -26,6 +27,10 @@ createInertiaApp({
     // see https://inertia-rails.dev/guide/pages#default-layouts
     //
     // page.default.layout = page.default.layout || Layout
+
+    if (page?.default && name.startsWith('admin/')) {
+      page.default.layout = page.default.layout ?? AdminLayout
+    }
 
     return page
   },
