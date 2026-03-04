@@ -15,6 +15,10 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { Home, GalleryVerticalEnd } from 'lucide-vue-next';
+import { Link } from '@inertiajs/vue3';
+import { adminHome } from '@/api';
+
 </script>
 
 <template>
@@ -42,10 +46,10 @@ import {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton as-child>
-                  <a href="#">
+                  <Link :href="adminHome.index.path()">
                     <Home />
                     <span>Home</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

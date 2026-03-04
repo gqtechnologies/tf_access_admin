@@ -156,6 +156,8 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
+    js_from_routes (4.0.2)
+      railties (>= 5.1, < 9)
     json (2.18.1)
     json-schema (6.1.0)
       addressable (~> 2.8)
@@ -443,6 +445,7 @@ DEPENDENCIES
   importmap-rails
   inertia_rails (~> 3.17)
   jbuilder
+  js_from_routes
   kamal
   propshaft
   puma (>= 5.0)
@@ -518,6 +521,7 @@ CHECKSUMS
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.17.0) sha256=168c4ddb93d8a361a045c41d92b2952c7a118fa73f23fe14e55609eb7a863aae
   jbuilder (2.14.1) sha256=4eb26376ff60ef100cb4fd6fd7533cd271f9998327e86adf20fd8c0e69fabb42
+  js_from_routes (4.0.2) sha256=f922e51ad7d3bdedbb8549c2f6bbec43b3f6e6b4608033df655bf1bdbe905a0b
   json (2.18.1) sha256=fe112755501b8d0466b5ada6cf50c8c3f41e897fa128ac5d263ec09eedc9f986
   json-schema (6.1.0) sha256=6bf70a2cfb6dfd5a06da28093fa8190f324c88eabd36a7f47097f227321dc702
   kamal (2.10.1) sha256=53b7ecb4c33dd83b1aedfc7aacd1c059f835993258a552d70d584c6ce32b6340
