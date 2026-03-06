@@ -10,16 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_01_225612) do
-  create_table "users", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.datetime "remember_created_at"
-    t.datetime "reset_password_sent_at"
-    t.string "reset_password_token"
-    t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_000001) do
+# Could not dump table "organizations" because of following StandardError
+#   Unknown type 'uuid' for column 'id'
+
+
+# Could not dump table "roles" because of following StandardError
+#   Unknown type '' for column 'organization_id'
+
+
+# Could not dump table "users" because of following StandardError
+#   Unknown type '' for column 'organization_id'
+
+
+  create_table "users_roles", id: false, force: :cascade do |t|
+    t.integer "role_id"
+    t.integer "user_id"
+    t.index ["role_id"], name: "index_users_roles_on_role_id"
+    t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id"
+    t.index ["user_id"], name: "index_users_roles_on_user_id"
   end
+
+  add_foreign_key "roles", "organizations"
+  add_foreign_key "users", "organizations"
 end
