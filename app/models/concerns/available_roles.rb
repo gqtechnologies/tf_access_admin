@@ -13,11 +13,12 @@ module AvailableRoles
       TENANT_ADMIN,
       MANAGER,
       CLIENT,
+      CONTENT_MANAGER
     ].freeze
   
-    RESOURCE = [
-        CONTENT_MANAGER
-    ].freeze
+    # RESOURCE = [
+    #     CONTENT_MANAGER
+    # ].freeze
   
-    ALL = (GLOBAL + TENANT + RESOURCE).freeze
+    ALL = (GLOBAL + TENANT).freeze
   end

@@ -12,6 +12,8 @@ Rails.application.routes.draw do
   }
   defaults export: true do
     get "admin/home/index"
+    get "admin/users/new"
+    post "admin/users/create"
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/vue3'
 import { createApp, DefineComponent, h } from 'vue'
 import AdminLayout from "@/layouts/admin.vue"
+import { createI18n } from 'vue-i18n'
 
 createInertiaApp({
   // Set default page title
@@ -36,8 +37,27 @@ createInertiaApp({
   },
 
   setup({ el, App, props, plugin }) {
+
+    // Global i18n configuration
+    const pageProps = props.initialPage.props as any
+
+    const locale = pageProps.app.locale
+    const translations = pageProps.app.translations || {}
+    
+    const i18n = createI18n({
+      legacy: false,
+      locale: locale,
+      fallbackLocale: 'en',
+      messages: {
+        [locale]: translations,
+      },
+    })
+    // End of global i18n configuration
+
+    // Create the app
     createApp({ render: () => h(App, props) })
       .use(plugin)
+      .use(i18n)
       .mount(el)
   },
 

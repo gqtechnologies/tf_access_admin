@@ -15,9 +15,9 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
-import { adminHome } from '@/api';
+import { adminHome, adminUsers } from '@/api';
 
 </script>
 
@@ -49,6 +49,14 @@ import { adminHome } from '@/api';
                   <Link :href="adminHome.index.path()">
                     <Home />
                     <span>Home</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link :href="adminUsers.new.path()">
+                    <Users />
+                    <span>Users</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

@@ -6,6 +6,7 @@ class User < ApplicationRecord
   acts_as_tenant(:organization)
   belongs_to :organization
 
+  after_create :assign_default_role
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -18,5 +19,10 @@ class User < ApplicationRecord
 
   def tenant_admin?(tenant = Current.tenant)
     has_role?(AvailableRoles::TENANT_ADMIN, tenant)
+  end
+
+  private
+  def assign_default_role
+    self.add_role(:client, self.organization) if self.roles.blank?
   end
 end

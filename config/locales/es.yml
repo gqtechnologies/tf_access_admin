@@ -31,26 +31,26 @@ en:
   hello: "Hello world"
   frontend:
     roles:
-      super_admin: "Super Admin"
-      tenant_admin: "Tenant Admin"
+      super_admin: "Administrador Global"
+      tenant_admin: "Administrador"
       manager: "Manager"
-      client: "Client"
-      content_manager: "Content Manager"
+      client: "Cliente"
+      content_manager: "Gestor de Contenido"
     users:
       input:
         rol:
-          placeholder: "Select a role"
-          label: "Role"
+          placeholder: "Selecciona un rol"
+          label: "Rol"
       new:
-        title: "Create User"
-        name: "Name"
+        title: "Crear Usuario"
+        name: "Nombre"
         email: "Email"
         dni: "DNI"
-        language: "Language"
-        password: "Password"
-        password_confirmation: "Password Confirmation"
+        language: "Idioma"
+        password: "Contraseña"
+        password_confirmation: "Confirmar Contraseña"
         roles: "Roles"
-        submit: "Create User"
+        submit: "Crear Usuario"
     organizations:
       show:
-        title: "Organization"
+        title: "Organización"
