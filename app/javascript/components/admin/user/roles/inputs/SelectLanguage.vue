@@ -16,7 +16,7 @@ defineOptions({ inheritAttrs: false })
 const { t } = useI18n()
 
 const props = defineProps<{
-  roles: string[];
+  languages: string[];
   id?: string;
 }>();
 
@@ -47,13 +47,13 @@ function onUpdateValue(v: unknown) {
     @update:model-value="onUpdateValue"
   >
     <SelectTrigger :id="props.id" class="w-[180px]" v-bind="triggerAttrs">
-      <SelectValue :placeholder="t('users.input.role.placeholder')" />
+      <SelectValue :placeholder="t('users.input.language.placeholder')" />
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
-        <SelectLabel>{{ t('users.input.role.label') }}</SelectLabel>
-        <SelectItem v-for="role in roles" :key="role" :value="role">
-          {{ t(`roles.${role}`) }}
+        <SelectLabel>{{ t('users.input.language.label') }}</SelectLabel>
+        <SelectItem v-for="language in languages" :key="language" :value="language">
+          {{ t(`languages.${language}`) }}
         </SelectItem>
       </SelectGroup>
     </SelectContent>

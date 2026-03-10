@@ -121,3 +121,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Estilos globales para todos los Field (shadcn-vue usa data-slot="field") */
+@layer components {
+  [data-slot="field"] {
+    gap: 0.25rem !important;
+  }
+  [data-slot="field-error"] {
+    font-size: 0.8rem !important;
+  }
+}

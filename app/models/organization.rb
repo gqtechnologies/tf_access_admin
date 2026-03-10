@@ -1,4 +1,6 @@
 class Organization < ApplicationRecord
+  resourcify
+  
   has_many :users
   has_many :roles
 

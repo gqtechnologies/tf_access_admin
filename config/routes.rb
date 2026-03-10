@@ -12,8 +12,10 @@ Rails.application.routes.draw do
   }
   defaults export: true do
     get "admin/home/index"
-    get "admin/users/new"
-    post "admin/users/create"
+    namespace :admin do
+      resources :users, only: [:index, :new, :create]
+      get "admin/users/create", to: redirect("/admin/users/index")
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

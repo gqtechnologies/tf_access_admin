@@ -27,30 +27,67 @@
 #       "yes": yup
 #       enabled: "ON"
 
-en:
-  hello: "Hello world"
+es:
+  hello: "Hola mundo"
   frontend:
+    common:
+      cancel: "Cancelar"
     roles:
       super_admin: "Administrador Global"
       tenant_admin: "Administrador"
       manager: "Manager"
       client: "Cliente"
       content_manager: "Gestor de Contenido"
+    languages:
+      en: "Inglés"
+      es: "Español"
+      pt: "Portugués"
     users:
+      created_successfully: "Usuario creado correctamente"
+      creation_failed: "Error al crear el usuario"
+      validations:
+        name_required: "El nombre es obligatorio"
+        dni_required: "El DNI es obligatorio"
+        email_invalid: "Dirección de email no válida"
+        password_min: "La contraseña debe tener al menos 8 caracteres"
+        password_confirmation_min: "La confirmación debe tener al menos 8 caracteres"
+        password_mismatch: "Las contraseñas no coinciden"
+        role_required: "El rol es obligatorio"
+        language_required: "El idioma es obligatorio"
+        password_lowercase: "Debe incluir al menos 1 letra minúscula"
+        password_uppercase: "Debe incluir al menos 1 letra mayúscula"
+        password_symbol: "Debe incluir al menos 1 símbolo: $ % {'@'} . - _"
+        email_taken: "El email ya ha sido tomado"
+        language_invalid: "Idioma no válido"
+        role_invalid: "Rol no válido"
+      new:
+        title: "Nuevo Usuario"
+        description: "Crea un nuevo usuario para tu organización"
+        submit: "Crear Usuario"
       input:
-        rol:
+        role:
           placeholder: "Selecciona un rol"
           label: "Rol"
-      new:
-        title: "Crear Usuario"
-        name: "Nombre"
-        email: "Email"
-        dni: "DNI"
-        language: "Idioma"
-        password: "Contraseña"
-        password_confirmation: "Confirmar Contraseña"
-        roles: "Roles"
-        submit: "Crear Usuario"
+        name:
+          placeholder: "Ingresa tu nombre"
+          label: "Nombre"
+        email:
+          placeholder: "Ingresa tu email"
+          label: "Email"
+        dni:
+          placeholder: "Ingresa tu DNI"
+          label: "DNI"
+        language:
+          placeholder: "Selecciona tu idioma"
+          label: "Idioma"
+        password:
+          placeholder: "Ingresa tu contraseña"
+          label: "Contraseña"
+        password_confirmation:
+          placeholder: "Confirma tu contraseña"
+          label: "Contraseña Confirmación"
+        submit:
+          label: "Crear Usuario"
     organizations:
       show:
         title: "Organización"

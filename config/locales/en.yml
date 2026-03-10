@@ -30,27 +30,64 @@
 en:
   hello: "Hello world"
   frontend:
+    common:
+      cancel: "Cancel"
     roles:
       super_admin: "Super Admin"
       tenant_admin: "Tenant Admin"
       manager: "Manager"
       client: "Client"
       content_manager: "Content Manager"
+    languages:
+      en: "English"
+      es: "Spanish"
+      pt: "Portuguese"
     users:
+      created_successfully: "User created successfully"
+      creation_failed: "Failed to create user"
+      validations:
+        name_required: "Name is required"
+        dni_required: "DNI is required"
+        email_invalid: "Invalid email address"
+        password_min: "Password must be at least 8 characters"
+        password_confirmation_min: "Password confirmation must be at least 8 characters"
+        password_mismatch: "Passwords do not match"
+        role_required: "Role is required"
+        language_required: "Language is required"
+        password_lowercase: "Must include at least 1 lowercase letter"
+        password_uppercase: "Must include at least 1 uppercase letter"
+        password_symbol: "Must include at least 1 symbol: $ % {'@'} . - _"
+        email_taken: "Email has already been taken"
+        language_invalid: "Invalid language"
+        role_invalid: "Invalid role"
+      new:
+        title: "New User"
+        description: "Create a new user for your organization"
+        submit: "Create User"
       input:
-        rol:
+        role:
           placeholder: "Select a role"
           label: "Role"
-      new:
-        title: "Create User"
-        name: "Name"
-        email: "Email"
-        dni: "DNI"
-        language: "Language"
-        password: "Password"
-        password_confirmation: "Password Confirmation"
-        roles: "Roles"
-        submit: "Create User"
+        name:
+          placeholder: "Enter your name"
+          label: "Name"
+        email:
+          placeholder: "Enter your email"
+          label: "Email"
+        dni:
+          placeholder: "Enter your DNI"
+          label: "DNI"
+        language:
+          placeholder: "Select your language"
+          label: "Language"
+        password:
+          placeholder: "Enter your password"
+          label: "Password"
+        password_confirmation:
+          placeholder: "Confirm your password"
+          label: "Password Confirmation"
+        submit:
+          label: "Create User"
     organizations:
       show:
         title: "Organization"
