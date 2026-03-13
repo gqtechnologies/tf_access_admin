@@ -32,6 +32,17 @@ pt:
   frontend:
     common:
       cancel: "Cancelar"
+      actions:
+        edit: "Editar"
+        search: "Buscar"
+      table:
+        pagination:
+          rows_per_page: "Linhas por página"
+          current_page: "Página {current_page} de {total_pages}"
+          previous: "Anterior"
+          next: "Próximo"
+        empty_message: "Nenhum usuário encontrado"
+        actions: "Ações"
     roles:
       super_admin: "Super Admin"
       tenant_admin: "Tenant Admin"
@@ -45,6 +56,19 @@ pt:
     users:
       created_successfully: "Usuário criado com sucesso"
       creation_failed: "Falha ao criar o usuário"
+      index:
+        title: "Usuários"
+        description: "Lista de usuários"
+        table:
+          headers:
+            id: "ID"
+            name: "Nome"
+            dni: "DNI"
+            email: "Email"
+        actions:
+          edit: "Editar Usuário"
+          delete: "Deletar Usuário"
+          create: "Criar Usuário"
       validations:
         name_required: "O nome é obrigatório"
         dni_required: "O DNI é obrigatório"

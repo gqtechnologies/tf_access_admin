@@ -32,6 +32,17 @@ es:
   frontend:
     common:
       cancel: "Cancelar"
+      actions:
+        edit: "Editar"
+        search: "Buscar"
+      table:
+        pagination:
+          rows_per_page: "Filas por página"
+          current_page: "Página {current_page} de {total_pages}"
+          previous: "Anterior"
+          next: "Siguiente"
+        empty_message: "No se encontraron usuarios"
+        actions: "Acciones"
     roles:
       super_admin: "Administrador Global"
       tenant_admin: "Administrador"
@@ -60,6 +71,19 @@ es:
         email_taken: "El email ya ha sido tomado"
         language_invalid: "Idioma no válido"
         role_invalid: "Rol no válido"
+      index:
+        title: "Usuarios"
+        description: "Lista de usuarios"
+        table:
+          headers:
+            id: "ID"
+            name: "Nombre"
+            dni: "DNI"
+            email: "Email"
+        actions:
+          edit: "Editar Usuario"
+          delete: "Eliminar Usuario"
+          create: "Crear Usuario"
       new:
         title: "Nuevo Usuario"
         description: "Crea un nuevo usuario para tu organización"

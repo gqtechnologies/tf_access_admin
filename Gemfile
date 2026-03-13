@@ -77,3 +77,5 @@ gem "inertia_rails", "~> 3.17"
 gem "vite_rails", "~> 3.0"
 
 gem 'acts_as_tenant'
+
+gem 'kaminari'

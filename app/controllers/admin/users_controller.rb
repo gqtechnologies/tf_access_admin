@@ -1,10 +1,14 @@
 class Admin::UsersController < AdminController
+    before_action :set_filters, only: [:index]
     before_action :set_user, only: [:create]
     before_action :validate_role, only: [:create]
 
     def index
+        users = User.order(created_at: :desc).page(@filters[:page]).per(@filters[:per_page])
+        pagination = pagination_info(users)
         render inertia: "admin/users/index", props: {
-            users: User.all
+            users: users,
+            pagination: pagination
         }, status: :ok
     end
 
@@ -50,5 +54,21 @@ class Admin::UsersController < AdminController
 
     def user_params
         params.require(:user).permit(:name, :email, :dni, :password, :password_confirmation, :language)
+    end
+
+    def set_filters
+        @filters = {
+            page: params[:page] || 1,
+            per_page: params[:per_page] || 10,
+        }
+    end
+
+    def pagination_info(users)
+        {
+            current_page: users.current_page,
+            per_page: @filters[:per_page],
+            total_pages: users.total_pages,
+            total_count: users.total_count,
+        }
     end
 end

@@ -32,6 +32,17 @@ en:
   frontend:
     common:
       cancel: "Cancel"
+      actions:
+        edit: "Edit"
+        search: "Search"
+      table:
+        pagination:
+          rows_per_page: "Rows per page"
+          current_page: "Current {current_page} of {total_pages}"
+          previous: "Previous"
+          next: "Next"
+        empty_message: "No users found"
+        actions: "Actions"
     roles:
       super_admin: "Super Admin"
       tenant_admin: "Tenant Admin"
@@ -60,6 +71,19 @@ en:
         email_taken: "Email has already been taken"
         language_invalid: "Invalid language"
         role_invalid: "Invalid role"
+      index:
+        title: "Users"
+        description: "List of users"
+        table:
+          headers:
+            id: "ID"
+            name: "Name"
+            dni: "DNI"
+            email: "Email"
+        actions:
+          edit: "Edit User"
+          delete: "Delete User"
+          create: "Create User"
       new:
         title: "New User"
         description: "Create a new user for your organization"
