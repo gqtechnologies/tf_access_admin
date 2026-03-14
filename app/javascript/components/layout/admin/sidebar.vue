@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Home, GalleryVerticalEnd, Users } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
-import { adminHome, adminUsers } from '@/api';
+import { admin_home_index_path, admin_users_path } from "@/routes"
 
 </script>
 
@@ -46,7 +46,7 @@ import { adminHome, adminUsers } from '@/api';
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton as-child>
-                  <Link :href="adminHome.index.path()">
+                  <Link :href="admin_home_index_path()">
                     <Home />
                     <span>Home</span>
                   </Link>
@@ -54,7 +54,7 @@ import { adminHome, adminUsers } from '@/api';
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton as-child>
-                  <Link :href="adminUsers.new.path()">
+                  <Link :href="admin_users_path()">
                     <Users />
                     <span>Users</span>
                   </Link>

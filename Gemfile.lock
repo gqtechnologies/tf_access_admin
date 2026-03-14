@@ -75,6 +75,9 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
+    acts_as_paranoid (0.11.0)
+      activerecord (>= 6.1, < 8.2)
+      activesupport (>= 6.1, < 8.2)
     acts_as_tenant (1.0.1)
       rails (>= 6.0)
     addressable (2.8.9)
@@ -158,8 +161,9 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    js_from_routes (4.0.2)
-      railties (>= 5.1, < 9)
+    js-routes (2.3.6)
+      railties (>= 5)
+      sorbet-runtime
     json (2.18.1)
     json-schema (6.1.0)
       addressable (~> 2.8)
@@ -308,6 +312,10 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
+    ransack (4.4.1)
+      activerecord (>= 7.2)
+      activesupport (>= 7.2)
+      i18n
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
@@ -377,6 +385,7 @@ GEM
       fugit (~> 1.11)
       railties (>= 7.1)
       thor (>= 1.3.1)
+    sorbet-runtime (0.6.13028)
     sqlite3 (2.9.1-aarch64-linux-gnu)
     sqlite3 (2.9.1-aarch64-linux-musl)
     sqlite3 (2.9.1-arm-linux-gnu)
@@ -450,6 +459,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  acts_as_paranoid (~> 0.11.0)
   acts_as_tenant
   bootsnap
   brakeman
@@ -461,13 +471,14 @@ DEPENDENCIES
   importmap-rails
   inertia_rails (~> 3.17)
   jbuilder
-  js_from_routes
+  js-routes
   kamal
   kaminari
   propshaft
   puma (>= 5.0)
   pundit (~> 2.5)
   rails (~> 8.1.2)
+  ransack
   rolify
   rubocop-rails-omakase
   selenium-webdriver
@@ -495,6 +506,7 @@ CHECKSUMS
   activerecord (8.1.2) sha256=acfbe0cadfcc50fa208011fe6f4eb01cae682ebae0ef57145ba45380c74bcc44
   activestorage (8.1.2) sha256=8a63a48c3999caeee26a59441f813f94681fc35cc41aba7ce1f836add04fba76
   activesupport (8.1.2) sha256=88842578ccd0d40f658289b0e8c842acfe9af751afee2e0744a7873f50b6fdae
+  acts_as_paranoid (0.11.0) sha256=8fae9e408f739d8ad840b02dde18beb364a897f6b57ee25ef1c52efa8bc906db
   acts_as_tenant (1.0.1) sha256=6944e4d64533337938a8817a6b4ff9b11189c9dcc0b1333bb89f3821a4c14c53
   addressable (2.8.9) sha256=cc154fcbe689711808a43601dee7b980238ce54368d23e127421753e46895485
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
@@ -540,7 +552,7 @@ CHECKSUMS
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.17.0) sha256=168c4ddb93d8a361a045c41d92b2952c7a118fa73f23fe14e55609eb7a863aae
   jbuilder (2.14.1) sha256=4eb26376ff60ef100cb4fd6fd7533cd271f9998327e86adf20fd8c0e69fabb42
-  js_from_routes (4.0.2) sha256=f922e51ad7d3bdedbb8549c2f6bbec43b3f6e6b4608033df655bf1bdbe905a0b
+  js-routes (2.3.6) sha256=a46220beadddf3ee4dc7a1e0b908587c0b3418d44d84ef7970ed72e849598474
   json (2.18.1) sha256=fe112755501b8d0466b5ada6cf50c8c3f41e897fa128ac5d263ec09eedc9f986
   json-schema (6.1.0) sha256=6bf70a2cfb6dfd5a06da28093fa8190f324c88eabd36a7f47097f227321dc702
   kamal (2.10.1) sha256=53b7ecb4c33dd83b1aedfc7aacd1c059f835993258a552d70d584c6ce32b6340
@@ -602,6 +614,7 @@ CHECKSUMS
   railties (8.1.2) sha256=1289ece76b4f7668fc46d07e55cc992b5b8751f2ad85548b7da351b8c59f8055
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.3.1) sha256=8c9e89d09f66a26a01264e7e3480ec0607f0c497a861ef16063604b1b08eb19c
+  ransack (4.4.1) sha256=6aeaac36fc19088570e10da1044e6cfd88c740e20f871b84566fd30e32b7a63d
   rdoc (7.2.0) sha256=8650f76cd4009c3b54955eb5d7e3a075c60a57276766ebf36f9085e8c9f23192
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.6.3) sha256=1198b04973565b36ec0f11542ab3f5cfeeec34823f4e54cebde90968092b1835
@@ -621,6 +634,7 @@ CHECKSUMS
   solid_cable (3.0.12) sha256=a168a54731a455d5627af48d8441ea3b554b8c1f6e6cd6074109de493e6b0460
   solid_cache (1.0.10) sha256=bc05a2fb3ac78a6f43cbb5946679cf9db67dd30d22939ededc385cb93e120d41
   solid_queue (1.3.2) sha256=44a53047be4255f616ff13fa5d35980e7b3eee6e31d957eadb88fbe8e0db4509
+  sorbet-runtime (0.6.13028) sha256=236ba7d601fb05fde6fd1e5ee689c6e3d12a96476b21db83e73df27f9e35ae20
   sqlite3 (2.9.1-aarch64-linux-gnu) sha256=85535ddf1c37f116ebebe0330bbbffc2ccb55d09f69717a565f8cfb35142f136
   sqlite3 (2.9.1-aarch64-linux-musl) sha256=646a28a655fc0298ff4266de0af89b66477a2d9ad65cebb5abad190bb64ed092
   sqlite3 (2.9.1-arm-linux-gnu) sha256=ed25696b0fb4694ca4f47287eaaa9e0d46a0a0c92990c453743d6ab6b4f51fa0

@@ -94,8 +94,8 @@
         </CardContent>
         <CardFooter>
             <Field orientation="horizontal" class="md:flex md:justify-end flex-col md:flex-row">
-                <Button type="button" variant="outline" @click="resetForm" class="w-full md:w-auto">
-                    {{ t('common.cancel') }}
+                <Button type="button" as="a" :href="admin_users_path()" variant="outline" class="w-full md:w-auto">
+                    {{ props.cancelLabel || t('common.cancel') }}
                 </Button>
                 <Button type="submit" form="form-user" class="w-full md:w-auto">
                     {{ props.submitLabel }}
@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from 'vue'
+import { nextTick, onMounted } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, Field as VeeField } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
@@ -128,9 +128,12 @@ import {
 import { Input } from '@/components/ui/input'
 import SelectRol from '@/components/admin/user/roles/inputs/SelectRol.vue';
 import SelectLanguage from '@/components/admin/user/roles/inputs/SelectLanguage.vue';
-import { UserSchema, userSchema } from '@/lib/schemas/user';
+import { UserSchema, UserEditSchema, userEditSchema, userSchema } from '@/lib/schemas/user';
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors';
 import type { InertiaErrors } from '@/types/globals';
+import { admin_users_path } from "@/routes"
+import { User } from '@/types/user';
+
 
 const props = defineProps<{
     title: string;
@@ -138,19 +141,22 @@ const props = defineProps<{
     submitLabel: string;
     roles: string[];
     languages: string[];
+    cancelLabel?: string;
+    defaultValues?: User;
     serverErrors?: Record<string, string[]>;
+    editMode?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (e: 'submit', data: UserSchema): void
+    (e: 'submit', data: UserSchema | UserEditSchema): void
 }>();
 
 const { t } = useI18n();
 
 const { translateErrors, mapServerErrorsToForm } = useTranslateErrors();
-const formSchema = toTypedSchema(userSchema);
+const formSchema = toTypedSchema( props.editMode ? userEditSchema : userSchema);
 
-const { handleSubmit, resetForm, setErrors } = useForm({
+const { handleSubmit, setErrors, setValues } = useForm({
     validationSchema: formSchema,
     initialValues: {
         name: '',
@@ -163,6 +169,14 @@ const { handleSubmit, resetForm, setErrors } = useForm({
     },
 })
 
+onMounted(() => {
+    if (props.defaultValues) {
+        setValues({
+            ...props.defaultValues
+        })
+    }
+})
+
 function applyServerErrors( errors: InertiaErrors ) {
     if (errors && Object.keys(errors).length > 0) {
         nextTick(() => {
@@ -171,9 +185,8 @@ function applyServerErrors( errors: InertiaErrors ) {
     }
 }
 
-
 const onSubmit = handleSubmit((data) => {
-    emit('submit', data)
+    emit('submit', data as UserSchema)
 })
 
 defineExpose<{

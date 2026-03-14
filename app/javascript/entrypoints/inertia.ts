@@ -40,9 +40,9 @@ createInertiaApp({
 
     // Global i18n configuration
     const pageProps = props.initialPage.props as any
-
     const locale = pageProps.app.locale
     const translations = pageProps.app.translations || {}
+
     const i18n = createI18n({
       legacy: false,
       locale: locale,

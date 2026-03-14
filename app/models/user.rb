@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   rolify
+  acts_as_paranoid
 
   has_many :permissions, through: :roles
 
@@ -22,10 +23,18 @@ class User < ApplicationRecord
     has_role?(AvailableRoles::SUPER_ADMIN)
   end
 
-  def tenant_admin?(tenant = Current.tenant)
+  def tenant_admin?(tenant = self.organization)
     has_role?(AvailableRoles::TENANT_ADMIN, tenant)
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["name", "email", "dni"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    []
+  end
+  
   private
   def assign_default_role
     self.add_role(:client, self.organization) if self.roles.blank?

@@ -32,6 +32,7 @@ en:
   frontend:
     common:
       cancel: "Cancel"
+      back: "Back"
       actions:
         edit: "Edit"
         search: "Search"
@@ -56,6 +57,9 @@ en:
     users:
       created_successfully: "User created successfully"
       creation_failed: "Failed to create user"
+      updated_successfully: "User updated successfully"
+      update_failed: "Failed to update user"
+      not_found: "User not found"
       validations:
         name_required: "Name is required"
         dni_required: "DNI is required"
@@ -88,6 +92,10 @@ en:
         title: "New User"
         description: "Create a new user for your organization"
         submit: "Create User"
+      edit:
+        title: "Edit User"
+        description: "Edit a user for your organization"
+        submit: "Update User"
       input:
         role:
           placeholder: "Select a role"

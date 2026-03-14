@@ -14,22 +14,41 @@ export const userValidationKeys = {
   password_symbol: 'users.validations.password_symbol',
 } as const
 
-export const userSchema = z
-  .object({
-    name: z.string().min(1, userValidationKeys.name_required),
-    dni: z.string().min(1, userValidationKeys.dni_required),
-    email: z.string().email(userValidationKeys.email_invalid),
-    password: z.string().min(8, userValidationKeys.password_min)
-    .regex(/[a-z]/, { message: userValidationKeys.password_lowercase })
-    .regex(/[A-Z]/, { message: userValidationKeys.password_uppercase })
-    .regex(/[$%@.\-_]/, { message: userValidationKeys.password_symbol }),
-    password_confirmation: z.string().min(8, userValidationKeys.password_confirmation_min),
-    role: z.string().min(1, userValidationKeys.role_required),
-    language: z.string().min(1, userValidationKeys.language_required),
+const passwordSchema = z.string().min(8, userValidationKeys.password_min)
+.regex(/[a-z]/, { message: userValidationKeys.password_lowercase })
+.regex(/[A-Z]/, { message: userValidationKeys.password_uppercase })
+.regex(/[$%@.\-_]/, { message: userValidationKeys.password_symbol });
+
+const passwordConfirmationSchema = z.string().min(8, userValidationKeys.password_confirmation_min);
+
+const userBaseSchema = z.object({
+  name: z.string().min(1, userValidationKeys.name_required),
+  dni: z.string().min(1, userValidationKeys.dni_required),
+  email: z.string().email(userValidationKeys.email_invalid),
+  password: passwordSchema,
+  password_confirmation: passwordConfirmationSchema,
+  role: z.string().min(1, userValidationKeys.role_required),
+  language: z.string().min(1, userValidationKeys.language_required),
+});
+
+export const userSchema = userBaseSchema
+.refine((data) => data.password === data.password_confirmation, {
+  message: userValidationKeys.password_mismatch,
+  path: ['password_confirmation'],
+})
+
+export const userEditSchema = userBaseSchema
+  .omit({ password: true, password_confirmation: true })
+  .extend({
+    password: z.union([passwordSchema, z.literal('')]),
+    password_confirmation: z.union([passwordConfirmationSchema, z.literal('')]),
   })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: userValidationKeys.password_mismatch,
-    path: ['password_confirmation'],
-  })
+  .refine(
+    (data) =>
+      (!data.password && !data.password_confirmation) ||
+      data.password === data.password_confirmation,
+    { message: userValidationKeys.password_mismatch, path: ['password_confirmation'] }
+  );
 
 export type UserSchema = z.infer<typeof userSchema>;
+export type UserEditSchema = z.infer<typeof userEditSchema>;

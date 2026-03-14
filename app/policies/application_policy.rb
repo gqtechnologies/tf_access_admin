@@ -36,6 +36,20 @@ class ApplicationPolicy
     false
   end
 
+
+
+  def admin?
+    user.present? && (user.super_admin? || user.tenant_admin?)
+  end
+
+  def same_organization?
+    return false unless user.present?
+    return true if user.super_admin?
+    return true unless record.respond_to?(:organization_id)
+
+    record.organization_id == user.organization_id
+  end
+
   class Scope
     def initialize(user, scope)
       @user = user

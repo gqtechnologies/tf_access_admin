@@ -49,6 +49,10 @@ export const useTable = (
     fetchData(search.value, currentPage.value, itemsPerPage.value)
   }
 
+  const triggerSearch = () => {
+    fetchData(search.value, currentPage.value, itemsPerPage.value)
+  }
+
   return {
     currentPage,
     itemsPerPage,
@@ -60,5 +64,6 @@ export const useTable = (
     handleItemsPerPageChange,
     clearSearch,
     setPagination,
+    triggerSearch,
   }
 }

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class AdminController < InertiaController
-  # Set the locale for the user
-    before_action :set_locale
+  before_action :authenticate_user!
+  before_action :set_locale
 
     inertia_share auth: -> {
       if user_signed_in?
-        { user: current_user.as_json(only: [:id, :email]) }
+        { user: current_user.as_json(only: [:id, :email, :language]) }
       else
         {}
       end
@@ -14,9 +14,9 @@ class AdminController < InertiaController
     # Share data with all Inertia responses, this is used to pass the locale and translations to the client
     inertia_share app: -> {
       {
-        locale: I18n.locale.to_s,
+        locale: current_user.language.presence || I18n.locale.to_s,
         available_locales: I18n.available_locales.map(&:to_s),
-        translations: frontend_translations(I18n.locale)
+        translations: frontend_translations(current_user.language.presence || I18n.locale)
       }
     }
 

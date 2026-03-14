@@ -7,3 +7,5 @@ application.debug = false
 window.Stimulus   = application
 
 export { application }
+import {root_path} from '../routes';
+// alert(`JsRoutes installed.\nYour root path is ${root_path()}`)

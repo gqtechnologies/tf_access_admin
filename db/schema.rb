@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_07_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_14_193636) do
 # Could not dump table "organizations" because of following StandardError
 #   Unknown type 'uuid' for column 'id'
 

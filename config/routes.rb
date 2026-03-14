@@ -10,12 +10,11 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     sessions: "users/sessions"
   }
-  defaults export: true do
-    get "admin/home/index"
-    namespace :admin do
-      resources :users, only: [:index, :new, :create]
-      get "admin/users/create", to: redirect("/admin/users/index")
-    end
+  
+  get "admin/home/index"
+  namespace :admin do
+    resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
+    # get "users/create", to: redirect("/admin/users")
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

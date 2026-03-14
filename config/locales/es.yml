@@ -32,6 +32,7 @@ es:
   frontend:
     common:
       cancel: "Cancelar"
+      back: "Volver"
       actions:
         edit: "Editar"
         search: "Buscar"
@@ -56,6 +57,9 @@ es:
     users:
       created_successfully: "Usuario creado correctamente"
       creation_failed: "Error al crear el usuario"
+      updated_successfully: "Usuario actualizado correctamente"
+      update_failed: "Error al actualizar el usuario"
+      not_found: "Usuario no encontrado"
       validations:
         name_required: "El nombre es obligatorio"
         dni_required: "El DNI es obligatorio"
@@ -112,6 +116,10 @@ es:
           label: "Contraseña Confirmación"
         submit:
           label: "Crear Usuario"
+      edit:
+        title: "Editar Usuario"
+        description: "Editar un usuario para tu organización"
+        submit: "Actualizar Usuario"
     organizations:
       show:
         title: "Organización"

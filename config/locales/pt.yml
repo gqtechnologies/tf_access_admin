@@ -32,6 +32,7 @@ pt:
   frontend:
     common:
       cancel: "Cancelar"
+      back: "Voltar"
       actions:
         edit: "Editar"
         search: "Buscar"
@@ -56,6 +57,9 @@ pt:
     users:
       created_successfully: "Usuário criado com sucesso"
       creation_failed: "Falha ao criar o usuário"
+      updated_successfully: "Usuário atualizado com sucesso"
+      update_failed: "Falha ao atualizar o usuário"
+      not_found: "Usuário não encontrado"
       index:
         title: "Usuários"
         description: "Lista de usuários"
@@ -107,6 +111,10 @@ pt:
           placeholder: "Confirm your password"
           label: "Password Confirmation"
         submit: "Create User"
+      edit:
+        title: "Editar Usuario"
+        description: "Editar un usuario para tu organización"
+        submit: "Actualizar Usuario"
     organizations:
       show:
         title: "Organization"

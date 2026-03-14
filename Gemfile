@@ -57,7 +57,7 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem 'js_from_routes'
+  gem "js-routes"
 end
 
 group :test do
@@ -79,3 +79,5 @@ gem "vite_rails", "~> 3.0"
 gem 'acts_as_tenant'
 
 gem 'kaminari'
+gem 'ransack'
+gem "acts_as_paranoid", "~> 0.11.0"
