@@ -148,3 +148,7 @@ en:
       description: "The page you're looking for doesn't exist."
       need_help: "Need help?"
       contact_support: "Contact support"
+      go_to_home: "Go to home"
+    home:
+      title: "Welcome to our site"
+      description: "We are glad to have you here"

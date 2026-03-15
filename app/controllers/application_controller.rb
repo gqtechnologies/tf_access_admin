@@ -9,6 +9,15 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
   before_action :set_current_organization
+  before_action :set_locale
+  # Share data with all Inertia responses, this is used to pass the locale and translations to the client
+  inertia_share app: -> {
+    {
+      locale: I18n.locale,
+      available_locales: I18n.available_locales.map(&:to_s),
+      translations: frontend_translations(I18n.locale)
+    }
+  }
 
   protected
 
@@ -43,5 +52,18 @@ class ApplicationController < ActionController::Base
 
   def user_not_authorized
     redirect_back_or_to(root_path)
+  end
+
+  # Set the locale for the user
+  def set_locale
+    I18n.locale =
+      params[:locale].presence ||
+      session[:locale].presence ||
+      I18n.default_locale
+  end
+
+  # Get the translations for the frontend
+  def frontend_translations(locale)
+    I18n.t("frontend", locale: locale, default: {})
   end
 end

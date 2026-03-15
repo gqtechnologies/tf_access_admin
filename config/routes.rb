@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     get "(*path)", to: redirect { |params, req| "#{req.protocol}localhost:#{req.port}/#{params[:path]}" }
   end
 
+  get "home/index"
   #Remove this route
   devise_for :users, controllers: {
     sessions: "users/sessions"
@@ -24,7 +25,7 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
+  match "*path", to: "errors#not_found", via: :all
   # Defines the root path route ("/")
   root "admin/home#index"
 end

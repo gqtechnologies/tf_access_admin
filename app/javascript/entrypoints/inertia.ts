@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/vue3'
 import { createApp, DefineComponent, h } from 'vue'
 import AdminLayout from "@/layouts/admin.vue"
+import DefaultLayout from "@/layouts/default.vue"
 import { createI18n } from 'vue-i18n'
 
 createInertiaApp({
@@ -31,6 +32,8 @@ createInertiaApp({
 
     if (page?.default && name.startsWith('admin/')) {
       page.default.layout = page.default.layout ?? AdminLayout
+    }else{
+      page.default.layout = page.default.layout ?? DefaultLayout
     }
 
     return page

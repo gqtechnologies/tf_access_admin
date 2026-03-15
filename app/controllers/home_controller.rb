@@ -1,5 +1,5 @@
-class HomeController < AdminController
+class HomeController < ApplicationController
   def index
-    render inertia: "home/index", props: {}
+    render inertia: "home/index"
   end
 end
