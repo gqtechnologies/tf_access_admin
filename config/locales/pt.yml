@@ -136,3 +136,5 @@ pt:
         title: "My Account"
         logout: "Log out"
         profile: "Profile"
+        logout_success: "Sessão encerrada com sucesso"
+        logout_error: "Erro ao encerrar sessão"

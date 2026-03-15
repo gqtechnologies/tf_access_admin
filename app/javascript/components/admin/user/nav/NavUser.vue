@@ -23,7 +23,7 @@
                     <DropdownMenuItem class="cursor-pointer">
                         <UserIcon /> {{ t('sidebar.footer.profile') }}
                     </DropdownMenuItem>
-                    <DropdownMenuItem class="cursor-pointer">
+                    <DropdownMenuItem class="cursor-pointer" @click="handleLogout">
                         <LogOut /> {{ t('sidebar.footer.logout') }}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -47,8 +47,22 @@ import { LogOut, User as UserIcon } from 'lucide-vue-next'
 import { User } from '@/types/user'
 import { getUserFallback } from '@/lib/user'
 import { useI18n } from 'vue-i18n'
+import { router } from '@inertiajs/vue3'
+import { toast } from "vue-sonner"
+import { user_session_path, destroy_user_session_path } from '@/routes'
 const { user } = defineProps<{
     user: User
 }>()
 const { t } = useI18n()
+
+const handleLogout = () => {
+    router.delete(destroy_user_session_path(), {
+        onSuccess: () => {
+            router.visit(user_session_path())
+        },
+        onError: () => {
+            toast.error(t('sidebar.footer.logout_error'))
+        }
+    })
+}
 </script>

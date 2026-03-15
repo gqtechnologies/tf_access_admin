@@ -141,3 +141,5 @@ es:
         title: "Mi Cuenta"
         logout: "Cerrar Sesión"
         profile: "Perfil"
+        logout_success: "Cerrada sesión correctamente"
+        logout_error: "Error al cerrar sesión"

@@ -138,6 +138,8 @@ en:
         title: My Account
         logout: Log out
         profile: Profile
+        logout_success: "Logged out successfully"
+        logout_error: "Failed to log out"
     organizations:
       show:
         title: "Organization"
