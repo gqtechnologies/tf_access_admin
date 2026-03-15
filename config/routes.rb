@@ -6,7 +6,6 @@ Rails.application.routes.draw do
   end
 
   #Remove this route
-  get 'inertia-example', to: 'inertia_example#index'
   devise_for :users, controllers: {
     sessions: "users/sessions"
   }

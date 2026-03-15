@@ -5,7 +5,8 @@
       <template #actions-table>
         <div class="w-full flex items-center justify-between gap-2">
           <div class="w-full md:w-1/2 flex gap-2">
-            <Input type="text" placeholder="Buscar usuario" v-model="search" />
+            <Input type="search" placeholder="Buscar usuario" v-model="search" 
+            @search="onSearchClear"/>
             <Button variant="outline" @click="triggerSearch">
               <SearchIcon class="w-4 h-4" />
               {{ t('common.actions.search') }}
@@ -134,5 +135,11 @@ const deleteUser = (id: number) => {
       toast.error(t('users.index.actions.delete_error'))
     }
   })
+}
+const onSearchClear = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (target?.value === '') {
+    triggerSearch()
+  }
 }
 </script>
