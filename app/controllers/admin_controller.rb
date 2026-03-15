@@ -13,10 +13,11 @@ class AdminController < InertiaController
     }
     # Share data with all Inertia responses, this is used to pass the locale and translations to the client
     inertia_share app: -> {
+      effective_locale = current_user&.language.presence || I18n.locale.to_s
       {
-        locale: current_user.language.presence || I18n.locale.to_s,
+        locale: effective_locale,
         available_locales: I18n.available_locales.map(&:to_s),
-        translations: frontend_translations(current_user.language.presence || I18n.locale)
+        translations: frontend_translations(effective_locale)
       }
     }
 
