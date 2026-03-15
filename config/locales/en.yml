@@ -36,6 +36,10 @@ en:
       actions:
         edit: "Edit"
         search: "Search"
+        delete: "Delete"
+        continue: "Continue"
+        confirm: "Confirm"
+        cancel: "Cancel"
       table:
         pagination:
           rows_per_page: "Rows per page"
@@ -50,6 +54,7 @@ en:
       manager: "Manager"
       client: "Client"
       content_manager: "Content Manager"
+    no_role: "No role"
     languages:
       en: "English"
       es: "Spanish"
@@ -84,10 +89,14 @@ en:
             name: "Name"
             dni: "DNI"
             email: "Email"
+            role: "Role"
         actions:
           edit: "Edit User"
           delete: "Delete User"
+          delete_description: "Are you sure you want to delete {name}?"
           create: "Create User"
+          delete_success: "User deleted successfully"
+          delete_error: "Failed to delete user"
       new:
         title: "New User"
         description: "Create a new user for your organization"

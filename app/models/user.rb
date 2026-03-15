@@ -19,6 +19,11 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  def role
+    roles.first.name if roles.present?
+    nil
+  end
+
   def super_admin?
     has_role?(AvailableRoles::SUPER_ADMIN)
   end

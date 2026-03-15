@@ -14,7 +14,7 @@ class Admin::UsersController < AdminController
         
         pagination = pagination_info(users)
         render inertia: "admin/users/index", props: {
-            users: users,
+            users: users.map { |u| Admin::UserSerializer.call(u) },
             pagination: pagination
         }, status: :ok
     end

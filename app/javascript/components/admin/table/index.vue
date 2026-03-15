@@ -125,7 +125,7 @@ const table = useVueTable({
                   <template v-if="cell.column.id === 'actions' && $slots.actions">
                     <Popover>
                       <PopoverTrigger><Button variant="ghost" size="icon" class="h-8 w-8 p-0 cursor-pointer"><EllipsisVertical class="size-4" /></Button></PopoverTrigger>
-                      <PopoverContent><slot name="actions" :row="row.original" /></PopoverContent>
+                      <PopoverContent class="w-42 p-2"><slot name="actions" :row="row.original" /></PopoverContent>
                     </Popover>
                     
                   </template>

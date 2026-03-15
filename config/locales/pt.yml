@@ -36,6 +36,10 @@ pt:
       actions:
         edit: "Editar"
         search: "Buscar"
+        delete: "Deletar"
+        continue: "Continuar"
+        confirm: "Confirmar"
+        cancel: "Cancelar"
       table:
         pagination:
           rows_per_page: "Linhas por página"
@@ -50,6 +54,7 @@ pt:
       manager: "Manager"
       client: "Client"
       content_manager: "Content Manager"
+    no_role: "Sem cargo"
     languages:
       en: "English"
       es: "Spanish"
@@ -69,10 +74,14 @@ pt:
             name: "Nome"
             dni: "DNI"
             email: "Email"
+            role: "Cargo"
         actions:
           edit: "Editar Usuário"
           delete: "Deletar Usuário"
+          delete_description: "Tem certeza que deseja deletar o usuário {name}?"
           create: "Criar Usuário"
+          delete_success: "Usuário deletado com sucesso"
+          delete_error: "Erro ao deletar o usuário"
       validations:
         name_required: "O nome é obrigatório"
         dni_required: "O DNI é obrigatório"

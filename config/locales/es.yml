@@ -36,6 +36,10 @@ es:
       actions:
         edit: "Editar"
         search: "Buscar"
+        delete: "Eliminar"
+        continue: "Continuar"
+        confirm: "Confirmar"
+        cancel: "Cancelar"
       table:
         pagination:
           rows_per_page: "Filas por página"
@@ -50,6 +54,7 @@ es:
       manager: "Manager"
       client: "Cliente"
       content_manager: "Gestor de Contenido"
+    no_role: "Sin rol"
     languages:
       en: "Inglés"
       es: "Español"
@@ -84,10 +89,14 @@ es:
             name: "Nombre"
             dni: "DNI"
             email: "Email"
+            role: "Rol"
         actions:
           edit: "Editar Usuario"
           delete: "Eliminar Usuario"
+          delete_description: "¿Estás seguro de querer eliminar a {name}?"
           create: "Crear Usuario"
+          delete_success: "Usuario eliminado correctamente"
+          delete_error: "Error al eliminar el usuario"
       new:
         title: "Nuevo Usuario"
         description: "Crea un nuevo usuario para tu organización"

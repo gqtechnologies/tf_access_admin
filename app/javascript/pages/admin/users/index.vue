@@ -26,6 +26,15 @@
           {{ t('common.actions.edit') }}
           </span>
         </ListItem>
+        <ListItem as="confirm" :onClick="() => deleteUser(row.id as number)"
+          :confirmTitle="t('users.index.actions.delete')"
+          :confirmDescription="t('users.index.actions.delete_description', { name: row.name })"
+          >
+          <span class="flex items-center gap-2">
+            <TrashIcon class="w-4 h-4" />
+          {{ t('common.actions.delete') }}
+          </span>
+        </ListItem>
       </template>
       <template v-if="paginationMeta" #footer>
         <DataTablePagination :current-page="currentPage" :total-pages="totalPages" :total-items="totalItems"
@@ -45,9 +54,9 @@ import { useTable } from "@/lib/composables/useTable"
 import { useI18n } from "vue-i18n"
 import type { ColumnDef } from "@/types/table"
 import { Button } from "@/components/ui/button"
-import { PlusIcon, SearchIcon, PencilIcon } from "lucide-vue-next"
+import { PlusIcon, SearchIcon, PencilIcon, TrashIcon } from "lucide-vue-next"
 import { Input } from "@/components/ui/input"
-import { new_admin_user_path } from "@/routes"
+import { new_admin_user_path, admin_user_path } from "@/routes"
 import ListItem from "@/components/custom/list/ListItem.vue"
 import { User } from "@/types/user"
 import { toast } from "vue-sonner"
@@ -113,5 +122,17 @@ const columns: ColumnDef<User, any>[] = [
   { accessorKey: "name", header: () => t("users.index.table.headers.name") },
   { accessorKey: "dni", header: () => t("users.index.table.headers.dni") },
   { accessorKey: "email", header: () => t("users.index.table.headers.email") },
+  { accessorKey: "role", header: () => t("users.index.table.headers.role"), cell: ({ getValue }) => h("span", getValue() ? t(`roles.${getValue()}`) : t('no_role')) },
 ]
+
+const deleteUser = (id: number) => {
+  router.delete( admin_user_path(id), {
+    onSuccess: () => {
+      toast.success(t('users.index.actions.delete_success'))
+    },
+    onError: () => {
+      toast.error(t('users.index.actions.delete_error'))
+    }
+  })
+}
 </script>
