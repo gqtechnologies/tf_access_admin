@@ -1,10 +1,10 @@
 <template>
     <div>
+        <Header :itemsBreadcrumb="itemsBreadcrumb" :title="t('admin.users.new.title')" />
         <Form
             ref="formRef"
-            :title="t('users.new.title')"
-            :description="t('users.new.description')"
-            :submitLabel="t('users.new.submit')"
+            :description="t('admin.users.new.description')"
+            :submitLabel="t('admin.users.new.submit')"
             :roles="props.roles"
             :languages="props.languages"
             :server-errors="props.errors"
@@ -19,7 +19,9 @@ import Form from '@/components/admin/user/Form.vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import type { UserSchema } from '@/lib/schemas/user'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { getUsersBreadcrumbs } from '@/lib/breadcrumbs/user'
+import Header from '@/components/admin/layout/Header.vue'
 
 const { t } = useI18n()
 
@@ -30,7 +32,7 @@ const props = defineProps<{
 }>();
 
 const formRef = ref<InstanceType<typeof Form> | null>(null)
-
+const itemsBreadcrumb = computed(() => getUsersBreadcrumbs(t))
 function onSubmit(data: UserSchema) {
     router.post('/admin/users', {
         user: {
@@ -45,9 +47,9 @@ function onSubmit(data: UserSchema) {
     }, {
         preserveScroll: true,
         preserveState: true,
-        onSuccess: () => toast.success(t('users.created_successfully')),
+        onSuccess: () => toast.success(t('admin.users.created_successfully')),
         onError: (errors: any) => {
-            toast.error(t('users.creation_failed'))
+            toast.error(t('admin.users.creation_failed'))
             if (errors && Object.keys(errors).length > 0) {
                 formRef.value?.applyServerErrors(errors)
             }

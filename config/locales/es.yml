@@ -59,93 +59,108 @@ es:
       en: "Inglés"
       es: "Español"
       pt: "Portugués"
-    users:
-      created_successfully: "Usuario creado correctamente"
-      creation_failed: "Error al crear el usuario"
-      updated_successfully: "Usuario actualizado correctamente"
-      update_failed: "Error al actualizar el usuario"
-      not_found: "Usuario no encontrado"
-      validations:
-        name_required: "El nombre es obligatorio"
-        dni_required: "El DNI es obligatorio"
-        email_invalid: "Dirección de email no válida"
-        password_min: "La contraseña debe tener al menos 8 caracteres"
-        password_confirmation_min: "La confirmación debe tener al menos 8 caracteres"
-        password_mismatch: "Las contraseñas no coinciden"
-        role_required: "El rol es obligatorio"
-        language_required: "El idioma es obligatorio"
-        password_lowercase: "Debe incluir al menos 1 letra minúscula"
-        password_uppercase: "Debe incluir al menos 1 letra mayúscula"
-        password_symbol: "Debe incluir al menos 1 símbolo: $ % {'@'} . - _"
-        email_taken: "El email ya ha sido tomado"
-        language_invalid: "Idioma no válido"
-        role_invalid: "Rol no válido"
-      index:
-        title: "Usuarios"
-        description: "Lista de usuarios"
-        table:
-          headers:
-            id: "ID"
-            name: "Nombre"
-            dni: "DNI"
-            email: "Email"
-            role: "Rol"
-        actions:
-          edit: "Editar Usuario"
-          delete: "Eliminar Usuario"
-          delete_description: "¿Estás seguro de querer eliminar a {name}?"
-          create: "Crear Usuario"
-          delete_success: "Usuario eliminado correctamente"
-          delete_error: "Error al eliminar el usuario"
-      new:
-        title: "Nuevo Usuario"
-        description: "Crea un nuevo usuario para tu organización"
-        submit: "Crear Usuario"
-      input:
-        role:
-          placeholder: "Selecciona un rol"
-          label: "Rol"
-        name:
-          placeholder: "Ingresa tu nombre"
-          label: "Nombre"
-        email:
-          placeholder: "Ingresa tu email"
-          label: "Email"
-        dni:
-          placeholder: "Ingresa tu DNI"
-          label: "DNI"
-        language:
-          placeholder: "Selecciona tu idioma"
-          label: "Idioma"
-        password:
-          placeholder: "Ingresa tu contraseña"
-          label: "Contraseña"
-        password_confirmation:
-          placeholder: "Confirma tu contraseña"
-          label: "Contraseña Confirmación"
-        submit:
-          label: "Crear Usuario"
-      edit:
-        title: "Editar Usuario"
-        description: "Editar un usuario para tu organización"
-        submit: "Actualizar Usuario"
-    organizations:
-      show:
-        title: "Organización"
-    sidebar:
-      home: "Inicio"
-      users: "Usuarios"
-      organizations: "Organizaciones"
-      settings: "Configuración"
-      footer:
-        title: "Mi Cuenta"
-        logout: "Cerrar Sesión"
-        profile: "Perfil"
-        logout_success: "Cerrada sesión correctamente"
-        logout_error: "Error al cerrar sesión"
     not_found:
       title: "404 - Página no encontrada"
       description: "La página que estás buscando no existe."
       need_help: "¿Necesitas ayuda?"
       contact_support: "Contactar soporte"
       go_to_home: "Ir a la página de inicio"
+    admin:
+      home:
+        title: "Inicio"
+      users:
+        title: "Usuarios"
+        created_successfully: "Usuario creado correctamente"
+        creation_failed: "Error al crear el usuario"
+        updated_successfully: "Usuario actualizado correctamente"
+        update_failed: "Error al actualizar el usuario"
+        not_found: "Usuario no encontrado"
+        validations:
+          name_required: "El nombre es obligatorio"
+          dni_required: "El DNI es obligatorio"
+          email_invalid: "Dirección de email no válida"
+          password_min: "La contraseña debe tener al menos 8 caracteres"
+          password_confirmation_min: "La confirmación debe tener al menos 8 caracteres"
+          password_mismatch: "Las contraseñas no coinciden"
+          role_required: "El rol es obligatorio"
+          language_required: "El idioma es obligatorio"
+          password_lowercase: "Debe incluir al menos 1 letra minúscula"
+          password_uppercase: "Debe incluir al menos 1 letra mayúscula"
+          password_symbol: "Debe incluir al menos 1 símbolo: $ % {'@'} . - _"
+          email_taken: "El email ya ha sido tomado"
+          language_invalid: "Idioma no válido"
+          role_invalid: "Rol no válido"
+        index:
+          title: "Usuarios"
+          input:
+            search:
+              placeholder: "Buscar usuario"
+          description: "Lista de usuarios"
+          table:
+            headers:
+              id: "ID"
+              name: "Nombre"
+              dni: "DNI"
+              email: "Email"
+              role: "Rol"
+          actions:
+            edit: "Editar Usuario"
+            delete: "Eliminar Usuario"
+            delete_description: "¿Estás seguro de querer eliminar a {name}?"
+            create: "Crear Usuario"
+            delete_success: "Usuario eliminado correctamente"
+            delete_error: "Error al eliminar el usuario"
+        new:
+          title: "Nuevo Usuario"
+          description: "Crea un nuevo usuario para tu organización"
+          submit: "Crear Usuario"
+        input:
+          role:
+            placeholder: "Selecciona un rol"
+            label: "Rol"
+          name:
+            placeholder: "Ingresa tu nombre"
+            label: "Nombre"
+          email:
+            placeholder: "Ingresa tu email"
+            label: "Email"
+          dni:
+            placeholder: "Ingresa tu DNI"
+            label: "DNI"
+          language:
+            placeholder: "Selecciona tu idioma"
+            label: "Idioma"
+          password:
+            placeholder: "Ingresa tu contraseña"
+            label: "Contraseña"
+          password_confirmation:
+            placeholder: "Confirma tu contraseña"
+            label: "Contraseña Confirmación"
+          submit:
+            label: "Crear Usuario"
+        edit:
+          title: "Editar Usuario"
+          description: "Editar un usuario para tu organización"
+          submit: "Actualizar Usuario"
+      organizations:
+        show:
+          title: "Organización"
+      sidebar:
+        home: "Inicio"
+        users: "Usuarios"
+        organizations: "Organizaciones"
+        settings: "Configuración"
+        footer:
+          title: "Mi Cuenta"
+          logout: "Cerrar Sesión"
+          profile: "Perfil"
+          logout_success: "Cerrada sesión correctamente"
+          logout_error: "Error al cerrar sesión"
+      profile:
+        title: "Perfil"
+        updated_successfully: "Perfil actualizado correctamente"
+        update_failed: "Error al actualizar el perfil"
+        edit:
+          title: "Editar Perfil"
+          description: "Editar tu perfil"
+          submit: "Actualizar Perfil"

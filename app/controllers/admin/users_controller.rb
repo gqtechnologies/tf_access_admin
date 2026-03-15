@@ -76,9 +76,9 @@ class Admin::UsersController < AdminController
     end
 
     def get_user
-        @user = User.find_by(id: params[:id])
+        @user = User.find(params[:id])
         if @user.blank?
-            redirect_to admin_users_path, inertia: { errors: [I18n.t("frontend.users.not_found")]  }
+            redirect_to admin_users_path, inertia: { errors: [I18n.t("frontend.admin.users.not_found")]  }
             return
         end
     end
@@ -89,7 +89,7 @@ class Admin::UsersController < AdminController
             if AvailableRoles::ALL.include?(role)
                 @user.add_role(role, @user.organization)
             else
-                @user.errors.add(:role, "users.validations.role_invalid")
+                @user.errors.add(:role, "admin.users.validations.role_invalid")
                 @validation_errors = true
             end
         end

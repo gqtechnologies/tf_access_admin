@@ -47,11 +47,11 @@ function onUpdateValue(v: unknown) {
     @update:model-value="onUpdateValue"
   >
     <SelectTrigger :id="props.id" class="w-[180px]" v-bind="triggerAttrs">
-      <SelectValue :placeholder="t('users.input.role.placeholder')" />
+      <SelectValue :placeholder="t('admin.users.input.role.placeholder')" />
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
-        <SelectLabel>{{ t('users.input.role.label') }}</SelectLabel>
+        <SelectLabel>{{ t('admin.users.input.role.label') }}</SelectLabel>
         <SelectItem v-for="role in roles" :key="role" :value="role">
           {{ t(`roles.${role}`) }}
         </SelectItem>

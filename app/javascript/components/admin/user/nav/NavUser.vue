@@ -14,17 +14,19 @@
                                 {{ user?.email }}
                             </span>
                         </div>
-                        <DotsVertical class="ml-auto size-4" />
+                        <EllipsisVerticalIcon class="ml-auto size-4" />
                     </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="right" align="end" :sideOffset="4" class="min-w-56">
-                    <DropdownMenuLabel>{{ t('sidebar.footer.title') }}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{{ t('admin.sidebar.footer.title') }}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem class="cursor-pointer">
-                        <UserIcon /> {{ t('sidebar.footer.profile') }}
+                        <Link :href="edit_admin_profile_path(user.id!)" class="w-full flex items-center gap-2">
+                            <UserIcon /> {{ t('admin.sidebar.footer.profile') }}
+                        </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem class="cursor-pointer" @click="handleLogout">
-                        <LogOut /> {{ t('sidebar.footer.logout') }}
+                        <LogOut /> {{ t('admin.sidebar.footer.logout') }}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -43,13 +45,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { LogOut, User as UserIcon } from 'lucide-vue-next'
+import { LogOut, User as UserIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
 import { User } from '@/types/user'
 import { getUserFallback } from '@/lib/user'
 import { useI18n } from 'vue-i18n'
 import { router } from '@inertiajs/vue3'
 import { toast } from "vue-sonner"
 import { user_session_path, destroy_user_session_path } from '@/routes'
+import { Link } from '@inertiajs/vue3'
+import { edit_admin_profile_path } from '@/routes'
 const { user } = defineProps<{
     user: User
 }>()
@@ -61,7 +65,7 @@ const handleLogout = () => {
             router.visit(user_session_path())
         },
         onError: () => {
-            toast.error(t('sidebar.footer.logout_error'))
+            toast.error(t('admin.sidebar.footer.logout_error'))
         }
     })
 }

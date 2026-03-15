@@ -1,25 +1,25 @@
 import { z } from 'zod'
 
 export const userValidationKeys = {
-  name_required: 'users.validations.name_required',
-  dni_required: 'users.validations.dni_required',
-  email_invalid: 'users.validations.email_invalid',
-  password_min: 'users.validations.password_min',
-  password_confirmation_min: 'users.validations.password_confirmation_min',
-  password_mismatch: 'users.validations.password_mismatch',
-  role_required: 'users.validations.role_required',
-  language_required: 'users.validations.language_required',
-  password_lowercase: 'users.validations.password_lowercase',
-  password_uppercase: 'users.validations.password_uppercase',
-  password_symbol: 'users.validations.password_symbol',
+  name_required: 'admin.users.validations.name_required',
+  dni_required: 'admin.users.validations.dni_required',
+  email_invalid: 'admin.users.validations.email_invalid',
+  password_min: 'admin.users.validations.password_min',
+  password_confirmation_min: 'admin.users.validations.password_confirmation_min',
+  password_mismatch: 'admin.users.validations.password_mismatch',
+  role_required: 'admin.users.validations.role_required',
+  language_required: 'admin.users.validations.language_required',
+  password_lowercase: 'admin.users.validations.password_lowercase',
+  password_uppercase: 'admin.users.validations.password_uppercase',
+  password_symbol: 'admin.users.validations.password_symbol',
 } as const
 
-const passwordSchema = z.string().min(8, userValidationKeys.password_min)
+export const passwordSchema = z.string().min(8, userValidationKeys.password_min)
 .regex(/[a-z]/, { message: userValidationKeys.password_lowercase })
 .regex(/[A-Z]/, { message: userValidationKeys.password_uppercase })
 .regex(/[$%@.\-_]/, { message: userValidationKeys.password_symbol });
 
-const passwordConfirmationSchema = z.string().min(8, userValidationKeys.password_confirmation_min);
+export const passwordConfirmationSchema = z.string().min(8, userValidationKeys.password_confirmation_min);
 
 const userBaseSchema = z.object({
   name: z.string().min(1, userValidationKeys.name_required),

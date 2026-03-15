@@ -59,96 +59,111 @@ en:
       en: "English"
       es: "Spanish"
       pt: "Portuguese"
-    users:
-      created_successfully: "User created successfully"
-      creation_failed: "Failed to create user"
-      updated_successfully: "User updated successfully"
-      update_failed: "Failed to update user"
-      not_found: "User not found"
-      validations:
-        name_required: "Name is required"
-        dni_required: "DNI is required"
-        email_invalid: "Invalid email address"
-        password_min: "Password must be at least 8 characters"
-        password_confirmation_min: "Password confirmation must be at least 8 characters"
-        password_mismatch: "Passwords do not match"
-        role_required: "Role is required"
-        language_required: "Language is required"
-        password_lowercase: "Must include at least 1 lowercase letter"
-        password_uppercase: "Must include at least 1 uppercase letter"
-        password_symbol: "Must include at least 1 symbol: $ % {'@'} . - _"
-        email_taken: "Email has already been taken"
-        language_invalid: "Invalid language"
-        role_invalid: "Invalid role"
-      index:
-        title: "Users"
-        description: "List of users"
-        table:
-          headers:
-            id: "ID"
-            name: "Name"
-            dni: "DNI"
-            email: "Email"
-            role: "Role"
-        actions:
-          edit: "Edit User"
-          delete: "Delete User"
-          delete_description: "Are you sure you want to delete {name}?"
-          create: "Create User"
-          delete_success: "User deleted successfully"
-          delete_error: "Failed to delete user"
-      new:
-        title: "New User"
-        description: "Create a new user for your organization"
-        submit: "Create User"
-      edit:
-        title: "Edit User"
-        description: "Edit a user for your organization"
-        submit: "Update User"
-      input:
-        role:
-          placeholder: "Select a role"
-          label: "Role"
-        name:
-          placeholder: "Enter your name"
-          label: "Name"
-        email:
-          placeholder: "Enter your email"
-          label: "Email"
-        dni:
-          placeholder: "Enter your DNI"
-          label: "DNI"
-        language:
-          placeholder: "Select your language"
-          label: "Language"
-        password:
-          placeholder: "Enter your password"
-          label: "Password"
-        password_confirmation:
-          placeholder: "Confirm your password"
-          label: "Password Confirmation"
-        submit:
-          label: "Create User"
-    sidebar:
-      home: "Home"
-      users: "Users"
-      organizations: "Organizations"
-      settings: "Settings"
-      footer:
-        title: My Account
-        logout: Log out
-        profile: Profile
-        logout_success: "Logged out successfully"
-        logout_error: "Failed to log out"
-    organizations:
-      show:
-        title: "Organization"
+    home:
+      title: "Welcome to our site"
+      description: "We are glad to have you here"
     not_found:
       title: "404 - Page not found"
       description: "The page you're looking for doesn't exist."
       need_help: "Need help?"
       contact_support: "Contact support"
       go_to_home: "Go to home"
-    home:
-      title: "Welcome to our site"
-      description: "We are glad to have you here"
+    admin:
+      home:
+        title: "Home"
+      users:
+        title: "Users"
+        created_successfully: "User created successfully"
+        creation_failed: "Failed to create user"
+        updated_successfully: "User updated successfully"
+        update_failed: "Failed to update user"
+        not_found: "User not found"
+        validations:
+          name_required: "Name is required"
+          dni_required: "DNI is required"
+          email_invalid: "Invalid email address"
+          password_min: "Password must be at least 8 characters"
+          password_confirmation_min: "Password confirmation must be at least 8 characters"
+          password_mismatch: "Passwords do not match"
+          role_required: "Role is required"
+          language_required: "Language is required"
+          password_lowercase: "Must include at least 1 lowercase letter"
+          password_uppercase: "Must include at least 1 uppercase letter"
+          password_symbol: "Must include at least 1 symbol: $ % {'@'} . - _"
+          email_taken: "Email has already been taken"
+          language_invalid: "Invalid language"
+          role_invalid: "Invalid role"
+        index:
+          title: "Users"
+          description: "List of users"
+          table:
+            headers:
+              id: "ID"
+              name: "Name"
+              dni: "DNI"
+              email: "Email"
+              role: "Role"
+          actions:
+            edit: "Edit User"
+            delete: "Delete User"
+            delete_description: "Are you sure you want to delete {name}?"
+            create: "Create User"
+            delete_success: "User deleted successfully"
+            delete_error: "Failed to delete user"
+          input:
+            search:
+              placeholder: "Search user"
+        new:
+          title: "New User"
+          description: "Create a new user for your organization"
+          submit: "Create User"
+        edit:
+          title: "Edit User"
+          description: "Edit a user for your organization"
+          submit: "Update User"
+        input:
+          role:
+            placeholder: "Select a role"
+            label: "Role"
+          name:
+            placeholder: "Enter your name"
+            label: "Name"
+          email:
+            placeholder: "Enter your email"
+            label: "Email"
+          dni:
+            placeholder: "Enter your DNI"
+            label: "DNI"
+          language:
+            placeholder: "Select your language"
+            label: "Language"
+          password:
+            placeholder: "Enter your password"
+            label: "Password"
+          password_confirmation:
+            placeholder: "Confirm your password"
+            label: "Password Confirmation"
+          submit:
+            label: "Create User"
+      sidebar:
+        home: "Home"
+        users: "Users"
+        organizations: "Organizations"
+        settings: "Settings"
+        footer:
+          title: My Account
+          logout: Log out
+          profile: Profile
+          logout_success: "Logged out successfully"
+          logout_error: "Failed to log out"
+      organizations:
+        show:
+          title: "Organization"
+      profile:
+        title: "Profile"
+        updated_successfully: "Profile updated successfully"
+        update_failed: "Failed to update profile"
+        edit:
+          title: "Edit Profile"
+          description: "Edit your profile"
+          submit: "Update Profile"

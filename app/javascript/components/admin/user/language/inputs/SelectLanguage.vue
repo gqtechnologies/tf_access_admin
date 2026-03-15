@@ -47,11 +47,11 @@ function onUpdateValue(v: unknown) {
     @update:model-value="onUpdateValue"
   >
     <SelectTrigger :id="props.id" class="w-[180px]" v-bind="triggerAttrs">
-      <SelectValue :placeholder="t('users.input.language.placeholder')" />
+      <SelectValue :placeholder="t('admin.users.input.language.placeholder')" />
     </SelectTrigger>
     <SelectContent>
       <SelectGroup>
-        <SelectLabel>{{ t('users.input.language.label') }}</SelectLabel>
+        <SelectLabel>{{ t('admin.users.input.language.label') }}</SelectLabel>
         <SelectItem v-for="language in languages" :key="language" :value="language">
           {{ t(`languages.${language}`) }}
         </SelectItem>

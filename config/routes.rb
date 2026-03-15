@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   get "admin/home/index"
   namespace :admin do
     resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
+    resources :profile, only: [:edit, :update]
     match "*path", to: "errors#not_found", via: :all
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

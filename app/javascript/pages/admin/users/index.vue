@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h1 class="mb-4 text-2xl font-semibold">{{ t('users.index.title') }}</h1>
+    <Header :itemsBreadcrumb="itemsBreadcrumb" :title="t('admin.users.index.title')" />
     <AdminDataTable :columns="columns" :data="users">
       <template #actions-table>
         <div class="w-full flex items-center justify-between gap-2">
           <div class="w-full md:w-1/2 flex gap-2">
-            <Input type="search" placeholder="Buscar usuario" v-model="search" 
+            <Input type="search" :placeholder="t('admin.users.index.input.search.placeholder')" v-model="search" 
             @search="onSearchClear"/>
             <Button variant="outline" @click="triggerSearch">
               <SearchIcon class="w-4 h-4" />
@@ -15,7 +15,7 @@
           <Link :href="new_admin_user_path()">
             <Button>
               <PlusIcon class="w-4 h-4" />
-              {{ t('users.index.actions.create') }}
+              {{ t('admin.users.index.actions.create') }}
             </Button>
           </Link>
         </div>
@@ -28,8 +28,8 @@
           </span>
         </ListItem>
         <ListItem as="confirm" :onClick="() => deleteUser(row.id as number)"
-          :confirmTitle="t('users.index.actions.delete')"
-          :confirmDescription="t('users.index.actions.delete_description', { name: row.name })"
+          :confirmTitle="t('admin.users.index.actions.delete')"
+          :confirmDescription="t('admin.users.index.actions.delete_description', { name: row.name })"
           >
           <span class="flex items-center gap-2">
             <TrashIcon class="w-4 h-4" />
@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, watch, onMounted } from "vue"
+import { h, watch, onMounted, computed } from "vue"
 import { Link, router } from "@inertiajs/vue3"
 import AdminDataTable from "@/components/admin/table/index.vue"
 import DataTablePagination from "@/components/admin/table/DataTablePagination.vue"
@@ -59,9 +59,10 @@ import { PlusIcon, SearchIcon, PencilIcon, TrashIcon } from "lucide-vue-next"
 import { Input } from "@/components/ui/input"
 import { new_admin_user_path, admin_user_path } from "@/routes"
 import ListItem from "@/components/custom/list/ListItem.vue"
+import Header from '@/components/admin/layout/Header.vue'
 import { User } from "@/types/user"
 import { toast } from "vue-sonner"
-
+import { getUsersBreadcrumbs } from '@/lib/breadcrumbs/user'
 const { t } = useI18n()
 
 const props = defineProps<{
@@ -80,6 +81,7 @@ const fetchData = (search: string, page: number, itemsPerPage: number) => {
     q: { name_or_email_or_dni_cont: search } }, { preserveState: true })
 }
 
+const itemsBreadcrumb = computed(() => getUsersBreadcrumbs(t))
 const {
   currentPage,
   totalPages,
@@ -117,22 +119,22 @@ onMounted(() => {
 const columns: ColumnDef<User, any>[] = [
   {
     accessorKey: "id",
-    header: () => h('span', { class: 'block text-center' }, t("users.index.table.headers.id")),
+    header: () => h('span', { class: 'block text-center' }, t("admin.users.index.table.headers.id")),
     cell: ({ getValue }) => h("span", { class: "block text-center" }, getValue())
   },
-  { accessorKey: "name", header: () => t("users.index.table.headers.name") },
-  { accessorKey: "dni", header: () => t("users.index.table.headers.dni") },
-  { accessorKey: "email", header: () => t("users.index.table.headers.email") },
-  { accessorKey: "role", header: () => t("users.index.table.headers.role"), cell: ({ getValue }) => h("span", getValue() ? t(`roles.${getValue()}`) : t('no_role')) },
+  { accessorKey: "name", header: () => t("admin.users.index.table.headers.name") },
+  { accessorKey: "dni", header: () => t("admin.users.index.table.headers.dni") },
+  { accessorKey: "email", header: () => t("admin.users.index.table.headers.email") },
+  { accessorKey: "role", header: () => t("admin.users.index.table.headers.role"), cell: ({ getValue }) => h("span", getValue() ? t(`roles.${getValue()}`) : t('no_role')) },
 ]
 
 const deleteUser = (id: number) => {
   router.delete( admin_user_path(id), {
     onSuccess: () => {
-      toast.success(t('users.index.actions.delete_success'))
+      toast.success(t('admin.users.index.actions.delete_success'))
     },
     onError: () => {
-      toast.error(t('users.index.actions.delete_error'))
+      toast.error(t('admin.users.index.actions.delete_error'))
     }
   })
 }

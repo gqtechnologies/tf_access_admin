@@ -52,6 +52,13 @@ class ApplicationPolicy
     record.organization_id == user.organization_id
   end
 
+  def same_user?
+    return false unless user.present?
+    return false unless record.respond_to?(:id) 
+    return false unless user.respond_to?(:id)
+    record.id == user.id
+  end
+
   class Scope
     def initialize(user, scope)
       raise Pundit::NotAuthorizedError, "User must be logged in" unless user

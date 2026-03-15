@@ -32,7 +32,7 @@
                         </Field>
                     </VeeField>
                 </FieldGroup>
-                <FieldGroup class="mt-4 md:pr-2 flex w-full md:w-1/2 flex-col md:flex-row">
+                <FieldGroup class="mt-4 md:pr-2 flex w-full flex-col md:flex-row">
                     <VeeField v-slot="{ field, errors }" name="dni">
                         <Field :data-invalid="!!errors.length">
                             <FieldLabel for="form-user-dni">
@@ -41,17 +41,6 @@
                             <Input id="form-user-dni" v-bind="field"
                                 :placeholder="t('admin.users.input.dni.placeholder')" autocomplete="off"
                                 :aria-invalid="!!errors.length" />
-                            <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
-                        </Field>
-                    </VeeField>
-                </FieldGroup>
-                <FieldGroup class="mt-4 flex flex-col md:flex-row">
-                    <VeeField v-slot="{ field, errors }" name="role">
-                        <Field :data-invalid="!!errors.length">
-                            <FieldLabel for="form-user-role">
-                                {{ t('admin.users.input.role.label') }}
-                            </FieldLabel>
-                            <SelectRol id="form-user-role" :roles="props.roles" v-bind="field" :aria-invalid="!!errors.length"/>
                             <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
                         </Field>
                     </VeeField>
@@ -94,7 +83,7 @@
         </CardContent>
         <CardFooter>
             <Field orientation="horizontal" class="md:flex md:justify-end flex-col md:flex-row">
-                <Button type="button" as="a" :href="admin_users_path()" variant="outline" class="w-full md:w-auto">
+                <Button type="button" as="a" :href="admin_home_index_path()" variant="outline" class="w-full md:w-auto">
                     {{ props.cancelLabel || t('common.cancel') }}
                 </Button>
                 <Button type="submit" form="form-user" class="w-full md:w-auto">
@@ -126,35 +115,33 @@ import {
     FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import SelectRol from '@/components/admin/user/roles/inputs/SelectRol.vue';
 import SelectLanguage from '@/components/admin/user/language/inputs/SelectLanguage.vue';
-import { UserSchema, UserEditSchema, userEditSchema, userSchema } from '@/lib/schemas/user';
+import { profileEditSchema } from '@/lib/schemas/profile';
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors';
 import type { InertiaErrors } from '@/types/globals';
-import { admin_users_path } from "@/routes"
+import { admin_home_index_path } from "@/routes"
 import { User } from '@/types/user';
+import { ProfileEditSchema } from '@/lib/schemas/profile';
 
 
 const props = defineProps<{
     description: string;
     submitLabel: string;
-    roles: string[];
     languages: string[];
     title?: string;
     cancelLabel?: string;
     defaultValues?: User;
     serverErrors?: Record<string, string[]>;
-    editMode?: boolean;
 }>();
 
 const emit = defineEmits<{
-    (e: 'submit', data: UserSchema | UserEditSchema): void
+    (e: 'submit', data: ProfileEditSchema): void
 }>();
 
 const { t } = useI18n();
 
 const { translateErrors, mapServerErrorsToForm } = useTranslateErrors();
-const formSchema = toTypedSchema( props.editMode ? userEditSchema : userSchema);
+const formSchema = toTypedSchema( profileEditSchema);
 
 const { handleSubmit, setErrors, setValues } = useForm({
     validationSchema: formSchema,
@@ -164,7 +151,6 @@ const { handleSubmit, setErrors, setValues } = useForm({
         email: '',
         password: '',
         password_confirmation: '',
-        role: '',
         language: '',
     },
 })
@@ -186,7 +172,7 @@ function applyServerErrors( errors: InertiaErrors ) {
 }
 
 const onSubmit = handleSubmit((data) => {
-    emit('submit', data as UserSchema)
+    emit('submit', data as ProfileEditSchema)
 })
 
 defineExpose<{

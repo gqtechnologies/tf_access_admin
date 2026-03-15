@@ -12,7 +12,7 @@ class User < ApplicationRecord
   validates :name, presence: true
   validates :dni, presence: true
   validates :language, presence: true, inclusion: { in: Languages::ALL }
-  validates :email, uniqueness: { message: "users.validations.email_taken" }
+  validates :email, uniqueness: { message: "admin.users.validations.email_taken" }
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
