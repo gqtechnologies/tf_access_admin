@@ -18,7 +18,7 @@ import {
 import { Home, GalleryVerticalEnd, Users } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import { admin_home_index_path, admin_users_path } from "@/routes"
-
+import NavUser from '@/components/admin/user/nav/NavUser.vue'
 </script>
 
 <template>
@@ -64,7 +64,9 @@ import { admin_home_index_path, admin_users_path } from "@/routes"
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
     <SidebarInset>
