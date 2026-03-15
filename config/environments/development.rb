@@ -78,5 +78,7 @@ Rails.application.configure do
 
   # Automatically update js-routes file
   # when routes.rb is changed
+  config.consider_all_requests_local = false
+  
   config.middleware.use(JsRoutes::Middleware)
 end

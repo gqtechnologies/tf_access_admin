@@ -138,3 +138,8 @@ pt:
         profile: "Profile"
         logout_success: "Sessão encerrada com sucesso"
         logout_error: "Erro ao encerrar sessão"
+    not_found:
+      title: "404 - Página não encontrada"
+      description: "A página que você está buscando não existe."
+      need_help: "Precisa de ajuda?"
+      contact_support: "Contatar suporte"
