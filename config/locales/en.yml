@@ -129,6 +129,15 @@ en:
           label: "Password Confirmation"
         submit:
           label: "Create User"
+    sidebar:
+      home: "Home"
+      users: "Users"
+      organizations: "Organizations"
+      settings: "Settings"
+      footer:
+        title: My Account
+        logout: Log out
+        profile: Profile
     organizations:
       show:
         title: "Organization"

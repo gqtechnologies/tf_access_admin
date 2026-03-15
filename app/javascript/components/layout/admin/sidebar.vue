@@ -19,6 +19,10 @@ import { Home, GalleryVerticalEnd, Users } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import { admin_home_index_path, admin_users_path } from "@/routes"
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
+import { User } from '@/types/user'
+const {user} = defineProps<{
+  user: User
+}>()
 </script>
 
 <template>
@@ -65,7 +69,7 @@ import NavUser from '@/components/admin/user/nav/NavUser.vue'
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <NavUser :user="user" />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

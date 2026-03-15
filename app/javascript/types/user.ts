@@ -5,4 +5,5 @@ export type User = {
     email: string
     language: string
     role: string
+    image?: string
 }

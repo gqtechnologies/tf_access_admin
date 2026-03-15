@@ -6,7 +6,7 @@ class AdminController < InertiaController
 
     inertia_share auth: -> {
       if user_signed_in?
-        { user: current_user.as_json(only: [:id, :email, :language]) }
+        { user: current_user.as_json(only: [:id, :email, :language, :name]) }
       else
         {}
       end

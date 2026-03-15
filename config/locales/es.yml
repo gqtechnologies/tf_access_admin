@@ -132,3 +132,12 @@ es:
     organizations:
       show:
         title: "Organización"
+    sidebar:
+      home: "Inicio"
+      users: "Usuarios"
+      organizations: "Organizaciones"
+      settings: "Configuración"
+      footer:
+        title: "Mi Cuenta"
+        logout: "Cerrar Sesión"
+        profile: "Perfil"
