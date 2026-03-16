@@ -69,6 +69,26 @@ en:
       contact_support: "Contact support"
       go_to_home: "Go to home"
     admin:
+      login:
+        title: "Login"
+        description: "Login to your account"
+        submit: "Login"
+        processing: "Logging in..."
+        validation:
+          email:
+            required: "Email is required"
+            email: "Invalid email address"
+          password:
+            required: "Password is required"
+        errors:
+          invalid: "Invalid email or password"
+        input:
+          email:
+            label: "Email"
+            placeholder: "Enter your email"
+          password:
+            label: "Password"
+            placeholder: "Enter your password"
       home:
         title: "Home"
       users:

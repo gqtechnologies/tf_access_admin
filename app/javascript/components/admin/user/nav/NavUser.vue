@@ -14,7 +14,7 @@
                                 {{ user?.email }}
                             </span>
                         </div>
-                        <EllipsisVerticalIcon class="ml-auto size-4" />
+                        <ChevronsUpDownIcon class="ml-auto size-4" />
                     </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="right" align="end" :sideOffset="4" class="min-w-56">
@@ -45,15 +45,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { LogOut, User as UserIcon, EllipsisVerticalIcon } from 'lucide-vue-next'
+import { LogOut, User as UserIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
 import { User } from '@/types/user'
 import { getUserFallback } from '@/lib/user'
 import { useI18n } from 'vue-i18n'
 import { router } from '@inertiajs/vue3'
 import { toast } from "vue-sonner"
-import { user_session_path, destroy_user_session_path } from '@/routes'
+import { user_session_path, destroy_user_session_path, edit_admin_profile_path } from '@/routes'
 import { Link } from '@inertiajs/vue3'
-import { edit_admin_profile_path } from '@/routes'
 const { user } = defineProps<{
     user: User
 }>()

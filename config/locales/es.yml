@@ -66,6 +66,26 @@ es:
       contact_support: "Contactar soporte"
       go_to_home: "Ir a la página de inicio"
     admin:
+      login:
+        errors:
+          invalid: "Email o contraseña inválidos"
+        processing: "Entrando..."
+        title: "Iniciar sesión"
+        description: "Inicia sesión para continuar"
+        submit: "Iniciar sesión"
+        validation:
+          email:
+            required: "Email es requerido"
+            email: "Email no válido"
+          password:
+            required: "Contraseña es requerida"
+        input:
+          email:
+            label: "Email"
+            placeholder: "Ingresa tu email"
+          password:
+            label: "Contraseña"
+            placeholder: "Ingresa tu contraseña"
       home:
         title: "Inicio"
       users:

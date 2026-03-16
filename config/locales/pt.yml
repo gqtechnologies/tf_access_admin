@@ -66,6 +66,26 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     admin:
+      login:
+        errors:
+          invalid: "Email ou senha inválidos"
+        processing: "Entrando..."
+        title: "Login"
+        description: "Login para continuar"
+        submit: "Login"
+        validation:
+          email:
+            required: "Email é obrigatório"
+            email: "Email inválido"
+          password:
+            required: "Senha é obrigatória"
+        input:
+          email:
+            label: "Email"
+            placeholder: "Digite seu email"
+          password:
+            label: "Senha"
+            placeholder: "Digite sua senha"
       home:
         title: "Início"
       users:
