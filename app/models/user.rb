@@ -17,8 +17,9 @@ class User < ApplicationRecord
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable, 
+  # Sin :registerable: el alta de usuarios es vía admin; evita rutas/métodos de sign_up público
+  devise :database_authenticatable,
+         :recoverable, :rememberable, :validatable,
          :confirmable
   def role
     return nil if roles.blank?

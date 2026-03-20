@@ -1,0 +1,22 @@
+<h1  class="title" style=" margin-bottom: 5px !important;"><%= t("mailer.confirmation.title") %></h1>
+<div class="background-p subtitle">
+  <%= @email %>
+</div>
+<div class="section-gap">
+  <%= t("mailer.confirmation.description") %>
+</div>
+
+<div class="section-gap">
+  <%= link_to t("mailer.confirmation.button"),
+    confirmation_url(
+      @resource,
+      confirmation_token: @token,
+      **mailer.tenant_url_options_for(@resource)
+    ),
+    target: "_blank",
+    class: "primary-button"
+    %>
+</div>
+<div class="section-gap">
+  <%= t("mailer.confirmation.no_preview", url: link_to(confirmation_url(@resource, confirmation_token: @token, **mailer.tenant_url_options_for(@resource)), confirmation_url(@resource, confirmation_token: @token, **mailer.tenant_url_options_for(@resource)), target: "_blank")).html_safe %>
+</div>

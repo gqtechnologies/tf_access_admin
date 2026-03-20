@@ -13,11 +13,15 @@ Rails.application.routes.draw do
   #Remove this route
   get "home/index"
   
-  devise_for :users, controllers: {
-    sessions: "users/sessions",
-      passwords: "users/passwords",
-      confirmations: "users/confirmations"
-  }
+  # Solo rutas Devise necesarias: login (Inertia), recuperación de contraseña, confirmación por email.
+  # No exponer registrations (sign up), unlocks ni otros módulos hasta implementarlos.
+  devise_for :users,
+             only: %i[sessions passwords confirmations],
+             controllers: {
+               sessions: "users/sessions",
+               passwords: "users/passwords",
+               confirmations: "users/confirmations"
+             }
   
   get "admin/home/index"
   namespace :admin do
