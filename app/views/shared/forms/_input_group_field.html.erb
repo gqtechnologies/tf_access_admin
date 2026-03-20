@@ -1,0 +1,26 @@
+<% field_type = local_assigns.fetch(:field_type, :text_field) %>
+<% field_options = local_assigns.fetch(:field_options, {}) %>
+<% addon_text = local_assigns[:addon_text] %>
+<% addon_align = local_assigns.fetch(:addon_align, "inline-start") %>
+
+<label class="grid gap-2">
+  <span class="<%= shadcn_field_label_classes %>"><%= label %></span>
+  <div data-slot="input-group" role="group" class="<%= shadcn_input_group_classes %>">
+    <% if addon_text.present? %>
+      <div
+        role="group"
+        data-slot="input-group-addon"
+        data-align="<%= addon_align %>"
+        class="<%= shadcn_input_group_addon_classes(align: addon_align) %>"
+      >
+        <span class="text-muted-foreground flex items-center gap-2 text-sm"><%= addon_text %></span>
+      </div>
+    <% end %>
+
+    <%= form.public_send(
+      field_type,
+      attribute,
+      { class: shadcn_input_group_input_classes, data: { slot: "input-group-control" } }.deep_merge(field_options)
+    ) %>
+  </div>
+</label>

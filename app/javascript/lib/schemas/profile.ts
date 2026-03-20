@@ -8,6 +8,7 @@ const profileBaseSchema = z.object({
   password: passwordSchema,
   password_confirmation: passwordConfirmationSchema,
   language: z.string().min(1, userValidationKeys.language_required),
+  avatar: z.instanceof(File).nullable(),
 });
 
 export const profileEditSchema = profileBaseSchema

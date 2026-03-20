@@ -2,17 +2,11 @@
 import AdminSidebar from '@/components/layout/admin/sidebar.vue'
 import { Toaster } from 'vue-sonner'
 import 'vue-sonner/style.css'
-import { User } from '@/types/user'
-const {auth} = defineProps<{
-    auth: {
-        user: User
-    }
-}>()
 </script>
 
 <template>
     <main>
-        <AdminSidebar :user="auth.user">
+        <AdminSidebar>
             <article>
                 <slot />
             </article>

@@ -28,11 +28,13 @@
 #       enabled: "ON"
 
 es:
-  hello: "Hola mundo"
   frontend:
+    name: "Admin Base"
+    description: "bienvenido nuevamente"
     common:
       cancel: "Cancelar"
       back: "Volver"
+      clear: "Limpiar"
       actions:
         edit: "Editar"
         search: "Buscar"
@@ -86,6 +88,34 @@ es:
           password:
             label: "Contraseña"
             placeholder: "Ingresa tu contraseña"
+      passwords:
+        new:
+          title: "Olvidé mi contraseña"
+          description: "Olvidaste tu contraseña? No hay problema. Solo ingresa tu email y te enviaremos instrucciones para restablecerla."
+          submit: "Enviar instrucciones de restablecimiento"
+          success: "Instrucciones de restablecimiento enviadas correctamente"
+          error: "Error al enviar instrucciones de restablecimiento"
+          not_found: "Email no encontrado"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Ingresa tu email"
+        edit:
+          title: "Editar Contraseña"
+          description: "Ingresa tu nueva contraseña y confírmala para actualizarla."
+          success: "Contraseña actualizada correctamente"
+          error: "Error al actualizar la contraseña"
+          title: "Editar Contraseña"
+          description: "Editar tu contraseña"
+          submit: "Actualizar Contraseña"
+          processing: "Actualizando contraseña..."
+          input:
+            password:
+              label: "Contraseña"
+              placeholder: "Ingresa tu contraseña"
+            password_confirmation:
+              label: "Confirmar Contraseña"
+              placeholder: "Confirma tu contraseña"
       home:
         title: "Inicio"
       users:
@@ -158,6 +188,9 @@ es:
             label: "Contraseña Confirmación"
           submit:
             label: "Crear Usuario"
+          avatar:
+            label: "Avatar"
+            placeholder: "Selecciona tu avatar"
         edit:
           title: "Editar Usuario"
           description: "Editar un usuario para tu organización"
@@ -166,6 +199,7 @@ es:
         show:
           title: "Organización"
       sidebar:
+        platform: "Plataforma"
         home: "Inicio"
         users: "Usuarios"
         organizations: "Organizaciones"
@@ -184,3 +218,21 @@ es:
           title: "Editar Perfil"
           description: "Editar tu perfil"
           submit: "Actualizar Perfil"
+  mailer:
+    verification:
+      title: "Confirma tu dirección de correo electrónico"
+      description: "Para confirmar tu dirección de correo electrónico, haz clic en el siguiente botón."
+      button: "Verifica tu email"
+      no_preview: "Si no puedes hacer clic en el botón, copia y pega el siguiente enlace en tu navegador: %{url}"
+    confirmation:
+      title: "Confirma tu cuenta"
+      description: "Para confirmar tu cuenta, haz clic en el siguiente botón."
+      button: "Confirma tu cuenta"
+      no_preview: "Si no puedes hacer clic en el botón, copia y pega el siguiente enlace en tu navegador: %{url}"
+    reset_password:
+      title: "Restablece tu contraseña"
+      description: "Para restablecer tu contraseña, haz clic en el siguiente botón."
+      button: "Restablecer contraseña"
+      no_preview: "Si no puedes hacer clic en el botón, copia y pega el siguiente enlace en tu navegador: %{url}"
+      ignore: "Si no solicitaste este cambio, ignora este email."
+      password_not_changed: "Tu contraseña no cambiará hasta que accedas al enlace anterior y crees una nueva."

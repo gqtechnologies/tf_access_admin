@@ -1,0 +1,40 @@
+<% content_for :title, t("frontend.admin.passwords.edit.title") %>
+<% content_for :description, t("frontend.admin.passwords.edit.description") %>
+<%= render "layouts/devise" do %>
+
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+    
+    <%= f.hidden_field :reset_password_token %>
+
+    <div class="grid gap-4">
+      <%= render "shared/forms/input_group_field",
+        form: f,
+        attribute: :password,
+        label: t("frontend.admin.passwords.edit.input.password.label"),
+        field_type: :password_field,
+        field_options: {
+          autofocus: true,
+          autocomplete: "new-password",
+          placeholder: t("frontend.admin.passwords.edit.input.password.placeholder")
+        } %>
+    </div>
+    <div class="grid gap-4 mt-4">
+      <%= render "shared/forms/input_group_field",
+        form: f,
+        attribute: :password_confirmation,
+        label: t("frontend.admin.passwords.edit.input.password_confirmation.label"),
+        field_type: :password_field,
+        field_options: {
+          autocomplete: "new-password",
+          placeholder: t("frontend.admin.passwords.edit.input.password_confirmation.placeholder")
+        } %>
+    </div>
+
+    <div class="actions mt-4">
+      <%= f.submit t("frontend.admin.passwords.edit.submit"), class: shadcn_button_classes(variant: :default, size: :default, class_name: "w-full") %>
+    </div>
+    <%= render "users/shared/error_messages", resource: resource %>
+  <% end %>
+
+  <%= render "users/shared/links" %>
+<% end %>

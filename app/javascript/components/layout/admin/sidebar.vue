@@ -19,10 +19,8 @@ import { Home, GalleryVerticalEnd, Users } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import { admin_home_index_path, admin_users_path } from "@/routes"
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
-import { User } from '@/types/user'
-const {user} = defineProps<{
-  user: User
-}>()
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 </script>
 
 <template>
@@ -36,8 +34,8 @@ const {user} = defineProps<{
                 <GalleryVerticalEnd class="size-4" />
               </div>
               <div class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-semibold">Acme Inc</span>
-                <span class="truncate text-xs">Enterprise</span>
+                <span class="truncate font-semibold capitalize">{{ t('name') }}</span>
+                <span class="truncate text-xs capitalize">{{ t('description') }}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -45,14 +43,14 @@ const {user} = defineProps<{
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarGroupLabel>{{ t('admin.sidebar.platform') }}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton as-child>
                   <Link :href="admin_home_index_path()">
                     <Home />
-                    <span>Home</span>
+                    <span>{{ t('admin.sidebar.home') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -60,7 +58,7 @@ const {user} = defineProps<{
                 <SidebarMenuButton as-child>
                   <Link :href="admin_users_path()">
                     <Users />
-                    <span>Users</span>
+                    <span>{{ t('admin.sidebar.users') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -69,7 +67,7 @@ const {user} = defineProps<{
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser :user="user" />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

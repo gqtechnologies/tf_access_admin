@@ -46,6 +46,7 @@ function onSubmit(data: ProfileEditSchema) {
             password: data.password,
             password_confirmation: data.password_confirmation,
             language: data.language,
+            avatar: data.avatar,
         },
     }, {
         preserveScroll: true,

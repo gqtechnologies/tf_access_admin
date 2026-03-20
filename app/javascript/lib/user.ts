@@ -1,5 +1,10 @@
 import { User } from "@/types/user"
 
 export const getUserFallback = (user: User) => {
-    return user.name.charAt(0) + user.name.split(' ').pop()?.charAt(0)
+    return getStringFallback(user.name)
+}
+
+
+export const getStringFallback = (string: string) => {
+    return string.charAt(0) + string.split(' ').pop()?.charAt(0)
 }

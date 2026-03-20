@@ -1,25 +1,26 @@
-# frozen_string_literal: true
+class Admin::UserSerializer < ActiveModel::Serializer
+  attributes :id, :name, :email, :dni, :language, :avatar_path, :avatar_filename, :role, :tenant_role
 
-module Admin
-  class UserSerializer
-    ADMIN_USER_ATTRIBUTES = %i[id name email dni language].freeze
+  def avatar_path
+    return nil unless object.avatar.attached?
 
-    def self.call(user)
-      new(user).as_json
-    end
+    Rails.application.routes.url_helpers.rails_blob_path(
+      object.avatar,
+      only_path: true
+    )
+  end
 
-    def initialize(user)
-      @user = user
-    end
+  def avatar_filename
+    return nil unless object.avatar.attached?
 
-    def as_json(*)
-      @user.slice(*ADMIN_USER_ATTRIBUTES).merge(role: role_name).stringify_keys
-    end
+    object.avatar.filename.to_s
+  end
 
-    private
+  def role
+    object.role
+  end
 
-    def role_name
-      @user.roles.first&.name&.to_s
-    end
+  def tenant_role
+    object.tenant_role
   end
 end

@@ -1,0 +1,16 @@
+<div class="flex justify-center items-center h-screen">
+    <div class="md:w-1/2 h-screen flex justify-center items-center">
+        <div class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm md:w-2/3 h-fit mx-auto p-4">
+            <div class="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6">
+                <div class="leading-none font-semibold"><%= @title || yield(:title) %></div>
+                <div class="text-muted-foreground text-sm"><%= @description || yield(:description) %></div>
+            </div>
+            <div class="px-6">
+                <%= yield %>
+            </div>
+        </div>
+    </div>
+    <div class="w-1/2 hidden md:block md:h-screen bg-gray-100 overflow-hidden">
+        <%= image_tag "admin/portada.png", class: "w-auto h-full object-cover object-center", style: "max-width: none;" %>
+    </div>
+</div>

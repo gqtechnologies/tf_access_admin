@@ -1,12 +1,14 @@
 class Admin::ProfileController < AdminController
 
     before_action :get_user, only: [:edit, :update]
+    after_action :handle_avatar, only: [:update]
     
     def edit
         authorize @user, :edit?, policy_class: Admin::ProfilePolicy
+
         render inertia: "admin/profile/edit", 
         props: {
-            user: Admin::UserSerializer.call(@user),
+            user: Admin::UserSerializer.new(@user).as_json,
             languages: Languages::ALL,
         }
     end
@@ -38,5 +40,13 @@ class Admin::ProfileController < AdminController
 
     def user_params
         params.require(:user).permit(:name, :email, :dni, :password, :password_confirmation, :language)
+    end
+
+    def handle_avatar
+        if @user.avatar.attached? && params[:user][:avatar].blank?
+            @user.avatar.purge
+        elsif params[:user][:avatar].present?
+            @user.avatar.attach(params[:user][:avatar])
+        end
     end
 end

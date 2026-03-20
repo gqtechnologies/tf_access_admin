@@ -7,3 +7,15 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+# organization = Organization.create(name: "abc", subdomain: "abc")
+# ActsAsTenant.current_tenant = organization
+# user = User.create(
+#   email: "admin@admin.com",
+#   password: "123123",
+#   organization: organization,
+#   language: "es",
+#   dni: "1-2",
+#   name: "samu"
+# )
+
+# [user.id, user.persisted?, User.count]

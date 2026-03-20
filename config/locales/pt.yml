@@ -28,11 +28,13 @@
 #       enabled: "ON"
 
 pt:
-  hello: "Olá mundo"
   frontend:
+    name: "Admin Base"
+    description: "bem-vindo de volta"
     common:
       cancel: "Cancelar"
       back: "Voltar"
+      clear: "Limpar"
       actions:
         edit: "Editar"
         search: "Buscar"
@@ -66,6 +68,31 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     admin:
+      passwords:
+        new:
+          title: "Esqueceu sua senha?"
+          description: "Esqueceu sua senha? Não há problema. Basta informar seu email e nós lhe enviaremos instruções para redefinir sua senha."
+          submit: "Enviar instruções de redefinição"
+          success: "Instruções de redefinição enviadas com sucesso"
+          error: "Erro ao enviar instruções de redefinição"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Digite seu email"
+        edit:
+          success: "Senha atualizada com sucesso"
+          error: "Erro ao atualizar a senha"
+          title: "Editar Senha"
+          description: "Editar sua senha"
+          submit: "Atualizar Senha"
+          processing: "Atualizando senha..."
+          input:
+            password:
+              label: "Senha"
+              placeholder: "Digite sua senha"
+            password_confirmation:
+              label: "Confirmar Senha"
+              placeholder: "Confirme sua senha"
       login:
         errors:
           invalid: "Email ou senha inválidos"
@@ -152,6 +179,10 @@ pt:
           password_confirmation:
             placeholder: "Confirm your password"
             label: "Password Confirmation"
+          avatar:
+            label: "Avatar"
+            placeholder: "Selecione seu avatar"
+            remove: "Remover avatar"
           submit: "Create User"
         edit:
           title: "Editar Usuario"
@@ -161,6 +192,7 @@ pt:
         show:
           title: "Organization"
       sidebar:
+        platform: "Plataforma"
         home: "Home"
         users: "Users"
         organizations: "Organizations"
@@ -179,3 +211,21 @@ pt:
           title: "Editar Perfil"
           description: "Editar seu perfil"
           submit: "Atualizar Perfil"
+  mailer:
+    verification:
+      title: "Confirme seu endereço de email"
+      description: "Para confirmar seu endereço de email, clique no botão abaixo."
+      button: "Verificar seu email"
+      no_preview: "Se você não pode clicar no botão, copie e cole o link abaixo em seu navegador: %{url}"
+    confirmation:
+      title: "Confirme sua conta"
+      description: "Para confirmar sua conta, clique no botão abaixo."
+      button: "Confirme sua conta"
+      no_preview: "Se você não pode clicar no botão, copie e cole o link abaixo em seu navegador: %{url}"
+    reset_password:
+      title: "Redefina sua senha"
+      description: "Para redefinir sua senha, clique no botão abaixo."
+      button: "Redefinir senha"
+      no_preview: "Se você não pode clicar no botão, copie e cole o link abaixo em seu navegador: %{url}"
+      ignore: "Se você não solicitou este cambio, ignore este email."
+      password_not_changed: "Sua senha não será alterada até que você acesse o link acima e crie uma nova."

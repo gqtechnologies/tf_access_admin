@@ -31,14 +31,31 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
-  # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.delivery_method = :resend
 
-  # Make template changes take effect immediately.
-  config.action_mailer.perform_caching = false
+  # ## Mailer configuration for development
+  # config.action_mailer.delivery_method = :mailgun
+  # config.action_mailer.mailgun_settings = {
+  #   api_key: Rails.application.credentials.dig(:mailgun, :api_key),
+  #   domain: Rails.application.credentials.dig(:mailgun, :domain)
+  # }
+  # # Host requerido para generar links en templates de mail (ej: link_to con *_url)
+  config.action_mailer.default_url_options = {
+    host: "localhost",
+    port: 5100
+  }
+  # config.action_mailer.raise_delivery_errors = true
 
-  # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+
+  # # Don't care if the mailer can't send.
+  # config.action_mailer.raise_delivery_errors = false
+
+  # # Make template changes take effect immediately.
+  # config.action_mailer.perform_caching = false
+
+  # # Set localhost to be used by links generated in mailer templates.
+  # config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

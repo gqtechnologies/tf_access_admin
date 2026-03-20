@@ -58,6 +58,7 @@ group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
   gem "js-routes"
+  gem 'dotenv-rails'
 end
 
 group :test do
@@ -70,14 +71,28 @@ gem "devise", "~> 5.0"
 
 gem "pundit", "~> 2.5"
 
-gem "rolify"
 
 gem "inertia_rails", "~> 3.17"
 
 gem "vite_rails", "~> 3.0"
 
-gem 'acts_as_tenant'
 
-gem 'kaminari'
-gem 'ransack'
 gem "acts_as_paranoid", "~> 0.11.0"
+gem "sidekiq", "~> 8.1"
+
+gem "rolify", "~> 6.0"
+
+gem "kaminari", "~> 1.2"
+
+gem "acts_as_tenant", "~> 1.0"
+
+gem "ransack", "~> 4.4"
+
+gem "pg", "~> 1.6"
+
+gem "aws-sdk-s3", "~> 1.216", require: false
+
+gem "active_model_serializers", "~> 0.10.16"
+
+gem "mailgun-ruby", "~> 1.4"
+gem 'resend'

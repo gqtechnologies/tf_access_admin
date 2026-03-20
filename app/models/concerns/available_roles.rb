@@ -1,24 +1,41 @@
 module AvailableRoles
-    SUPER_ADMIN = "super_admin".freeze
-    TENANT_ADMIN = "tenant_admin".freeze
-    MANAGER = "manager".freeze
-    CLIENT = "client".freeze
-    CONTENT_MANAGER = "content_manager".freeze
-  
-    GLOBAL = [
-      SUPER_ADMIN
-    ].freeze
-  
-    TENANT = [
-      TENANT_ADMIN,
-      MANAGER,
-      CLIENT,
-      CONTENT_MANAGER
-    ].freeze
-  
-    # RESOURCE = [
-    #     CONTENT_MANAGER
-    # ].freeze
-  
-    ALL = (GLOBAL + TENANT).freeze
+  SUPER_ADMIN = "super_admin".freeze
+  TENANT_ADMIN = "tenant_admin".freeze
+  MANAGER = "manager".freeze
+  CONTENT_MANAGER = "content_manager".freeze
+  CLIENT = "client".freeze
+
+  # Orden de prioridad: el primero es el más importante (rol principal para User#role).
+  TENANT_ROLE_PRIORITY = [
+    TENANT_ADMIN,
+    MANAGER,
+    CONTENT_MANAGER,
+    CLIENT
+  ].freeze
+  ROLE_PRIORITY = ([SUPER_ADMIN] + TENANT_ROLE_PRIORITY ).freeze
+
+  GLOBAL = [
+    SUPER_ADMIN
+  ].freeze
+
+  TENANT = [
+    TENANT_ADMIN,
+    MANAGER,
+    CONTENT_MANAGER,
+    CLIENT
+  ].freeze
+
+  # RESOURCE = [
+  #   CONTENT_MANAGER
+  # ].freeze
+
+  ALL = (GLOBAL + TENANT).freeze
+
+  # Índice de prioridad para un nombre de rol (menor = más importante).
+  # Roles no definidos se consideran de menor prioridad (Float::INFINITY).
+  # scope: :tenant o :global
+  def self.priority_index(role_name, scope = :tenant)
+    idx = scope == :tenant ? TENANT_ROLE_PRIORITY.index(role_name) : ROLE_PRIORITY.index(role_name)
+    idx.nil? ? Float::INFINITY : idx
   end
+end

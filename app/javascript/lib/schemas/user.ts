@@ -12,6 +12,9 @@ export const userValidationKeys = {
   password_lowercase: 'admin.users.validations.password_lowercase',
   password_uppercase: 'admin.users.validations.password_uppercase',
   password_symbol: 'admin.users.validations.password_symbol',
+  reset_password_token_required: 'admin.users.validations.reset_password_token_required',
+  email_required: 'admin.users.validations.email_required',
+  password_required: 'admin.users.validations.password_required',
 } as const
 
 export const passwordSchema = z.string().min(8, userValidationKeys.password_min)

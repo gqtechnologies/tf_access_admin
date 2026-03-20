@@ -5,7 +5,7 @@
                 <DropdownMenuTrigger asChild>
                     <SidebarMenuButton size="lg">
                         <Avatar class="h-8 w-8 rounded-lg">
-                            <AvatarImage v-if="user?.image" :src="user?.image" :alt="user?.name" />
+                            <AvatarImage v-if="user?.avatar_path" :src="user?.avatar_path" :alt="user?.name" />
                             <AvatarFallback class="bg-gray-200 uppercase">{{ getUserFallback(user) }}</AvatarFallback>
                         </Avatar>
                         <div class="grid flex-1 text-left text-sm leading-tight">
@@ -46,16 +46,16 @@ import {
 import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { LogOut, User as UserIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
-import { User } from '@/types/user'
+import type { User } from '@/types/user'
 import { getUserFallback } from '@/lib/user'
 import { useI18n } from 'vue-i18n'
 import { router } from '@inertiajs/vue3'
 import { toast } from "vue-sonner"
 import { user_session_path, destroy_user_session_path, edit_admin_profile_path } from '@/routes'
 import { Link } from '@inertiajs/vue3'
-const { user } = defineProps<{
-    user: User
-}>()
+import {usePage} from '@inertiajs/vue3'
+const page = usePage()
+const user = page.props.auth.user as User
 const { t } = useI18n()
 
 const handleLogout = () => {

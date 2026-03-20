@@ -1,3 +1,5 @@
+require "sidekiq/web"
+
 Rails.application.routes.draw do
 
   # Redirect to localhost from 127.0.0.1 to use same IP address with Vite server
@@ -5,10 +7,16 @@ Rails.application.routes.draw do
     get "(*path)", to: redirect { |params, req| "#{req.protocol}localhost:#{req.port}/#{params[:path]}" }
   end
 
-  get "home/index"
+  authenticate :user, lambda { |u| u.super_admin? } do
+    mount Sidekiq::Web => '/sidekiq'
+  end
   #Remove this route
+  get "home/index"
+  
   devise_for :users, controllers: {
-    sessions: "users/sessions"
+    sessions: "users/sessions",
+      passwords: "users/passwords",
+      confirmations: "users/confirmations"
   }
   
   get "admin/home/index"
@@ -26,7 +34,10 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-  match "*path", to: "errors#not_found", via: :all
+  match "*path", to: "errors#not_found", via: :all,
+  constraints: lambda { |req|
+    !req.path.start_with?("/rails/active_storage")
+  }
   # Defines the root path route ("/")
   root "admin/home#index"
 end

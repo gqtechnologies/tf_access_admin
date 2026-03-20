@@ -14,7 +14,7 @@ class Admin::UsersController < AdminController
         
         pagination = pagination_info(users)
         render inertia: "admin/users/index", props: {
-            users: users.map { |u| Admin::UserSerializer.call(u) },
+            users: users.map { |u| Admin::UserSerializer.new(u).as_json },
             pagination: pagination
         }, status: :ok
     end
@@ -39,8 +39,12 @@ class Admin::UsersController < AdminController
 
     def edit
         authorize @user
+        
+        user_json = Admin::UserSerializer.new(@user).as_json
+
+        user_json[:role] = user_json[:tenant_role]
         render inertia: "admin/users/edit", props: {
-            user: Admin::UserSerializer.call(@user),
+            user: user_json,
             roles: AvailableRoles::TENANT,
             languages: Languages::ALL,
         }
@@ -86,8 +90,8 @@ class Admin::UsersController < AdminController
     def validate_role
         role = params[:user][:role]
         if role.present?
-            if AvailableRoles::ALL.include?(role)
-                @user.add_role(role, @user.organization)
+            if AvailableRoles::TENANT_ROLE_PRIORITY.include?(role)
+                @user.set_tenant_role(role)
             else
                 @user.errors.add(:role, "admin.users.validations.role_invalid")
                 @validation_errors = true

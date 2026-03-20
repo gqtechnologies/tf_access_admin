@@ -1,0 +1,26 @@
+<% content_for :title, t("frontend.admin.passwords.new.title") %>
+<% content_for :description, t("frontend.admin.passwords.new.description") %>
+<%= render "layouts/devise" do %>
+<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+  
+  <div class="grid gap-4">
+    <%= render "shared/forms/input_group_field",
+      form: f,
+      attribute: :email,
+      label: t("frontend.admin.passwords.new.input.email.label"),
+      field_type: :email_field,
+      addon_text: "@",
+      field_options: {
+        autofocus: true,
+        autocomplete: "email",
+        placeholder: t("frontend.admin.passwords.new.input.email.placeholder")
+      } %>
+  </div>
+  <div class="actions mt-4">
+    <%= f.submit t("frontend.admin.passwords.new.submit"), class: shadcn_button_classes(variant: :default, size: :default, class_name: "w-full") %>
+  </div>
+  <%= render "users/shared/error_messages", resource: resource %>
+<% end %>
+
+<%= render "users/shared/links" %>
+<% end %>

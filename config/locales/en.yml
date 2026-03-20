@@ -28,11 +28,13 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
   frontend:
+    name: "Admin Base"
+    description: "welcome again"
     common:
       cancel: "Cancel"
       back: "Back"
+      clear: "Clear"
       actions:
         edit: "Edit"
         search: "Search"
@@ -89,6 +91,32 @@ en:
           password:
             label: "Password"
             placeholder: "Enter your password"
+      passwords:
+        new:
+          title: "Forgot Password"
+          description: "Forgot your password? No problem. Just let us know your email and we'll send you instructions to reset it."
+          submit: "Send Reset Instructions"
+          processing: "Sending reset instructions..."
+          success: "Reset instructions sent successfully"
+          error: "Failed to send reset instructions"
+          not_found: "Email not found"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Enter your email"
+        edit:
+          title: "Edit Password"
+          description: "Enter your new password and confirm it to update it."
+          submit: "Change my password"
+          success: "Password updated successfully"
+          error: "Failed to update password"
+          input:
+            password:
+              label: "Password"
+              placeholder: "Enter your password"
+            password_confirmation:
+              label: "Password Confirmation"
+              placeholder: "Confirm your password"
       home:
         title: "Home"
       users:
@@ -163,9 +191,14 @@ en:
           password_confirmation:
             placeholder: "Confirm your password"
             label: "Password Confirmation"
+          avatar:
+            label: "Avatar"
+            placeholder: "Select your avatar"
+            remove: "Remove avatar"
           submit:
             label: "Create User"
       sidebar:
+        platform: "Platform"
         home: "Home"
         users: "Users"
         organizations: "Organizations"
@@ -187,3 +220,21 @@ en:
           title: "Edit Profile"
           description: "Edit your profile"
           submit: "Update Profile"
+  mailer:
+    verification:
+      title: "Confirm your email address"
+      description: "To confirm your email address, click the following button."
+      button: "Verify your email"
+      no_preview: "If you cannot click the button, copy and paste the following link in your browser: %{url}"
+    confirmation:
+      title: "Confirm your account"
+      description: "To confirm your account, click the following button."
+      button: "Confirm your account"
+      no_preview: "If you cannot click the button, copy and paste the following link in your browser: %{url}"
+    reset_password:
+      title: "Reset your password"
+      description: "To reset your password, click the following button."
+      button: "Reset your password"
+      no_preview: "If you cannot click the button, copy and paste the following link in your browser: %{url}"
+      ignore: "If you didn't request this, please ignore this email."
+      password_not_changed: "Your password won't change until you access the link above and create a new one."

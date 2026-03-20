@@ -3,7 +3,8 @@ class User < ApplicationRecord
   acts_as_paranoid
 
   has_many :permissions, through: :roles
-
+  has_one_attached :avatar
+  
   acts_as_tenant(:organization)
   belongs_to :organization
 
@@ -17,11 +18,16 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
-
+         :recoverable, :rememberable, :validatable, 
+         :confirmable
   def role
-    roles.first.name if roles.present?
-    nil
+    return nil if roles.blank?
+    roles.min_by { |r| AvailableRoles.priority_index(r.name, :global) }.name
+  end
+
+  def tenant_role
+    return nil if roles.blank?
+    roles.min_by { |r| AvailableRoles.priority_index(r.name, :tenant) }.name
   end
 
   def super_admin?
@@ -30,6 +36,12 @@ class User < ApplicationRecord
 
   def tenant_admin?(tenant = self.organization)
     has_role?(AvailableRoles::TENANT_ADMIN, tenant)
+  end
+
+  def set_tenant_role(role)
+    removed = delete_tenant_roles
+
+    self.add_role(role, self.organization) unless has_role?(role, self.organization)
   end
 
   def self.ransackable_attributes(auth_object = nil)
@@ -43,5 +55,17 @@ class User < ApplicationRecord
   private
   def assign_default_role
     self.add_role(:client, self.organization) if self.roles.blank?
+  end
+
+  def delete_tenant_roles
+    return [] if roles.blank?
+
+    tenant_roles = roles.select do |r|
+      r.resource_type == "Organization" && r.resource_id == organization_id
+    end
+
+    role_names = tenant_roles.map(&:name)
+    role_names.each { |name| remove_role(name, organization) }
+    role_names
   end
 end

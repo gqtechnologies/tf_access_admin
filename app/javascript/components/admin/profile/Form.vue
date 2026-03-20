@@ -1,13 +1,20 @@
 <template>
     <Card class="w-full">
-        <CardHeader>
-            <CardTitle v-if="props.title">{{ props.title }}</CardTitle>
-            <CardDescription>
-                {{ props.description }}
-            </CardDescription>
-        </CardHeader>
         <CardContent>
             <form id="form-user" @submit="onSubmit">
+                <FieldGroup class="mt-4 mb-8 flex justify-center w-full">
+                    <AvatarInput
+                        name="avatar"
+                        for="form-user-avatar"
+                        accept="image/*"
+                        label="Avatar"
+                        placeholder="Selecciona tu avatar"
+                        :defaultValue="props.defaultValues?.avatar_path"
+                        :alt="props.defaultValues?.name!"
+                        @change="onAvatarChange($event)"
+                        @clear="clearAvatar()"
+                    />
+                </FieldGroup>
                 <FieldGroup class="flex flex-col md:flex-row">
                     <VeeField v-slot="{ field, errors }" name="name">
                         <Field :data-invalid="!!errors.length">
@@ -73,8 +80,8 @@
                                 {{ t('admin.users.input.password_confirmation.label') }}
                             </FieldLabel>
                             <Input id="form-user-password_confirmation" v-bind="field" type="password"
-                                :placeholder="t('admin.users.input.password_confirmation.placeholder')" autocomplete="off"
-                                :aria-invalid="!!errors.length" />
+                                :placeholder="t('admin.users.input.password_confirmation.placeholder')"
+                                autocomplete="off" :aria-invalid="!!errors.length" />
                             <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
                         </Field>
                     </VeeField>
@@ -86,7 +93,7 @@
                 <Button type="button" as="a" :href="admin_home_index_path()" variant="outline" class="w-full md:w-auto">
                     {{ props.cancelLabel || t('common.cancel') }}
                 </Button>
-                <Button type="submit" form="form-user" class="w-full md:w-auto">
+                <Button type="submit" form="form-user" class="w-full md:w-auto cursor-pointer">
                     {{ props.submitLabel }}
                 </Button>
             </Field>
@@ -103,10 +110,7 @@ import { Button } from '@/components/ui/button'
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
-    CardHeader,
-    CardTitle,
 } from '@/components/ui/card'
 import {
     Field,
@@ -122,6 +126,7 @@ import type { InertiaErrors } from '@/types/globals';
 import { admin_home_index_path } from "@/routes"
 import { User } from '@/types/user';
 import { ProfileEditSchema } from '@/lib/schemas/profile';
+import AvatarInput from '@/components/custom/inputs/AvatarInput.vue';
 
 
 const props = defineProps<{
@@ -141,9 +146,9 @@ const emit = defineEmits<{
 const { t } = useI18n();
 
 const { translateErrors, mapServerErrorsToForm } = useTranslateErrors();
-const formSchema = toTypedSchema( profileEditSchema);
+const formSchema = toTypedSchema(profileEditSchema);
 
-const { handleSubmit, setErrors, setValues } = useForm({
+const { handleSubmit, setErrors, setValues, setFieldValue } = useForm({
     validationSchema: formSchema,
     initialValues: {
         name: '',
@@ -152,18 +157,20 @@ const { handleSubmit, setErrors, setValues } = useForm({
         password: '',
         password_confirmation: '',
         language: '',
+        avatar: null,
     },
 })
 
 onMounted(() => {
     if (props.defaultValues) {
+        const { avatar_path, avatar_filename, ...rest } = props.defaultValues;
         setValues({
-            ...props.defaultValues
+            ...rest,
         })
     }
 })
 
-function applyServerErrors( errors: InertiaErrors ) {
+function applyServerErrors(errors: InertiaErrors) {
     if (errors && Object.keys(errors).length > 0) {
         nextTick(() => {
             setErrors(mapServerErrorsToForm(errors))
@@ -171,13 +178,23 @@ function applyServerErrors( errors: InertiaErrors ) {
     }
 }
 
+const onAvatarChange = (e: Event) => {
+    const input = e.target as HTMLInputElement
+    const file = input.files?.[0] ?? null
+    setFieldValue('avatar', file, true)
+}
+
+const clearAvatar = () => {
+    setFieldValue('avatar', null, true)
+}
+
 const onSubmit = handleSubmit((data) => {
     emit('submit', data as ProfileEditSchema)
 })
 
 defineExpose<{
-    applyServerErrors: ( errors: InertiaErrors ) => void
+    applyServerErrors: (errors: InertiaErrors) => void
 }>({
-    applyServerErrors: ( errors: InertiaErrors ) => applyServerErrors(errors)
+    applyServerErrors: (errors: InertiaErrors) => applyServerErrors(errors)
 })
 </script>

@@ -117,13 +117,8 @@ onMounted(() => {
 })
 
 const columns: ColumnDef<User, any>[] = [
-  {
-    accessorKey: "id",
-    header: () => h('span', { class: 'block text-center' }, t("admin.users.index.table.headers.id")),
-    cell: ({ getValue }) => h("span", { class: "block text-center" }, getValue())
-  },
-  { accessorKey: "name", header: () => t("admin.users.index.table.headers.name") },
   { accessorKey: "dni", header: () => t("admin.users.index.table.headers.dni") },
+  { accessorKey: "name", header: () => t("admin.users.index.table.headers.name") },
   { accessorKey: "email", header: () => t("admin.users.index.table.headers.email") },
   { accessorKey: "role", header: () => t("admin.users.index.table.headers.role"), cell: ({ getValue }) => h("span", getValue() ? t(`roles.${getValue()}`) : t('no_role')) },
 ]
