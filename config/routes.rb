@@ -10,8 +10,8 @@ Rails.application.routes.draw do
   authenticate :user, lambda { |u| u.super_admin? } do
     mount Sidekiq::Web => '/sidekiq'
   end
-  #Remove this route
-  get "home/index"
+  # Público / sin tenant (dominio base o sin subdominio de organización)
+  get "home", to: "home#index", as: :home
   
   # Solo rutas Devise necesarias: login (Inertia), recuperación de contraseña, confirmación por email.
   # No exponer registrations (sign up), unlocks ni otros módulos hasta implementarlos.
