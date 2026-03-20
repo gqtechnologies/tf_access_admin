@@ -91,6 +91,15 @@ en:
           password:
             label: "Password"
             placeholder: "Enter your password"
+      confirmations:
+        new:
+          title: "Resend confirmation instructions"
+          description: "Resend confirmation instructions to your email"
+          submit: "Resend confirmation instructions"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Enter your email"
       passwords:
         new:
           title: "Forgot Password"

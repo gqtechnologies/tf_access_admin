@@ -88,6 +88,15 @@ es:
           password:
             label: "Contraseña"
             placeholder: "Ingresa tu contraseña"
+      confirmations:
+        new:
+          title: "Reenviar instrucciones de confirmación"
+          description: "Reenvía instrucciones de confirmación a tu email"
+          submit: "Reenviar instrucciones de confirmación"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Ingresa tu email"
       passwords:
         new:
           title: "Olvidé mi contraseña"

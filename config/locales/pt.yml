@@ -68,6 +68,15 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     admin:
+      confirmations:
+        new:
+          title: "Reenviar instruções de confirmação"
+          description: "Reenvie instruções de confirmação para seu email"
+          submit: "Reenviar instruções de confirmação"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Digite seu email"
       passwords:
         new:
           title: "Esqueceu sua senha?"
