@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   rolify
   acts_as_paranoid
+  include Users::Features
 
   has_many :permissions, through: :roles
   has_one_attached :avatar
@@ -52,7 +53,7 @@ class User < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     []
   end
-  
+
   private
   def assign_default_role
     self.add_role(:client, self.organization) if self.roles.blank?

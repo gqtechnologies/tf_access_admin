@@ -6,7 +6,7 @@ class AdminController < InertiaController
 
     inertia_share auth: -> {
       if user_signed_in?
-        { user: Admin::UserSerializer.new(current_user).as_json}
+        { user: Admin::UserSerializer.new(current_user).as_json, features: current_user.features}
       else
         {}
       end
