@@ -128,6 +128,22 @@ en:
               placeholder: "Confirm your password"
       home:
         title: "Home"
+      organizations:
+        index:
+          title: "Organizations"
+          description: "List of organizations"
+          table:
+            headers:
+              name: "Name"
+          actions:
+            create: "Create Organization"
+            delete: "Delete Organization"
+            delete_description: "Are you sure you want to delete {name}?"
+            delete_success: "Organization deleted successfully"
+            delete_error: "Failed to delete organization"
+          input:
+            search:
+              placeholder: "Search organization"
       users:
         title: "Users"
         created_successfully: "User created successfully"

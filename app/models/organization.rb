@@ -6,6 +6,14 @@ class Organization < ApplicationRecord
 
   before_validation :generate_uuid, on: :create
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["name"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    []
+  end
+
   private
 
   def generate_uuid

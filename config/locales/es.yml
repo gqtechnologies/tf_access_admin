@@ -205,6 +205,21 @@ es:
           description: "Editar un usuario para tu organización"
           submit: "Actualizar Usuario"
       organizations:
+        index:
+          title: "Organizaciones"
+          description: "Lista de organizaciones"
+          input:
+            search:
+              placeholder: "Buscar organización"
+          table:
+            headers:
+              name: "Nombre"
+          actions:
+            create: "Crear Organización"
+            delete: "Eliminar Organización"
+            delete_description: "¿Estás seguro de querer eliminar a {name}?"
+            delete_success: "Organización eliminada correctamente"
+            delete_error: "Error al eliminar la organización"
         show:
           title: "Organización"
       sidebar:

@@ -27,10 +27,10 @@
     } %>
   </div>
 
+  <%= render "users/shared/flash_alert" %>
   <div class="actions mt-4">
     <%= f.submit t("frontend.admin.login.submit"), class: shadcn_button_classes(variant: :default, size: :default, class_name: "w-full") %>
   </div>
-  <%= render "users/shared/error_messages", resource: resource %>
 <% end %>
 
 <%= render "users/shared/links" %>

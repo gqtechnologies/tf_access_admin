@@ -124,6 +124,22 @@ pt:
             placeholder: "Digite sua senha"
       home:
         title: "Início"
+      organizations:
+        index:
+          title: "Organizações"
+          description: "Lista de organizações"
+          table:
+            headers:
+              name: "Nome"
+          actions:
+            create: "Criar Organização"
+            delete: "Deletar Organização"
+            delete_description: "Tem certeza que deseja deletar a organização {name}?"
+            delete_success: "Organização deletada com sucesso"
+            delete_error: "Erro ao deletar a organização"
+          input:
+            search:
+              placeholder: "Buscar organização"
       users:
         title: "Usuários"
         created_successfully: "Usuário criado com sucesso"
