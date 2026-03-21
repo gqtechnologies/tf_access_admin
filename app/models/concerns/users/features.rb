@@ -22,7 +22,7 @@ module Users::Features
       :home,
       :users,
       :organizations,
-      # :settings
+      :settings
       # :reports,
       # :analytics,
       # :notifications,
@@ -40,7 +40,7 @@ module Users::Features
       users: h.admin_users_path,
       # No hay ruta admin/organizations aún; mismo destino que home hasta que exista.
       organizations: h.admin_home_index_path,
-      # settings: h.edit_admin_profile_path(self)
+      settings: h.edit_admin_profile_path(self)
     }
   end
 end

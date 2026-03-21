@@ -96,3 +96,6 @@ gem "active_model_serializers", "~> 0.10.16"
 
 gem "mailgun-ruby", "~> 1.4"
 gem 'resend'
+gem "flipper", "~> 1.4"
+gem "flipper-ui", "~> 1.4"
+gem "flipper-active_record", "~> 1.4"

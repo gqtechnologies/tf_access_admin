@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   authenticate :user, lambda { |u| u.super_admin? } do
     mount Sidekiq::Web => '/sidekiq'
+    mount Flipper::UI.app(Flipper) => '/flipper'
   end
   # Público / sin tenant (dominio base o sin subdominio de organización)
   get "home", to: "home#index", as: :home
