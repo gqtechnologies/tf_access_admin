@@ -38,10 +38,12 @@ class ApplicationPolicy
     false
   end
 
-
-
   def admin?
     user.present? && (user.super_admin? || user.tenant_admin?)
+  end
+
+  def super_admin?
+    user.present? && user.super_admin?
   end
 
   def same_organization?

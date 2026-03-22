@@ -32,9 +32,11 @@ const getFeatureIcon = (key: string) => {
     case 'users':
       return Users
     case 'organizations':
-      return Building
-    case 'settings':
+        return Building
+    case 'organization_settings':
       return Settings
+    case 'settings':
+        return Settings
   }
   return null
 }

@@ -21,7 +21,7 @@
         </div>
       </template>
       <template #actions="{ row }">
-        <ListItem as="link" :href="`#`">
+        <ListItem as="link" :href="`/admin/organizations/${row.id}/edit`">
           <span class="flex items-center gap-2">
             <PencilIcon class="w-4 h-4" />
           {{ t('common.actions.edit') }}

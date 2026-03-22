@@ -1,11 +1,13 @@
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { TranslationOptionalParams } from '@/types/form'
 
 /** Solo traduce si el mensaje parece una clave i18n (ej. "users.validations.xxx"); si no, lo devuelve tal cual (mensajes literales del servidor). */
-function translateErrors(errors: Array<string | { message?: string } | undefined>) {
+function translateErrors(errors: Array<string | { message?: string } | undefined>, tOptionalParams: TranslationOptionalParams) {
   const { t } = useI18n()
   return errors.map((e) => {
     const msg = typeof e === 'string' ? e : (e?.message ?? '')
-    return isI18nKey(msg) ? t(msg) : msg
+    return isI18nKey(msg) ? t(msg, tOptionalParams) : msg
   })
 }
 
@@ -23,9 +25,15 @@ function mapServerErrorsToForm(errors: Record<string, string[]>): Record<string,
     )
 }
 
-export function useTranslateErrors() {
+export function useTranslateErrors( params?: TranslationOptionalParams ) {
+  const tOptionalParams = ref<TranslationOptionalParams>({})
+  onMounted(() => {
+    if(Object.keys(params ?? {}).length > 0) {
+      tOptionalParams.value = { ...tOptionalParams.value, ...params }
+    }
+  })
   return {
-    translateErrors,
+    translateErrors: (errors: Array<string | { message?: string } | undefined>) => translateErrors(errors, tOptionalParams.value),
     mapServerErrorsToForm,
   }
 }

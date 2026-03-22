@@ -2,7 +2,19 @@
 
 class OrganizationPolicy < ApplicationPolicy
   def index?
-    admin?
+    super_admin?
+  end
+
+  def show?
+    super_admin? || (same_organization? && user.tenant_admin?(record))
+  end
+
+  def edit?
+    super_admin? || (same_organization? && user.tenant_admin?(record))
+  end
+
+  def update?
+    super_admin? || (same_organization? && user.tenant_admin?(record))
   end
 
   class Scope < ApplicationPolicy::Scope

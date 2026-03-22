@@ -46,7 +46,8 @@ function onSubmit(data: ProfileEditSchema) {
             password: data.password,
             password_confirmation: data.password_confirmation,
             language: data.language,
-            avatar: data.avatar,
+            ...(data.avatar ? { avatar: data.avatar } : {}),
+            ...(data.remove_avatar ? { remove_avatar: true } : {}),
         },
     }, {
         preserveScroll: true,

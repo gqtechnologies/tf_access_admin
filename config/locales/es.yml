@@ -205,6 +205,40 @@ es:
           description: "Editar un usuario para tu organización"
           submit: "Actualizar Usuario"
       organizations:
+        created_successfully: "Organización creada correctamente"
+        creation_failed: "Error al crear la organización"
+        updated_successfully: "Organización actualizada correctamente"
+        update_failed: "Error al actualizar la organización"
+        not_found: "Organización no encontrada"
+        input:
+          name:
+            label: "Nombre"
+            placeholder: "Ingresa el nombre de la organización"
+          subdomain:
+            label: "Código"
+            placeholder: "Ingresa el código de la organización"
+          cover:
+            label: "Portada"
+            placeholder: "Selecciona tu portada"
+          logo:
+            label: "Logo"
+            placeholder: "Selecciona tu logo"
+        validations:
+          name_required: "El nombre es obligatorio"
+          name_max: "El nombre debe como máximo {name_max} caracteres"
+          name_min: "El nombre debe como mínimo {name_min} caracteres"
+          subdomain_required: "El código es obligatorio"
+          subdomain_invalid: "El código no es válido"
+          subdomain_max: "El código debe como máximo {subdomain_max} caracteres"
+          subdomain_min: "El código debe como mínimo {subdomain_min} caracteres"
+          subdomain_no_whitespace: "El código no puede contener espacios en blanco"
+          subdomain_exists: "El código ya existe"
+        edit:
+          title: "Editar Organización"
+          description: "Editar una organización"
+          submit: "Actualizar Organización"
+        show:
+          title: "Organización"
         index:
           title: "Organizaciones"
           description: "Lista de organizaciones"
@@ -227,6 +261,7 @@ es:
         home: "Inicio"
         users: "Usuarios"
         organizations: "Organizaciones"
+        organization_settings: "Configuración de Organización"
         settings: "Configuración"
         footer:
           title: "Mi Cuenta"

@@ -125,6 +125,40 @@ pt:
       home:
         title: "Início"
       organizations:
+        created_successfully: "Organização criada com sucesso"
+        creation_failed: "Falha ao criar a organização"
+        updated_successfully: "Organização atualizada com sucesso"
+        update_failed: "Falha ao atualizar a organização"
+        not_found: "Organização não encontrada"
+        input:
+          name:
+            label: "Nome"
+            placeholder: "Digite o nome da organização"
+          subdomain:
+            label: "Código"
+            placeholder: "Digite o código da organização"
+          cover:
+            label: "Portada"
+            placeholder: "Selecione a portada da organização"
+          logo:
+            label: "Logo"
+            placeholder: "Selecione a logo da organização"
+        show:
+          title: "Organização"
+        edit:
+          title: "Editar Organização"
+          description: "Editar uma organização"
+          submit: "Atualizar Organização"
+        validations:
+          subdomain_no_whitespace: "O código não pode conter espaços em branco"
+          name_required: "O nome é obrigatório"
+          name_max: "O nome deve como máximo {max} caracteres"
+          name_min: "O nome deve como mínimo {min} caracteres"
+          subdomain_required: "O código é obrigatório"
+          subdomain_invalid: "O código é inválido"
+          subdomain_max: "O código deve como máximo {max} caracteres"
+          subdomain_min: "O código deve como mínimo {min} caracteres"
+          subdomain_exists: "O código já existe"
         index:
           title: "Organizações"
           description: "Lista de organizações"
@@ -221,6 +255,7 @@ pt:
         home: "Home"
         users: "Users"
         organizations: "Organizations"
+        organization_settings: "Configurações da Organização"
         settings: "Settings"
         footer:
           title: "My Account"

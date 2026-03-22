@@ -129,6 +129,40 @@ en:
       home:
         title: "Home"
       organizations:
+        created_successfully: "Organization created successfully"
+        creation_failed: "Failed to create organization"
+        updated_successfully: "Organization updated successfully"
+        update_failed: "Failed to update organization"
+        not_found: "Organization not found"
+        validations:
+          subdomain_no_whitespace: "The subdomain cannot contain whitespace"
+          name_required: "The name is required"
+          name_max: "The name must be at least {max} characters"
+          name_min: "The name must be at least {min} characters"
+          subdomain_required: "The subdomain is required"
+          subdomain_invalid: "The subdomain is invalid"
+          subdomain_max: "The subdomain must be at least {max} characters"
+          subdomain_min: "The subdomain must be at least {min} characters"
+          subdomain_exists: "The subdomain already exists"
+        input:
+          name:
+            label: "Name"
+            placeholder: "Enter the name of the organization"
+          subdomain:
+            label: "Subdomain"
+            placeholder: "Enter the subdomain of the organization"
+          cover:
+            label: "Cover"
+            placeholder: "Select the cover of the organization"
+          logo:
+            label: "Logo"
+            placeholder: "Select the logo of the organization"
+        show:
+          title: "Organization"
+        edit:
+          title: "Edit Organization"
+          description: "Edit an organization"
+          submit: "Update Organization"
         index:
           title: "Organizations"
           description: "List of organizations"
@@ -227,6 +261,7 @@ en:
         home: "Home"
         users: "Users"
         organizations: "Organizations"
+        organization_settings: "Organization Settings"
         settings: "Settings"
         footer:
           title: My Account

@@ -3,6 +3,9 @@ class Organization < ApplicationRecord
   
   has_many :users
   has_many :roles
+  has_one_attached :logo
+  has_one_attached :cover
+
 
   before_validation :generate_uuid, on: :create
 

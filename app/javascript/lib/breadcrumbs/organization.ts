@@ -12,3 +12,16 @@ export function getOrganizationsBreadcrumbs(t: ReturnType<typeof useI18n>['t']):
         },
     ]
 }
+
+
+export function getOrganizationBreadcrumbs(t: ReturnType<typeof useI18n>['t']): BreadcrumbItem[] {
+    return [
+        {
+            label: t('admin.home.title'),
+            href: admin_home_index_path(),
+        },
+        {
+            label: t('admin.organizations.edit.title'),
+        },
+    ]
+}
