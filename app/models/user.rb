@@ -46,6 +46,15 @@ class User < ApplicationRecord
     self.add_role(role, self.organization) unless has_role?(role, self.organization)
   end
 
+  def avatar_path
+    return nil unless avatar.attached?
+
+    Rails.application.routes.url_helpers.rails_blob_path(
+      avatar,
+      only_path: true
+    )
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     ["name", "email", "dni"]
   end

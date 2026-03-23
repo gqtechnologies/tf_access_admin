@@ -1,5 +1,6 @@
-<% content_for :title, t("frontend.admin.login.title") %>
+<% content_for :title, current_tenant&.name || t("frontend.admin.login.title") %>
 <% content_for :description, t("frontend.admin.login.description") %>
+<% content_for :cover, current_tenant&.cover_path %>
 
 <%= render "layouts/devise" do %>
 
