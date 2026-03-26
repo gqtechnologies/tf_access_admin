@@ -132,6 +132,7 @@ es:
               placeholder: "Confirma tu contraseña"
       home:
         title: "Inicio"
+        login: "Iniciar sesión"
       users:
         title: "Usuarios"
         created_successfully: "Usuario creado correctamente"

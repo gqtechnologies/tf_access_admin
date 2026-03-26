@@ -69,6 +69,7 @@ en:
     home:
       title: "Welcome to our site"
       description: "We are glad to have you here"
+      login: "Login"
     not_found:
       title: "404 - Page not found"
       description: "The page you're looking for doesn't exist."

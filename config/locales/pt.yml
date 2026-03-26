@@ -129,6 +129,7 @@ pt:
             placeholder: "Digite sua senha"
       home:
         title: "Início"
+        login: "Login"
       organizations:
         created_successfully: "Organização criada com sucesso"
         creation_failed: "Falha ao criar a organização"
