@@ -23,6 +23,7 @@ class Role < ApplicationRecord
     return if name.blank?
     return if [AvailableRoles::CLIENT, AvailableRoles::SUPER_ADMIN].include?(name)
     return if organization.present?
+    return if resource_type == "Organization" && resource_id.present?
 
     errors.add(:organization, :blank)
   end
