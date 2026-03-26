@@ -157,6 +157,10 @@ en:
           logo:
             label: "Logo"
             placeholder: "Select the logo of the organization"
+        new:
+          title: "New Organization"
+          description: "Create a new organization"
+          submit: "Create Organization"
         show:
           title: "Organization"
           subtitle: "Organization information"

@@ -12,7 +12,7 @@
               {{ t('common.actions.search') }}
             </Button>
           </div>
-          <Link :href="`#`">
+          <Link :href="new_admin_organization_path()">
             <Button>
               <PlusIcon class="w-4 h-4" />
               {{ t('admin.organizations.index.actions.create') }}
@@ -61,6 +61,7 @@ import ListItem from "@/components/custom/list/ListItem.vue"
 import Header from '@/components/admin/layout/Header.vue'
 import { getOrganizationsBreadcrumbs } from '@/lib/breadcrumbs/organization'
 import type { Organization } from '@/types/organization'
+import { new_admin_organization_path } from '@/routes'
 const { t } = useI18n()
 
 const props = defineProps<{

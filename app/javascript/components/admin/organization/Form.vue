@@ -41,7 +41,7 @@
                             <Input id="form-organization-subdomain" v-bind="field"
                                 :placeholder="t('admin.organizations.input.subdomain.placeholder')" autocomplete="off"
                                 :aria-invalid="!!errors.length"
-                                :disabled="true"
+                                :disabled="editMode"
                                 />
                             <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
                         </Field>
@@ -112,6 +112,7 @@ const props = defineProps<{
     defaultValues?: Organization;
     serverErrors?: Record<string, string[]>;
     submitLabel: string;
+    editMode?: boolean;
 }>();
 
 const emit = defineEmits<{

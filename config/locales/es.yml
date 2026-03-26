@@ -237,6 +237,10 @@ es:
           title: "Editar Organización"
           description: "Editar una organización"
           submit: "Actualizar Organización"
+        new:
+          title: "Nueva Organización"
+          description: "Crear una nueva organización"
+          submit: "Crear Organización"
         show:
           title: "Organización"
           subtitle: "Información de la organización"

@@ -164,6 +164,10 @@ pt:
           subdomain_max: "O código deve como máximo {max} caracteres"
           subdomain_min: "O código deve como mínimo {min} caracteres"
           subdomain_exists: "O código já existe"
+        new:
+          title: "Nova Organização"
+          description: "Criar uma nova organização"
+          submit: "Criar Organização"
         index:
           title: "Organizações"
           description: "Lista de organizações"

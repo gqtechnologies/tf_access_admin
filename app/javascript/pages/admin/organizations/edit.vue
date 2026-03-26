@@ -6,6 +6,7 @@
       :description="t('admin.organizations.edit.description')"
       :submitLabel="t('admin.organizations.edit.submit')"
       :defaultValues="props.organization"
+      :editMode="true"
       @submit="onSubmit"
     />
   </div>

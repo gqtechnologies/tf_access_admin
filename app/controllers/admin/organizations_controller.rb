@@ -1,9 +1,11 @@
 class Admin::OrganizationsController < AdminController
     before_action :set_filters, only: [:index]
-    before_action :set_organization, only: [:show, :edit, :update]
-    before_action :validate_organization_subdomain, only: [:update]
-    after_action :handle_cover, only: [:update]
-    after_action :handle_logo, only: [:update]
+    before_action :set_organization, only: [:create]
+    before_action :get_organization, only: [:show, :edit, :update]
+    before_action -> { validate_organization_subdomain(:create) }, only: :create
+    before_action -> { validate_organization_subdomain(:update) }, only: :update
+    after_action :handle_cover, only: [:create, :update]
+    after_action :handle_logo, only: [:create, :update]
 
     def index
         authorize Organization
@@ -25,6 +27,21 @@ class Admin::OrganizationsController < AdminController
         render inertia: "admin/organizations/show", props: {
             organization: Admin::OrganizationSerializer.new(@organization).as_json
         }, status: :ok
+    end
+
+    def new
+        authorize Organization
+        render inertia: "admin/organizations/new", props: {
+        }, status: :ok
+    end
+
+    def create
+        authorize @organization
+        if @validation_errors || !@organization.save
+            redirect_to new_admin_organization_path, inertia: { errors: @organization.errors }
+        else
+            redirect_to admin_organizations_path
+        end
     end
 
     def edit
@@ -49,24 +66,36 @@ class Admin::OrganizationsController < AdminController
 
     private
 
-    def validate_organization_subdomain
+    def validate_organization_subdomain(context = :create)
         organization_subdomain = params[:organization][:subdomain]
         if organization_subdomain.blank?
             @organization.errors.add(:subdomain, "admin.organizations.validations.subdomain_blank")
-            return false
+            @validation_errors = true
+            return
         end
-        if organization_subdomain.length != 6 || !organization_subdomain.match(/^[a-z-][a-z0-9-]*$/)
+        if organization_subdomain.length > 8 || !organization_subdomain.match(/^[a-z-][a-z0-9-]*$/)
             @organization.errors.add(:subdomain, "admin.organizations.validations.subdomain_invalid")
-            return false
+            @validation_errors = true
+            return
         end
-        if Organization.exists?(subdomain: organization_subdomain) && organization_subdomain != @organization.subdomain
+
+        if Organization.exists?(subdomain: organization_subdomain)
+            if context == :edit && organization_subdomain == @organization.subdomain
+                return
+            end
             @organization.errors.add(:subdomain, "admin.organizations.validations.subdomain_exists")
-            return false
+            @validation_errors = true
+            return
         end
-        return true
+        @validation_errors = false
     end
 
     def set_organization
+        @organization = Organization.new(organization_params)
+        @validation_errors = false
+    end
+
+    def get_organization
         @organization = Organization.find_by(id: params[:id])
         if @organization.blank?
             if current_user.super_admin?

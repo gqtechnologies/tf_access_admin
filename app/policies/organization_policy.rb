@@ -5,6 +5,15 @@ class OrganizationPolicy < ApplicationPolicy
     super_admin?
   end
 
+
+  def new?
+    super_admin?
+  end
+
+  def create?
+    super_admin?
+  end
+
   def show?
     super_admin? || (same_organization? && user.tenant_admin?(record))
   end
