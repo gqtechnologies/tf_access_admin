@@ -239,6 +239,11 @@ es:
           submit: "Actualizar Organización"
         show:
           title: "Organización"
+          subtitle: "Información de la organización"
+          name: "Nombre"
+          subdomain: "Subdomínio"
+          cover: "Portada"
+          logo: "Logo"
         index:
           title: "Organizaciones"
           description: "Lista de organizaciones"
@@ -248,14 +253,13 @@ es:
           table:
             headers:
               name: "Nombre"
+              subdomain: "Subdomínio"
           actions:
             create: "Crear Organización"
             delete: "Eliminar Organización"
             delete_description: "¿Estás seguro de querer eliminar a {name}?"
             delete_success: "Organización eliminada correctamente"
             delete_error: "Error al eliminar la organización"
-        show:
-          title: "Organización"
       sidebar:
         platform: "Plataforma"
         home: "Inicio"

@@ -135,8 +135,8 @@ pt:
             label: "Nome"
             placeholder: "Digite o nome da organização"
           subdomain:
-            label: "Código"
-            placeholder: "Digite o código da organização"
+            label: "Subdomínio"
+            placeholder: "Digite o subdomínio da organização"
           cover:
             label: "Portada"
             placeholder: "Selecione a portada da organização"
@@ -145,12 +145,17 @@ pt:
             placeholder: "Selecione a logo da organização"
         show:
           title: "Organização"
+          subtitle: "Informações da organização"
+          name: "Nome"
+          subdomain: "Subdomínio"
+          cover: "Portada"
+          logo: "Logo"
         edit:
           title: "Editar Organização"
           description: "Editar uma organização"
           submit: "Atualizar Organização"
         validations:
-          subdomain_no_whitespace: "O código não pode conter espaços em branco"
+          subdomain_no_whitespace: "O subdomínio não pode conter espaços em branco"
           name_required: "O nome é obrigatório"
           name_max: "O nome deve como máximo {max} caracteres"
           name_min: "O nome deve como mínimo {min} caracteres"
@@ -165,6 +170,7 @@ pt:
           table:
             headers:
               name: "Nome"
+              subdomain: "Subdomínio"
           actions:
             create: "Criar Organização"
             delete: "Deletar Organização"

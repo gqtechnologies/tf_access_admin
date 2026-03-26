@@ -105,6 +105,7 @@ watch(
 
 
 const columns: ColumnDef<Organization, any>[] = [
+  { accessorKey: "subdomain", header: () => t("admin.organizations.index.table.headers.subdomain") },
   { accessorKey: "name", header: () => t("admin.organizations.index.table.headers.name") },
 ]
 

@@ -159,6 +159,11 @@ en:
             placeholder: "Select the logo of the organization"
         show:
           title: "Organization"
+          subtitle: "Organization information"
+          name: "Name"
+          subdomain: "Subdomain"
+          cover: "Cover"
+          logo: "Logo"
         edit:
           title: "Edit Organization"
           description: "Edit an organization"
@@ -169,6 +174,7 @@ en:
           table:
             headers:
               name: "Name"
+              subdomain: "Subdomain"
           actions:
             create: "Create Organization"
             delete: "Delete Organization"
@@ -269,9 +275,6 @@ en:
           profile: Profile
           logout_success: "Logged out successfully"
           logout_error: "Failed to log out"
-      organizations:
-        show:
-          title: "Organization"
       profile:
         title: "Profile"
         updated_successfully: "Profile updated successfully"

@@ -65,7 +65,7 @@
         </CardContent>
         <CardFooter>
             <Field orientation="horizontal" class="md:flex md:justify-end flex-col md:flex-row">
-                <Button type="button" as="a" :href="admin_users_path()" variant="outline" class="w-full md:w-auto">
+                <Button type="button" as="a" :href="admin_organizations_path()" variant="outline" class="w-full md:w-auto">
                     {{ props.cancelLabel || t('common.cancel') }}
                 </Button>
                 <Button type="submit" form="form-organization" class="w-full md:w-auto cursor-pointer">
@@ -101,7 +101,7 @@ import { Input } from '@/components/ui/input'
 import { nameMax, nameMin, organizationSubdomainMax, organizationSubdomainMin, OrganizationSchema, organizationSchema } from '@/lib/schemas/organization';
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors';
 import type { InertiaErrors } from '@/types/globals';
-import { admin_users_path } from "@/routes"
+import { admin_organizations_path } from "@/routes"
 import { Organization } from '@/types/organization';
 
 
