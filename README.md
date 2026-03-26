@@ -87,10 +87,10 @@ git remote -v
 ```
 Debería verse algo similar a esto:
 ```bash
-origin    git@github.com:empresa/proyecto-cliente-a.git (fetch)
-origin    git@github.com:empresa/proyecto-cliente-a.git (push)
-upstream  git@github.com:empresa/dashboard-base.git (fetch)
-upstream  git@github.com:empresa/dashboard-base.git (push)
+origin	git@github.com:Samubz/fidelidade_admin.git (fetch)
+origin	git@github.com:Samubz/fidelidade_admin.git (push)
+upstream	git@github.com:Samubz/admin_base.git (fetch)
+upstream	git@github.com:Samubz/admin_base.git (push)
 ```
 
 ### 5. Subir el proyecto nuevo a su propio repositorio
