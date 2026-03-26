@@ -43,10 +43,13 @@ class Admin::ProfileController < AdminController
     end
 
     def handle_avatar
-        if @user.avatar.attached? && params[:user][:avatar].blank?
+        user = params[:user]
+        return if user.blank?
+        
+        if ActiveModel::Type::Boolean.new.cast(user[:remove_avatar])    
             @user.avatar.purge
-        elsif params[:user][:avatar].present?
-            @user.avatar.attach(params[:user][:avatar])
+        elsif user[:avatar].present?
+            @user.avatar.attach(user[:avatar])
         end
     end
 end

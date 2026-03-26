@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   rolify
   acts_as_paranoid
+  include Users::Features
 
   has_many :permissions, through: :roles
   has_one_attached :avatar
@@ -17,9 +18,11 @@ class User < ApplicationRecord
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable, 
+  # Sin :registerable: el alta de usuarios es vía admin; evita rutas/métodos de sign_up público
+  devise :database_authenticatable,
+         :recoverable, :rememberable, :validatable,
          :confirmable
+
   def role
     return nil if roles.blank?
     roles.min_by { |r| AvailableRoles.priority_index(r.name, :global) }.name
@@ -34,6 +37,10 @@ class User < ApplicationRecord
     has_role?(AvailableRoles::SUPER_ADMIN)
   end
 
+  def client_global?
+    has_role?(AvailableRoles::CLIENT)
+  end
+
   def tenant_admin?(tenant = self.organization)
     has_role?(AvailableRoles::TENANT_ADMIN, tenant)
   end
@@ -44,6 +51,15 @@ class User < ApplicationRecord
     self.add_role(role, self.organization) unless has_role?(role, self.organization)
   end
 
+  def avatar_path
+    return nil unless avatar.attached?
+
+    Rails.application.routes.url_helpers.rails_blob_path(
+      avatar,
+      only_path: true
+    )
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     ["name", "email", "dni"]
   end
@@ -51,10 +67,11 @@ class User < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     []
   end
-  
+
   private
   def assign_default_role
-    self.add_role(:client, self.organization) if self.roles.blank?
+    # client roles is a global role, so it should be assigned to the user without organization
+    self.add_role(:client) if self.roles.blank?
   end
 
   def delete_tenant_roles

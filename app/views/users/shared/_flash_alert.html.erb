@@ -1,0 +1,11 @@
+<% message = local_assigns.fetch(:message, nil) || flash.now[:alert].presence || flash[:alert].presence %>
+<% if message.present? %>
+  <div
+    id="devise-alert"
+    role="alert"
+    data-turbo-temporary
+    class="mt-4 rounded-md bg-destructive/10 p-2 text-sm font-medium leading-tight text-destructive"
+  >
+    <%= message %>
+  </div>
+<% end %>

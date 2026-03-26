@@ -9,7 +9,7 @@
             <EmptyContent>
                 <EmptyDescription>
                     {{ t('not_found.need_help') }}
-                    <Link :href="home_index_path()">{{ t('not_found.go_to_home') }}</Link>
+                    <Link :href="home_path()">{{ t('not_found.go_to_home') }}</Link>
                 </EmptyDescription>
             </EmptyContent>
         </Empty>
@@ -22,6 +22,6 @@ import EmptyContent from '@/components/ui/empty/EmptyContent.vue';
 import { SearchXIcon } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { Link } from '@inertiajs/vue3'
-import { home_index_path } from '@/routes'
+import { home_path } from '@/routes'
 const { t } = useI18n()
 </script>

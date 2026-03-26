@@ -7,12 +7,11 @@
                         name="avatar"
                         for="form-user-avatar"
                         accept="image/*"
-                        label="Avatar"
-                        placeholder="Selecciona tu avatar"
                         :defaultValue="props.defaultValues?.avatar_path"
                         :alt="props.defaultValues?.name!"
                         @change="onAvatarChange($event)"
                         @clear="clearAvatar()"
+                        defaultImageType="profile"
                     />
                 </FieldGroup>
                 <FieldGroup class="flex flex-col md:flex-row">
@@ -158,6 +157,7 @@ const { handleSubmit, setErrors, setValues, setFieldValue } = useForm({
         password_confirmation: '',
         language: '',
         avatar: null,
+        remove_avatar: false,
     },
 })
 
@@ -181,11 +181,13 @@ function applyServerErrors(errors: InertiaErrors) {
 const onAvatarChange = (e: Event) => {
     const input = e.target as HTMLInputElement
     const file = input.files?.[0] ?? null
+    setFieldValue('remove_avatar', false)
     setFieldValue('avatar', file, true)
 }
 
 const clearAvatar = () => {
-    setFieldValue('avatar', null, true)
+    setFieldValue('remove_avatar', true)
+    setFieldValue('avatar', null)
 }
 
 const onSubmit = handleSubmit((data) => {

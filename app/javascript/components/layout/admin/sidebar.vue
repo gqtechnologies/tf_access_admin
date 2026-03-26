@@ -15,12 +15,31 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, Settings, Building } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
-import { admin_home_index_path, admin_users_path } from "@/routes"
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
+import { usePage } from '@inertiajs/vue3'
+import { FeatureItem } from '@/types/auth'
 const { t } = useI18n()
+const page = usePage()
+const features = page.props.auth.features as FeatureItem[]
+
+const getFeatureIcon = (key: string) => {
+  switch (key) {
+    case 'home':
+      return Home
+    case 'users':
+      return Users
+    case 'organizations':
+        return Building
+    case 'organization_settings':
+      return Settings
+    case 'settings':
+        return Settings
+  }
+  return null
+}
 </script>
 
 <template>
@@ -46,19 +65,12 @@ const { t } = useI18n()
           <SidebarGroupLabel>{{ t('admin.sidebar.platform') }}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
+
+              <SidebarMenuItem v-for="feature in features" :key="feature.key">
                 <SidebarMenuButton as-child>
-                  <Link :href="admin_home_index_path()">
-                    <Home />
-                    <span>{{ t('admin.sidebar.home') }}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton as-child>
-                  <Link :href="admin_users_path()">
-                    <Users />
-                    <span>{{ t('admin.sidebar.users') }}</span>
+                  <Link :href="feature.url">
+                    <component :is="getFeatureIcon(feature.key)" />
+                    <span>{{ t(`admin.sidebar.${feature.key}`) }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

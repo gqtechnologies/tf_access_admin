@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+class AddDeletedAtToOrganizations < ActiveRecord::Migration[8.1]
+  def change
+    add_column :organizations, :deleted_at, :datetime
+    add_index :organizations, :deleted_at
+  end
+end
+

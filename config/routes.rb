@@ -9,20 +9,26 @@ Rails.application.routes.draw do
 
   authenticate :user, lambda { |u| u.super_admin? } do
     mount Sidekiq::Web => '/sidekiq'
+    mount Flipper::UI.app(Flipper) => '/flipper'
   end
-  #Remove this route
-  get "home/index"
+  # Público / sin tenant (dominio base o sin subdominio de organización)
+  get "home", to: "home#index", as: :home
   
-  devise_for :users, controllers: {
-    sessions: "users/sessions",
-      passwords: "users/passwords",
-      confirmations: "users/confirmations"
-  }
+  # Solo rutas Devise necesarias: login (Inertia), recuperación de contraseña, confirmación por email.
+  # No exponer registrations (sign up), unlocks ni otros módulos hasta implementarlos.
+  devise_for :users,
+             only: %i[sessions passwords confirmations],
+             controllers: {
+               sessions: "users/sessions",
+               passwords: "users/passwords",
+               confirmations: "users/confirmations"
+             }
   
   get "admin/home/index"
   namespace :admin do
     resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :profile, only: [:edit, :update]
+    resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
     match "*path", to: "errors#not_found", via: :all
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

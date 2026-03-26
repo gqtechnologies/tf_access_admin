@@ -49,23 +49,31 @@ import { LogOut, User as UserIcon, ChevronsUpDownIcon } from 'lucide-vue-next'
 import type { User } from '@/types/user'
 import { getUserFallback } from '@/lib/user'
 import { useI18n } from 'vue-i18n'
-import { router } from '@inertiajs/vue3'
 import { toast } from "vue-sonner"
-import { user_session_path, destroy_user_session_path, edit_admin_profile_path } from '@/routes'
+import { destroy_user_session_path, edit_admin_profile_path } from '@/routes'
 import { Link } from '@inertiajs/vue3'
 import {usePage} from '@inertiajs/vue3'
 const page = usePage()
 const user = page.props.auth.user as User
 const { t } = useI18n()
-
 const handleLogout = () => {
-    router.delete(destroy_user_session_path(), {
-        onSuccess: () => {
-            router.visit(user_session_path())
-        },
-        onError: () => {
-            toast.error(t('admin.sidebar.footer.logout_error'))
-        }
+  const token = document
+    .querySelector('meta[name="csrf-token"]')
+    ?.getAttribute('content')
+
+  fetch(destroy_user_session_path(), {
+    method: "DELETE",
+    headers: {
+      "X-CSRF-Token": token || "",
+      "Accept": "text/html",
+    },
+    credentials: "same-origin",
+  })
+    .then(() => {
+      window.location.href = "/users/sign_in"
+    })
+    .catch(() => {
+      toast.error(t('admin.sidebar.footer.logout_error'))
     })
 }
 </script>

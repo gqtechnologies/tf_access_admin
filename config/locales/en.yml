@@ -56,6 +56,11 @@ en:
       manager: "Manager"
       client: "Client"
       content_manager: "Content Manager"
+      seller: "Seller"
+    plans:
+      free: "Free"
+      pro: "Pro"
+      enterprise: "Enterprise"
     no_role: "No role"
     languages:
       en: "English"
@@ -64,6 +69,7 @@ en:
     home:
       title: "Welcome to our site"
       description: "We are glad to have you here"
+      login: "Login"
     not_found:
       title: "404 - Page not found"
       description: "The page you're looking for doesn't exist."
@@ -91,6 +97,15 @@ en:
           password:
             label: "Password"
             placeholder: "Enter your password"
+      confirmations:
+        new:
+          title: "Resend confirmation instructions"
+          description: "Resend confirmation instructions to your email"
+          submit: "Resend confirmation instructions"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Enter your email"
       passwords:
         new:
           title: "Forgot Password"
@@ -119,6 +134,74 @@ en:
               placeholder: "Confirm your password"
       home:
         title: "Home"
+      organizations:
+        created_successfully: "Organization created successfully"
+        creation_failed: "Failed to create organization"
+        updated_successfully: "Organization updated successfully"
+        update_failed: "Failed to update organization"
+        not_found: "Organization not found"
+        validations:
+          subdomain_no_whitespace: "The subdomain cannot contain whitespace"
+          name_required: "The name is required"
+          name_max: "The name must be at least {max} characters"
+          name_min: "The name must be at least {min} characters"
+          subdomain_required: "The subdomain is required"
+          subdomain_invalid: "The subdomain is invalid"
+          subdomain_max: "The subdomain must be at least {max} characters"
+          subdomain_min: "The subdomain must be at least {min} characters"
+          subdomain_exists: "The subdomain already exists"
+          plan_required: "The plan is required"
+          plan_invalid: "The plan is invalid"
+        input:
+          plan:
+            label: "Plan"
+            placeholder: "Select the plan of the organization"
+          name:
+            label: "Name"
+            placeholder: "Enter the name of the organization"
+          subdomain:
+            label: "Subdomain"
+            placeholder: "Enter the subdomain of the organization"
+          cover:
+            label: "Cover"
+            placeholder: "Select the cover of the organization"
+          logo:
+            label: "Logo"
+            placeholder: "Select the logo of the organization"
+        new:
+          title: "New Organization"
+          description: "Create a new organization"
+          submit: "Create Organization"
+        show:
+          title: "Organization"
+          subtitle: "Organization information"
+          name: "Name"
+          subdomain: "Subdomain"
+          plan: "Plan"
+          cover: "Cover"
+          logo: "Logo"
+        edit:
+          title: "Edit Organization"
+          description: "Edit an organization"
+          submit: "Update Organization"
+        index:
+          title: "Organizations"
+          description: "List of organizations"
+          table:
+            headers:
+              name: "Name"
+              subdomain: "Subdomain"
+              users_count: "Users"
+              plan: "Plan"
+          actions:
+            create: "Create Organization"
+            delete: "Delete Organization"
+            delete_description: "Are you sure you want to delete {name}?"
+            delete_success: "Organization deleted successfully"
+            delete_error: "Failed to delete organization"
+          input:
+            search:
+              placeholder: "Search organization"
       users:
         title: "Users"
         created_successfully: "User created successfully"
@@ -202,6 +285,7 @@ en:
         home: "Home"
         users: "Users"
         organizations: "Organizations"
+        organization_settings: "Organization Settings"
         settings: "Settings"
         footer:
           title: My Account
@@ -209,9 +293,6 @@ en:
           profile: Profile
           logout_success: "Logged out successfully"
           logout_error: "Failed to log out"
-      organizations:
-        show:
-          title: "Organization"
       profile:
         title: "Profile"
         updated_successfully: "Profile updated successfully"

@@ -1,7 +1,7 @@
 class Role < ApplicationRecord
   has_and_belongs_to_many :users, :join_table => :users_roles
-  acts_as_tenant(:organization)
-  belongs_to :organization
+  # Global roles (e.g. :client, :super_admin) must be allowed without tenant.
+  belongs_to :organization, optional: true
 
   belongs_to :resource,
              :polymorphic => true,
@@ -13,6 +13,17 @@ class Role < ApplicationRecord
             :allow_nil => true
   
   validates :name, presence: true, inclusion: { in: AvailableRoles::ALL }
+  validate :organization_required_for_non_global_roles
 
   scopify
+
+  private
+
+  def organization_required_for_non_global_roles
+    return if name.blank?
+    return if [AvailableRoles::CLIENT, AvailableRoles::SUPER_ADMIN].include?(name)
+    return if organization.present?
+
+    errors.add(:organization, :blank)
+  end
 end

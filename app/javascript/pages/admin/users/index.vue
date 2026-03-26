@@ -66,7 +66,7 @@ import { getUsersBreadcrumbs } from '@/lib/breadcrumbs/user'
 const { t } = useI18n()
 
 const props = defineProps<{
-  users: User[]
+  users: User[] 
   pagination?: {
     current_page: number
     per_page: number
@@ -133,6 +133,7 @@ const deleteUser = (id: number) => {
     }
   })
 }
+
 const onSearchClear = (e: Event) => {
   const target = e.target as HTMLInputElement
   if (target?.value === '') {

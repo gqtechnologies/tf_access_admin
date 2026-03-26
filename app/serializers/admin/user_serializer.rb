@@ -1,15 +1,6 @@
 class Admin::UserSerializer < ActiveModel::Serializer
   attributes :id, :name, :email, :dni, :language, :avatar_path, :avatar_filename, :role, :tenant_role
 
-  def avatar_path
-    return nil unless object.avatar.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(
-      object.avatar,
-      only_path: true
-    )
-  end
-
   def avatar_filename
     return nil unless object.avatar.attached?
 

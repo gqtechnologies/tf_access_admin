@@ -1,5 +1,6 @@
-<% content_for :title, t("frontend.admin.passwords.edit.title") %>
+<% content_for :title, current_tenant&.name || t("frontend.admin.passwords.edit.title") %>
 <% content_for :description, t("frontend.admin.passwords.edit.description") %>
+<% content_for :cover, current_tenant&.cover_path %>
 <%= render "layouts/devise" do %>
 
   <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>

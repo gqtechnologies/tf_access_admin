@@ -33,12 +33,54 @@ class ApplicationController < ActionController::Base
 
   def set_current_organization
     subdomain = subdomain_from_request
+
+    if subdomain.blank?
+      if request.path == "/"
+        redirect_to(home_path) and return
+      end
+
+      return if allow_request_without_organization?
+
+      redirect_to(home_path) and return
+    end
+
     organization = Organization.find_by(subdomain: subdomain)
     if organization
       set_current_tenant(organization)
     else
-      render plain: "Organization not found", status: :not_found
+      # Evita bucle: el subdominio no existe; vuelve al host público (p. ej. abc.localhost → localhost)
+      redirect_to home_url(public_home_url_options), allow_other_host: true and return
     end
+  end
+
+  # Rutas que deben responder sin subdominio de organización (auth, health, assets internos).
+  def allow_request_without_organization?
+    path = request.path
+
+    # path.start_with?("/users") || # Devise (sessions, passwords, confirmations)
+      path.start_with?("/rails/") || # ActiveStorage, etc.
+      path.start_with?("/assets/") ||
+      path.start_with?("/vite-dev/") ||
+      path == home_path
+      # path == "/up" ||
+      # path.start_with?("#{home_path}/") ||
+      # path.start_with?("/sidekiq")
+  end
+
+  def public_home_url_options
+    {
+      host: host_without_organization_subdomain,
+      port: (request.port if request.port != request.standard_port),
+      protocol: request.protocol.delete_suffix("://")
+    }.compact
+  end
+
+  def host_without_organization_subdomain
+    sub = subdomain_from_request
+    return request.host if sub.blank?
+
+    stripped = request.host.sub(/\A#{Regexp.escape(sub)}\./, "")
+    stripped.presence || request.host
   end
 
   def subdomain_from_request

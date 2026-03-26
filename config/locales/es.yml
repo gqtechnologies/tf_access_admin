@@ -56,7 +56,12 @@ es:
       manager: "Manager"
       client: "Cliente"
       content_manager: "Gestor de Contenido"
+      seller: "Vendedor"
     no_role: "Sin rol"
+    plans:
+      free: "Grátis"
+      pro: "Profesional"
+      enterprise: "Empresarial"
     languages:
       en: "Inglés"
       es: "Español"
@@ -88,6 +93,15 @@ es:
           password:
             label: "Contraseña"
             placeholder: "Ingresa tu contraseña"
+      confirmations:
+        new:
+          title: "Reenviar instrucciones de confirmación"
+          description: "Reenvía instrucciones de confirmación a tu email"
+          submit: "Reenviar instrucciones de confirmación"
+          input:
+            email:
+              label: "Email"
+              placeholder: "Ingresa tu email"
       passwords:
         new:
           title: "Olvidé mi contraseña"
@@ -118,6 +132,7 @@ es:
               placeholder: "Confirma tu contraseña"
       home:
         title: "Inicio"
+        login: "Iniciar sesión"
       users:
         title: "Usuarios"
         created_successfully: "Usuario creado correctamente"
@@ -196,13 +211,79 @@ es:
           description: "Editar un usuario para tu organización"
           submit: "Actualizar Usuario"
       organizations:
+        created_successfully: "Organización creada correctamente"
+        creation_failed: "Error al crear la organización"
+        updated_successfully: "Organización actualizada correctamente"
+        update_failed: "Error al actualizar la organización"
+        not_found: "Organización no encontrada"
+        input:
+          name:
+            label: "Nombre"
+            placeholder: "Ingresa el nombre de la organización"
+          subdomain:
+            label: "Código"
+            placeholder: "Ingresa el código de la organización"
+          cover:
+            label: "Portada"
+            placeholder: "Selecciona tu portada"
+          logo:
+            label: "Logo"
+            placeholder: "Selecciona tu logo"
+          plan:
+            label: "Plan"
+            placeholder: "Selecciona el plan de la organización"
+        validations:
+          name_required: "El nombre es obligatorio"
+          name_max: "El nombre debe como máximo {name_max} caracteres"
+          name_min: "El nombre debe como mínimo {name_min} caracteres"
+          subdomain_required: "El código es obligatorio"
+          subdomain_invalid: "El código no es válido"
+          subdomain_max: "El código debe como máximo {subdomain_max} caracteres"
+          subdomain_min: "El código debe como mínimo {subdomain_min} caracteres"
+          subdomain_no_whitespace: "El código no puede contener espacios en blanco"
+          subdomain_exists: "El código ya existe"
+          plan_required: "El plan es obligatorio"
+          plan_invalid: "El plan no es válido"
+        edit:
+          title: "Editar Organización"
+          description: "Editar una organización"
+          submit: "Actualizar Organización"
+        new:
+          title: "Nueva Organización"
+          description: "Crear una nueva organización"
+          submit: "Crear Organización"
         show:
           title: "Organización"
+          subtitle: "Información de la organización"
+          name: "Nombre"
+          subdomain: "Subdomínio"
+          plan: "Plan"
+          cover: "Portada"
+          logo: "Logo"
+        index:
+          title: "Organizaciones"
+          description: "Lista de organizaciones"
+          input:
+            search:
+              placeholder: "Buscar organización"
+          table:
+            headers:
+              name: "Nombre"
+              subdomain: "Subdomínio"
+              users_count: "Usuarios"
+              plan: "Plan"
+          actions:
+            create: "Crear Organización"
+            delete: "Eliminar Organización"
+            delete_description: "¿Estás seguro de querer eliminar a {name}?"
+            delete_success: "Organización eliminada correctamente"
+            delete_error: "Error al eliminar la organización"
       sidebar:
         platform: "Plataforma"
         home: "Inicio"
         users: "Usuarios"
         organizations: "Organizaciones"
+        organization_settings: "Configuración de Organización"
         settings: "Configuración"
         footer:
           title: "Mi Cuenta"

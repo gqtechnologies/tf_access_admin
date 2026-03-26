@@ -38,14 +38,17 @@ class ApplicationPolicy
     false
   end
 
-
-
   def admin?
     user.present? && (user.super_admin? || user.tenant_admin?)
   end
 
+  def super_admin?
+    user.present? && user.super_admin?
+  end
+
   def same_organization?
     return false unless user.present?
+    return false if user.client_global?
     return true if user.super_admin?
     return true unless record.respond_to?(:organization_id)
 
