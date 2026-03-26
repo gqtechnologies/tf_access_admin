@@ -50,19 +50,25 @@ Todo proyecto que nazca desde este repositorio debe:
 
 ## Flujo oficial para crear un nuevo proyecto
 
-### 1. Clonar el repositorio base
-
-```bash
-git clone git@github.com:Samubz/admin_base.git
-cd nombre-nuevo-proyecto
-```
-### 2. Crear el nuevo repositorio en GitHub
+### 1. Crear el nuevo repositorio en GitHub
 Crear manualmente en GitHub un repositorio nuevo para el proyecto.
 
 ```bash
 git@github.com:empresa/proyecto-cliente-a.git
 ```
 ***Este repositorio debe estar vacío al inicio.***
+
+
+### 2. Crear carpeta en local y setear origin
+
+```bash
+mkdir new-project
+cd /new-project
+git init
+git checkout main
+git remote add origin git@github.com:Samubz/admin_base.git
+git pull origin main
+```
 
 ### 3. Cambiar la configuración de remotos
 Renombrar el remoto actual para que el repositorio base quede como upstream:
@@ -71,7 +77,7 @@ git remote rename origin upstream
 ```
 Agregar el repositorio nuevo como origin:
 ```bash
-git remote add origin git@github.com:empresa/proyecto-cliente-a.git
+git remote add origin git@github.com:Samubz/new-peoject.git
 ```
 
 
@@ -81,10 +87,10 @@ git remote -v
 ```
 Debería verse algo similar a esto:
 ```bash
-origin    git@github.com:empresa/proyecto-cliente-a.git (fetch)
-origin    git@github.com:empresa/proyecto-cliente-a.git (push)
-upstream  git@github.com:empresa/dashboard-base.git (fetch)
-upstream  git@github.com:empresa/dashboard-base.git (push)
+origin	git@github.com:Samubz/fidelidade_admin.git (fetch)
+origin	git@github.com:Samubz/fidelidade_admin.git (push)
+upstream	git@github.com:Samubz/admin_base.git (fetch)
+upstream	git@github.com:Samubz/admin_base.git (push)
 ```
 
 ### 5. Subir el proyecto nuevo a su propio repositorio
