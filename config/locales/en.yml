@@ -176,6 +176,7 @@ en:
           subtitle: "Organization information"
           name: "Name"
           subdomain: "Subdomain"
+          plan: "Plan"
           cover: "Cover"
           logo: "Logo"
         edit:

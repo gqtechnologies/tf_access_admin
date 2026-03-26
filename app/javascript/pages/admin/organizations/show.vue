@@ -24,6 +24,11 @@
               <Label class="text-sm font-bold">{{ t("admin.organizations.show.subdomain") }}</Label>
               <p class="pl-8">{{ props.organization.subdomain }}</p>
             </div>
+
+            <div class="flex justify-between items-center min-h-12 gap-2 border-b border-gray-200 pb-2">
+              <Label class="text-sm font-bold">{{ t("admin.organizations.show.plan") }}</Label>
+              <p class="pl-8">{{ t(`plans.${props.organization.plan}`) }}</p>
+            </div>
             <div class="flex justify-between items-center min-h-12 gap-2 border-b border-gray-200 pb-2">
               <Label class="text-sm font-bold">{{ t("admin.organizations.show.logo") }}</Label>
               <div class="w-32 h-32 rounded-md overflow-hidden">

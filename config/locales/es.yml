@@ -256,6 +256,7 @@ es:
           subtitle: "Información de la organización"
           name: "Nombre"
           subdomain: "Subdomínio"
+          plan: "Plan"
           cover: "Portada"
           logo: "Logo"
         index:

@@ -156,6 +156,7 @@ pt:
           subtitle: "Informações da organização"
           name: "Nome"
           subdomain: "Subdomínio"
+          plan: "Plano"
           cover: "Portada"
           logo: "Logo"
         edit:
