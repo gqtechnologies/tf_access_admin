@@ -8,6 +8,7 @@
       :defaultValues="props.organization"
       :editMode="true"
       @submit="onSubmit"
+      :plans="props.plans"
     />
   </div>
 </template>
@@ -26,7 +27,8 @@ import { toast } from "vue-sonner"
 const { t } = useI18n()
 
 const props = defineProps<{
-  organization: Organization
+  organization: Organization,
+  plans: string[]
 }>()
 
 const itemsBreadcrumb = computed(() => getOrganizationBreadcrumbs(t))
@@ -36,6 +38,7 @@ const formRef = ref<InstanceType<typeof Form> | null>(null)
         organization: {
             name: data.name,
             subdomain: data.subdomain,
+            plan: data.plan,
             ...(data.cover ? { cover: data.cover } : {}),
             ...(data.logo ? { logo: data.logo } : {}),
             ...(data.remove_cover ? { remove_cover: true } : {}),

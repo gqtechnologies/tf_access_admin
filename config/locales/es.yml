@@ -58,6 +58,10 @@ es:
       content_manager: "Gestor de Contenido"
       seller: "Vendedor"
     no_role: "Sin rol"
+    plans:
+      free: "Grátis"
+      pro: "Profesional"
+      enterprise: "Empresarial"
     languages:
       en: "Inglés"
       es: "Español"
@@ -224,6 +228,9 @@ es:
           logo:
             label: "Logo"
             placeholder: "Selecciona tu logo"
+          plan:
+            label: "Plan"
+            placeholder: "Selecciona el plan de la organización"
         validations:
           name_required: "El nombre es obligatorio"
           name_max: "El nombre debe como máximo {name_max} caracteres"
@@ -234,6 +241,8 @@ es:
           subdomain_min: "El código debe como mínimo {subdomain_min} caracteres"
           subdomain_no_whitespace: "El código no puede contener espacios en blanco"
           subdomain_exists: "El código ya existe"
+          plan_required: "El plan es obligatorio"
+          plan_invalid: "El plan no es válido"
         edit:
           title: "Editar Organización"
           description: "Editar una organización"
@@ -260,6 +269,7 @@ es:
               name: "Nombre"
               subdomain: "Subdomínio"
               users_count: "Usuarios"
+              plan: "Plan"
           actions:
             create: "Crear Organización"
             delete: "Eliminar Organización"

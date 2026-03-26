@@ -48,6 +48,15 @@
                     </VeeField>
                 </FieldGroup>
                 <FieldGroup class="mt-4 mb-8 flex justify-center w-1/2 pr-3">
+                    <VeeField v-slot="{ field, errors }" name="plan">
+                        <Field :data-invalid="!!errors.length">
+                            <FieldLabel for="form-organization-plan">
+                                {{ t('admin.organizations.input.plan.label') }}
+                            </FieldLabel>
+                            <SelectPlan id="form-organization-plan" :plans="props.plans" v-bind="field" :aria-invalid="!!errors.length"/>
+                            <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
+                        </Field>
+                    </VeeField>
                     <AvatarInput
                         name="logo"
                         for="form-organization-logo"
@@ -103,6 +112,7 @@ import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors';
 import type { InertiaErrors } from '@/types/globals';
 import { admin_organizations_path } from "@/routes"
 import { Organization } from '@/types/organization';
+import SelectPlan from '@/components/admin/user/plan/inputs/SelectPlan.vue';
 
 
 const props = defineProps<{
@@ -113,6 +123,7 @@ const props = defineProps<{
     serverErrors?: Record<string, string[]>;
     submitLabel: string;
     editMode?: boolean;
+    plans: string[];
 }>();
 
 const emit = defineEmits<{

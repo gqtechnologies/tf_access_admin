@@ -57,6 +57,10 @@ pt:
       client: "Client"
       content_manager: "Content Manager"
       seller: "Vendedor"
+    plans:
+      free: "Grátis"
+      pro: "Profissional"
+      enterprise: "Empresarial"
     no_role: "Sem cargo"
     languages:
       en: "English"
@@ -144,6 +148,9 @@ pt:
           logo:
             label: "Logo"
             placeholder: "Selecione a logo da organização"
+          plan:
+            label: "Plano"
+            placeholder: "Selecione o plano da organização"
         show:
           title: "Organização"
           subtitle: "Informações da organização"
@@ -165,6 +172,8 @@ pt:
           subdomain_max: "O código deve como máximo {max} caracteres"
           subdomain_min: "O código deve como mínimo {min} caracteres"
           subdomain_exists: "O código já existe"
+          plan_required: "O plano é obrigatório"
+          plan_invalid: "O plano é inválido"
         new:
           title: "Nova Organização"
           description: "Criar uma nova organização"
@@ -176,6 +185,8 @@ pt:
             headers:
               name: "Nome"
               subdomain: "Subdomínio"
+              users_count: "Usuários"
+              plan: "Plano"
           actions:
             create: "Criar Organização"
             delete: "Deletar Organização"

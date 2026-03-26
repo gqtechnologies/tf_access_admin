@@ -4,6 +4,7 @@ class Admin::OrganizationsController < AdminController
     before_action :get_organization, only: [:show, :edit, :update]
     before_action -> { validate_organization_subdomain(:create) }, only: :create
     before_action -> { validate_organization_subdomain(:update) }, only: :update
+    before_action :validate_organization_plan, only: [:create, :update]
     after_action :handle_cover, only: [:create, :update]
     after_action :handle_logo, only: [:create, :update]
 
@@ -32,6 +33,7 @@ class Admin::OrganizationsController < AdminController
     def new
         authorize Organization
         render inertia: "admin/organizations/new", props: {
+            plans: Organization.plans.keys,
         }, status: :ok
     end
 
@@ -48,14 +50,14 @@ class Admin::OrganizationsController < AdminController
         authorize @organization
 
         render inertia: "admin/organizations/edit", props: {
-            organization: Admin::OrganizationSerializer.new(@organization).as_json
+            organization: Admin::OrganizationSerializer.new(@organization).as_json,
+            plans: Organization.plans.keys,
         }, status: :ok
     end
 
     def update
         authorize @organization
-        @organization.update(organization_params)
-
+        
         if @validation_errors ||  !@organization.update(organization_params)
             redirect_to edit_admin_organization_path(@organization), inertia: { errors: @organization.errors }
 
@@ -65,6 +67,16 @@ class Admin::OrganizationsController < AdminController
     end
 
     private
+
+
+    def validate_organization_plan
+        plan = params[:organization][:plan]
+        if plan.blank? || !Organization.plans.keys.include?(plan)
+            @organization.errors.add(:plan, "admin.organizations.validations.plan_invalid")
+            @validation_errors = true
+            return
+        end   
+    end
 
     def validate_organization_subdomain(context = :create)
         organization_subdomain = params[:organization][:subdomain]
@@ -80,7 +92,7 @@ class Admin::OrganizationsController < AdminController
         end
 
         if Organization.exists?(subdomain: organization_subdomain)
-            if context == :edit && organization_subdomain == @organization.subdomain
+            if context == :update && organization_subdomain == @organization.subdomain
                 return
             end
             @organization.errors.add(:subdomain, "admin.organizations.validations.subdomain_exists")
@@ -109,7 +121,7 @@ class Admin::OrganizationsController < AdminController
     end
 
     def organization_params
-        params.require(:organization).permit(:name, :subdomain)
+        params.require(:organization).permit(:name, :subdomain, :plan)
     end
 
     def set_filters

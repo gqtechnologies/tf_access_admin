@@ -6,6 +6,7 @@
             :description="t('admin.organizations.new.description')"
             :submitLabel="t('admin.organizations.new.submit')"
             @submit="onSubmit"
+            :plans="plans"
         />
     </div>
 </template>
@@ -20,6 +21,10 @@ import Form from '@/components/admin/organization/Form.vue'
 import type { OrganizationSchema } from '@/lib/schemas/organization'
 import { toast } from 'vue-sonner'
 
+defineProps<{
+    plans: string[]
+}>()
+
 const { t } = useI18n()
 const itemsBreadcrumb = computed(() => getOrganizationsBreadcrumbs(t))
 
@@ -31,6 +36,7 @@ function onSubmit(data: OrganizationSchema) {
             subdomain: data.subdomain,
             cover: data.cover,
             logo: data.logo,
+            plan: data.plan,
         },
     }, {
         preserveScroll: true,

@@ -57,6 +57,10 @@ en:
       client: "Client"
       content_manager: "Content Manager"
       seller: "Seller"
+    plans:
+      free: "Free"
+      pro: "Pro"
+      enterprise: "Enterprise"
     no_role: "No role"
     languages:
       en: "English"
@@ -145,7 +149,12 @@ en:
           subdomain_max: "The subdomain must be at least {max} characters"
           subdomain_min: "The subdomain must be at least {min} characters"
           subdomain_exists: "The subdomain already exists"
+          plan_required: "The plan is required"
+          plan_invalid: "The plan is invalid"
         input:
+          plan:
+            label: "Plan"
+            placeholder: "Select the plan of the organization"
           name:
             label: "Name"
             placeholder: "Enter the name of the organization"
@@ -180,6 +189,8 @@ en:
             headers:
               name: "Name"
               subdomain: "Subdomain"
+              users_count: "Users"
+              plan: "Plan"
           actions:
             create: "Create Organization"
             delete: "Delete Organization"
