@@ -27,6 +27,10 @@ class Organization < ApplicationRecord
       only_path: true
     )
   end
+
+  def users_count
+    users.where(organization_id: id).count
+  end
   
   def self.ransackable_attributes(auth_object = nil)
     ["name"]

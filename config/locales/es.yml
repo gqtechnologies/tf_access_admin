@@ -56,6 +56,7 @@ es:
       manager: "Manager"
       client: "Cliente"
       content_manager: "Gestor de Contenido"
+      seller: "Vendedor"
     no_role: "Sin rol"
     languages:
       en: "Inglés"
@@ -258,6 +259,7 @@ es:
             headers:
               name: "Nombre"
               subdomain: "Subdomínio"
+              users_count: "Usuarios"
           actions:
             create: "Crear Organización"
             delete: "Eliminar Organización"

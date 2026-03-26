@@ -4,25 +4,26 @@ module AvailableRoles
   MANAGER = "manager".freeze
   CONTENT_MANAGER = "content_manager".freeze
   CLIENT = "client".freeze
+  SELLER = "seller".freeze
 
   # Orden de prioridad: el primero es el más importante (rol principal para User#role).
   TENANT_ROLE_PRIORITY = [
     TENANT_ADMIN,
     MANAGER,
-    CONTENT_MANAGER,
-    CLIENT
+    CONTENT_MANAGER
   ].freeze
-  ROLE_PRIORITY = ([SUPER_ADMIN] + TENANT_ROLE_PRIORITY ).freeze
+  ROLE_PRIORITY = ([SUPER_ADMIN] + TENANT_ROLE_PRIORITY + [CLIENT]).freeze
 
   GLOBAL = [
-    SUPER_ADMIN
+    SUPER_ADMIN,
+    CLIENT,
   ].freeze
 
   TENANT = [
     TENANT_ADMIN,
     MANAGER,
     CONTENT_MANAGER,
-    CLIENT
+    SELLER,
   ].freeze
 
   # RESOURCE = [

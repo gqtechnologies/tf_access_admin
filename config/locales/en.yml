@@ -56,6 +56,7 @@ en:
       manager: "Manager"
       client: "Client"
       content_manager: "Content Manager"
+      seller: "Seller"
     no_role: "No role"
     languages:
       en: "English"

@@ -48,6 +48,7 @@ class ApplicationPolicy
 
   def same_organization?
     return false unless user.present?
+    return false if user.client_global?
     return true if user.super_admin?
     return true unless record.respond_to?(:organization_id)
 

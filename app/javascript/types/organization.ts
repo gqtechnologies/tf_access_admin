@@ -4,4 +4,5 @@ export type Organization = {
     subdomain: string
     logo_path?: string
     cover_path?: string
+    users_count: number
 }

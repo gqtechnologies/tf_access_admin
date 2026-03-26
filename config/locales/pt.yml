@@ -56,6 +56,7 @@ pt:
       manager: "Manager"
       client: "Client"
       content_manager: "Content Manager"
+      seller: "Vendedor"
     no_role: "Sem cargo"
     languages:
       en: "English"
