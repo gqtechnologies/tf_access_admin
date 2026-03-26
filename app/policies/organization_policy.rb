@@ -26,6 +26,10 @@ class OrganizationPolicy < ApplicationPolicy
     super_admin? || (same_organization? && user.tenant_admin?(record))
   end
 
+  def destroy?
+    super_admin?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.none unless user.present?

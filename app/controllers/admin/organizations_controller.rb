@@ -1,7 +1,7 @@
 class Admin::OrganizationsController < AdminController
     before_action :set_filters, only: [:index]
     before_action :set_organization, only: [:create]
-    before_action :get_organization, only: [:show, :edit, :update]
+    before_action :get_organization, only: [:show, :edit, :update, :destroy]
     before_action -> { validate_organization_subdomain(:create) }, only: :create
     before_action -> { validate_organization_subdomain(:update) }, only: :update
     before_action :validate_organization_plan, only: [:create, :update]
@@ -64,6 +64,19 @@ class Admin::OrganizationsController < AdminController
         else
             redirect_to edit_admin_organization_path(@organization)
         end
+    end
+
+    def destroy
+        authorize @organization
+
+        if ActsAsTenant.current_tenant.id == @organization.id
+            @organization.errors.add(:base, "admin.organizations.validations.organization_current")
+            redirect_to admin_organizations_path, inertia: { errors: @organization.errors }
+            return
+        end
+
+        @organization.destroy
+        redirect_to admin_organizations_path
     end
 
     private

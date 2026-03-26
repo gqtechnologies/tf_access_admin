@@ -61,7 +61,8 @@ import ListItem from "@/components/custom/list/ListItem.vue"
 import Header from '@/components/admin/layout/Header.vue'
 import { getOrganizationsBreadcrumbs } from '@/lib/breadcrumbs/organization'
 import type { Organization } from '@/types/organization'
-import { new_admin_organization_path } from '@/routes'
+import { new_admin_organization_path, admin_organization_path } from '@/routes'
+import { toast } from 'vue-sonner'
 const { t } = useI18n()
 
 const props = defineProps<{
@@ -113,7 +114,14 @@ const columns: ColumnDef<Organization, any>[] = [
 ]
 
 const deleteOrganization = (id: number) => {
-  console.log("delete organization", id)
+  router.delete( admin_organization_path(id), {
+    onSuccess: () => {
+      toast.success(t('admin.organizations.index.actions.delete_success'))
+    },
+    onError: () => {
+      toast.error(t('admin.organizations.index.actions.delete_error'))
+    }
+  })
 }
 
 const onSearchClear = (e: Event) => {

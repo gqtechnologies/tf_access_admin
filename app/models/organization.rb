@@ -1,4 +1,5 @@
 class Organization < ApplicationRecord
+  acts_as_paranoid
   resourcify
   
   PLAN_FREE = "free".freeze
