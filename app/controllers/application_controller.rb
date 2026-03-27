@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
   before_action :set_current_organization
   before_action :set_locale
+  before_action :set_filters, if: -> { action_name == "index" }
   # Share data with all Inertia responses, this is used to pass the locale and translations to the client
   inertia_share app: -> {
     {
@@ -107,5 +108,12 @@ class ApplicationController < ActionController::Base
   # Get the translations for the frontend
   def frontend_translations(locale)
     I18n.t("frontend", locale: locale, default: {})
+  end
+
+  def set_filters
+      @filters = {
+          page: params[:page] || 1,
+          per_page: params[:per_page] || 10,
+      }
   end
 end

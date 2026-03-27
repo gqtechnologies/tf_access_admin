@@ -1,5 +1,4 @@
 class Admin::UsersController < AdminController
-    before_action :set_filters, only: [:index]
     before_action :set_user, only: [:create]
     before_action :get_user, only: [:edit, :update, :destroy]
     before_action :validate_role, only: [:create, :update]
@@ -101,13 +100,6 @@ class Admin::UsersController < AdminController
 
     def user_params
         params.require(:user).permit(:name, :email, :dni, :password, :password_confirmation, :language)
-    end
-
-    def set_filters
-        @filters = {
-            page: params[:page] || 1,
-            per_page: params[:per_page] || 10,
-        }
     end
 
     def pagination_info(users)
