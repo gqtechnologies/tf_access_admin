@@ -1,5 +1,4 @@
 class Admin::OrganizationsController < AdminController
-    before_action :set_filters, only: [:index]
     before_action :set_organization, only: [:create]
     before_action :get_organization, only: [:show, :edit, :update, :destroy]
     before_action -> { validate_organization_subdomain(:create) }, only: :create
@@ -135,13 +134,6 @@ class Admin::OrganizationsController < AdminController
 
     def organization_params
         params.require(:organization).permit(:name, :subdomain, :plan)
-    end
-
-    def set_filters
-        @filters = {
-            page: params[:page] || 1,
-            per_page: params[:per_page] || 10,
-        }
     end
 
     def pagination_info(organizations)
