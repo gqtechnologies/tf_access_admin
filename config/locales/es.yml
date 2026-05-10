@@ -58,6 +58,13 @@ es:
       content_manager: "Gestor de Contenido"
       seller: "Vendedor"
     no_role: "Sin rol"
+    currencies:
+      CLP: "CLP"
+      USD: "USD"
+      EUR: "EUR"
+      BRL: "BRL"
+      MXN: "MXN"
+      ARS: "ARS"
     plans:
       free: "Grátis"
       pro: "Profesional"

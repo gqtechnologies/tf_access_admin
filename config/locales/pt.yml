@@ -57,6 +57,13 @@ pt:
       client: "Client"
       content_manager: "Content Manager"
       seller: "Vendedor"
+    currencies:
+      CLP: "CLP"
+      USD: "USD"
+      EUR: "EUR"
+      BRL: "BRL"
+      MXN: "MXN"
+      ARS: "ARS"
     plans:
       free: "Grátis"
       pro: "Profissional"
