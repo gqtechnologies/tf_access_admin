@@ -145,3 +145,56 @@ git checkout main
 git merge upstream/main
 git push origin main
 ```
+
+
+##Crear un usuario
+
+```bash
+
+bin/rails c
+
+email = 'sambzgo@gmail.com'
+password = '123123'
+
+subdomain = 'demo-catalogo-pro'
+organization = Organization.find_or_initialize_by(subdomain: subdomain)
+organization.assign_attributes(
+  name: organization.name.presence || "Bar & Cocina Demo",
+  plan: Organization::PLAN_PRO
+)
+organization.save!
+
+ActsAsTenant.with_tenant(organization) do
+  user = User.find_or_initialize_by(email: email)
+  user.assign_attributes(
+    organization: organization,
+    name: user.name.presence || "Admin demo",
+    dni: user.dni.presence || "DEMO-1",
+    language: user.language.presence || Languages::ES,
+    password: password,
+    password_confirmation: password
+  )
+  user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
+  user.save!
+  user.add_role(:super_admin)
+  user.add_role(:tenant_admin, organization) unless user.has_role?(:tenant_admin, organization)
+  puts <<~MSG
+    Listo.
+      Organización: #{organization.name} (#{organization.subdomain}) id=#{organization.id} plan=#{organization.plan}
+      Usuario:      #{user.email} (tenant_admin: #{user.tenant_admin?(organization)})
+  MSG
+end
+exit
+```
+
+## Para iniciar el proyecto
+
+```bash
+bundle install
+npm install
+
+foreman start -f Procfile.dev
+```
+
+ingresar a 
+- http://demo-catalogo-pro.localhost:5100/home
