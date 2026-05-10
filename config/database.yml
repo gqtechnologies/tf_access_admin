@@ -44,19 +44,20 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: <%= ENV.fetch("PGUSER", "admin_base") %>
+  username: <%= ENV.fetch("PGUSER", "postgres") %>
   password: <%= ENV.fetch("PGPASSWORD", "secret") %>
   host: <%= ENV.fetch("PGHOST", "localhost") %>
   port: <%= ENV.fetch("PGPORT", 5432) %>
+  database: <%= ENV.fetch("PGDATABASE", "admin_base") %>
 
 
 development:
   <<: *default
-  database: admin_base_development2
+  database: admin_base_development
 
 test:
   <<: *default
-  database: <%= ENV.fetch("PGDATABASE", "admin_base_test2") %>
+  database: <%= ENV.fetch("PGDATABASE", "admin_base_test") %>
 
 production:
   primary:
