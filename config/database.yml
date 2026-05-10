@@ -59,8 +59,14 @@ test:
   database: <%= ENV.fetch("PGDATABASE", "admin_base_test2") %>
 
 production:
-  <<: *default
-  url: <%= ENV["DATABASE_URL"] %>
+  primary:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+
+  cable:
+    <<: *default
+    url: <%= ENV.fetch("CABLE_DATABASE_URL", ENV["DATABASE_URL"]) %>
+    migrations_paths: db/cable_migrate
   # database: admin_base_production
   # username: <%= ENV["PG_USER"] %>
   # password: <%= ENV["PG_PASSWORD"] %>
