@@ -51,11 +51,11 @@ default: &default
 
 development:
   <<: *default
-  database: admin_base_development1
+  database: admin_base_development2
 
 test:
   <<: *default
-  database: admin_base_test1
+  database: admin_base_test2
 
 production:
   <<: *default
