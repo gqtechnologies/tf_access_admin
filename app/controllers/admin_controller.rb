@@ -3,6 +3,7 @@
 class AdminController < InertiaController
   before_action :authenticate_user!
   before_action :set_locale
+  before_action :set_filters, only: [:index]
 
   inertia_share auth: -> {
     if user_signed_in?
@@ -34,6 +35,13 @@ class AdminController < InertiaController
   # Get the translations for the frontend
   def frontend_translations(locale)
     I18n.t("frontend", locale: locale, default: {})
+  end
+
+  def set_filters
+    @filters = {
+        page: params[:page] || 1,
+        per_page: params[:per_page] || 10,
+    }
   end
   
 end
