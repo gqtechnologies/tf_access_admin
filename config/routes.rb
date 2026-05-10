@@ -31,9 +31,9 @@ Rails.application.routes.draw do
         delete :logout, to: "sessions#destroy"
       end
 
-      namespace :public do
-        resources :organizations, only: [:index]
-      end
+      # namespace :public do
+      #   resources :organizations, only: [:index]
+      # end
 
       namespace :private do
       end
