@@ -156,7 +156,7 @@ bin/rails c
 email = 'sambzgo@gmail.com'
 password = '123123'
 
-subdomain = 'demo-catalogo-pro'
+subdomain = 'demo-pro'
 organization = Organization.find_or_initialize_by(subdomain: subdomain)
 organization.assign_attributes(
   name: organization.name.presence || "Bar & Cocina Demo",
@@ -197,7 +197,7 @@ foreman start -f Procfile.dev
 ```
 
 ingresar a 
-- http://demo-catalogo-pro.localhost:5100/home
+- http://demo-pro.localhost:5100/home
 
 ### To install shadcn modules
 ```bash
