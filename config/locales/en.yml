@@ -35,6 +35,14 @@ en:
       cancel: "Cancel"
       back: "Back"
       clear: "Clear"
+      multi_file_upload:
+        browse: "Browse"
+        browse_aria: "Choose files (up to {max})"
+        hint: "Upload your images or files (up to {count})"
+        remove_file: "Remove {name}"
+        file_too_large: "File exceeds maximum size: {name}"
+        file_type_not_allowed: "File type not allowed: {name}"
+        max_files_reached: "Maximum number of files reached"
       actions:
         edit: "Edit"
         search: "Search"

@@ -25,21 +25,11 @@ class Organization < ApplicationRecord
   validates :plan, inclusion: { in: plans.keys }
 
   def cover_path
-    return nil unless cover.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(
-      cover,
-      only_path: true
-    )
+    BlobUrls.url_for(cover)
   end
 
   def logo_path
-    return nil unless logo.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(
-      logo,
-      only_path: true
-    )
+    BlobUrls.url_for(logo)
   end
 
   def users_count

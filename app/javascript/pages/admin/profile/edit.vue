@@ -34,7 +34,6 @@ const props = defineProps<{
     errors?: Record<string, string[]>;
 }>();
 
-
 const formRef = ref<InstanceType<typeof Form> | null>(null)
 const itemsBreadcrumb = computed(() => getProfileBreadcrumbs(t))
 function onSubmit(data: ProfileEditSchema) {

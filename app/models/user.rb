@@ -59,12 +59,7 @@ class User < ApplicationRecord
   end
 
   def avatar_path
-    return nil unless avatar.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(
-      avatar,
-      only_path: true
-    )
+    BlobUrls.url_for(avatar)
   end
 
   def self.ransackable_attributes(auth_object = nil)

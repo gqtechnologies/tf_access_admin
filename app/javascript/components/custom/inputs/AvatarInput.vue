@@ -33,7 +33,7 @@
     </VeeField>
 </template>
 <script setup lang="ts">
-import { ref, onBeforeUnmount } from 'vue'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import { Input } from '@/components/ui/input';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -63,6 +63,16 @@ const emit = defineEmits<{
 const { translateErrors } = useTranslateErrors();
 
 const previewUrl = ref<string | null>(null)
+
+watch(
+  () => props.defaultValue,
+  () => {
+    if (previewUrl.value) {
+      URL.revokeObjectURL(previewUrl.value)
+      previewUrl.value = null
+    }
+  },
+)
 
 const changeFile = (e: Event) => {
     const input = e.target as HTMLInputElement | null
