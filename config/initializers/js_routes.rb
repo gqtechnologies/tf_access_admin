@@ -1,5 +1,4 @@
 JsRoutes.setup do |c|
-
   c.module_type = "ESM"
   # c.include = /^admin_/
   # Setup your JS module system:

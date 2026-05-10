@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Api::V1::Auth::SessionsController < Api::V1::BaseController
-  skip_before_action :set_current_organization, only: [:create]
+  skip_before_action :set_current_organization, only: [ :create ]
 
-  before_action :authenticate_user!, only: [:destroy]
-  before_action :ensure_destroy_tenant_access!, only: [:destroy]
+  before_action :authenticate_user!, only: [ :destroy ]
+  before_action :ensure_destroy_tenant_access!, only: [ :destroy ]
 
   def create
     organization = get_organization_from_subdomain(api_subdomain_from_request)
@@ -64,6 +64,6 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
     return if current_user.organization_id == ActsAsTenant.current_tenant.id
 
     render json: { error: I18n.t("api.errors.forbidden") }, status: :forbidden
-    return
+    nil
   end
 end

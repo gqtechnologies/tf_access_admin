@@ -33,7 +33,7 @@ class OrganizationPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.none unless user.present?
-      
+
       if user.super_admin?
         scope.all
       else

@@ -25,7 +25,7 @@ class Api::V1::BaseController < ActionController::API
   def set_filters
     @filters = {
         page: params[:page] || 1,
-        per_page: params[:per_page] || 10,
+        per_page: params[:per_page] || 10
     }
   end
 
@@ -49,9 +49,9 @@ class Api::V1::BaseController < ActionController::API
     raw = params[:limit].to_i
     return default if raw <= 0
 
-    [raw, max].min
+    [ raw, max ].min
   end
-  
+
   def resolve_organization
     subdomain = api_subdomain_from_request
     return nil if subdomain.blank?

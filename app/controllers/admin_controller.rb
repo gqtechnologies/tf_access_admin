@@ -9,7 +9,7 @@ class AdminController < InertiaController
 
   inertia_share auth: -> {
     if user_signed_in?
-      { user: Admin::UserSerializer.new(current_user).as_json, features: current_user.features}
+      { user: Admin::UserSerializer.new(current_user).as_json, features: current_user.features }
     else
       {}
     end
@@ -43,8 +43,7 @@ class AdminController < InertiaController
   def set_filters
     @filters = {
         page: params[:page] || 1,
-        per_page: params[:per_page] || 10,
+        per_page: params[:per_page] || 10
     }
   end
-  
 end

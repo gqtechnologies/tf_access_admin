@@ -12,18 +12,18 @@ module AvailableRoles
     MANAGER,
     CONTENT_MANAGER
   ].freeze
-  ROLE_PRIORITY = ([SUPER_ADMIN] + TENANT_ROLE_PRIORITY + [CLIENT]).freeze
+  ROLE_PRIORITY = ([ SUPER_ADMIN ] + TENANT_ROLE_PRIORITY + [ CLIENT ]).freeze
 
   GLOBAL = [
     SUPER_ADMIN,
-    CLIENT,
+    CLIENT
   ].freeze
 
   TENANT = [
     TENANT_ADMIN,
     MANAGER,
     CONTENT_MANAGER,
-    SELLER,
+    SELLER
   ].freeze
 
   # RESOURCE = [

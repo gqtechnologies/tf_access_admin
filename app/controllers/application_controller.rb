@@ -59,14 +59,14 @@ class ApplicationController < ActionController::Base
   def allow_request_without_organization?
     path = request.path
 
-    # path.start_with?("/users") || # Devise (sessions, passwords, confirmations)
+      # path.start_with?("/users") || # Devise (sessions, passwords, confirmations)
       path.start_with?("/rails/") || # ActiveStorage, etc.
       path.start_with?("/assets/") ||
       path.start_with?("/vite-dev/") ||
       path == home_path
-      # path == "/up" ||
-      # path.start_with?("#{home_path}/") ||
-      # path.start_with?("/sidekiq")
+    # path == "/up" ||
+    # path.start_with?("#{home_path}/") ||
+    # path.start_with?("/sidekiq")
   end
 
   def public_home_url_options

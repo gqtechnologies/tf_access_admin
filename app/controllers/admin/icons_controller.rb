@@ -5,10 +5,10 @@ class Admin::IconsController < AdminController
     authorize Icon
 
     query = params[:q].to_s.strip
-    page = [params[:page].to_i, 1].max
+    page = [ params[:page].to_i, 1 ].max
     per_page = params[:per_page].to_i
     per_page = 48 if per_page <= 0
-    per_page = [per_page, 100].min
+    per_page = [ per_page, 100 ].min
 
     scope = policy_scope(Icon).ordered
     if query.present?

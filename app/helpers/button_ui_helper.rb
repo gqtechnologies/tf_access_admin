@@ -24,6 +24,6 @@ module ButtonUiHelper
     size_key = size.to_s.tr("_", "-").to_sym
     size_classes = SHADCN_BUTTON_SIZES.fetch(size_key, SHADCN_BUTTON_SIZES[:default])
 
-    [SHADCN_BUTTON_BASE_CLASSES, variant_classes, size_classes, class_name].compact.join(" ")
+    [ SHADCN_BUTTON_BASE_CLASSES, variant_classes, size_classes, class_name ].compact.join(" ")
   end
 end

@@ -26,17 +26,17 @@ module AttachmentImageFormat
   def extract_content_type_and_filename(source)
     case source
     when ActiveStorage::Blob
-      [source.content_type, source.filename.to_s]
+      [ source.content_type, source.filename.to_s ]
     when ActiveStorage::Attached::One
-      return [nil, ""] unless source.attached?
+      return [ nil, "" ] unless source.attached?
 
       extract_content_type_and_filename(source.blob)
     when ActiveStorage::Attachment
       extract_content_type_and_filename(source.blob)
     when ActionDispatch::Http::UploadedFile, Rack::Test::UploadedFile
-      [source.content_type, source.original_filename.to_s]
+      [ source.content_type, source.original_filename.to_s ]
     else
-      [nil, ""]
+      [ nil, "" ]
     end
   end
 

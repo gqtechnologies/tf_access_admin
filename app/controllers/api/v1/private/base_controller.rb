@@ -14,7 +14,7 @@ class Api::V1::Private::BaseController < Api::V1::BaseController
     return if current_user.organization_id == ActsAsTenant.current_tenant.id
 
     render json: { error: I18n.t("api.errors.forbidden") }, status: :forbidden
-    return
+    nil
   end
 
   def pundit_user

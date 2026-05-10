@@ -6,7 +6,7 @@
 # on Warden::JWTAuth.config. Register API login/logout here so they persist.
 Rails.application.config.after_initialize do
   Warden::JWTAuth.configure do |config|
-    config.dispatch_requests << ["POST", %r{\A/api/v1/auth/login(\.json)?\z}]
-    config.revocation_requests << ["DELETE", %r{\A/api/v1/auth/logout(\.json)?\z}]
+    config.dispatch_requests << [ "POST", %r{\A/api/v1/auth/login(\.json)?\z} ]
+    config.revocation_requests << [ "DELETE", %r{\A/api/v1/auth/logout(\.json)?\z} ]
   end
 end

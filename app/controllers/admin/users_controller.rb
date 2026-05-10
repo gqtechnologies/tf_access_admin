@@ -10,7 +10,7 @@ class Admin::UsersController < AdminController
                     .order(created_at: :desc)
                     .page(@filters[:page])
                     .per(@filters[:per_page])
-        
+
         pagination = pagination_info(users)
         render inertia: "admin/users/index", props: {
             users: users.map { |u| Admin::UserSerializer.new(u).as_json },
@@ -38,14 +38,14 @@ class Admin::UsersController < AdminController
 
     def edit
         authorize @user
-        
+
         user_json = Admin::UserSerializer.new(@user).as_json
 
         user_json[:role] = user_json[:tenant_role]
         render inertia: "admin/users/edit", props: {
             user: user_json,
             roles: AvailableRoles::TENANT,
-            languages: Languages::ALL,
+            languages: Languages::ALL
         }
     end
 
@@ -81,8 +81,8 @@ class Admin::UsersController < AdminController
     def get_user
         @user = User.find(params[:id])
         if @user.blank?
-            redirect_to admin_users_path, inertia: { errors: [I18n.t("frontend.admin.users.not_found")]  }
-            return
+            redirect_to admin_users_path, inertia: { errors: [ I18n.t("frontend.admin.users.not_found") ]  }
+            nil
         end
     end
 
@@ -107,7 +107,7 @@ class Admin::UsersController < AdminController
             current_page: users.current_page,
             per_page: @filters[:per_page],
             total_pages: users.total_pages,
-            total_count: users.total_count,
+            total_count: users.total_count
         }
     end
 end

@@ -1,19 +1,18 @@
 require "sidekiq/web"
 
 Rails.application.routes.draw do
-
   # Redirect to localhost from 127.0.0.1 to use same IP address with Vite server
   constraints(host: "127.0.0.1") do
     get "(*path)", to: redirect { |params, req| "#{req.protocol}localhost:#{req.port}/#{params[:path]}" }
   end
 
   authenticate :user, lambda { |u| u.super_admin? } do
-    mount Sidekiq::Web => '/sidekiq'
-    mount Flipper::UI.app(Flipper) => '/flipper'
+    mount Sidekiq::Web => "/sidekiq"
+    mount Flipper::UI.app(Flipper) => "/flipper"
   end
   # Público / sin tenant (dominio base o sin subdominio de organización)
   get "home", to: "home#index", as: :home
-  
+
   # Solo rutas Devise necesarias: login (Inertia), recuperación de contraseña, confirmación por email.
   # No exponer registrations (sign up), unlocks ni otros módulos hasta implementarlos.
   devise_for :users,
@@ -39,7 +38,7 @@ Rails.application.routes.draw do
       end
     end
   end
-  
+
   get "admin/home/index"
   namespace :admin do
     resources :users, only: [:index, :new, :create, :edit, :update, :destroy]

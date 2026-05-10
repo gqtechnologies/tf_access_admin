@@ -57,7 +57,7 @@ class ApplicationPolicy
 
   def same_user?
     return false unless user.present?
-    return false unless record.respond_to?(:id) 
+    return false unless record.respond_to?(:id)
     return false unless user.respond_to?(:id)
     record.id == user.id
   end

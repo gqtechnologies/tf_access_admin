@@ -38,7 +38,7 @@ class User < ApplicationRecord
 
   has_many :permissions, through: :roles
   has_one_attached :avatar
-  
+
   acts_as_tenant(:organization)
   belongs_to :organization
 
@@ -96,7 +96,7 @@ class User < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["name", "email", "dni"]
+    [ "name", "email", "dni" ]
   end
 
   def self.ransackable_associations(auth_object = nil)

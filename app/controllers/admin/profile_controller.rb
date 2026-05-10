@@ -1,15 +1,14 @@
 class Admin::ProfileController < AdminController
+    before_action :get_user, only: [ :edit, :update ]
+    after_action :handle_avatar, only: [ :update ]
 
-    before_action :get_user, only: [:edit, :update]
-    after_action :handle_avatar, only: [:update]
-    
     def edit
         authorize @user, :edit?, policy_class: Admin::ProfilePolicy
 
-        render inertia: "admin/profile/edit", 
+        render inertia: "admin/profile/edit",
         props: {
             user: Admin::UserSerializer.new(@user).as_json,
-            languages: Languages::ALL,
+            languages: Languages::ALL
         }
     end
 
@@ -33,8 +32,8 @@ class Admin::ProfileController < AdminController
     def get_user
         @user = User.find_by(id: params[:id])
         if @user.blank?
-            redirect_to admin_home_index_path, inertia: { errors: [I18n.t("frontend.admin.users.not_found")]  }
-            return
+            redirect_to admin_home_index_path, inertia: { errors: [ I18n.t("frontend.admin.users.not_found") ]  }
+            nil
         end
     end
 
@@ -45,8 +44,8 @@ class Admin::ProfileController < AdminController
     def handle_avatar
         user = params[:user]
         return if user.blank?
-        
-        if ActiveModel::Type::Boolean.new.cast(user[:remove_avatar])    
+
+        if ActiveModel::Type::Boolean.new.cast(user[:remove_avatar])
             @user.avatar.purge
         elsif user[:avatar].present?
             @user.avatar.attach(user[:avatar])

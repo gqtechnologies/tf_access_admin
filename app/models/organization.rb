@@ -19,7 +19,7 @@
 class Organization < ApplicationRecord
   acts_as_paranoid
   resourcify
-  
+
   PLAN_FREE = "free".freeze
   PLAN_PRO = "pro".freeze
   PLAN_ENTERPRISE = "enterprise".freeze
@@ -53,9 +53,9 @@ class Organization < ApplicationRecord
   def users_count
     users.where(organization_id: id).count
   end
-  
+
   def self.ransackable_attributes(auth_object = nil)
-    ["name", "plan"]
+    [ "name", "plan" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
