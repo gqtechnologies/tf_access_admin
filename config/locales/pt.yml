@@ -35,6 +35,7 @@ pt:
       cancel: "Cancelar"
       back: "Voltar"
       clear: "Limpar"
+      back: "Voltar"
       multi_file_upload:
         browse: "Procurar"
         browse_aria: "Selecionar arquivos (até {max})"

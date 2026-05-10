@@ -35,6 +35,7 @@ es:
       cancel: "Cancelar"
       back: "Volver"
       clear: "Limpiar"
+      back: "Volver"
       multi_file_upload:
         browse: "Examinar"
         browse_aria: "Seleccionar archivos (hasta {max})"

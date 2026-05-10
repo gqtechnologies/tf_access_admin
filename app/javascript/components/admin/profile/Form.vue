@@ -90,7 +90,7 @@
         <CardFooter>
             <Field orientation="horizontal" class="md:flex md:justify-end flex-col md:flex-row">
                 <Button type="button" as="a" :href="admin_home_index_path()" variant="outline" class="w-full md:w-auto">
-                    {{ props.cancelLabel || t('common.cancel') }}
+                    {{ props.cancelLabel || t('common.back') }}
                 </Button>
                 <Button type="submit" form="form-user" class="w-full md:w-auto cursor-pointer">
                     {{ props.submitLabel }}
