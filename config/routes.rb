@@ -32,13 +32,10 @@ Rails.application.routes.draw do
       end
 
       namespace :public do
-        resources :categories, only: [:index]
-        resources :products, only: [:index, :show]
+        resources :organizations, only: [:index]
       end
 
       namespace :private do
-        resources :categories, only: [:index]
-        resources :products, only: [:index]
       end
     end
   end
