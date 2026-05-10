@@ -1,9 +1,27 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
+# == Schema Information
+#
+# Table name: organizations
+#
+#  id         :uuid             not null, primary key
+#  deleted_at :datetime
+#  name       :string
+#  plan       :string           default("free"), not null
+#  subdomain  :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_organizations_on_deleted_at  (deleted_at)
+#  index_organizations_on_plan        (plan)
+#  index_organizations_on_subdomain   (subdomain) UNIQUE
+#
 one:
   name: MyString
-  subdomain: MyString
+  subdomain: fixture-org-one
 
 two:
   name: MyString
-  subdomain: MyString
+  subdomain: fixture-org-two

@@ -9,6 +9,7 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.6
+ARG NODE_VERSION=22
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -16,12 +17,13 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
     ln -s /usr/lib/$(uname -m)-linux-gnu/libjemalloc.so.2 /usr/local/lib/libjemalloc.so && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment variables and enable jemalloc for reduced memory usage and latency.
 ENV RAILS_ENV="production" \
+    NODE_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development" \
@@ -30,11 +32,18 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
+ARG NODE_VERSION
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libyaml-dev libpq-dev pkg-config && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
+    apt-get update -qq && \
+    apt-get install --no-install-recommends -y nodejs && \
+    npm install -g corepack && \
+    corepack enable && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
 # Install application gems
 COPY vendor/* ./vendor/
 COPY Gemfile Gemfile.lock ./
@@ -44,6 +53,20 @@ RUN bundle install && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
 
+COPY package.json ./
+COPY yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+
+# Install frontend dependencies.
+# Important: Vite is often in devDependencies, so we must install dev deps during build.
+RUN if [ -f yarn.lock ]; then \
+      yarn install --frozen-lockfile --production=false; \
+    elif [ -f pnpm-lock.yaml ]; then \
+      pnpm install --frozen-lockfile --prod=false; \
+    elif [ -f package-lock.json ]; then \
+      npm ci --include=dev; \
+    else \
+      npm install --include=dev; \
+    fi
 # Copy application code
 COPY . .
 

@@ -44,21 +44,30 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: dischool          # o tu usuario local
-  password: secret                  # si aplica
-  host: localhost
+  username: <%= ENV.fetch("PGUSER", "postgres") %>
+  password: <%= ENV.fetch("PGPASSWORD", "secret") %>
+  host: <%= ENV.fetch("PGHOST", "localhost") %>
+  port: <%= ENV.fetch("PGPORT", 5432) %>
+  database: <%= ENV.fetch("PGDATABASE", "admin_base") %>
 
 
 development:
   <<: *default
-  database: admin_base_development1
+  database: <%= ENV.fetch("PGDATABASE", "admin_base") %>
 
 test:
   <<: *default
-  database: admin_base_test1
+  database: <%= ENV.fetch("PGDATABASE", "admin_base_test") %>
 
 production:
-  <<: *default
-  database: admin_base_production
-  username: <%= ENV["PG_USER"] %>
-  password: <%= ENV["PG_PASSWORD"] %>
+  primary:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+
+  cable:
+    <<: *default
+    url: <%= ENV.fetch("CABLE_DATABASE_URL", ENV["DATABASE_URL"]) %>
+    migrations_paths: db/cable_migrate
+  # database: admin_base_production
+  # username: <%= ENV["PG_USER"] %>
+  # password: <%= ENV["PG_PASSWORD"] %>

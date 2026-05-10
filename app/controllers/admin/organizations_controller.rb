@@ -3,9 +3,9 @@ class Admin::OrganizationsController < AdminController
     before_action :get_organization, only: [:show, :edit, :update, :destroy]
     before_action -> { validate_organization_subdomain(:create) }, only: :create
     before_action -> { validate_organization_subdomain(:update) }, only: :update
-    before_action :validate_organization_plan, only: [:create, :update]
-    after_action :handle_cover, only: [:create, :update]
-    after_action :handle_logo, only: [:create, :update]
+    before_action :validate_organization_plan, only: [ :create, :update ]
+    after_action :handle_cover, only: [ :create, :update ]
+    after_action :handle_logo, only: [ :create, :update ]
 
     def index
         authorize Organization
@@ -14,7 +14,7 @@ class Admin::OrganizationsController < AdminController
                     .order(created_at: :desc)
                     .page(@filters[:page])
                     .per(@filters[:per_page])
-        
+
         pagination = pagination_info(organizations)
         render inertia: "admin/organizations/index", props: {
             organizations: organizations.map { |o| Admin::OrganizationSerializer.new(o).as_json },
@@ -32,7 +32,7 @@ class Admin::OrganizationsController < AdminController
     def new
         authorize Organization
         render inertia: "admin/organizations/new", props: {
-            plans: Organization.plans.keys,
+            plans: Organization.plans.keys
         }, status: :ok
     end
 
@@ -50,13 +50,13 @@ class Admin::OrganizationsController < AdminController
 
         render inertia: "admin/organizations/edit", props: {
             organization: Admin::OrganizationSerializer.new(@organization).as_json,
-            plans: Organization.plans.keys,
+            plans: Organization.plans.keys
         }, status: :ok
     end
 
     def update
         authorize @organization
-        
+
         if @validation_errors ||  !@organization.update(organization_params)
             redirect_to edit_admin_organization_path(@organization), inertia: { errors: @organization.errors }
 
@@ -86,8 +86,8 @@ class Admin::OrganizationsController < AdminController
         if plan.blank? || !Organization.plans.keys.include?(plan)
             @organization.errors.add(:plan, "admin.organizations.validations.plan_invalid")
             @validation_errors = true
-            return
-        end   
+            nil
+        end
     end
 
     def validate_organization_subdomain(context = :create)
@@ -123,11 +123,11 @@ class Admin::OrganizationsController < AdminController
         @organization = Organization.find_by(id: params[:id])
         if @organization.blank?
             if current_user.super_admin?
-                redirect_to admin_organizations_path, inertia: { errors: [I18n.t("frontend.admin.organizations.not_found")]  }
-                return
+                redirect_to admin_organizations_path, inertia: { errors: [ I18n.t("frontend.admin.organizations.not_found") ]  }
+                nil
             else
-                redirect_to admin_home_index_path, inertia: { errors: [I18n.t("frontend.admin.organizations.not_found")]  }
-                return
+                redirect_to admin_home_index_path, inertia: { errors: [ I18n.t("frontend.admin.organizations.not_found") ]  }
+                nil
             end
         end
     end
@@ -141,7 +141,7 @@ class Admin::OrganizationsController < AdminController
             current_page: organizations.current_page,
             per_page: @filters[:per_page],
             total_pages: organizations.total_pages,
-            total_count: organizations.total_count,
+            total_count: organizations.total_count
         }
     end
 

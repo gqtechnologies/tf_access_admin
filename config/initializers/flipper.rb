@@ -32,10 +32,9 @@ Flipper.configure do |config|
   ## Configure other adapters that you want to use here:
   ## See http://flippercloud.io/docs/adapters
   # config.use Flipper::Adapters::ActiveSupportCacheStore, Rails.cache, expires_in: 5.minutes
-  
 end
 Flipper::UI.configure do |config|
-  config.application_breadcrumb_href = '/admin/home/index'
+  config.application_breadcrumb_href = "/admin/home/index"
 end
 ## Register a group that can be used for enabling features.
 ##

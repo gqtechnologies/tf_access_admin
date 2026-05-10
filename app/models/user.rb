@@ -1,3 +1,36 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                     :uuid             not null, primary key
+#  confirmation_sent_at   :datetime
+#  confirmation_token     :string
+#  confirmed_at           :datetime
+#  deleted_at             :datetime
+#  dni                    :string
+#  email                  :string           default(""), not null
+#  encrypted_password     :string           default(""), not null
+#  language               :string
+#  name                   :string
+#  remember_created_at    :datetime
+#  reset_password_sent_at :datetime
+#  reset_password_token   :string
+#  unconfirmed_email      :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  organization_id        :uuid
+#
+# Indexes
+#
+#  index_users_on_deleted_at            (deleted_at)
+#  index_users_on_email                 (email) UNIQUE
+#  index_users_on_organization_id       (organization_id)
+#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organization_id => organizations.id)
+#
 class User < ApplicationRecord
   rolify
   acts_as_paranoid
@@ -5,7 +38,7 @@ class User < ApplicationRecord
 
   has_many :permissions, through: :roles
   has_one_attached :avatar
-  
+
   acts_as_tenant(:organization)
   belongs_to :organization
 
@@ -21,7 +54,14 @@ class User < ApplicationRecord
   # Sin :registerable: el alta de usuarios es vía admin; evita rutas/métodos de sign_up público
   devise :database_authenticatable,
          :recoverable, :rememberable, :validatable,
-         :confirmable
+         :confirmable,
+         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
+
+  def jwt_payload
+    {
+      "organization_id" => organization_id.to_s
+    }
+  end
 
   def role
     return nil if roles.blank?
@@ -52,16 +92,11 @@ class User < ApplicationRecord
   end
 
   def avatar_path
-    return nil unless avatar.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(
-      avatar,
-      only_path: true
-    )
+    BlobUrls.url_for(avatar)
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ["name", "email", "dni"]
+    [ "name", "email", "dni" ]
   end
 
   def self.ransackable_associations(auth_object = nil)

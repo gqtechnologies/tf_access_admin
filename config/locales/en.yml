@@ -32,9 +32,20 @@ en:
     name: "Admin Base"
     description: "welcome again"
     common:
+      yes: "Yes"
+      no: "No"
       cancel: "Cancel"
       back: "Back"
       clear: "Clear"
+      back: "Back"
+      multi_file_upload:
+        browse: "Browse"
+        browse_aria: "Choose files (up to {max})"
+        hint: "Upload your images or files (up to {count})"
+        remove_file: "Remove {name}"
+        file_too_large: "File exceeds maximum size: {name}"
+        file_type_not_allowed: "File type not allowed: {name}"
+        max_files_reached: "Maximum number of files reached"
       actions:
         edit: "Edit"
         search: "Search"
@@ -57,6 +68,13 @@ en:
       client: "Client"
       content_manager: "Content Manager"
       seller: "Seller"
+    currencies:
+      CLP: "CLP"
+      USD: "USD"
+      EUR: "EUR"
+      BRL: "BRL"
+      MXN: "MXN"
+      ARS: "ARS"
     plans:
       free: "Free"
       pro: "Pro"
@@ -77,6 +95,17 @@ en:
       contact_support: "Contact support"
       go_to_home: "Go to home"
     admin:
+      common:
+        icon_picker:
+          aria_select_icon: "Select icon"
+          selected: "Selected icon"
+          select: "Select icon"
+          search_label: "Search icon"
+          search_placeholder: "Search icon"
+          clear: "Clear icon"
+          empty: "No icons found."
+          loading_more: "Loading more icons..."
+          fetch_error: "Could not load icon catalog."
       login:
         title: "Login"
         description: "Login to your account"
@@ -123,6 +152,7 @@ en:
           title: "Edit Password"
           description: "Enter your new password and confirm it to update it."
           submit: "Change my password"
+          processing: "Updating password..."
           success: "Password updated successfully"
           error: "Failed to update password"
           input:
@@ -134,6 +164,7 @@ en:
               placeholder: "Confirm your password"
       home:
         title: "Home"
+        login: "Log in"
       organizations:
         created_successfully: "Organization created successfully"
         creation_failed: "Failed to create organization"
@@ -287,6 +318,10 @@ en:
         organizations: "Organizations"
         organization_settings: "Organization Settings"
         settings: "Settings"
+        categories: "Categories"
+        components: "Components"
+        products: "Products"
+        product_option_groups: "Option Groups"
         footer:
           title: My Account
           logout: Log out
@@ -301,6 +336,17 @@ en:
           title: "Edit Profile"
           description: "Edit your profile"
           submit: "Update Profile"
+  api:
+    errors:
+      forbidden: "You are not authorized to access this resource"
+      not_found: "Resource not found"
+      unauthorized: "You are not authorized to access this resource"
+      unauthorized_tenant: "You are not authorized to access this resource"
+      token_dispatch_failed: "Failed to dispatch token"
+      invalid_credentials: "Invalid credentials"
+      unconfirmed_account: "Account not confirmed"
+      token_expired: "Token expired"
+      token_invalid: "Token invalid"
   mailer:
     verification:
       title: "Confirm your email address"

@@ -32,9 +32,20 @@ es:
     name: "Admin Base"
     description: "bienvenido nuevamente"
     common:
+      yes: "Sí"
+      no: "No"
       cancel: "Cancelar"
       back: "Volver"
       clear: "Limpiar"
+      back: "Volver"
+      multi_file_upload:
+        browse: "Examinar"
+        browse_aria: "Seleccionar archivos (hasta {max})"
+        hint: "Sube tus imágenes o archivos (hasta {count})"
+        remove_file: "Quitar {name}"
+        file_too_large: "El archivo supera el tamaño máximo: {name}"
+        file_type_not_allowed: "Tipo de archivo no permitido: {name}"
+        max_files_reached: "Número máximo de archivos alcanzado"
       actions:
         edit: "Editar"
         search: "Buscar"
@@ -58,6 +69,13 @@ es:
       content_manager: "Gestor de Contenido"
       seller: "Vendedor"
     no_role: "Sin rol"
+    currencies:
+      CLP: "CLP"
+      USD: "USD"
+      EUR: "EUR"
+      BRL: "BRL"
+      MXN: "MXN"
+      ARS: "ARS"
     plans:
       free: "Grátis"
       pro: "Profesional"
@@ -73,6 +91,17 @@ es:
       contact_support: "Contactar soporte"
       go_to_home: "Ir a la página de inicio"
     admin:
+      common:
+        icon_picker:
+          aria_select_icon: "Seleccionar icono"
+          selected: "Icono seleccionado"
+          select: "Seleccionar icono"
+          search_label: "Buscar icono"
+          search_placeholder: "Buscar icono"
+          clear: "Limpiar icono"
+          empty: "No se encontraron iconos."
+          loading_more: "Cargando más iconos..."
+          fetch_error: "No se pudo consultar el catálogo de iconos."
       login:
         errors:
           invalid: "Email o contraseña inválidos"
@@ -299,6 +328,17 @@ es:
           title: "Editar Perfil"
           description: "Editar tu perfil"
           submit: "Actualizar Perfil"
+  api:
+    errors:
+      forbidden: "No tienes permisos para acceder a este recurso"
+      not_found: "Recurso no encontrado"
+      unauthorized: "No tienes permisos para acceder a este recurso"
+      unauthorized_tenant: "No tienes permisos para acceder a este recurso"
+      token_dispatch_failed: "Error al generar el token"
+      invalid_credentials: "Credenciales inválidas"
+      unconfirmed_account: "Cuenta no confirmada"
+      token_expired: "Token expirado"
+      token_invalid: "Token inválido"
   mailer:
     verification:
       title: "Confirma tu dirección de correo electrónico"

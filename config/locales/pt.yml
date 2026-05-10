@@ -32,9 +32,20 @@ pt:
     name: "Admin Base"
     description: "bem-vindo de volta"
     common:
+      yes: "Sim"
+      no: "Não"
       cancel: "Cancelar"
       back: "Voltar"
       clear: "Limpar"
+      back: "Voltar"
+      multi_file_upload:
+        browse: "Procurar"
+        browse_aria: "Selecionar arquivos (até {max})"
+        hint: "Envie suas imagens ou arquivos (até {count})"
+        remove_file: "Remover {name}"
+        file_too_large: "Arquivo excede o tamanho máximo: {name}"
+        file_type_not_allowed: "Tipo de arquivo não permitido: {name}"
+        max_files_reached: "Número máximo de arquivos atingido"
       actions:
         edit: "Editar"
         search: "Buscar"
@@ -57,6 +68,13 @@ pt:
       client: "Client"
       content_manager: "Content Manager"
       seller: "Vendedor"
+    currencies:
+      CLP: "CLP"
+      USD: "USD"
+      EUR: "EUR"
+      BRL: "BRL"
+      MXN: "MXN"
+      ARS: "ARS"
     plans:
       free: "Grátis"
       pro: "Profissional"
@@ -73,6 +91,17 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     admin:
+      common:
+        icon_picker:
+          aria_select_icon: "Selecionar ícone"
+          selected: "Ícone selecionado"
+          select: "Selecionar ícone"
+          search_label: "Buscar ícone"
+          search_placeholder: "Buscar ícone"
+          clear: "Limpar ícone"
+          empty: "Nenhum ícone encontrado."
+          loading_more: "Carregando mais ícones..."
+          fetch_error: "Não foi possível carregar o catálogo de ícones."
       confirmations:
         new:
           title: "Reenviar instruções de confirmação"
@@ -89,6 +118,7 @@ pt:
           submit: "Enviar instruções de redefinição"
           success: "Instruções de redefinição enviadas com sucesso"
           error: "Erro ao enviar instruções de redefinição"
+          not_found: "Email não encontrado"
           input:
             email:
               label: "Email"
@@ -97,7 +127,7 @@ pt:
           success: "Senha atualizada com sucesso"
           error: "Erro ao atualizar a senha"
           title: "Editar Senha"
-          description: "Editar sua senha"
+          description: "Digite sua nova senha e confirme para atualizá-la."
           submit: "Atualizar Senha"
           processing: "Atualizando senha..."
           input:
@@ -205,8 +235,15 @@ pt:
         updated_successfully: "Usuário atualizado com sucesso"
         update_failed: "Falha ao atualizar o usuário"
         not_found: "Usuário não encontrado"
+        new:
+          title: "Novo Usuário"
+          description: "Crie um novo usuário para sua organização"
+          submit: "Criar Usuário"
         index:
           title: "Usuários"
+          input:
+            search:
+              placeholder: "Buscar usuário"
           description: "Lista de usuários"
           table:
             headers:
@@ -222,9 +259,6 @@ pt:
             create: "Criar Usuário"
             delete_success: "Usuário deletado com sucesso"
             delete_error: "Erro ao deletar o usuário"
-        input:
-          search:
-            placeholder: "Buscar usuário"
         validations:
           name_required: "O nome é obrigatório"
           dni_required: "O DNI é obrigatório"
@@ -280,7 +314,11 @@ pt:
         users: "Users"
         organizations: "Organizations"
         organization_settings: "Configurações da Organização"
-        settings: "Settings"
+        settings: "Configurações"
+        categories: "Categorias"
+        components: "Componentes"
+        products: "Produtos"
+        product_option_groups: "Grupos de Opções"
         footer:
           title: "My Account"
           logout: "Log out"
@@ -295,6 +333,17 @@ pt:
           title: "Editar Perfil"
           description: "Editar seu perfil"
           submit: "Atualizar Perfil"
+  api:
+    errors:
+      forbidden: "Você não tem permissão para acessar este recurso"
+      not_found: "Recurso não encontrado"
+      unauthorized: "Você não tem permissão para acessar este recurso"
+      unauthorized_tenant: "Você não tem permissão para acessar este recurso"
+      token_dispatch_failed: "Erro ao enviar o token"
+      invalid_credentials: "Credenciais inválidas"
+      unconfirmed_account: "Conta não confirmada"
+      token_expired: "Token expirado"
+      token_invalid: "Token inválido"
   mailer:
     verification:
       title: "Confirme seu endereço de email"
