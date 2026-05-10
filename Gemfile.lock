@@ -87,6 +87,9 @@ GEM
       rails (>= 6.0)
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
+    annotaterb (4.22.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     ast (2.4.3)
     aws-eventstream (1.4.0)
     aws-partitions (1.1227.0)
@@ -574,6 +577,7 @@ DEPENDENCIES
   active_model_serializers (~> 0.10.16)
   acts_as_paranoid (~> 0.11.0)
   acts_as_tenant (~> 1.0)
+  annotaterb (~> 4.22)
   aws-sdk-s3 (~> 1.216)
   bootsnap
   brakeman
@@ -634,6 +638,7 @@ CHECKSUMS
   acts_as_paranoid (0.11.0) sha256=8fae9e408f739d8ad840b02dde18beb364a897f6b57ee25ef1c52efa8bc906db
   acts_as_tenant (1.0.1) sha256=6944e4d64533337938a8817a6b4ff9b11189c9dcc0b1333bb89f3821a4c14c53
   addressable (2.8.9) sha256=cc154fcbe689711808a43601dee7b980238ce54368d23e127421753e46895485
+  annotaterb (4.22.0) sha256=66fc40e5f48d5b82ae82013da1e5b43aaaad41ee9bd3d0cf803048efc0a70286
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
   aws-partitions (1.1227.0) sha256=122dd20fe108cb38d38cccbc1f2592408bc1b30ca6e0d05797a7af2501567e29

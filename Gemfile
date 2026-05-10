@@ -59,6 +59,7 @@ group :development do
   gem "web-console"
   gem "js-routes"
   gem 'dotenv-rails'
+  gem "annotaterb", "~> 4.22"
 end
 
 group :test do
