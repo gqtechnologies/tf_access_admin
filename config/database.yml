@@ -44,9 +44,10 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: dischool          # o tu usuario local
-  password: secret                  # si aplica
-  host: localhost
+  username: <%= ENV.fetch("PGUSER", "dischool") %>
+  password: <%= ENV.fetch("PGPASSWORD", "secret") %>
+  host: <%= ENV.fetch("PGHOST", "localhost") %>
+  port: <%= ENV.fetch("PGPORT", 5432) %>
 
 
 development:
@@ -55,7 +56,7 @@ development:
 
 test:
   <<: *default
-  database: admin_base_test2
+  database: <%= ENV.fetch("PGDATABASE", "admin_base_test2") %>
 
 production:
   <<: *default
