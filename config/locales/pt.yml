@@ -91,6 +91,17 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     admin:
+      common:
+        icon_picker:
+          aria_select_icon: "Selecionar ícone"
+          selected: "Ícone selecionado"
+          select: "Selecionar ícone"
+          search_label: "Buscar ícone"
+          search_placeholder: "Buscar ícone"
+          clear: "Limpar ícone"
+          empty: "Nenhum ícone encontrado."
+          loading_more: "Carregando mais ícones..."
+          fetch_error: "Não foi possível carregar o catálogo de ícones."
       confirmations:
         new:
           title: "Reenviar instruções de confirmação"

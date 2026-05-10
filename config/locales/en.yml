@@ -95,6 +95,17 @@ en:
       contact_support: "Contact support"
       go_to_home: "Go to home"
     admin:
+      common:
+        icon_picker:
+          aria_select_icon: "Select icon"
+          selected: "Selected icon"
+          select: "Select icon"
+          search_label: "Search icon"
+          search_placeholder: "Search icon"
+          clear: "Clear icon"
+          empty: "No icons found."
+          loading_more: "Loading more icons..."
+          fetch_error: "Could not load icon catalog."
       login:
         title: "Login"
         description: "Login to your account"

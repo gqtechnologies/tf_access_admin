@@ -91,6 +91,17 @@ es:
       contact_support: "Contactar soporte"
       go_to_home: "Ir a la página de inicio"
     admin:
+      common:
+        icon_picker:
+          aria_select_icon: "Seleccionar icono"
+          selected: "Icono seleccionado"
+          select: "Seleccionar icono"
+          search_label: "Buscar icono"
+          search_placeholder: "Buscar icono"
+          clear: "Limpiar icono"
+          empty: "No se encontraron iconos."
+          loading_more: "Cargando más iconos..."
+          fetch_error: "No se pudo consultar el catálogo de iconos."
       login:
         errors:
           invalid: "Email o contraseña inválidos"
