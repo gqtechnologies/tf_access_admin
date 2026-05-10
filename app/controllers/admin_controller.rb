@@ -3,7 +3,9 @@
 class AdminController < InertiaController
   before_action :authenticate_user!
   before_action :set_locale
-  before_action :set_filters, only: [:index]
+  # Usar `if:` en lugar de `only:` para no exigir la acción `index` en hijos sin esa acción
+  # (p. ej. Devise::SessionsController), con raise_on_missing_callback_actions en Rails 7.1+.
+  before_action :set_filters, if: -> { action_name == "index" }
 
   inertia_share auth: -> {
     if user_signed_in?
