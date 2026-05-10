@@ -6,6 +6,15 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Rails 8.1+ validates fixture FKs by updating pg_catalog.pg_constraint, which
+  # requires a superuser (or equivalent). Typical app DB roles cannot do that, so
+  # disable the check unless your test user is elevated (e.g. local postgres superuser).
+
+
+  # TODO: FIX THIS
+
+  config.active_record.verify_foreign_keys_for_fixtures = false
+
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
 

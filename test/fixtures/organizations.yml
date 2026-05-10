@@ -20,8 +20,8 @@
 #
 one:
   name: MyString
-  subdomain: MyString
+  subdomain: fixture-org-one
 
 two:
   name: MyString
-  subdomain: MyString
+  subdomain: fixture-org-two
