@@ -57,7 +57,6 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem "js-routes"
   gem 'dotenv-rails'
   gem "annotaterb", "~> 4.22"
 end
@@ -68,6 +67,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
+gem "js-routes"
 gem "devise", "~> 5.0"
 
 gem "pundit", "~> 2.5"

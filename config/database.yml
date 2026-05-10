@@ -59,6 +59,7 @@ test:
 
 production:
   <<: *default
-  database: admin_base_production
-  username: <%= ENV["PG_USER"] %>
-  password: <%= ENV["PG_PASSWORD"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+  # database: admin_base_production
+  # username: <%= ENV["PG_USER"] %>
+  # password: <%= ENV["PG_PASSWORD"] %>
