@@ -21,7 +21,14 @@ class User < ApplicationRecord
   # Sin :registerable: el alta de usuarios es vía admin; evita rutas/métodos de sign_up público
   devise :database_authenticatable,
          :recoverable, :rememberable, :validatable,
-         :confirmable
+         :confirmable,
+         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
+
+  def jwt_payload
+    {
+      "organization_id" => organization_id.to_s
+    }
+  end
 
   def role
     return nil if roles.blank?

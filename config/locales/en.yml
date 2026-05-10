@@ -301,6 +301,17 @@ en:
           title: "Edit Profile"
           description: "Edit your profile"
           submit: "Update Profile"
+  api:
+    errors:
+      forbidden: "You are not authorized to access this resource"
+      not_found: "Resource not found"
+      unauthorized: "You are not authorized to access this resource"
+      unauthorized_tenant: "You are not authorized to access this resource"
+      token_dispatch_failed: "Failed to dispatch token"
+      invalid_credentials: "Invalid credentials"
+      unconfirmed_account: "Account not confirmed"
+      token_expired: "Token expired"
+      token_invalid: "Token invalid"
   mailer:
     verification:
       title: "Confirm your email address"

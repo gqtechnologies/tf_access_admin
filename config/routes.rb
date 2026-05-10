@@ -23,6 +23,25 @@ Rails.application.routes.draw do
                passwords: "users/passwords",
                confirmations: "users/confirmations"
              }
+
+  namespace :api do
+    namespace :v1 do
+      namespace :auth do
+        post :login, to: "sessions#create"
+        delete :logout, to: "sessions#destroy"
+      end
+
+      namespace :public do
+        resources :categories, only: [:index]
+        resources :products, only: [:index, :show]
+      end
+
+      namespace :private do
+        resources :categories, only: [:index]
+        resources :products, only: [:index]
+      end
+    end
+  end
   
   get "admin/home/index"
   namespace :admin do

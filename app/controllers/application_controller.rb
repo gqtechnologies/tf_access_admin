@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   include Pundit::Authorization
+  include RequestSubdomain
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
@@ -45,7 +46,7 @@ class ApplicationController < ActionController::Base
       redirect_to(home_path) and return
     end
 
-    organization = Organization.find_by(subdomain: subdomain)
+    organization = get_organization_from_subdomain(subdomain)
     if organization
       set_current_tenant(organization)
     else
@@ -82,15 +83,6 @@ class ApplicationController < ActionController::Base
 
     stripped = request.host.sub(/\A#{Regexp.escape(sub)}\./, "")
     stripped.presence || request.host
-  end
-
-  def subdomain_from_request
-    host = request.host
-    if Rails.env.development? && host.end_with?(".localhost")
-      host.remove(".localhost")
-    else
-      request.subdomain.presence
-    end
   end
 
   def user_not_authorized

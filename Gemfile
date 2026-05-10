@@ -93,9 +93,12 @@ gem "pg", "~> 1.6"
 gem "aws-sdk-s3", "~> 1.216", require: false
 
 gem "active_model_serializers", "~> 0.10.16"
+gem "rack-cors", "~> 2.0"
 
 gem "mailgun-ruby", "~> 1.4"
 gem 'resend'
 gem "flipper", "~> 1.4"
 gem "flipper-ui", "~> 1.4"
 gem "flipper-active_record", "~> 1.4"
+
+gem "devise-jwt", "~> 0.13.0"

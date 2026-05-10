@@ -295,6 +295,17 @@ pt:
           title: "Editar Perfil"
           description: "Editar seu perfil"
           submit: "Atualizar Perfil"
+  api:
+    errors:
+      forbidden: "Você não tem permissão para acessar este recurso"
+      not_found: "Recurso não encontrado"
+      unauthorized: "Você não tem permissão para acessar este recurso"
+      unauthorized_tenant: "Você não tem permissão para acessar este recurso"
+      token_dispatch_failed: "Erro ao enviar o token"
+      invalid_credentials: "Credenciais inválidas"
+      unconfirmed_account: "Conta não confirmada"
+      token_expired: "Token expirado"
+      token_invalid: "Token inválido"
   mailer:
     verification:
       title: "Confirme seu endereço de email"
