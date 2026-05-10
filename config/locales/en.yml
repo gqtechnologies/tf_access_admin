@@ -32,6 +32,8 @@ en:
     name: "Admin Base"
     description: "welcome again"
     common:
+      yes: "Yes"
+      no: "No"
       cancel: "Cancel"
       back: "Back"
       clear: "Clear"
@@ -308,6 +310,7 @@ en:
         categories: "Categories"
         components: "Components"
         products: "Products"
+        product_option_groups: "Option Groups"
         footer:
           title: My Account
           logout: Log out

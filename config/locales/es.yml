@@ -32,6 +32,8 @@ es:
     name: "Admin Base"
     description: "bienvenido nuevamente"
     common:
+      yes: "Sí"
+      no: "No"
       cancel: "Cancelar"
       back: "Volver"
       clear: "Limpiar"

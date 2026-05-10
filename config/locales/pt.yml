@@ -32,6 +32,8 @@ pt:
     name: "Admin Base"
     description: "bem-vindo de volta"
     common:
+      yes: "Sim"
+      no: "Não"
       cancel: "Cancelar"
       back: "Voltar"
       clear: "Limpar"
@@ -305,6 +307,7 @@ pt:
         categories: "Categorias"
         components: "Componentes"
         products: "Produtos"
+        product_option_groups: "Grupos de Opções"
         footer:
           title: "My Account"
           logout: "Log out"
