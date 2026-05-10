@@ -53,7 +53,7 @@ default: &default
 
 development:
   <<: *default
-  database: admin_base_development
+  database: <%= ENV.fetch("PGDATABASE", "admin_base") %>
 
 test:
   <<: *default
