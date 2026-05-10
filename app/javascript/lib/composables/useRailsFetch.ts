@@ -7,14 +7,13 @@ export type RailsFormDataSource = Record<string, unknown>
 
 /**
  * Convierte un objeto plano en `FormData` con claves `rootKey[campo]` (parámetros anidados de Rails).
- * Omite `null` y `undefined`; los `false` booleanos se omiten (equivalente a checkbox sin marcar).
+ * Omite `null` y `undefined`.
  * Los `File`/`Blob` se envían como archivo; el resto se convierte con `String(...)`.
  */
 export function objectToRailsFormData(rootKey: string, data: RailsFormDataSource): FormData {
   const fd = new FormData()
   for (const [key, value] of Object.entries(data)) {
     if (value === undefined || value === null) continue
-    if (value === false) continue
     const field = `${rootKey}[${key}]`
     if (value instanceof File) {
       fd.append(field, value)

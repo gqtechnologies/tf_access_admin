@@ -29,6 +29,7 @@ class AdminController < InertiaController
   # Set the locale for the user
   def set_locale
     I18n.locale =
+      current_user&.language.presence ||
       params[:locale].presence ||
       session[:locale].presence ||
       I18n.default_locale
