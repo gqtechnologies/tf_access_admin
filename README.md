@@ -198,3 +198,8 @@ foreman start -f Procfile.dev
 
 ingresar a 
 - http://demo-catalogo-pro.localhost:5100/home
+
+### To install shadcn modules
+```bash
+npm run shadcn -- add hover-card -y
+```

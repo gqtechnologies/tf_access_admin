@@ -104,6 +104,7 @@ pt:
           submit: "Enviar instruções de redefinição"
           success: "Instruções de redefinição enviadas com sucesso"
           error: "Erro ao enviar instruções de redefinição"
+          not_found: "Email não encontrado"
           input:
             email:
               label: "Email"
@@ -112,7 +113,7 @@ pt:
           success: "Senha atualizada com sucesso"
           error: "Erro ao atualizar a senha"
           title: "Editar Senha"
-          description: "Editar sua senha"
+          description: "Digite sua nova senha e confirme para atualizá-la."
           submit: "Atualizar Senha"
           processing: "Atualizando senha..."
           input:
@@ -220,8 +221,15 @@ pt:
         updated_successfully: "Usuário atualizado com sucesso"
         update_failed: "Falha ao atualizar o usuário"
         not_found: "Usuário não encontrado"
+        new:
+          title: "Novo Usuário"
+          description: "Crie um novo usuário para sua organização"
+          submit: "Criar Usuário"
         index:
           title: "Usuários"
+          input:
+            search:
+              placeholder: "Buscar usuário"
           description: "Lista de usuários"
           table:
             headers:
@@ -237,9 +245,6 @@ pt:
             create: "Criar Usuário"
             delete_success: "Usuário deletado com sucesso"
             delete_error: "Erro ao deletar o usuário"
-        input:
-          search:
-            placeholder: "Buscar usuário"
         validations:
           name_required: "O nome é obrigatório"
           dni_required: "O DNI é obrigatório"
@@ -295,7 +300,10 @@ pt:
         users: "Users"
         organizations: "Organizations"
         organization_settings: "Configurações da Organização"
-        settings: "Settings"
+        settings: "Configurações"
+        categories: "Categorias"
+        components: "Componentes"
+        products: "Produtos"
         footer:
           title: "My Account"
           logout: "Log out"

@@ -138,6 +138,7 @@ en:
           title: "Edit Password"
           description: "Enter your new password and confirm it to update it."
           submit: "Change my password"
+          processing: "Updating password..."
           success: "Password updated successfully"
           error: "Failed to update password"
           input:
@@ -149,6 +150,7 @@ en:
               placeholder: "Confirm your password"
       home:
         title: "Home"
+        login: "Log in"
       organizations:
         created_successfully: "Organization created successfully"
         creation_failed: "Failed to create organization"
@@ -302,6 +304,9 @@ en:
         organizations: "Organizations"
         organization_settings: "Organization Settings"
         settings: "Settings"
+        categories: "Categories"
+        components: "Components"
+        products: "Products"
         footer:
           title: My Account
           logout: Log out
