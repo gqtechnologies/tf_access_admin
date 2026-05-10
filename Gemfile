@@ -67,7 +67,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "js-routes"
+gem "js-routes", "~> 2.3"
 gem "devise", "~> 5.0"
 
 gem "pundit", "~> 2.5"
@@ -97,7 +97,7 @@ gem "active_model_serializers", "~> 0.10.16"
 gem "rack-cors", "~> 2.0"
 
 gem "mailgun-ruby", "~> 1.4"
-gem 'resend'
+gem "resend", "~> 1.0"
 gem "flipper", "~> 1.4"
 gem "flipper-ui", "~> 1.4"
 gem "flipper-active_record", "~> 1.4"
