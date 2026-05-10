@@ -1,7 +1,7 @@
 class Admin::UsersController < AdminController
-    before_action :set_user, only: [:create]
-    before_action :get_user, only: [:edit, :update, :destroy]
-    before_action :validate_role, only: [:create, :update]
+    before_action :set_user, only: [ :create ]
+    before_action :get_user, only: [ :edit, :update, :destroy ]
+    before_action :validate_role, only: [ :create, :update ]
 
     def index
         authorize User
