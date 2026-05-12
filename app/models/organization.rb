@@ -45,6 +45,7 @@ class Organization < ApplicationRecord
   has_many :people, dependent: :destroy
   has_many :organization_memberships, dependent: :destroy
   has_many :users, through: :people
+  has_many :residential_properties, dependent: :destroy
   has_many :roles
   has_one_attached :logo
   has_one_attached :cover

@@ -26,6 +26,16 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #
+# Indexes
+#
+#  index_users_on_deactivated_at        (deactivated_at)
+#  index_users_on_deleted_at            (deleted_at)
+#  index_users_on_email                 (email) UNIQUE
+#  index_users_on_global_status         (global_status)
+#  index_users_on_metadata              (metadata) USING gin
+#  index_users_on_reset_password_token  (reset_password_token) UNIQUE
+#  index_users_on_suspended_at          (suspended_at)
+#
 class User < ApplicationRecord
   acts_as_paranoid
   include Users::Features
