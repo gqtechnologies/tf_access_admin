@@ -39,7 +39,7 @@ class ApplicationPolicy
   end
 
   def admin?
-    user.present? && (user.super_admin? || user.tenant_admin?)
+    user.present? && (user.super_admin? || user.tenant_admin?(ActsAsTenant.current_tenant))
   end
 
   def super_admin?
@@ -50,9 +50,17 @@ class ApplicationPolicy
     return false unless user.present?
     return false if user.client_global?
     return true if user.super_admin?
-    return true unless record.respond_to?(:organization_id)
 
-    record.organization_id == user.organization_id
+    tenant = ActsAsTenant.current_tenant
+    return false unless tenant&.id
+
+    if record.is_a?(User)
+      user.people.exists?(organization_id: tenant.id) && record.people.exists?(organization_id: tenant.id)
+    elsif record.respond_to?(:organization_id)
+      record.organization_id == tenant.id && user.people.exists?(organization_id: tenant.id)
+    else
+      true
+    end
   end
 
   def same_user?

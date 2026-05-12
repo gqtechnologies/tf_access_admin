@@ -6,30 +6,33 @@
 #  confirmation_sent_at   :datetime
 #  confirmation_token     :string
 #  confirmed_at           :datetime
+#  deactivated_at         :datetime
 #  deleted_at             :datetime
 #  dni                    :string
 #  email                  :string           default(""), not null
 #  encrypted_password     :string           default(""), not null
+#  global_status          :string           default("active"), not null
 #  language               :string
+#  last_active_at         :datetime
+#  metadata               :jsonb            not null
 #  name                   :string
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
+#  suspended_at           :datetime
 #  unconfirmed_email      :string
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  organization_id        :uuid
 #
 # Indexes
 #
+#  index_users_on_deactivated_at        (deactivated_at)
 #  index_users_on_deleted_at            (deleted_at)
 #  index_users_on_email                 (email) UNIQUE
-#  index_users_on_organization_id       (organization_id)
+#  index_users_on_global_status         (global_status)
+#  index_users_on_metadata              (metadata) USING gin
 #  index_users_on_reset_password_token  (reset_password_token) UNIQUE
-#
-# Foreign Keys
-#
-#  fk_rails_...  (organization_id => organizations.id)
+#  index_users_on_suspended_at          (suspended_at)
 #
 require "test_helper"
 

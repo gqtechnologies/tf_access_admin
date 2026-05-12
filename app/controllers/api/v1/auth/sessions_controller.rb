@@ -21,7 +21,8 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
       return render json: { error: I18n.t("api.errors.invalid_credentials") }, status: :unauthorized
     end
 
-    unless user.super_admin? || user.tenant_admin?(organization)
+    person = ActsAsTenant.without_tenant { user.person_for(organization) }
+    unless user.super_admin? || person&.has_role?(AvailableRoles::TENANT_ADMIN, organization)
       return render json: { error: I18n.t("api.errors.forbidden") }, status: :forbidden
     end
 
@@ -29,12 +30,17 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
       return render json: { error: I18n.t("api.errors.unconfirmed_account") }, status: :unauthorized
     end
 
-    sign_in(user, store: false)
+    Current.organization = organization
+    ActsAsTenant.with_tenant(organization) do
+      sign_in(user, store: false)
+    end
 
     token = request.env[Warden::JWTAuth::Hooks::PREPARED_TOKEN_ENV_KEY]
     unless token
       return render json: { error: I18n.t("api.errors.token_dispatch_failed") }, status: :internal_server_error
     end
+
+    Current.reset
 
     render json: {
       data: {
@@ -45,7 +51,7 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.tenant_role || user.role
+          role: ActsAsTenant.with_tenant(organization) { user.tenant_role || user.role }
         }
       }
     }, status: :ok
@@ -61,7 +67,7 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
   def ensure_destroy_tenant_access!
     return if current_user.super_admin?
 
-    return if current_user.organization_id == ActsAsTenant.current_tenant.id
+    return if current_user.member_of_tenant?(ActsAsTenant.current_tenant)
 
     render json: { error: I18n.t("api.errors.forbidden") }, status: :forbidden
     nil

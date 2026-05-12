@@ -22,7 +22,7 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 class Role < ApplicationRecord
-  has_and_belongs_to_many :users, join_table: :users_roles
+  has_and_belongs_to_many :people, join_table: :people_roles
   # Global roles (e.g. :client, :super_admin) must be allowed without tenant.
   belongs_to :organization, optional: true
 

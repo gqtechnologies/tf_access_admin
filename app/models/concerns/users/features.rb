@@ -25,8 +25,11 @@ module Users::Features
 
   def features_keys
     keys = BASIC_FEATURES.dup
-    keys << :organizations if Flipper.enabled?(:organizations, organization) && self.super_admin?
-    keys << :organization_settings if Flipper.enabled?(:organizations, organization) && self.tenant_admin?(organization)
+    org = ActsAsTenant.current_tenant
+    return keys unless org
+
+    keys << :organizations if Flipper.enabled?(:organizations, org) && super_admin?
+    keys << :organization_settings if Flipper.enabled?(:organizations, org) && tenant_admin?(org)
     keys
   end
 
@@ -37,7 +40,7 @@ module Users::Features
       users: h.admin_users_path,
       # No hay ruta admin/organizations aún; mismo destino que home hasta que exista.
       organizations: h.admin_organizations_path,
-      organization_settings: h.admin_organization_path(organization),
+      organization_settings: h.admin_organization_path(ActsAsTenant.current_tenant),
       # settings: h.edit_admin_profile_path(self)
     }
   end

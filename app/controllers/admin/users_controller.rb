@@ -87,15 +87,21 @@ class Admin::UsersController < AdminController
     end
 
     def validate_role
-        role = params[:user][:role]
-        if role.present?
-            if AvailableRoles::TENANT_ROLE_PRIORITY.include?(role)
-                @user.set_tenant_role(role)
-            else
-                @user.errors.add(:role, "admin.users.validations.role_invalid")
-                @validation_errors = true
-            end
-        end
+      role = params[:user][:role]
+      return if role.blank?
+
+      unless AvailableRoles::TENANT_ROLE_PRIORITY.include?(role)
+        @user.errors.add(:role, "admin.users.validations.role_invalid")
+        @validation_errors = true
+        return
+      end
+
+      if @user.persisted?
+        org = ActsAsTenant.current_tenant
+        @user.person_for(org)&.set_tenant_role(role)
+      else
+        @user.pending_tenant_role = role
+      end
     end
 
     def user_params

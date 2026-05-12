@@ -32,8 +32,12 @@ class UserPolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.none unless user.present?
-      if user.tenant_admin? || user.super_admin?
-        scope.where(organization_id: user.organization_id)
+
+      tenant = ActsAsTenant.current_tenant
+      return scope.none unless tenant
+
+      if user.super_admin? || user.tenant_admin?(tenant)
+        scope.joins(:people).where(people: { organization_id: tenant.id }).distinct
       else
         scope.none
       end
