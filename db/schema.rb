@@ -10,10 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_13_120005) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "access_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.inet "ip_address"
+    t.jsonb "metadata", default: {}, null: false
+    t.text "notes"
+    t.datetime "occurred_at", null: false
+    t.uuid "organization_id", null: false
+    t.uuid "recorded_by_user_id"
+    t.uuid "residential_property_id", null: false
+    t.string "result", default: "success", null: false
+    t.string "source", default: "web", null: false
+    t.uuid "staff_shift_id"
+    t.uuid "unit_id"
+    t.datetime "updated_at", null: false
+    t.text "user_agent"
+    t.uuid "vehicle_id"
+    t.uuid "visit_id"
+    t.uuid "visit_participant_id"
+    t.uuid "visitor_profile_id"
+    t.index ["metadata"], name: "index_access_events_on_metadata", using: :gin
+    t.index ["organization_id", "event_type", "result", "occurred_at"], name: "index_access_events_on_org_type_result_occurred_at"
+    t.index ["organization_id", "residential_property_id", "occurred_at"], name: "index_access_events_on_org_property_occurred_at"
+    t.index ["organization_id", "unit_id", "occurred_at"], name: "index_access_events_on_org_unit_occurred_at"
+    t.index ["organization_id", "visit_id", "occurred_at"], name: "index_access_events_on_org_visit_occurred_at"
+    t.index ["organization_id"], name: "index_access_events_on_organization_id"
+    t.index ["recorded_by_user_id"], name: "index_access_events_on_recorded_by_user_id"
+    t.index ["residential_property_id"], name: "index_access_events_on_residential_property_id"
+    t.index ["unit_id"], name: "index_access_events_on_unit_id"
+    t.index ["vehicle_id"], name: "index_access_events_on_vehicle_id"
+    t.index ["visit_id"], name: "index_access_events_on_visit_id"
+    t.index ["visit_participant_id"], name: "index_access_events_on_visit_participant_id"
+    t.index ["visitor_profile_id"], name: "index_access_events_on_visitor_profile_id"
+  end
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -417,6 +452,150 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_120005) do
     t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id"
   end
 
+  create_table "vehicles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "authorized_from"
+    t.datetime "authorized_until"
+    t.string "brand"
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "model"
+    t.uuid "organization_id", null: false
+    t.uuid "person_id"
+    t.text "plate_number_ciphertext"
+    t.string "plate_number_digest"
+    t.string "status", default: "active", null: false
+    t.uuid "unit_id"
+    t.datetime "updated_at", null: false
+    t.string "vehicle_type"
+    t.index ["organization_id"], name: "index_vehicles_on_organization_id"
+    t.index ["person_id"], name: "index_vehicles_on_person_id"
+    t.index ["unit_id"], name: "index_vehicles_on_unit_id"
+  end
+
+  create_table "visit_participants", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "checked_in_at"
+    t.datetime "checked_out_at"
+    t.datetime "created_at", null: false
+    t.string "document_snapshot_digest"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name_snapshot"
+    t.text "notes"
+    t.uuid "organization_id", null: false
+    t.uuid "person_id"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "validated_by_id"
+    t.uuid "visit_id", null: false
+    t.uuid "visitor_profile_id"
+    t.index ["metadata"], name: "index_visit_participants_on_metadata", using: :gin
+    t.index ["organization_id", "person_id"], name: "index_visit_participants_on_organization_id_and_person_id"
+    t.index ["organization_id", "visit_id", "status"], name: "idx_on_organization_id_visit_id_status_d1b6982805"
+    t.index ["organization_id", "visitor_profile_id"], name: "idx_on_organization_id_visitor_profile_id_0adf418fb3"
+    t.index ["organization_id"], name: "index_visit_participants_on_organization_id"
+    t.index ["person_id"], name: "index_visit_participants_on_person_id"
+    t.index ["validated_by_id"], name: "index_visit_participants_on_validated_by_id"
+    t.index ["visit_id"], name: "index_visit_participants_on_visit_id"
+    t.index ["visitor_profile_id"], name: "index_visit_participants_on_visitor_profile_id"
+  end
+
+  create_table "visit_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "changed_by_person_id"
+    t.uuid "changed_by_user_id"
+    t.datetime "created_at", null: false
+    t.string "from_status"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.text "reason"
+    t.string "to_status", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "visit_id", null: false
+    t.index ["changed_by_person_id"], name: "index_visit_status_histories_on_changed_by_person_id"
+    t.index ["changed_by_user_id"], name: "index_visit_status_histories_on_changed_by_user_id"
+    t.index ["metadata"], name: "index_visit_status_histories_on_metadata", using: :gin
+    t.index ["organization_id", "to_status"], name: "index_visit_status_histories_on_organization_id_and_to_status"
+    t.index ["organization_id", "visit_id", "created_at"], name: "index_visit_status_histories_on_org_visit_created_at"
+    t.index ["organization_id"], name: "index_visit_status_histories_on_organization_id"
+    t.index ["visit_id"], name: "index_visit_status_histories_on_visit_id"
+  end
+
+  create_table "visitor_profiles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "company_name"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.text "document_number_ciphertext"
+    t.string "document_number_digest"
+    t.string "document_type"
+    t.text "email_ciphertext"
+    t.string "external_name"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.uuid "person_id"
+    t.text "phone_ciphertext"
+    t.text "security_notes"
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_visitor_profiles_on_deleted_at"
+    t.index ["metadata"], name: "index_visitor_profiles_on_metadata", using: :gin
+    t.index ["organization_id", "document_number_digest"], name: "index_visitor_profiles_on_org_document_digest"
+    t.index ["organization_id", "person_id"], name: "index_visitor_profiles_on_organization_id_and_person_id"
+    t.index ["organization_id", "status"], name: "index_visitor_profiles_on_organization_id_and_status"
+    t.index ["organization_id"], name: "index_visitor_profiles_on_organization_id"
+    t.index ["person_id"], name: "index_visitor_profiles_on_person_id"
+  end
+
+  create_table "visits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "actual_ended_at"
+    t.datetime "actual_started_at"
+    t.datetime "approved_at"
+    t.uuid "approved_by_id"
+    t.string "authorization_method"
+    t.datetime "concierge_validated_at"
+    t.uuid "concierge_validated_by_id"
+    t.datetime "created_at", null: false
+    t.uuid "created_by_person_id"
+    t.uuid "created_by_user_id"
+    t.jsonb "metadata", default: {}, null: false
+    t.text "notes"
+    t.uuid "organization_id", null: false
+    t.jsonb "recurring_rule", default: {}, null: false
+    t.datetime "rejected_at"
+    t.uuid "rejected_by_id"
+    t.text "rejection_reason"
+    t.uuid "residential_property_id", null: false
+    t.uuid "responsible_person_id"
+    t.datetime "scheduled_ends_at"
+    t.datetime "scheduled_starts_at", null: false
+    t.uuid "staff_shift_id"
+    t.string "status", default: "pending", null: false
+    t.uuid "unit_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_visits_on_approved_by_id"
+    t.index ["concierge_validated_by_id"], name: "index_visits_on_concierge_validated_by_id"
+    t.index ["created_by_person_id"], name: "index_visits_on_created_by_person_id"
+    t.index ["created_by_user_id"], name: "index_visits_on_created_by_user_id"
+    t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
+    t.index ["organization_id", "residential_property_id", "scheduled_starts_at"], name: "index_visits_on_org_property_pending_statuses", where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'concierge_validation_pending'::character varying, 'resident_notified'::character varying])::text[]))"
+    t.index ["organization_id", "residential_property_id", "status", "scheduled_starts_at"], name: "index_visits_on_org_property_status_scheduled_starts"
+    t.index ["organization_id", "staff_shift_id"], name: "index_visits_on_organization_id_and_staff_shift_id"
+    t.index ["organization_id", "unit_id", "scheduled_starts_at"], name: "index_visits_on_org_unit_scheduled_starts"
+    t.index ["organization_id"], name: "index_visits_on_organization_id"
+    t.index ["recurring_rule"], name: "index_visits_on_recurring_rule", using: :gin
+    t.index ["rejected_by_id"], name: "index_visits_on_rejected_by_id"
+    t.index ["residential_property_id"], name: "index_visits_on_residential_property_id"
+    t.index ["responsible_person_id"], name: "index_visits_on_responsible_person_id"
+    t.index ["unit_id"], name: "index_visits_on_unit_id"
+  end
+
+  add_foreign_key "access_events", "organizations"
+  add_foreign_key "access_events", "residential_properties"
+  add_foreign_key "access_events", "units"
+  add_foreign_key "access_events", "users", column: "recorded_by_user_id"
+  add_foreign_key "access_events", "vehicles"
+  add_foreign_key "access_events", "visit_participants"
+  add_foreign_key "access_events", "visitor_profiles"
+  add_foreign_key "access_events", "visits"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "authorized_residents", "organizations"
@@ -458,4 +637,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_120005) do
   add_foreign_key "units", "organizations"
   add_foreign_key "units", "property_sections"
   add_foreign_key "units", "residential_properties"
+  add_foreign_key "vehicles", "organizations"
+  add_foreign_key "vehicles", "people"
+  add_foreign_key "vehicles", "units"
+  add_foreign_key "visit_participants", "organizations"
+  add_foreign_key "visit_participants", "people"
+  add_foreign_key "visit_participants", "users", column: "validated_by_id"
+  add_foreign_key "visit_participants", "visitor_profiles"
+  add_foreign_key "visit_participants", "visits"
+  add_foreign_key "visit_status_histories", "organizations"
+  add_foreign_key "visit_status_histories", "people", column: "changed_by_person_id"
+  add_foreign_key "visit_status_histories", "users", column: "changed_by_user_id"
+  add_foreign_key "visit_status_histories", "visits"
+  add_foreign_key "visitor_profiles", "organizations"
+  add_foreign_key "visitor_profiles", "people"
+  add_foreign_key "visits", "organizations"
+  add_foreign_key "visits", "people", column: "created_by_person_id"
+  add_foreign_key "visits", "people", column: "responsible_person_id"
+  add_foreign_key "visits", "residential_properties"
+  add_foreign_key "visits", "units"
+  add_foreign_key "visits", "users", column: "approved_by_id"
+  add_foreign_key "visits", "users", column: "concierge_validated_by_id"
+  add_foreign_key "visits", "users", column: "created_by_user_id"
+  add_foreign_key "visits", "users", column: "rejected_by_id"
 end
