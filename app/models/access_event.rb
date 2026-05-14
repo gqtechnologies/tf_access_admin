@@ -33,7 +33,7 @@
 #  index_access_events_on_org_unit_occurred_at         (organization_id,unit_id,occurred_at)
 #  index_access_events_on_org_visit_occurred_at        (organization_id,visit_id,occurred_at)
 #  index_access_events_on_organization_id              (organization_id)
-#  index_access_events_on_recorded_by_user_id         (recorded_by_user_id)
+#  index_access_events_on_recorded_by_user_id          (recorded_by_user_id)
 #  index_access_events_on_residential_property_id      (residential_property_id)
 #  index_access_events_on_unit_id                      (unit_id)
 #  index_access_events_on_vehicle_id                   (vehicle_id)
@@ -46,6 +46,7 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #  fk_rails_...  (recorded_by_user_id => users.id)
 #  fk_rails_...  (residential_property_id => residential_properties.id)
+#  fk_rails_...  (staff_shift_id => staff_shifts.id)
 #  fk_rails_...  (unit_id => units.id)
 #  fk_rails_...  (vehicle_id => vehicles.id)
 #  fk_rails_...  (visit_id => visits.id)
@@ -63,4 +64,5 @@ class AccessEvent < ApplicationRecord
   belongs_to :visitor_profile, optional: true
   belongs_to :vehicle, optional: true
   belongs_to :recorded_by_user, class_name: "User", optional: true
+  belongs_to :staff_shift, optional: true
 end

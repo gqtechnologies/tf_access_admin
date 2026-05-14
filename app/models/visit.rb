@@ -59,6 +59,7 @@
 #  fk_rails_...  (rejected_by_id => users.id)
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #  fk_rails_...  (responsible_person_id => people.id)
+#  fk_rails_...  (staff_shift_id => staff_shifts.id)
 #  fk_rails_...  (unit_id => units.id)
 #
 class Visit < ApplicationRecord
@@ -73,6 +74,7 @@ class Visit < ApplicationRecord
   belongs_to :concierge_validated_by, class_name: "User", optional: true
   belongs_to :approved_by, class_name: "User", optional: true
   belongs_to :rejected_by, class_name: "User", optional: true
+  belongs_to :staff_shift, optional: true
 
   has_many :visit_participants
   has_many :visit_status_histories
