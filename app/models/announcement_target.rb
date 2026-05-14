@@ -11,7 +11,7 @@
 #  updated_at      :datetime         not null
 #  announcement_id :uuid             not null
 #  organization_id :uuid             not null
-#  target_id       :bigint           not null
+#  target_id       :uuid             not null
 #
 # Indexes
 #

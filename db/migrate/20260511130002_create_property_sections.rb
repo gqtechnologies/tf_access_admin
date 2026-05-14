@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class CreatePropertySections < ActiveRecord::Migration[8.1]
-  def change
+  def up
+    return if table_exists?(:property_sections)
+
     create_table :property_sections, id: :uuid do |t|
       t.references :organization, null: false, foreign_key: true, type: :uuid
       t.references :residential_property, null: false, foreign_key: true, type: :uuid
@@ -27,5 +29,9 @@ class CreatePropertySections < ActiveRecord::Migration[8.1]
 
     add_index :property_sections, :deleted_at
     add_index :property_sections, :metadata, using: :gin
+  end
+
+  def down
+    drop_table :property_sections, if_exists: true
   end
 end

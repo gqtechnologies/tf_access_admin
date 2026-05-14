@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class CreatePropertySettings < ActiveRecord::Migration[8.1]
-  def change
+  def up
+    return if table_exists?(:property_settings)
+
     create_table :property_settings, id: :uuid do |t|
       t.references :organization, null: false, foreign_key: true, type: :uuid
       t.references :residential_property, null: false, foreign_key: true, type: :uuid
@@ -28,5 +30,9 @@ class CreatePropertySettings < ActiveRecord::Migration[8.1]
     add_index :property_settings, %i[organization_id residential_property_id], unique: true
     add_index :property_settings, :metadata, using: :gin
     add_index :property_settings, :active_notification_channels, using: :gin
+  end
+
+  def down
+    drop_table :property_settings, if_exists: true
   end
 end

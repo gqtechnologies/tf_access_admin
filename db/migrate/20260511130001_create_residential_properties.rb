@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class CreateResidentialProperties < ActiveRecord::Migration[8.1]
-  def change
+  def up
+    return if table_exists?(:residential_properties)
+
     create_table :residential_properties, id: :uuid do |t|
       t.references :organization, null: false, foreign_key: true, type: :uuid
       t.string :name, null: false
@@ -27,5 +29,9 @@ class CreateResidentialProperties < ActiveRecord::Migration[8.1]
     add_index :residential_properties, %i[organization_id status]
     add_index :residential_properties, :deleted_at
     add_index :residential_properties, :metadata, using: :gin
+  end
+
+  def down
+    drop_table :residential_properties, if_exists: true
   end
 end

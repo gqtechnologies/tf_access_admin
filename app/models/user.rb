@@ -173,12 +173,8 @@ class User < ApplicationRecord
       display_name: name.presence || email,
       status: "active"
     )
-    OrganizationMembership.create!(
-      organization: org,
-      person: person,
-      status: "active",
-      joined_at: Time.current
-    )
+    membership = OrganizationMembership.create!(organization: org, person: person)
+    membership.accept!
     person.add_role(AvailableRoles::CLIENT) unless person.has_role?(AvailableRoles::CLIENT)
   end
 

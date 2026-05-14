@@ -17,7 +17,7 @@
 #  visibility            :string           default("private"), not null
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
-#  documentable_id       :bigint           not null
+#  documentable_id       :uuid             not null
 #  organization_id       :uuid             not null
 #  uploaded_by_person_id :uuid
 #

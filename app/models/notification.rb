@@ -16,7 +16,7 @@
 #  status                  :string           default("pending"), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
-#  notifiable_id           :bigint           not null
+#  notifiable_id           :uuid             not null
 #  organization_id         :uuid             not null
 #  recipient_person_id     :uuid             not null
 #  residential_property_id :uuid

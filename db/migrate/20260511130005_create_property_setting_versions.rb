@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class CreatePropertySettingVersions < ActiveRecord::Migration[8.1]
-  def change
+  def up
+    return if table_exists?(:property_setting_versions)
+
     create_table :property_setting_versions, id: :uuid do |t|
       t.references :organization, null: false, foreign_key: true, type: :uuid
       t.references :residential_property, null: false, foreign_key: true, type: :uuid
@@ -22,5 +24,9 @@ class CreatePropertySettingVersions < ActiveRecord::Migration[8.1]
               name: "index_property_setting_versions_on_org_and_setting"
 
     add_index :property_setting_versions, :snapshot, using: :gin
+  end
+
+  def down
+    drop_table :property_setting_versions, if_exists: true
   end
 end

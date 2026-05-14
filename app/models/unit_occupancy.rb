@@ -18,7 +18,7 @@
 #  updated_at               :datetime         not null
 #  organization_id          :uuid             not null
 #  person_id                :uuid             not null
-#  source_id                :bigint
+#  source_id                :uuid
 #  unit_id                  :uuid             not null
 #
 # Indexes

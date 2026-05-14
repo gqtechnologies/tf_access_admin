@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -79,6 +79,55 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "ahoy_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.uuid "organization_id"
+    t.jsonb "properties"
+    t.datetime "time"
+    t.uuid "user_id"
+    t.uuid "visit_id"
+    t.index ["name", "time"], name: "index_ahoy_events_on_name_and_time"
+    t.index ["organization_id", "name", "time"], name: "index_ahoy_events_on_org_name_time"
+    t.index ["organization_id"], name: "index_ahoy_events_on_organization_id"
+    t.index ["properties"], name: "index_ahoy_events_on_properties", opclass: :jsonb_path_ops, using: :gin
+    t.index ["user_id"], name: "index_ahoy_events_on_user_id"
+    t.index ["visit_id"], name: "index_ahoy_events_on_visit_id"
+  end
+
+  create_table "ahoy_visits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "app_version"
+    t.string "browser"
+    t.string "city"
+    t.string "country"
+    t.string "device_type"
+    t.string "ip"
+    t.text "landing_page"
+    t.float "latitude"
+    t.float "longitude"
+    t.uuid "organization_id"
+    t.string "os"
+    t.string "os_version"
+    t.string "platform"
+    t.text "referrer"
+    t.string "referring_domain"
+    t.string "region"
+    t.datetime "started_at"
+    t.text "user_agent"
+    t.uuid "user_id"
+    t.string "utm_campaign"
+    t.string "utm_content"
+    t.string "utm_medium"
+    t.string "utm_source"
+    t.string "utm_term"
+    t.string "visit_token"
+    t.string "visitor_token"
+    t.index ["organization_id", "started_at"], name: "index_ahoy_visits_on_org_started_at"
+    t.index ["organization_id"], name: "index_ahoy_visits_on_organization_id"
+    t.index ["user_id"], name: "index_ahoy_visits_on_user_id"
+    t.index ["visit_token"], name: "index_ahoy_visits_on_visit_token", unique: true
+    t.index ["visitor_token", "started_at"], name: "index_ahoy_visits_on_visitor_token_and_started_at"
+  end
+
   create_table "announcement_reads", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "acknowledged_at"
     t.uuid "announcement_id", null: false
@@ -105,7 +154,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.uuid "announcement_id", null: false
     t.datetime "created_at", null: false
     t.uuid "organization_id", null: false
-    t.bigint "target_id", null: false
+    t.uuid "target_id", null: false
     t.jsonb "target_rule", default: {}, null: false
     t.string "target_type", null: false
     t.datetime "updated_at", null: false
@@ -140,6 +189,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.index ["organization_id", "residential_property_id", "status", "published_at"], name: "index_announcements_on_org_property_status_published_at"
     t.index ["organization_id"], name: "index_announcements_on_organization_id"
     t.index ["residential_property_id"], name: "index_announcements_on_residential_property_id"
+  end
+
+  create_table "audits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "action"
+    t.uuid "associated_id"
+    t.string "associated_type"
+    t.uuid "auditable_id"
+    t.string "auditable_type"
+    t.text "audited_changes"
+    t.string "comment"
+    t.datetime "created_at"
+    t.uuid "organization_id"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.uuid "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.integer "version", default: 0
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["organization_id", "auditable_type", "auditable_id", "created_at"], name: "index_audits_on_org_auditable_created_at"
+    t.index ["organization_id"], name: "index_audits_on_organization_id"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
   end
 
   create_table "authorized_residents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -245,7 +319,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.text "description"
-    t.bigint "documentable_id", null: false
+    t.uuid "documentable_id", null: false
     t.string "documentable_type", null: false
     t.datetime "expires_at"
     t.jsonb "metadata", default: {}, null: false
@@ -386,7 +460,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.datetime "created_at", null: false
     t.text "last_error"
     t.jsonb "metadata", default: {}, null: false
-    t.bigint "notifiable_id", null: false
+    t.uuid "notifiable_id", null: false
     t.string "notifiable_type", null: false
     t.string "notification_type", null: false
     t.uuid "organization_id", null: false
@@ -702,13 +776,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.string "occupancy_type", null: false
     t.uuid "organization_id", null: false
     t.uuid "person_id", null: false
-    t.bigint "source_id"
+    t.uuid "source_id"
     t.string "source_type"
     t.datetime "starts_at", null: false
     t.string "status", default: "active", null: false
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
-    t.uuid "user_id"
     t.index ["metadata"], name: "index_unit_occupancies_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "index_unit_occupancies_on_org_person_status"
     t.index ["organization_id", "source_type", "source_id"], name: "index_unit_occupancies_on_org_source"
@@ -716,7 +789,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.index ["organization_id"], name: "index_unit_occupancies_on_organization_id"
     t.index ["person_id"], name: "index_unit_occupancies_on_person_id"
     t.index ["unit_id"], name: "index_unit_occupancies_on_unit_id"
-    t.index ["user_id"], name: "index_unit_occupancies_on_user_id"
   end
 
   create_table "unit_ownerships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -747,7 +819,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
     t.decimal "area_m2", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
-    t.integer "floor_number"
+    t.string "display_name"
     t.string "identifier", null: false
     t.jsonb "metadata", default: {}, null: false
     t.string "normalized_identifier", null: false
@@ -950,6 +1022,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
   add_foreign_key "access_events", "visits"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ahoy_events", "organizations"
+  add_foreign_key "ahoy_visits", "organizations"
   add_foreign_key "announcement_reads", "announcements"
   add_foreign_key "announcement_reads", "organizations"
   add_foreign_key "announcement_reads", "people"
@@ -958,6 +1032,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
   add_foreign_key "announcements", "organizations"
   add_foreign_key "announcements", "people", column: "author_person_id"
   add_foreign_key "announcements", "residential_properties"
+  add_foreign_key "audits", "organizations"
   add_foreign_key "authorized_residents", "organizations"
   add_foreign_key "authorized_residents", "people"
   add_foreign_key "authorized_residents", "people", column: "authorized_by_person_id"
@@ -1038,7 +1113,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
   add_foreign_key "unit_occupancies", "organizations"
   add_foreign_key "unit_occupancies", "people"
   add_foreign_key "unit_occupancies", "units"
-  add_foreign_key "unit_occupancies", "users"
   add_foreign_key "unit_ownerships", "organizations"
   add_foreign_key "unit_ownerships", "people"
   add_foreign_key "unit_ownerships", "units"

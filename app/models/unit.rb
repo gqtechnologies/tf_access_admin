@@ -7,7 +7,7 @@
 #  id                      :uuid             not null, primary key
 #  area_m2                 :decimal(10, 2)
 #  deleted_at              :datetime
-#  floor_number            :integer
+#  display_name            :string
 #  identifier              :string           not null
 #  metadata                :jsonb            not null
 #  normalized_identifier   :string           not null
