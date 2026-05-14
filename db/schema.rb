@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_13_150001) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
 
@@ -78,6 +79,69 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "announcement_reads", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "acknowledged_at"
+    t.uuid "announcement_id", null: false
+    t.string "channel"
+    t.datetime "created_at", null: false
+    t.jsonb "device_info", default: {}, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "notified_at"
+    t.uuid "organization_id", null: false
+    t.uuid "person_id"
+    t.datetime "read_at"
+    t.datetime "updated_at", null: false
+    t.index ["announcement_id"], name: "index_announcement_reads_on_announcement_id"
+    t.index ["device_info"], name: "index_announcement_reads_on_device_info", using: :gin
+    t.index ["metadata"], name: "index_announcement_reads_on_metadata", using: :gin
+    t.index ["organization_id", "announcement_id", "person_id"], name: "index_announcement_reads_unique_per_person_when_present", unique: true, where: "(person_id IS NOT NULL)"
+    t.index ["organization_id", "announcement_id", "read_at"], name: "index_announcement_reads_on_org_announcement_read_at"
+    t.index ["organization_id", "person_id", "read_at"], name: "index_announcement_reads_on_org_person_read_at"
+    t.index ["organization_id"], name: "index_announcement_reads_on_organization_id"
+    t.index ["person_id"], name: "index_announcement_reads_on_person_id"
+  end
+
+  create_table "announcement_targets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "announcement_id", null: false
+    t.datetime "created_at", null: false
+    t.uuid "organization_id", null: false
+    t.bigint "target_id", null: false
+    t.jsonb "target_rule", default: {}, null: false
+    t.string "target_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["announcement_id"], name: "index_announcement_targets_on_announcement_id"
+    t.index ["organization_id", "announcement_id"], name: "idx_on_organization_id_announcement_id_fddacab166"
+    t.index ["organization_id", "target_type", "target_id"], name: "index_announcement_targets_on_org_target"
+    t.index ["organization_id"], name: "index_announcement_targets_on_organization_id"
+    t.index ["target_rule"], name: "index_announcement_targets_on_target_rule", using: :gin
+  end
+
+  create_table "announcements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "author_person_id", null: false
+    t.string "category"
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "expires_at"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.string "priority", default: "normal", null: false
+    t.datetime "published_at"
+    t.boolean "requires_acknowledgement", default: false
+    t.uuid "residential_property_id", null: false
+    t.string "status", default: "draft", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_person_id"], name: "index_announcements_on_author_person_id"
+    t.index ["deleted_at"], name: "index_announcements_on_deleted_at"
+    t.index ["metadata"], name: "index_announcements_on_metadata", using: :gin
+    t.index ["organization_id", "author_person_id"], name: "index_announcements_on_organization_id_and_author_person_id"
+    t.index ["organization_id", "priority"], name: "index_announcements_on_organization_id_and_priority"
+    t.index ["organization_id", "residential_property_id", "status", "published_at"], name: "index_announcements_on_org_property_status_published_at"
+    t.index ["organization_id"], name: "index_announcements_on_organization_id"
+    t.index ["residential_property_id"], name: "index_announcements_on_residential_property_id"
+  end
+
   create_table "authorized_residents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "authorized_by_person_id"
     t.uuid "authorized_by_user_id"
@@ -104,6 +168,105 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.index ["unit_id"], name: "index_authorized_residents_on_unit_id"
   end
 
+  create_table "common_area_reservation_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "changed_by_person_id"
+    t.uuid "common_area_reservation_id", null: false
+    t.datetime "created_at", null: false
+    t.string "from_status"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.text "reason"
+    t.string "to_status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["changed_by_person_id"], name: "idx_on_changed_by_person_id_882d57421f"
+    t.index ["common_area_reservation_id"], name: "idx_on_common_area_reservation_id_f6c327d821"
+    t.index ["metadata"], name: "index_common_area_reservation_status_histories_on_metadata", using: :gin
+    t.index ["organization_id", "changed_by_person_id"], name: "idx_c_area_res_status_histories_on_org_changed_by"
+    t.index ["organization_id", "common_area_reservation_id", "created_at"], name: "idx_c_area_res_status_histories_on_org_res_created"
+    t.index ["organization_id"], name: "idx_on_organization_id_e7e8651341"
+  end
+
+  create_table "common_area_reservations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "approved_at"
+    t.uuid "approved_by_person_id"
+    t.uuid "common_area_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "ends_at", null: false
+    t.integer "guest_count", default: 0
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.text "rejection_reason"
+    t.uuid "requested_by_person_id", null: false
+    t.uuid "residential_property_id", null: false
+    t.datetime "starts_at", null: false
+    t.string "status", default: "pending", null: false
+    t.uuid "unit_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_person_id"], name: "index_common_area_reservations_on_approved_by_person_id"
+    t.index ["common_area_id"], name: "index_common_area_reservations_on_common_area_id"
+    t.index ["metadata"], name: "index_common_area_reservations_on_metadata", using: :gin
+    t.index ["organization_id", "approved_by_person_id"], name: "index_common_area_reservations_on_org_approved_by_person"
+    t.index ["organization_id", "common_area_id", "starts_at", "ends_at"], name: "index_common_area_reservations_on_org_area_time_range"
+    t.index ["organization_id", "requested_by_person_id", "status"], name: "index_common_area_reservations_on_org_requester_status"
+    t.index ["organization_id", "status"], name: "index_common_area_reservations_on_organization_id_and_status"
+    t.index ["organization_id", "unit_id", "status"], name: "idx_on_organization_id_unit_id_status_00945a979c"
+    t.index ["organization_id"], name: "index_common_area_reservations_on_organization_id"
+    t.index ["requested_by_person_id"], name: "index_common_area_reservations_on_requested_by_person_id"
+    t.index ["residential_property_id"], name: "index_common_area_reservations_on_residential_property_id"
+    t.index ["unit_id"], name: "index_common_area_reservations_on_unit_id"
+    t.check_constraint "ends_at > starts_at", name: "common_area_reservations_time_range_valid"
+    t.exclusion_constraint "organization_id WITH =, common_area_id WITH =, tsrange(starts_at, ends_at, '[)'::text) WITH &&", where: "(status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying])::text[])", using: :gist, name: "common_area_reservations_no_overlap"
+  end
+
+  create_table "common_areas", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "area_type", null: false
+    t.integer "capacity"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.jsonb "metadata", default: {}, null: false
+    t.string "name", null: false
+    t.uuid "organization_id", null: false
+    t.boolean "requires_approval", default: true, null: false
+    t.uuid "residential_property_id", null: false
+    t.jsonb "rules", default: {}, null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_common_areas_on_deleted_at"
+    t.index ["metadata"], name: "index_common_areas_on_metadata", using: :gin
+    t.index ["organization_id", "residential_property_id", "name"], name: "index_common_areas_unique_name_per_property_when_active", unique: true, where: "(deleted_at IS NULL)"
+    t.index ["organization_id", "residential_property_id", "status"], name: "idx_on_organization_id_residential_property_id_stat_8348429f7a"
+    t.index ["organization_id"], name: "index_common_areas_on_organization_id"
+    t.index ["residential_property_id"], name: "index_common_areas_on_residential_property_id"
+    t.index ["rules"], name: "index_common_areas_on_rules", using: :gin
+  end
+
+  create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "category", null: false
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.text "description"
+    t.bigint "documentable_id", null: false
+    t.string "documentable_type", null: false
+    t.datetime "expires_at"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.boolean "sensitive", default: false, null: false
+    t.string "status", default: "pending", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "uploaded_by_person_id"
+    t.string "visibility", default: "private", null: false
+    t.index ["deleted_at"], name: "index_documents_on_deleted_at"
+    t.index ["metadata"], name: "index_documents_on_metadata", using: :gin
+    t.index ["organization_id", "category"], name: "index_documents_on_organization_id_and_category"
+    t.index ["organization_id", "documentable_type", "documentable_id"], name: "index_documents_on_org_documentable"
+    t.index ["organization_id", "sensitive"], name: "index_documents_on_organization_id_and_sensitive"
+    t.index ["organization_id", "status", "expires_at"], name: "index_documents_on_org_status_expires_at"
+    t.index ["organization_id", "uploaded_by_person_id"], name: "index_documents_on_org_uploaded_by_person"
+    t.index ["organization_id"], name: "index_documents_on_organization_id"
+    t.index ["uploaded_by_person_id"], name: "index_documents_on_uploaded_by_person_id"
+  end
+
   create_table "flipper_features", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key", null: false
@@ -125,6 +288,62 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_icons_on_name", unique: true
+  end
+
+  create_table "incident_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "changed_by_person_id"
+    t.datetime "created_at", null: false
+    t.string "from_status"
+    t.uuid "incident_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.text "reason"
+    t.string "to_status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["changed_by_person_id"], name: "index_incident_status_histories_on_changed_by_person_id"
+    t.index ["incident_id"], name: "index_incident_status_histories_on_incident_id"
+    t.index ["metadata"], name: "index_incident_status_histories_on_metadata", using: :gin
+    t.index ["organization_id", "changed_by_person_id"], name: "index_incident_status_histories_on_org_changed_by_person"
+    t.index ["organization_id", "incident_id", "created_at"], name: "index_incident_status_histories_on_org_incident_created_at"
+    t.index ["organization_id"], name: "index_incident_status_histories_on_organization_id"
+  end
+
+  create_table "incidents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "assigned_to_person_id"
+    t.string "category", null: false
+    t.uuid "common_area_id"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.text "description", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "occurred_at"
+    t.uuid "organization_id", null: false
+    t.uuid "parcel_delivery_id"
+    t.string "priority", default: "normal", null: false
+    t.uuid "reported_by_person_id"
+    t.uuid "residential_property_id", null: false
+    t.text "resolution"
+    t.datetime "resolved_at"
+    t.string "status", default: "open", null: false
+    t.uuid "unit_id"
+    t.datetime "updated_at", null: false
+    t.uuid "vehicle_id"
+    t.uuid "visit_id"
+    t.index ["assigned_to_person_id"], name: "index_incidents_on_assigned_to_person_id"
+    t.index ["common_area_id"], name: "index_incidents_on_common_area_id"
+    t.index ["deleted_at"], name: "index_incidents_on_deleted_at"
+    t.index ["metadata"], name: "index_incidents_on_metadata", using: :gin
+    t.index ["organization_id", "assigned_to_person_id", "status"], name: "index_incidents_on_org_assigned_person_status"
+    t.index ["organization_id", "reported_by_person_id"], name: "index_incidents_on_org_reported_by_person"
+    t.index ["organization_id", "residential_property_id", "status", "priority", "occurred_at"], name: "index_incidents_on_org_property_status_priority_occurred"
+    t.index ["organization_id", "unit_id", "occurred_at"], name: "index_incidents_on_organization_id_and_unit_id_and_occurred_at"
+    t.index ["organization_id"], name: "index_incidents_on_organization_id"
+    t.index ["parcel_delivery_id"], name: "index_incidents_on_parcel_delivery_id"
+    t.index ["reported_by_person_id"], name: "index_incidents_on_reported_by_person_id"
+    t.index ["residential_property_id"], name: "index_incidents_on_residential_property_id"
+    t.index ["unit_id"], name: "index_incidents_on_unit_id"
+    t.index ["vehicle_id"], name: "index_incidents_on_vehicle_id"
+    t.index ["visit_id"], name: "index_incidents_on_visit_id"
   end
 
   create_table "jwt_denylist", force: :cascade do |t|
@@ -159,6 +378,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.index ["organization_id"], name: "index_lease_contracts_on_organization_id"
     t.index ["terminated_by_id"], name: "index_lease_contracts_on_terminated_by_id"
     t.index ["unit_id"], name: "index_lease_contracts_on_unit_id"
+  end
+
+  create_table "notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.integer "attempts_count", default: 0, null: false
+    t.string "channel", null: false
+    t.datetime "created_at", null: false
+    t.text "last_error"
+    t.jsonb "metadata", default: {}, null: false
+    t.bigint "notifiable_id", null: false
+    t.string "notifiable_type", null: false
+    t.string "notification_type", null: false
+    t.uuid "organization_id", null: false
+    t.datetime "read_at"
+    t.uuid "recipient_person_id", null: false
+    t.uuid "residential_property_id"
+    t.datetime "sent_at"
+    t.string "status", default: "pending", null: false
+    t.uuid "unit_id"
+    t.datetime "updated_at", null: false
+    t.index ["metadata"], name: "index_notifications_on_metadata", using: :gin
+    t.index ["organization_id", "channel", "status", "created_at"], name: "index_notifications_on_org_channel_pending_status", where: "((status)::text = 'pending'::text)"
+    t.index ["organization_id", "notifiable_type", "notifiable_id"], name: "index_notifications_on_org_notifiable"
+    t.index ["organization_id", "recipient_person_id", "status", "created_at"], name: "index_notifications_on_org_recipient_status_created_at"
+    t.index ["organization_id"], name: "index_notifications_on_organization_id"
+    t.index ["recipient_person_id"], name: "index_notifications_on_recipient_person_id"
+    t.index ["residential_property_id"], name: "index_notifications_on_residential_property_id"
+    t.index ["unit_id"], name: "index_notifications_on_unit_id"
+    t.check_constraint "recipient_person_id IS NOT NULL", name: "notifications_recipient_person_required"
   end
 
   create_table "organization_memberships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -203,6 +450,59 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.index ["settings"], name: "index_organizations_on_settings", using: :gin
     t.index ["status"], name: "index_organizations_on_status"
     t.index ["subdomain"], name: "index_organizations_on_subdomain", unique: true
+  end
+
+  create_table "parcel_deliveries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "courier_company"
+    t.datetime "created_at", null: false
+    t.string "delivery_type", default: "parcel", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.text "notes"
+    t.datetime "notified_at"
+    t.uuid "organization_id", null: false
+    t.datetime "received_at", null: false
+    t.uuid "received_by_person_id"
+    t.uuid "recipient_person_id"
+    t.uuid "residential_property_id", null: false
+    t.uuid "staff_shift_id"
+    t.string "status", default: "received", null: false
+    t.string "tracking_code"
+    t.uuid "unit_id", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "withdrawn_at"
+    t.uuid "withdrawn_by_person_id"
+    t.index ["metadata"], name: "index_parcel_deliveries_on_metadata", using: :gin
+    t.index ["organization_id", "received_by_person_id"], name: "index_parcel_deliveries_on_org_received_by_person"
+    t.index ["organization_id", "residential_property_id", "status", "received_at"], name: "index_parcel_deliveries_on_org_property_status_received_at"
+    t.index ["organization_id", "staff_shift_id"], name: "index_parcel_deliveries_on_organization_id_and_staff_shift_id"
+    t.index ["organization_id", "tracking_code"], name: "index_parcel_deliveries_on_org_tracking_code"
+    t.index ["organization_id", "unit_id", "status", "received_at"], name: "index_parcel_deliveries_on_org_unit_status_received_at"
+    t.index ["organization_id", "withdrawn_by_person_id"], name: "index_parcel_deliveries_on_org_withdrawn_by_person"
+    t.index ["organization_id"], name: "index_parcel_deliveries_on_organization_id"
+    t.index ["received_by_person_id"], name: "index_parcel_deliveries_on_received_by_person_id"
+    t.index ["recipient_person_id"], name: "index_parcel_deliveries_on_recipient_person_id"
+    t.index ["residential_property_id"], name: "index_parcel_deliveries_on_residential_property_id"
+    t.index ["staff_shift_id"], name: "index_parcel_deliveries_on_staff_shift_id"
+    t.index ["unit_id"], name: "index_parcel_deliveries_on_unit_id"
+    t.index ["withdrawn_by_person_id"], name: "index_parcel_deliveries_on_withdrawn_by_person_id"
+  end
+
+  create_table "parcel_delivery_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "changed_by_person_id"
+    t.datetime "created_at", null: false
+    t.string "from_status"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.uuid "parcel_delivery_id", null: false
+    t.text "reason"
+    t.string "to_status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["changed_by_person_id"], name: "index_parcel_delivery_status_histories_on_changed_by_person_id"
+    t.index ["metadata"], name: "index_parcel_delivery_status_histories_on_metadata", using: :gin
+    t.index ["organization_id", "changed_by_person_id"], name: "index_parcel_delivery_status_histories_on_org_changed_by"
+    t.index ["organization_id", "parcel_delivery_id", "created_at"], name: "index_parcel_delivery_status_histories_on_org_delivery_created"
+    t.index ["organization_id"], name: "index_parcel_delivery_status_histories_on_organization_id"
+    t.index ["parcel_delivery_id"], name: "index_parcel_delivery_status_histories_on_parcel_delivery_id"
   end
 
   create_table "people", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -343,6 +643,55 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.index ["resource_type", "resource_id"], name: "index_roles_on_resource"
   end
 
+  create_table "staff_assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "ends_at"
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.uuid "person_id", null: false
+    t.uuid "residential_property_id", null: false
+    t.string "staff_type", null: false
+    t.date "starts_at"
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["metadata"], name: "index_staff_assignments_on_metadata", using: :gin
+    t.index ["organization_id", "person_id", "status"], name: "idx_on_organization_id_person_id_status_36b5c5bfed"
+    t.index ["organization_id", "residential_property_id", "staff_type", "status"], name: "index_staff_assignments_on_org_property_type_status"
+    t.index ["organization_id"], name: "index_staff_assignments_on_organization_id"
+    t.index ["person_id"], name: "index_staff_assignments_on_person_id"
+    t.index ["residential_property_id"], name: "index_staff_assignments_on_residential_property_id"
+  end
+
+  create_table "staff_shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "actual_ends_at"
+    t.datetime "actual_starts_at"
+    t.uuid "closed_by_person_id"
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.text "notes"
+    t.uuid "opened_by_person_id"
+    t.uuid "organization_id", null: false
+    t.uuid "person_id", null: false
+    t.datetime "planned_ends_at", null: false
+    t.datetime "planned_starts_at", null: false
+    t.uuid "replaced_by_shift_id"
+    t.uuid "residential_property_id", null: false
+    t.uuid "staff_assignment_id", null: false
+    t.string "status", default: "scheduled", null: false
+    t.datetime "updated_at", null: false
+    t.index ["closed_by_person_id"], name: "index_staff_shifts_on_closed_by_person_id"
+    t.index ["metadata"], name: "index_staff_shifts_on_metadata", using: :gin
+    t.index ["opened_by_person_id"], name: "index_staff_shifts_on_opened_by_person_id"
+    t.index ["organization_id", "person_id", "planned_starts_at", "planned_ends_at"], name: "index_staff_shifts_on_org_person_planned_range"
+    t.index ["organization_id", "residential_property_id", "planned_starts_at", "planned_ends_at"], name: "index_staff_shifts_on_org_property_planned_range"
+    t.index ["organization_id", "status"], name: "index_staff_shifts_on_organization_id_and_status"
+    t.index ["organization_id"], name: "index_staff_shifts_on_organization_id"
+    t.index ["person_id"], name: "index_staff_shifts_on_person_id"
+    t.index ["residential_property_id"], name: "index_staff_shifts_on_residential_property_id"
+    t.index ["staff_assignment_id"], name: "index_staff_shifts_on_staff_assignment_id"
+    t.check_constraint "planned_ends_at >= planned_starts_at", name: "staff_shifts_planned_range_valid"
+  end
+
   create_table "unit_occupancies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.boolean "can_authorize_visits", default: false, null: false
     t.boolean "can_reserve_common_areas", default: false, null: false
@@ -359,6 +708,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.string "status", default: "active", null: false
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id"
     t.index ["metadata"], name: "index_unit_occupancies_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "index_unit_occupancies_on_org_person_status"
     t.index ["organization_id", "source_type", "source_id"], name: "index_unit_occupancies_on_org_source"
@@ -366,6 +716,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
     t.index ["organization_id"], name: "index_unit_occupancies_on_organization_id"
     t.index ["person_id"], name: "index_unit_occupancies_on_person_id"
     t.index ["unit_id"], name: "index_unit_occupancies_on_unit_id"
+    t.index ["user_id"], name: "index_unit_occupancies_on_user_id"
   end
 
   create_table "unit_ownerships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -590,6 +941,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
 
   add_foreign_key "access_events", "organizations"
   add_foreign_key "access_events", "residential_properties"
+  add_foreign_key "access_events", "staff_shifts"
   add_foreign_key "access_events", "units"
   add_foreign_key "access_events", "users", column: "recorded_by_user_id"
   add_foreign_key "access_events", "vehicles"
@@ -598,19 +950,66 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
   add_foreign_key "access_events", "visits"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "announcement_reads", "announcements"
+  add_foreign_key "announcement_reads", "organizations"
+  add_foreign_key "announcement_reads", "people"
+  add_foreign_key "announcement_targets", "announcements"
+  add_foreign_key "announcement_targets", "organizations"
+  add_foreign_key "announcements", "organizations"
+  add_foreign_key "announcements", "people", column: "author_person_id"
+  add_foreign_key "announcements", "residential_properties"
   add_foreign_key "authorized_residents", "organizations"
   add_foreign_key "authorized_residents", "people"
   add_foreign_key "authorized_residents", "people", column: "authorized_by_person_id"
   add_foreign_key "authorized_residents", "units"
   add_foreign_key "authorized_residents", "users", column: "authorized_by_user_id"
+  add_foreign_key "common_area_reservation_status_histories", "common_area_reservations"
+  add_foreign_key "common_area_reservation_status_histories", "organizations"
+  add_foreign_key "common_area_reservation_status_histories", "people", column: "changed_by_person_id"
+  add_foreign_key "common_area_reservations", "common_areas"
+  add_foreign_key "common_area_reservations", "organizations"
+  add_foreign_key "common_area_reservations", "people", column: "approved_by_person_id"
+  add_foreign_key "common_area_reservations", "people", column: "requested_by_person_id"
+  add_foreign_key "common_area_reservations", "residential_properties"
+  add_foreign_key "common_area_reservations", "units"
+  add_foreign_key "common_areas", "organizations"
+  add_foreign_key "common_areas", "residential_properties"
+  add_foreign_key "documents", "organizations"
+  add_foreign_key "documents", "people", column: "uploaded_by_person_id"
+  add_foreign_key "incident_status_histories", "incidents"
+  add_foreign_key "incident_status_histories", "organizations"
+  add_foreign_key "incident_status_histories", "people", column: "changed_by_person_id"
+  add_foreign_key "incidents", "common_areas"
+  add_foreign_key "incidents", "organizations"
+  add_foreign_key "incidents", "parcel_deliveries"
+  add_foreign_key "incidents", "people", column: "assigned_to_person_id"
+  add_foreign_key "incidents", "people", column: "reported_by_person_id"
+  add_foreign_key "incidents", "residential_properties"
+  add_foreign_key "incidents", "units"
+  add_foreign_key "incidents", "vehicles"
+  add_foreign_key "incidents", "visits"
   add_foreign_key "lease_contracts", "organizations"
   add_foreign_key "lease_contracts", "people", column: "lessee_person_id"
   add_foreign_key "lease_contracts", "people", column: "lessor_person_id"
   add_foreign_key "lease_contracts", "units"
   add_foreign_key "lease_contracts", "users", column: "created_by_id"
   add_foreign_key "lease_contracts", "users", column: "terminated_by_id"
+  add_foreign_key "notifications", "organizations"
+  add_foreign_key "notifications", "people", column: "recipient_person_id"
+  add_foreign_key "notifications", "residential_properties"
+  add_foreign_key "notifications", "units"
   add_foreign_key "organization_memberships", "organizations"
   add_foreign_key "organization_memberships", "people"
+  add_foreign_key "parcel_deliveries", "organizations"
+  add_foreign_key "parcel_deliveries", "people", column: "received_by_person_id"
+  add_foreign_key "parcel_deliveries", "people", column: "recipient_person_id"
+  add_foreign_key "parcel_deliveries", "people", column: "withdrawn_by_person_id"
+  add_foreign_key "parcel_deliveries", "residential_properties"
+  add_foreign_key "parcel_deliveries", "staff_shifts"
+  add_foreign_key "parcel_deliveries", "units"
+  add_foreign_key "parcel_delivery_status_histories", "organizations"
+  add_foreign_key "parcel_delivery_status_histories", "parcel_deliveries"
+  add_foreign_key "parcel_delivery_status_histories", "people", column: "changed_by_person_id"
   add_foreign_key "people", "organizations"
   add_foreign_key "people", "users"
   add_foreign_key "people_roles", "people"
@@ -626,9 +1025,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
   add_foreign_key "property_settings", "residential_properties"
   add_foreign_key "residential_properties", "organizations"
   add_foreign_key "roles", "organizations"
+  add_foreign_key "staff_assignments", "organizations"
+  add_foreign_key "staff_assignments", "people"
+  add_foreign_key "staff_assignments", "residential_properties"
+  add_foreign_key "staff_shifts", "organizations"
+  add_foreign_key "staff_shifts", "people"
+  add_foreign_key "staff_shifts", "people", column: "closed_by_person_id"
+  add_foreign_key "staff_shifts", "people", column: "opened_by_person_id"
+  add_foreign_key "staff_shifts", "residential_properties"
+  add_foreign_key "staff_shifts", "staff_assignments"
+  add_foreign_key "staff_shifts", "staff_shifts", column: "replaced_by_shift_id"
   add_foreign_key "unit_occupancies", "organizations"
   add_foreign_key "unit_occupancies", "people"
   add_foreign_key "unit_occupancies", "units"
+  add_foreign_key "unit_occupancies", "users"
   add_foreign_key "unit_ownerships", "organizations"
   add_foreign_key "unit_ownerships", "people"
   add_foreign_key "unit_ownerships", "units"
@@ -655,6 +1065,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_13_130005) do
   add_foreign_key "visits", "people", column: "created_by_person_id"
   add_foreign_key "visits", "people", column: "responsible_person_id"
   add_foreign_key "visits", "residential_properties"
+  add_foreign_key "visits", "staff_shifts"
   add_foreign_key "visits", "units"
   add_foreign_key "visits", "users", column: "approved_by_id"
   add_foreign_key "visits", "users", column: "concierge_validated_by_id"
