@@ -12,7 +12,6 @@
 #  concierge_validated_at    :datetime
 #  metadata                  :jsonb            not null
 #  notes                     :text
-#  recurring_rule            :jsonb            not null
 #  rejected_at               :datetime
 #  rejection_reason          :text
 #  scheduled_ends_at         :datetime
@@ -43,7 +42,6 @@
 #  index_visits_on_org_unit_scheduled_starts             (organization_id,unit_id,scheduled_starts_at)
 #  index_visits_on_organization_id                       (organization_id)
 #  index_visits_on_organization_id_and_staff_shift_id    (organization_id,staff_shift_id)
-#  index_visits_on_recurring_rule                        (recurring_rule) USING gin
 #  index_visits_on_rejected_by_id                        (rejected_by_id)
 #  index_visits_on_residential_property_id               (residential_property_id)
 #  index_visits_on_responsible_person_id                 (responsible_person_id)
@@ -78,4 +76,5 @@ class Visit < ApplicationRecord
 
   has_many :visit_participants
   has_many :visit_status_histories
+  has_one  :visit_recurrence, dependent: :destroy
 end

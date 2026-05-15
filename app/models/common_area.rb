@@ -11,7 +11,6 @@
 #  metadata                :jsonb            not null
 #  name                    :string           not null
 #  requires_approval       :boolean          default(TRUE), not null
-#  rules                   :jsonb            not null
 #  status                  :string           default("active"), not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -25,7 +24,6 @@
 #  index_common_areas_on_metadata                                  (metadata) USING gin
 #  index_common_areas_on_organization_id                           (organization_id)
 #  index_common_areas_on_residential_property_id                   (residential_property_id)
-#  index_common_areas_on_rules                                     (rules) USING gin
 #  index_common_areas_unique_name_per_property_when_active         (organization_id,residential_property_id,name) UNIQUE WHERE (deleted_at IS NULL)
 #
 # Foreign Keys
@@ -42,4 +40,5 @@ class CommonArea < ApplicationRecord
 
   has_many :common_area_reservations, dependent: :restrict_with_error
   has_many :incidents, dependent: :nullify
+  has_many :common_area_rules, dependent: :destroy
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -292,6 +292,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
     t.exclusion_constraint "organization_id WITH =, common_area_id WITH =, tsrange(starts_at, ends_at, '[)'::text) WITH &&", where: "(status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying])::text[])", using: :gist, name: "common_area_reservations_no_overlap"
   end
 
+  create_table "common_area_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "common_area_id", null: false
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.integer "position"
+    t.string "rule_type", null: false
+    t.datetime "updated_at", null: false
+    t.integer "value_int"
+    t.text "value_text"
+    t.index ["common_area_id"], name: "index_common_area_rules_on_common_area_id"
+    t.index ["metadata"], name: "index_common_area_rules_on_metadata", using: :gin
+    t.index ["organization_id", "common_area_id", "rule_type"], name: "index_common_area_rules_unique_per_area_type", unique: true
+    t.index ["organization_id", "rule_type"], name: "index_common_area_rules_on_org_rule_type"
+    t.index ["organization_id"], name: "index_common_area_rules_on_organization_id"
+    t.check_constraint "value_int IS NOT NULL OR value_text IS NOT NULL", name: "common_area_rules_value_present"
+  end
+
   create_table "common_areas", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "area_type", null: false
     t.integer "capacity"
@@ -302,7 +320,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
     t.uuid "organization_id", null: false
     t.boolean "requires_approval", default: true, null: false
     t.uuid "residential_property_id", null: false
-    t.jsonb "rules", default: {}, null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_common_areas_on_deleted_at"
@@ -311,7 +328,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
     t.index ["organization_id", "residential_property_id", "status"], name: "idx_on_organization_id_residential_property_id_stat_8348429f7a"
     t.index ["organization_id"], name: "index_common_areas_on_organization_id"
     t.index ["residential_property_id"], name: "index_common_areas_on_residential_property_id"
-    t.index ["rules"], name: "index_common_areas_on_rules", using: :gin
   end
 
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -923,6 +939,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
     t.index ["visitor_profile_id"], name: "index_visit_participants_on_visitor_profile_id"
   end
 
+  create_table "visit_recurrences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "byday"
+    t.string "bymonth"
+    t.string "bymonthday"
+    t.integer "count"
+    t.datetime "created_at", null: false
+    t.datetime "dtstart", null: false
+    t.string "freq", null: false
+    t.integer "interval", default: 1, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.string "timezone", default: "America/Santiago", null: false
+    t.datetime "until_at"
+    t.datetime "updated_at", null: false
+    t.uuid "visit_id", null: false
+    t.string "wkst", default: "MO", null: false
+    t.index ["metadata"], name: "index_visit_recurrences_on_metadata", using: :gin
+    t.index ["organization_id", "dtstart"], name: "index_visit_recurrences_on_org_dtstart"
+    t.index ["organization_id", "freq"], name: "index_visit_recurrences_on_org_freq"
+    t.index ["organization_id", "visit_id"], name: "index_visit_recurrences_unique_per_visit", unique: true
+    t.index ["organization_id"], name: "index_visit_recurrences_on_organization_id"
+    t.index ["visit_id"], name: "index_visit_recurrences_on_visit_id"
+    t.check_constraint "\"interval\" > 0", name: "visit_recurrences_interval_positive"
+    t.check_constraint "count IS NULL OR count > 0", name: "visit_recurrences_count_positive"
+    t.check_constraint "freq::text = ANY (ARRAY['DAILY'::character varying, 'WEEKLY'::character varying, 'MONTHLY'::character varying, 'YEARLY'::character varying]::text[])", name: "visit_recurrences_freq_allowed"
+    t.check_constraint "until_at IS NULL OR count IS NULL", name: "visit_recurrences_until_or_count"
+    t.check_constraint "until_at IS NULL OR until_at >= dtstart", name: "visit_recurrences_until_after_dtstart"
+  end
+
   create_table "visit_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "changed_by_person_id"
     t.uuid "changed_by_user_id"
@@ -982,7 +1027,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
     t.jsonb "metadata", default: {}, null: false
     t.text "notes"
     t.uuid "organization_id", null: false
-    t.jsonb "recurring_rule", default: {}, null: false
     t.datetime "rejected_at"
     t.uuid "rejected_by_id"
     t.text "rejection_reason"
@@ -1004,7 +1048,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
     t.index ["organization_id", "staff_shift_id"], name: "index_visits_on_organization_id_and_staff_shift_id"
     t.index ["organization_id", "unit_id", "scheduled_starts_at"], name: "index_visits_on_org_unit_scheduled_starts"
     t.index ["organization_id"], name: "index_visits_on_organization_id"
-    t.index ["recurring_rule"], name: "index_visits_on_recurring_rule", using: :gin
     t.index ["rejected_by_id"], name: "index_visits_on_rejected_by_id"
     t.index ["residential_property_id"], name: "index_visits_on_residential_property_id"
     t.index ["responsible_person_id"], name: "index_visits_on_responsible_person_id"
@@ -1047,6 +1090,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
   add_foreign_key "common_area_reservations", "people", column: "requested_by_person_id"
   add_foreign_key "common_area_reservations", "residential_properties"
   add_foreign_key "common_area_reservations", "units"
+  add_foreign_key "common_area_rules", "common_areas"
+  add_foreign_key "common_area_rules", "organizations"
   add_foreign_key "common_areas", "organizations"
   add_foreign_key "common_areas", "residential_properties"
   add_foreign_key "documents", "organizations"
@@ -1129,6 +1174,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_030003) do
   add_foreign_key "visit_participants", "users", column: "validated_by_id"
   add_foreign_key "visit_participants", "visitor_profiles"
   add_foreign_key "visit_participants", "visits"
+  add_foreign_key "visit_recurrences", "organizations"
+  add_foreign_key "visit_recurrences", "visits"
   add_foreign_key "visit_status_histories", "organizations"
   add_foreign_key "visit_status_histories", "people", column: "changed_by_person_id"
   add_foreign_key "visit_status_histories", "users", column: "changed_by_user_id"
