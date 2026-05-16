@@ -147,7 +147,9 @@ git push origin main
 ```
 
 
-##Crear un usuario
+## Crear un usuario
+
+Rolify está declarado en **`Person`**, no en `User`. Los roles globales (p. ej. `super_admin`) y por organización (`tenant_admin`) se asignan con `person.add_role(...)` sobre la persona del tenant.
 
 ```bash
 
@@ -167,7 +169,6 @@ organization.save!
 ActsAsTenant.with_tenant(organization) do
   user = User.find_or_initialize_by(email: email)
   user.assign_attributes(
-    organization: organization,
     name: user.name.presence || "Admin demo",
     dni: user.dni.presence || "DEMO-1",
     language: user.language.presence || Languages::ES,
@@ -176,12 +177,29 @@ ActsAsTenant.with_tenant(organization) do
   )
   user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
   user.save!
-  user.add_role(:super_admin)
-  user.add_role(:tenant_admin, organization) unless user.has_role?(:tenant_admin, organization)
+
+  person = user.person_for(organization)
+  if person.nil?
+    person = user.people.create!(
+      organization: organization,
+      display_name: user.name.presence || user.email,
+      status: "active",
+      person_type: PersonTypes::NATURAL
+    )
+    membership = OrganizationMembership.create!(organization: organization, person: person)
+    membership.accept!
+    person.add_role(AvailableRoles::CLIENT) unless person.has_role?(AvailableRoles::CLIENT)
+  end
+
+  ActsAsTenant.without_tenant do
+    person.add_role(AvailableRoles::SUPER_ADMIN) unless person.has_role?(AvailableRoles::SUPER_ADMIN)
+  end
+  person.add_role(AvailableRoles::TENANT_ADMIN, organization) unless person.has_role?(AvailableRoles::TENANT_ADMIN, organization)
+
   puts <<~MSG
     Listo.
       Organización: #{organization.name} (#{organization.subdomain}) id=#{organization.id} plan=#{organization.plan}
-      Usuario:      #{user.email} (tenant_admin: #{user.tenant_admin?(organization)})
+      Usuario:      #{user.email} (super_admin: #{user.super_admin?}, tenant_admin: #{user.tenant_admin?(organization)})
   MSG
 end
 exit
