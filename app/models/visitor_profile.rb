@@ -40,6 +40,7 @@ class VisitorProfile < ApplicationRecord
   include TenantScopedAssociations
 
   acts_as_tenant :organization
+  acts_as_paranoid
 
   belongs_to :organization
   belongs_to :person, optional: true

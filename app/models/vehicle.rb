@@ -44,6 +44,7 @@ class Vehicle < ApplicationRecord
   include VehicleTypes
 
   acts_as_tenant :organization
+  acts_as_paranoid
 
   belongs_to :organization
   belongs_to :person, optional: true
