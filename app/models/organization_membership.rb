@@ -18,7 +18,6 @@
 #
 # Indexes
 #
-#  idx_on_organization_id_person_id_cd1ad4bbc4        (organization_id,person_id)
 #  idx_org_memberships_unique_active_invited          (organization_id,person_id) UNIQUE WHERE (((status)::text = ANY ((ARRAY['invited'::character varying, 'active'::character varying])::text[])) AND (deleted_at IS NULL))
 #  index_organization_memberships_on_deleted_at       (deleted_at)
 #  index_organization_memberships_on_metadata         (metadata) USING gin
@@ -32,6 +31,8 @@
 #  fk_rails_...  (person_id => people.id)
 #
 class OrganizationMembership < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
   acts_as_paranoid
 
@@ -51,7 +52,7 @@ class OrganizationMembership < ApplicationRecord
   belongs_to :person
 
   validates :status, presence: true, inclusion: { in: STATUSES }
-  validate :person_belongs_to_same_organization
+  validates_same_tenant :person
 
   include AASM
 
@@ -92,12 +93,5 @@ class OrganizationMembership < ApplicationRecord
 
   def stamp_revoked_at
     self.revoked_at = Time.current
-  end
-
-  def person_belongs_to_same_organization
-    return if person.blank? || organization_id.blank?
-    return if person.organization_id == organization_id
-
-    errors.add(:person, :different_tenant)
   end
 end

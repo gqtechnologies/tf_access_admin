@@ -37,6 +37,9 @@
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #
 class Unit < ApplicationRecord
+  include TenantScopedAssociations
+  include UnitTypes
+
   acts_as_tenant :organization
   acts_as_paranoid
 
@@ -49,8 +52,10 @@ class Unit < ApplicationRecord
   has_many :unit_occupancies, dependent: :destroy
   has_many :authorized_residents, dependent: :destroy
 
-  validates :unit_type, presence: true
+  validates :unit_type, presence: true, inclusion: { in: UnitTypes::ALL }
   validates :identifier, presence: true
   validates :normalized_identifier, presence: true
   validates :status, presence: true
+
+  validates_same_tenant :residential_property, :property_section
 end

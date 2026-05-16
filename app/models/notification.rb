@@ -27,6 +27,7 @@
 #  index_notifications_on_metadata                         (metadata) USING gin
 #  index_notifications_on_org_channel_pending_status       (organization_id,channel,status,created_at) WHERE ((status)::text = 'pending'::text)
 #  index_notifications_on_org_notifiable                   (organization_id,notifiable_type,notifiable_id)
+#  index_notifications_on_org_recipient_read_at            (organization_id,recipient_person_id,read_at)
 #  index_notifications_on_org_recipient_status_created_at  (organization_id,recipient_person_id,status,created_at)
 #  index_notifications_on_organization_id                  (organization_id)
 #  index_notifications_on_recipient_person_id              (recipient_person_id)
@@ -41,6 +42,10 @@
 #  fk_rails_...  (unit_id => units.id)
 #
 class Notification < ApplicationRecord
+  include NotificationChannels
+  include NotificationTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -48,4 +53,9 @@ class Notification < ApplicationRecord
   belongs_to :unit, optional: true
   belongs_to :recipient_person, class_name: "Person"
   belongs_to :notifiable, polymorphic: true
+
+  validates :notification_type, presence: true, inclusion: { in: NotificationTypes::ALL }
+  validates :channel, presence: true, inclusion: { in: NotificationChannels::ALL }
+
+  validates_same_tenant :residential_property, :unit, :recipient_person, :notifiable
 end

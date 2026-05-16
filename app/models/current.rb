@@ -2,4 +2,6 @@
 
 class Current < ActiveSupport::CurrentAttributes
   attribute :organization
+  attribute :user
+  attribute :person
 end

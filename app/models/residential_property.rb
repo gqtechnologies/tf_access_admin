@@ -34,6 +34,8 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 class ResidentialProperty < ApplicationRecord
+  include PropertyTypes
+
   acts_as_tenant :organization
   acts_as_paranoid
 
@@ -43,6 +45,6 @@ class ResidentialProperty < ApplicationRecord
   has_one :property_setting, dependent: :destroy
 
   validates :name, presence: true
-  validates :property_type, presence: true
+  validates :property_type, presence: true, inclusion: { in: PropertyTypes::ALL }
   validates :status, presence: true
 end

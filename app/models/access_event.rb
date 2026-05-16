@@ -16,7 +16,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  organization_id         :uuid             not null
-#  recorded_by_user_id     :uuid
+#  recorded_by_person_id   :uuid
 #  residential_property_id :uuid             not null
 #  staff_shift_id          :uuid
 #  unit_id                 :uuid
@@ -33,7 +33,7 @@
 #  index_access_events_on_org_unit_occurred_at         (organization_id,unit_id,occurred_at)
 #  index_access_events_on_org_visit_occurred_at        (organization_id,visit_id,occurred_at)
 #  index_access_events_on_organization_id              (organization_id)
-#  index_access_events_on_recorded_by_user_id          (recorded_by_user_id)
+#  index_access_events_on_recorded_by_person_id        (recorded_by_person_id)
 #  index_access_events_on_residential_property_id      (residential_property_id)
 #  index_access_events_on_unit_id                      (unit_id)
 #  index_access_events_on_vehicle_id                   (vehicle_id)
@@ -44,7 +44,7 @@
 # Foreign Keys
 #
 #  fk_rails_...  (organization_id => organizations.id)
-#  fk_rails_...  (recorded_by_user_id => users.id)
+#  fk_rails_...  (recorded_by_person_id => people.id)
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #  fk_rails_...  (staff_shift_id => staff_shifts.id)
 #  fk_rails_...  (unit_id => units.id)
@@ -54,6 +54,8 @@
 #  fk_rails_...  (visitor_profile_id => visitor_profiles.id)
 #
 class AccessEvent < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -63,6 +65,9 @@ class AccessEvent < ApplicationRecord
   belongs_to :visit_participant, optional: true
   belongs_to :visitor_profile, optional: true
   belongs_to :vehicle, optional: true
-  belongs_to :recorded_by_user, class_name: "User", optional: true
+  belongs_to :recorded_by_person, class_name: "Person", optional: true
   belongs_to :staff_shift, optional: true
+
+  validates_same_tenant :residential_property, :unit, :visit, :visit_participant, :visitor_profile,
+                        :vehicle, :recorded_by_person, :staff_shift
 end

@@ -36,6 +36,8 @@
 #  fk_rails_...  (visit_id => visits.id)
 #
 class VisitRecurrence < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   FREQ_DAILY   = "DAILY"
@@ -61,7 +63,7 @@ class VisitRecurrence < ApplicationRecord
   validate  :byday_format
   validate  :bymonthday_format
   validate  :bymonth_format
-  validate  :visit_belongs_to_same_organization
+  validates_same_tenant :visit
 
   # Returns the RFC5545 RRULE string equivalent (without DTSTART line).
   def to_rrule
@@ -112,12 +114,5 @@ class VisitRecurrence < ApplicationRecord
     return if months.all? { |m| m.match?(/\A\d+\z/) && m.to_i.between?(1, 12) }
 
     errors.add(:bymonth, :invalid_month_list)
-  end
-
-  def visit_belongs_to_same_organization
-    return if visit.blank? || organization_id.blank?
-    return if visit.organization_id == organization_id
-
-    errors.add(:visit, :different_tenant)
   end
 end

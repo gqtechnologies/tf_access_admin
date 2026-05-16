@@ -23,13 +23,13 @@
 #
 # Indexes
 #
-#  index_visitor_profiles_on_deleted_at                     (deleted_at)
-#  index_visitor_profiles_on_metadata                       (metadata) USING gin
-#  index_visitor_profiles_on_org_document_digest            (organization_id,document_number_digest)
-#  index_visitor_profiles_on_organization_id                (organization_id)
-#  index_visitor_profiles_on_organization_id_and_person_id  (organization_id,person_id)
-#  index_visitor_profiles_on_organization_id_and_status     (organization_id,status)
-#  index_visitor_profiles_on_person_id                      (person_id)
+#  index_visitor_profiles_on_deleted_at                           (deleted_at)
+#  index_visitor_profiles_on_metadata                             (metadata) USING gin
+#  index_visitor_profiles_on_organization_id                      (organization_id)
+#  index_visitor_profiles_on_organization_id_and_person_id        (organization_id,person_id)
+#  index_visitor_profiles_on_organization_id_and_status           (organization_id,status)
+#  index_visitor_profiles_on_person_id                            (person_id)
+#  index_visitor_profiles_unique_doc_digest_per_org_when_present  (organization_id,document_number_digest) UNIQUE WHERE ((deleted_at IS NULL) AND (document_number_digest IS NOT NULL))
 #
 # Foreign Keys
 #
@@ -37,8 +37,12 @@
 #  fk_rails_...  (person_id => people.id)
 #
 class VisitorProfile < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :person, optional: true
+
+  validates_same_tenant :person
 end

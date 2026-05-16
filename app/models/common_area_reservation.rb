@@ -47,6 +47,8 @@
 #  fk_rails_...  (unit_id => units.id)
 #
 class CommonAreaReservation < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -55,6 +57,8 @@ class CommonAreaReservation < ApplicationRecord
   belongs_to :unit
   belongs_to :requested_by_person, class_name: "Person"
   belongs_to :approved_by_person, class_name: "Person", optional: true
+
+  validates_same_tenant :common_area, :residential_property, :unit, :requested_by_person, :approved_by_person
 
   has_many :common_area_reservation_status_histories, dependent: :destroy
 end

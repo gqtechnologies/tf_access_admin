@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
   before_action :set_current_organization
+  before_action :set_current_user_and_person, if: :user_signed_in?
   before_action :set_locale
   before_action :set_filters, if: -> { action_name == "index" }
   # Share data with all Inertia responses, this is used to pass the locale and translations to the client
@@ -34,6 +35,8 @@ class ApplicationController < ActionController::Base
   private
 
   def set_current_organization
+    Current.organization = nil
+
     subdomain = subdomain_from_request
 
     if subdomain.blank?
@@ -49,10 +52,17 @@ class ApplicationController < ActionController::Base
     organization = get_organization_from_subdomain(subdomain)
     if organization
       set_current_tenant(organization)
+      Current.organization = organization
     else
       # Evita bucle: el subdominio no existe; vuelve al host público (p. ej. abc.localhost → localhost)
       redirect_to home_url(public_home_url_options), allow_other_host: true and return
     end
+  end
+
+  def set_current_user_and_person
+    Current.user = current_user
+    tenant = ActsAsTenant.current_tenant
+    Current.person = current_user.person_for(tenant) if tenant
   end
 
   # Rutas que deben responder sin subdominio de organización (auth, health, assets internos).

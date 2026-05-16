@@ -34,6 +34,9 @@
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #
 class PropertySection < ApplicationRecord
+  include SectionTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
   acts_as_paranoid
 
@@ -43,6 +46,8 @@ class PropertySection < ApplicationRecord
   has_many :children, class_name: "PropertySection", foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
   has_many :units, dependent: :destroy
 
-  validates :section_type, presence: true
+  validates :section_type, presence: true, inclusion: { in: SectionTypes::ALL }
   validates :name, presence: true
+
+  validates_same_tenant :residential_property, :parent
 end

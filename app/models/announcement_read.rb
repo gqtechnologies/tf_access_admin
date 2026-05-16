@@ -35,9 +35,16 @@
 #  fk_rails_...  (person_id => people.id)
 #
 class AnnouncementRead < ApplicationRecord
+  include NotificationChannels
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :announcement
   belongs_to :person, optional: true
+
+  validates_same_tenant :announcement, :person
+
+  validates :channel, inclusion: { in: NotificationChannels::ALL }, allow_nil: true, if: -> { channel.present? }
 end

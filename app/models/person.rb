@@ -41,6 +41,8 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Person < ApplicationRecord
+  include PersonTypes
+
   acts_as_tenant :organization
   acts_as_paranoid
   rolify
@@ -50,6 +52,7 @@ class Person < ApplicationRecord
   has_one :organization_membership, dependent: :destroy
 
   validates :display_name, presence: true
+  validates :person_type, presence: true, inclusion: { in: PersonTypes::ALL }
 
   def set_tenant_role(role_name)
     delete_tenant_roles

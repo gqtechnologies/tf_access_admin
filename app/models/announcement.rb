@@ -40,6 +40,10 @@
 #
 class Announcement < ApplicationRecord
   acts_as_paranoid
+  include AnnouncementCategories
+  include Priorities
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -48,4 +52,9 @@ class Announcement < ApplicationRecord
 
   has_many :announcement_targets, dependent: :destroy
   has_many :announcement_reads, dependent: :destroy
+
+  validates :priority, presence: true, inclusion: { in: Priorities::ALL }
+  validates :category, inclusion: { in: AnnouncementCategories::ALL }, allow_nil: true, if: -> { category.present? }
+
+  validates_same_tenant :residential_property, :author_person
 end

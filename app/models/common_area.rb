@@ -33,10 +33,17 @@
 #
 class CommonArea < ApplicationRecord
   acts_as_paranoid
+  include CommonAreaTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :residential_property
+
+  validates_same_tenant :residential_property
+
+  validates :area_type, presence: true, inclusion: { in: CommonAreaTypes::ALL }
 
   has_many :common_area_reservations, dependent: :restrict_with_error
   has_many :incidents, dependent: :nullify

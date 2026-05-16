@@ -17,7 +17,6 @@
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  authorized_by_person_id  :uuid
-#  authorized_by_user_id    :uuid
 #  organization_id          :uuid             not null
 #  person_id                :uuid             not null
 #  unit_id                  :uuid             not null
@@ -35,21 +34,35 @@
 # Foreign Keys
 #
 #  fk_rails_...  (authorized_by_person_id => people.id)
-#  fk_rails_...  (authorized_by_user_id => users.id)
 #  fk_rails_...  (organization_id => organizations.id)
 #  fk_rails_...  (person_id => people.id)
 #  fk_rails_...  (unit_id => units.id)
 #
 class AuthorizedResident < ApplicationRecord
+  include RelationshipTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :unit
   belongs_to :person
   belongs_to :authorized_by_person, class_name: "Person", optional: true
-  belongs_to :authorized_by_user, class_name: "User", optional: true
 
-  validates :relationship_type, presence: true
+  validates :relationship_type, presence: true, inclusion: { in: RelationshipTypes::ALL }
   validates :starts_at, presence: true
   validates :status, presence: true
+
+  validates_same_tenant :unit, :person, :authorized_by_person
+
+  validate :ends_on_or_after_starts
+
+  private
+
+  def ends_on_or_after_starts
+    return if ends_at.blank? || starts_at.blank?
+    return if ends_at >= starts_at
+
+    errors.add(:ends_at, "must be on or after starts_at")
+  end
 end

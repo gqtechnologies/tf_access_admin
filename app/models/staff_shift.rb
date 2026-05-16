@@ -28,6 +28,7 @@
 #  index_staff_shifts_on_metadata                    (metadata) USING gin
 #  index_staff_shifts_on_opened_by_person_id         (opened_by_person_id)
 #  index_staff_shifts_on_org_person_planned_range    (organization_id,person_id,planned_starts_at,planned_ends_at)
+#  index_staff_shifts_on_org_property_in_progress    (organization_id,residential_property_id,status) WHERE ((status)::text = 'in_progress'::text)
 #  index_staff_shifts_on_org_property_planned_range  (organization_id,residential_property_id,planned_starts_at,planned_ends_at)
 #  index_staff_shifts_on_organization_id             (organization_id)
 #  index_staff_shifts_on_organization_id_and_status  (organization_id,status)
@@ -46,6 +47,9 @@
 #  fk_rails_...  (staff_assignment_id => staff_assignments.id)
 #
 class StaffShift < ApplicationRecord
+  include StaffShiftStatuses
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -55,4 +59,9 @@ class StaffShift < ApplicationRecord
   belongs_to :replaced_by_shift, class_name: "StaffShift", optional: true
   belongs_to :opened_by_person, class_name: "Person", optional: true
   belongs_to :closed_by_person, class_name: "Person", optional: true
+
+  validates :status, presence: true, inclusion: { in: StaffShiftStatuses::ALL }
+
+  validates_same_tenant :residential_property, :staff_assignment, :person, :replaced_by_shift,
+                        :opened_by_person, :closed_by_person
 end

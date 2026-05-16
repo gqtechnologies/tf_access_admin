@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_203000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -24,7 +24,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.text "notes"
     t.datetime "occurred_at", null: false
     t.uuid "organization_id", null: false
-    t.uuid "recorded_by_user_id"
+    t.uuid "recorded_by_person_id"
     t.uuid "residential_property_id", null: false
     t.string "result", default: "success", null: false
     t.string "source", default: "web", null: false
@@ -42,7 +42,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["organization_id", "unit_id", "occurred_at"], name: "index_access_events_on_org_unit_occurred_at"
     t.index ["organization_id", "visit_id", "occurred_at"], name: "index_access_events_on_org_visit_occurred_at"
     t.index ["organization_id"], name: "index_access_events_on_organization_id"
-    t.index ["recorded_by_user_id"], name: "index_access_events_on_recorded_by_user_id"
+    t.index ["recorded_by_person_id"], name: "index_access_events_on_recorded_by_person_id"
     t.index ["residential_property_id"], name: "index_access_events_on_residential_property_id"
     t.index ["unit_id"], name: "index_access_events_on_unit_id"
     t.index ["vehicle_id"], name: "index_access_events_on_vehicle_id"
@@ -208,6 +208,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.string "username"
     t.integer "version", default: 0
     t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "organization_id", "version"], name: "index_audits_on_auditable_org_version"
     t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["organization_id", "auditable_type", "auditable_id", "created_at"], name: "index_audits_on_org_auditable_created_at"
@@ -218,7 +219,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
 
   create_table "authorized_residents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "authorized_by_person_id"
-    t.uuid "authorized_by_user_id"
     t.boolean "can_authorize_visits", default: false, null: false
     t.boolean "can_reserve_common_areas", default: false, null: false
     t.boolean "can_withdraw_parcels", default: false, null: false
@@ -240,6 +240,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["organization_id"], name: "index_authorized_residents_on_organization_id"
     t.index ["person_id"], name: "index_authorized_residents_on_person_id"
     t.index ["unit_id"], name: "index_authorized_residents_on_unit_id"
+    t.check_constraint "ends_at IS NULL OR ends_at >= starts_at", name: "authorized_residents_date_range_valid"
   end
 
   create_table "common_area_reservation_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -447,7 +448,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.boolean "can_reserve_common_areas", default: true, null: false
     t.boolean "can_withdraw_parcels", default: true, null: false
     t.datetime "created_at", null: false
-    t.uuid "created_by_id"
+    t.uuid "created_by_person_id"
     t.date "ends_at"
     t.uuid "lessee_person_id", null: false
     t.uuid "lessor_person_id"
@@ -455,19 +456,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.uuid "organization_id", null: false
     t.date "starts_at", null: false
     t.string "status", default: "draft", null: false
-    t.uuid "terminated_by_id"
+    t.uuid "terminated_by_person_id"
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["created_by_id"], name: "index_lease_contracts_on_created_by_id"
+    t.index ["created_by_person_id"], name: "index_lease_contracts_on_created_by_person_id"
     t.index ["lessee_person_id"], name: "index_lease_contracts_on_lessee_person_id"
     t.index ["lessor_person_id"], name: "index_lease_contracts_on_lessor_person_id"
     t.index ["metadata"], name: "index_lease_contracts_on_metadata", using: :gin
     t.index ["organization_id", "lessee_person_id", "status"], name: "index_lease_contracts_on_org_lessee_person_status"
+    t.index ["organization_id", "status", "ends_at"], name: "index_lease_contracts_on_org_status_ends_at"
     t.index ["organization_id", "unit_id", "starts_at", "ends_at"], name: "index_lease_contracts_on_org_unit_date_range"
     t.index ["organization_id", "unit_id"], name: "index_lease_contracts_on_org_unit_unique_when_active", unique: true, where: "((status)::text = 'active'::text)"
     t.index ["organization_id"], name: "index_lease_contracts_on_organization_id"
-    t.index ["terminated_by_id"], name: "index_lease_contracts_on_terminated_by_id"
+    t.index ["terminated_by_person_id"], name: "index_lease_contracts_on_terminated_by_person_id"
     t.index ["unit_id"], name: "index_lease_contracts_on_unit_id"
+    t.check_constraint "ends_at IS NULL OR ends_at >= starts_at", name: "lease_contracts_date_range_valid"
   end
 
   create_table "notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -490,6 +493,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["metadata"], name: "index_notifications_on_metadata", using: :gin
     t.index ["organization_id", "channel", "status", "created_at"], name: "index_notifications_on_org_channel_pending_status", where: "((status)::text = 'pending'::text)"
     t.index ["organization_id", "notifiable_type", "notifiable_id"], name: "index_notifications_on_org_notifiable"
+    t.index ["organization_id", "recipient_person_id", "read_at"], name: "index_notifications_on_org_recipient_read_at"
     t.index ["organization_id", "recipient_person_id", "status", "created_at"], name: "index_notifications_on_org_recipient_status_created_at"
     t.index ["organization_id"], name: "index_notifications_on_organization_id"
     t.index ["recipient_person_id"], name: "index_notifications_on_recipient_person_id"
@@ -511,7 +515,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_organization_memberships_on_deleted_at"
     t.index ["metadata"], name: "index_organization_memberships_on_metadata", using: :gin
-    t.index ["organization_id", "person_id"], name: "idx_on_organization_id_person_id_cd1ad4bbc4"
     t.index ["organization_id", "person_id"], name: "idx_org_memberships_unique_active_invited", unique: true, where: "(((status)::text = ANY ((ARRAY['invited'::character varying, 'active'::character varying])::text[])) AND (deleted_at IS NULL))"
     t.index ["organization_id"], name: "index_organization_memberships_on_organization_id"
     t.index ["person_id"], name: "index_organization_memberships_on_person_id"
@@ -575,6 +578,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["staff_shift_id"], name: "index_parcel_deliveries_on_staff_shift_id"
     t.index ["unit_id"], name: "index_parcel_deliveries_on_unit_id"
     t.index ["withdrawn_by_person_id"], name: "index_parcel_deliveries_on_withdrawn_by_person_id"
+    t.check_constraint "withdrawn_at IS NULL OR withdrawn_at >= received_at", name: "parcel_deliveries_withdrawn_after_received"
   end
 
   create_table "parcel_delivery_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -653,7 +657,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
 
   create_table "property_setting_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "change_reason"
-    t.uuid "changed_by_id"
+    t.uuid "changed_by_person_id"
     t.datetime "created_at", null: false
     t.uuid "organization_id", null: false
     t.uuid "property_setting_id", null: false
@@ -661,7 +665,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.jsonb "snapshot", default: {}, null: false
     t.datetime "updated_at", null: false
     t.integer "version_number", null: false
-    t.index ["changed_by_id"], name: "index_property_setting_versions_on_changed_by_id"
+    t.index ["changed_by_person_id"], name: "index_property_setting_versions_on_changed_by_person_id"
     t.index ["organization_id", "property_setting_id"], name: "idx_property_setting_versions_on_org_and_setting"
     t.index ["organization_id", "residential_property_id", "version_number"], name: "idx_property_setting_versions_on_org_property_version"
     t.index ["organization_id"], name: "index_property_setting_versions_on_organization_id"
@@ -774,6 +778,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["opened_by_person_id"], name: "index_staff_shifts_on_opened_by_person_id"
     t.index ["organization_id", "person_id", "planned_starts_at", "planned_ends_at"], name: "index_staff_shifts_on_org_person_planned_range"
     t.index ["organization_id", "residential_property_id", "planned_starts_at", "planned_ends_at"], name: "index_staff_shifts_on_org_property_planned_range"
+    t.index ["organization_id", "residential_property_id", "status"], name: "index_staff_shifts_on_org_property_in_progress", where: "((status)::text = 'in_progress'::text)"
     t.index ["organization_id", "status"], name: "index_staff_shifts_on_organization_id_and_status"
     t.index ["organization_id"], name: "index_staff_shifts_on_organization_id"
     t.index ["person_id"], name: "index_staff_shifts_on_person_id"
@@ -805,12 +810,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["organization_id"], name: "index_unit_occupancies_on_organization_id"
     t.index ["person_id"], name: "index_unit_occupancies_on_person_id"
     t.index ["unit_id"], name: "index_unit_occupancies_on_unit_id"
+    t.check_constraint "ends_at IS NULL OR ends_at >= starts_at", name: "unit_occupancies_date_range_valid"
   end
 
   create_table "unit_ownerships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.uuid "created_by_id"
-    t.uuid "ended_by_id"
+    t.uuid "created_by_person_id"
+    t.uuid "ended_by_person_id"
     t.date "ends_at"
     t.jsonb "metadata", default: {}, null: false
     t.uuid "organization_id", null: false
@@ -820,8 +826,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.string "status", default: "active", null: false
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["created_by_id"], name: "index_unit_ownerships_on_created_by_id"
-    t.index ["ended_by_id"], name: "index_unit_ownerships_on_ended_by_id"
+    t.index ["created_by_person_id"], name: "index_unit_ownerships_on_created_by_person_id"
+    t.index ["ended_by_person_id"], name: "index_unit_ownerships_on_ended_by_person_id"
     t.index ["metadata"], name: "index_unit_ownerships_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "index_unit_ownerships_on_org_person_status"
     t.index ["organization_id", "unit_id", "starts_at", "ends_at"], name: "index_unit_ownerships_on_org_unit_date_range"
@@ -829,6 +835,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.index ["organization_id"], name: "index_unit_ownerships_on_organization_id"
     t.index ["person_id"], name: "index_unit_ownerships_on_person_id"
     t.index ["unit_id"], name: "index_unit_ownerships_on_unit_id"
+    t.check_constraint "ends_at IS NULL OR ends_at >= starts_at", name: "unit_ownerships_date_range_valid"
+    t.check_constraint "ownership_percentage > 0::numeric AND ownership_percentage <= 100::numeric", name: "unit_ownerships_percentage_range"
   end
 
   create_table "units", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -908,6 +916,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.uuid "unit_id"
     t.datetime "updated_at", null: false
     t.string "vehicle_type"
+    t.index ["deleted_at"], name: "index_vehicles_on_deleted_at"
+    t.index ["organization_id", "person_id"], name: "index_vehicles_on_org_person"
+    t.index ["organization_id", "plate_number_digest"], name: "index_vehicles_unique_plate_digest_per_org_when_present", unique: true, where: "((deleted_at IS NULL) AND (plate_number_digest IS NOT NULL))"
+    t.index ["organization_id", "status"], name: "index_vehicles_on_org_status"
+    t.index ["organization_id", "unit_id"], name: "index_vehicles_on_org_unit"
     t.index ["organization_id"], name: "index_vehicles_on_organization_id"
     t.index ["person_id"], name: "index_vehicles_on_person_id"
     t.index ["unit_id"], name: "index_vehicles_on_unit_id"
@@ -925,18 +938,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.uuid "person_id"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
-    t.uuid "validated_by_id"
+    t.uuid "validated_by_person_id"
     t.uuid "visit_id", null: false
     t.uuid "visitor_profile_id"
     t.index ["metadata"], name: "index_visit_participants_on_metadata", using: :gin
+    t.index ["organization_id", "document_snapshot_digest"], name: "index_visit_participants_on_org_document_snapshot_digest"
     t.index ["organization_id", "person_id"], name: "index_visit_participants_on_organization_id_and_person_id"
     t.index ["organization_id", "visit_id", "status"], name: "idx_on_organization_id_visit_id_status_d1b6982805"
     t.index ["organization_id", "visitor_profile_id"], name: "idx_on_organization_id_visitor_profile_id_0adf418fb3"
     t.index ["organization_id"], name: "index_visit_participants_on_organization_id"
     t.index ["person_id"], name: "index_visit_participants_on_person_id"
-    t.index ["validated_by_id"], name: "index_visit_participants_on_validated_by_id"
+    t.index ["validated_by_person_id"], name: "index_visit_participants_on_validated_by_person_id"
     t.index ["visit_id"], name: "index_visit_participants_on_visit_id"
     t.index ["visitor_profile_id"], name: "index_visit_participants_on_visitor_profile_id"
+    t.check_constraint "person_id IS NOT NULL OR visitor_profile_id IS NOT NULL OR name_snapshot IS NOT NULL", name: "visit_participants_identity_present"
   end
 
   create_table "visit_recurrences", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -970,7 +985,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
 
   create_table "visit_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "changed_by_person_id"
-    t.uuid "changed_by_user_id"
     t.datetime "created_at", null: false
     t.string "from_status"
     t.jsonb "metadata", default: {}, null: false
@@ -980,7 +994,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.datetime "updated_at", null: false
     t.uuid "visit_id", null: false
     t.index ["changed_by_person_id"], name: "index_visit_status_histories_on_changed_by_person_id"
-    t.index ["changed_by_user_id"], name: "index_visit_status_histories_on_changed_by_user_id"
     t.index ["metadata"], name: "index_visit_status_histories_on_metadata", using: :gin
     t.index ["organization_id", "to_status"], name: "index_visit_status_histories_on_organization_id_and_to_status"
     t.index ["organization_id", "visit_id", "created_at"], name: "index_visit_status_histories_on_org_visit_created_at"
@@ -1006,7 +1019,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_visitor_profiles_on_deleted_at"
     t.index ["metadata"], name: "index_visitor_profiles_on_metadata", using: :gin
-    t.index ["organization_id", "document_number_digest"], name: "index_visitor_profiles_on_org_document_digest"
+    t.index ["organization_id", "document_number_digest"], name: "index_visitor_profiles_unique_doc_digest_per_org_when_present", unique: true, where: "((deleted_at IS NULL) AND (document_number_digest IS NOT NULL))"
     t.index ["organization_id", "person_id"], name: "index_visitor_profiles_on_organization_id_and_person_id"
     t.index ["organization_id", "status"], name: "index_visitor_profiles_on_organization_id_and_status"
     t.index ["organization_id"], name: "index_visitor_profiles_on_organization_id"
@@ -1017,18 +1030,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.datetime "actual_ended_at"
     t.datetime "actual_started_at"
     t.datetime "approved_at"
-    t.uuid "approved_by_id"
+    t.uuid "approved_by_person_id"
     t.string "authorization_method"
     t.datetime "concierge_validated_at"
-    t.uuid "concierge_validated_by_id"
+    t.uuid "concierge_validated_by_person_id"
     t.datetime "created_at", null: false
     t.uuid "created_by_person_id"
-    t.uuid "created_by_user_id"
     t.jsonb "metadata", default: {}, null: false
     t.text "notes"
     t.uuid "organization_id", null: false
     t.datetime "rejected_at"
-    t.uuid "rejected_by_id"
+    t.uuid "rejected_by_person_id"
     t.text "rejection_reason"
     t.uuid "residential_property_id", null: false
     t.uuid "responsible_person_id"
@@ -1038,27 +1050,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
     t.string "status", default: "pending", null: false
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["approved_by_id"], name: "index_visits_on_approved_by_id"
-    t.index ["concierge_validated_by_id"], name: "index_visits_on_concierge_validated_by_id"
+    t.index ["approved_by_person_id"], name: "index_visits_on_approved_by_person_id"
+    t.index ["concierge_validated_by_person_id"], name: "index_visits_on_concierge_validated_by_person_id"
     t.index ["created_by_person_id"], name: "index_visits_on_created_by_person_id"
-    t.index ["created_by_user_id"], name: "index_visits_on_created_by_user_id"
     t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
     t.index ["organization_id", "residential_property_id", "scheduled_starts_at"], name: "index_visits_on_org_property_pending_statuses", where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'concierge_validation_pending'::character varying, 'resident_notified'::character varying])::text[]))"
     t.index ["organization_id", "residential_property_id", "status", "scheduled_starts_at"], name: "index_visits_on_org_property_status_scheduled_starts"
     t.index ["organization_id", "staff_shift_id"], name: "index_visits_on_organization_id_and_staff_shift_id"
     t.index ["organization_id", "unit_id", "scheduled_starts_at"], name: "index_visits_on_org_unit_scheduled_starts"
     t.index ["organization_id"], name: "index_visits_on_organization_id"
-    t.index ["rejected_by_id"], name: "index_visits_on_rejected_by_id"
+    t.index ["rejected_by_person_id"], name: "index_visits_on_rejected_by_person_id"
     t.index ["residential_property_id"], name: "index_visits_on_residential_property_id"
     t.index ["responsible_person_id"], name: "index_visits_on_responsible_person_id"
     t.index ["unit_id"], name: "index_visits_on_unit_id"
+    t.check_constraint "scheduled_ends_at IS NULL OR scheduled_ends_at >= scheduled_starts_at", name: "visits_scheduled_range_valid"
   end
 
   add_foreign_key "access_events", "organizations"
+  add_foreign_key "access_events", "people", column: "recorded_by_person_id"
   add_foreign_key "access_events", "residential_properties"
   add_foreign_key "access_events", "staff_shifts"
   add_foreign_key "access_events", "units"
-  add_foreign_key "access_events", "users", column: "recorded_by_user_id"
   add_foreign_key "access_events", "vehicles"
   add_foreign_key "access_events", "visit_participants"
   add_foreign_key "access_events", "visitor_profiles"
@@ -1080,7 +1092,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
   add_foreign_key "authorized_residents", "people"
   add_foreign_key "authorized_residents", "people", column: "authorized_by_person_id"
   add_foreign_key "authorized_residents", "units"
-  add_foreign_key "authorized_residents", "users", column: "authorized_by_user_id"
   add_foreign_key "common_area_reservation_status_histories", "common_area_reservations"
   add_foreign_key "common_area_reservation_status_histories", "organizations"
   add_foreign_key "common_area_reservation_status_histories", "people", column: "changed_by_person_id"
@@ -1109,11 +1120,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
   add_foreign_key "incidents", "vehicles"
   add_foreign_key "incidents", "visits"
   add_foreign_key "lease_contracts", "organizations"
+  add_foreign_key "lease_contracts", "people", column: "created_by_person_id"
   add_foreign_key "lease_contracts", "people", column: "lessee_person_id"
   add_foreign_key "lease_contracts", "people", column: "lessor_person_id"
+  add_foreign_key "lease_contracts", "people", column: "terminated_by_person_id"
   add_foreign_key "lease_contracts", "units"
-  add_foreign_key "lease_contracts", "users", column: "created_by_id"
-  add_foreign_key "lease_contracts", "users", column: "terminated_by_id"
   add_foreign_key "notifications", "organizations"
   add_foreign_key "notifications", "people", column: "recipient_person_id"
   add_foreign_key "notifications", "residential_properties"
@@ -1138,9 +1149,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
   add_foreign_key "property_sections", "property_sections", column: "parent_id"
   add_foreign_key "property_sections", "residential_properties"
   add_foreign_key "property_setting_versions", "organizations"
+  add_foreign_key "property_setting_versions", "people", column: "changed_by_person_id"
   add_foreign_key "property_setting_versions", "property_settings"
   add_foreign_key "property_setting_versions", "residential_properties"
-  add_foreign_key "property_setting_versions", "users", column: "changed_by_id"
   add_foreign_key "property_settings", "organizations"
   add_foreign_key "property_settings", "residential_properties"
   add_foreign_key "residential_properties", "organizations"
@@ -1160,9 +1171,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
   add_foreign_key "unit_occupancies", "units"
   add_foreign_key "unit_ownerships", "organizations"
   add_foreign_key "unit_ownerships", "people"
+  add_foreign_key "unit_ownerships", "people", column: "created_by_person_id"
+  add_foreign_key "unit_ownerships", "people", column: "ended_by_person_id"
   add_foreign_key "unit_ownerships", "units"
-  add_foreign_key "unit_ownerships", "users", column: "created_by_id"
-  add_foreign_key "unit_ownerships", "users", column: "ended_by_id"
   add_foreign_key "units", "organizations"
   add_foreign_key "units", "property_sections"
   add_foreign_key "units", "residential_properties"
@@ -1171,25 +1182,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_181000) do
   add_foreign_key "vehicles", "units"
   add_foreign_key "visit_participants", "organizations"
   add_foreign_key "visit_participants", "people"
-  add_foreign_key "visit_participants", "users", column: "validated_by_id"
+  add_foreign_key "visit_participants", "people", column: "validated_by_person_id"
   add_foreign_key "visit_participants", "visitor_profiles"
   add_foreign_key "visit_participants", "visits"
   add_foreign_key "visit_recurrences", "organizations"
   add_foreign_key "visit_recurrences", "visits"
   add_foreign_key "visit_status_histories", "organizations"
   add_foreign_key "visit_status_histories", "people", column: "changed_by_person_id"
-  add_foreign_key "visit_status_histories", "users", column: "changed_by_user_id"
   add_foreign_key "visit_status_histories", "visits"
   add_foreign_key "visitor_profiles", "organizations"
   add_foreign_key "visitor_profiles", "people"
   add_foreign_key "visits", "organizations"
+  add_foreign_key "visits", "people", column: "approved_by_person_id"
+  add_foreign_key "visits", "people", column: "concierge_validated_by_person_id"
   add_foreign_key "visits", "people", column: "created_by_person_id"
+  add_foreign_key "visits", "people", column: "rejected_by_person_id"
   add_foreign_key "visits", "people", column: "responsible_person_id"
   add_foreign_key "visits", "residential_properties"
   add_foreign_key "visits", "staff_shifts"
   add_foreign_key "visits", "units"
-  add_foreign_key "visits", "users", column: "approved_by_id"
-  add_foreign_key "visits", "users", column: "concierge_validated_by_id"
-  add_foreign_key "visits", "users", column: "created_by_user_id"
-  add_foreign_key "visits", "users", column: "rejected_by_id"
 end

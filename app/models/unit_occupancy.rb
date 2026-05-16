@@ -38,6 +38,9 @@
 #  fk_rails_...  (unit_id => units.id)
 #
 class UnitOccupancy < ApplicationRecord
+  include OccupancyTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -47,7 +50,20 @@ class UnitOccupancy < ApplicationRecord
 
   delegate :user, to: :person, allow_nil: true
 
-  validates :occupancy_type, presence: true
+  validates :occupancy_type, presence: true, inclusion: { in: OccupancyTypes::ALL }
   validates :starts_at, presence: true
   validates :status, presence: true
+
+  validates_same_tenant :unit, :person, :source
+
+  validate :ends_on_or_after_starts
+
+  private
+
+  def ends_on_or_after_starts
+    return if ends_at.blank? || starts_at.blank?
+    return if ends_at >= starts_at
+
+    errors.add(:ends_at, "must be on or after starts_at")
+  end
 end

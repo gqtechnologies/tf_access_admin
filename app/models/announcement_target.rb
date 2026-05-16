@@ -27,9 +27,13 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 class AnnouncementTarget < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :announcement
   belongs_to :target, polymorphic: true
+
+  validates_same_tenant :announcement, :target
 end

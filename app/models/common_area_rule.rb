@@ -29,6 +29,8 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #
 class CommonAreaRule < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   # Known rule keys. Keep in sync with documentation. Storing free strings is
@@ -65,7 +67,7 @@ class CommonAreaRule < ApplicationRecord
             length: { maximum: 64 },
             uniqueness: { scope: [ :organization_id, :common_area_id ] }
   validate  :at_least_one_value_present
-  validate  :common_area_belongs_to_same_organization
+  validates_same_tenant :common_area
 
   scope :known, -> { where(rule_type: KNOWN_RULE_TYPES) }
 
@@ -79,12 +81,5 @@ class CommonAreaRule < ApplicationRecord
     return if value_int.present? || value_text.present?
 
     errors.add(:base, :value_required)
-  end
-
-  def common_area_belongs_to_same_organization
-    return if common_area.blank? || organization_id.blank?
-    return if common_area.organization_id == organization_id
-
-    errors.add(:common_area, :different_tenant)
   end
 end

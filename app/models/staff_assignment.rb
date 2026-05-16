@@ -32,11 +32,18 @@
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #
 class StaffAssignment < ApplicationRecord
+  include StaffTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :person
   belongs_to :residential_property
+
+  validates :staff_type, presence: true, inclusion: { in: StaffTypes::ALL }
+
+  validates_same_tenant :person, :residential_property
 
   has_many :staff_shifts, dependent: :restrict_with_error
 end

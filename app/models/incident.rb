@@ -58,6 +58,10 @@
 #
 class Incident < ApplicationRecord
   acts_as_paranoid
+  include IncidentCategories
+  include Priorities
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -69,6 +73,12 @@ class Incident < ApplicationRecord
   belongs_to :vehicle, optional: true
   belongs_to :reported_by_person, class_name: "Person", optional: true
   belongs_to :assigned_to_person, class_name: "Person", optional: true
+
+  validates_same_tenant :residential_property, :unit, :common_area, :visit, :parcel_delivery, :vehicle,
+                        :reported_by_person, :assigned_to_person
+
+  validates :category, presence: true, inclusion: { in: IncidentCategories::ALL }
+  validates :priority, presence: true, inclusion: { in: Priorities::ALL }
 
   has_many :incident_status_histories, dependent: :destroy
 end

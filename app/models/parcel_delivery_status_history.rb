@@ -31,9 +31,13 @@
 #  fk_rails_...  (parcel_delivery_id => parcel_deliveries.id)
 #
 class ParcelDeliveryStatusHistory < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :parcel_delivery
   belongs_to :changed_by_person, class_name: "Person", optional: true
+
+  validates_same_tenant :parcel_delivery, :changed_by_person
 end

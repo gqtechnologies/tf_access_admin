@@ -39,9 +39,13 @@
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #
 class PropertySetting < ApplicationRecord
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :residential_property
   has_many :property_setting_versions, dependent: :destroy
+
+  validates_same_tenant :residential_property
 end

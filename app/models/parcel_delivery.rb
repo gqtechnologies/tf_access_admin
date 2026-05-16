@@ -52,6 +52,9 @@
 #  fk_rails_...  (withdrawn_by_person_id => people.id)
 #
 class ParcelDelivery < ApplicationRecord
+  include DeliveryTypes
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
@@ -62,5 +65,21 @@ class ParcelDelivery < ApplicationRecord
   belongs_to :withdrawn_by_person, class_name: "Person", optional: true
   belongs_to :staff_shift, optional: true
 
+  validates :delivery_type, presence: true, inclusion: { in: DeliveryTypes::ALL }
+
+  validates_same_tenant :residential_property, :unit, :recipient_person, :received_by_person,
+                        :withdrawn_by_person, :staff_shift
+
+  validate :withdrawn_on_or_after_received
+
   has_many :parcel_delivery_status_histories, dependent: :destroy
+
+  private
+
+  def withdrawn_on_or_after_received
+    return if withdrawn_at.blank?
+    return if withdrawn_at >= received_at
+
+    errors.add(:withdrawn_at, "must be on or after received_at")
+  end
 end

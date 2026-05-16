@@ -40,11 +40,20 @@
 #
 class Document < ApplicationRecord
   acts_as_paranoid
+  include DocumentCategories
+  include DocumentVisibilities
+  include TenantScopedAssociations
+
   acts_as_tenant :organization
 
   belongs_to :organization
   belongs_to :uploaded_by_person, class_name: "Person", optional: true
   belongs_to :documentable, polymorphic: true
+
+  validates_same_tenant :uploaded_by_person, :documentable
+
+  validates :category, presence: true, inclusion: { in: DocumentCategories::ALL }
+  validates :visibility, presence: true, inclusion: { in: DocumentVisibilities::ALL }
 
   has_one_attached :file
 end
