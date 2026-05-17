@@ -107,13 +107,4 @@ class Admin::UsersController < AdminController
     def user_params
         params.require(:user).permit(:name, :email, :dni, :password, :password_confirmation, :language)
     end
-
-    def pagination_info(users)
-        {
-            current_page: users.current_page,
-            per_page: @filters[:per_page],
-            total_pages: users.total_pages,
-            total_count: users.total_count
-        }
-    end
 end

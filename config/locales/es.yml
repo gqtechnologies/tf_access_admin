@@ -239,6 +239,84 @@ es:
           title: "Editar Usuario"
           description: "Editar un usuario para tu organización"
           submit: "Actualizar Usuario"
+      residential_properties:
+        title: "Propiedades"
+        created_successfully: "Propiedad creada correctamente"
+        creation_failed: "Error al crear la propiedad"
+        updated_successfully: "Propiedad actualizada correctamente"
+        update_failed: "Error al actualizar la propiedad"
+        not_found: "Propiedad no encontrada"
+        validations:
+          name_required: "El nombre es obligatorio"
+          property_type_required: "El tipo de propiedad es obligatorio"
+          status_required: "El estado es obligatorio"
+          country_required: "El país es obligatorio"
+          timezone_required: "La zona horaria es obligatoria"
+        property_types:
+          building: "Edificio"
+          condominium: "Condominio"
+          horizontal_community: "Comunidad horizontal"
+          residential_complex: "Conjunto residencial"
+          mixed_use: "Uso mixto"
+          tower: "Torre"
+          sector: "Sector"
+          other: "Otro"
+        statuses:
+          active: "Activa"
+          inactive: "Inactiva"
+        index:
+          title: "Propiedades residenciales"
+          input:
+            search:
+              placeholder: "Buscar por nombre, código o ciudad"
+          table:
+            headers:
+              name: "Nombre"
+              code: "Código"
+              property_type: "Tipo"
+              city: "Ciudad"
+              status: "Estado"
+          actions:
+            create: "Nueva propiedad"
+            delete: "Eliminar propiedad"
+            delete_description: "¿Eliminar la propiedad {name}?"
+            delete_success: "Propiedad eliminada correctamente"
+            delete_error: "No se pudo eliminar la propiedad"
+        new:
+          title: "Nueva propiedad residencial"
+          description: "Registra una propiedad en tu organización"
+          submit: "Crear propiedad"
+        edit:
+          title: "Editar propiedad residencial"
+          description: "Actualiza los datos de la propiedad"
+          submit: "Guardar cambios"
+        input:
+          name:
+            label: "Nombre"
+            placeholder: "Nombre de la propiedad"
+          code:
+            label: "Código"
+            placeholder: "Código interno (opcional)"
+          property_type:
+            label: "Tipo de propiedad"
+            placeholder: "Selecciona un tipo"
+          status:
+            label: "Estado"
+          address_line:
+            label: "Dirección"
+            placeholder: "Calle y número"
+          city:
+            label: "Ciudad"
+            placeholder: "Ciudad"
+          region:
+            label: "Región"
+            placeholder: "Región o estado"
+          country:
+            label: "País"
+            placeholder: "País"
+          timezone:
+            label: "Zona horaria"
+            placeholder: "p. ej. America/Santiago"
       organizations:
         created_successfully: "Organización creada correctamente"
         creation_failed: "Error al crear la organización"
@@ -311,6 +389,7 @@ es:
         platform: "Plataforma"
         home: "Inicio"
         users: "Usuarios"
+        residential_properties: "Propiedades"
         organizations: "Organizaciones"
         organization_settings: "Configuración de Organización"
         settings: "Configuración"

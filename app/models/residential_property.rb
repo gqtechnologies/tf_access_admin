@@ -35,6 +35,7 @@
 #
 class ResidentialProperty < ApplicationRecord
   include PropertyTypes
+  include NormalizableAttributes
 
   acts_as_tenant :organization
   acts_as_paranoid
@@ -47,4 +48,24 @@ class ResidentialProperty < ApplicationRecord
   validates :name, presence: true
   validates :property_type, presence: true, inclusion: { in: PropertyTypes::ALL }
   validates :status, presence: true
+
+  before_validation :normalize_optional_strings
+  trims_attributes :name, :code, :address_line, :city, :region, :country, :timezone
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[name code city region address_line status property_type]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    []
+  end
+
+  private
+
+  def normalize_optional_strings
+    self.code = code.presence
+    self.address_line = address_line.presence
+    self.city = city.presence
+    self.region = region.presence
+  end
 end

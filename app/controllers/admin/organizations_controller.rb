@@ -136,15 +136,6 @@ class Admin::OrganizationsController < AdminController
         params.require(:organization).permit(:name, :subdomain, :plan)
     end
 
-    def pagination_info(organizations)
-        {
-            current_page: organizations.current_page,
-            per_page: @filters[:per_page],
-            total_pages: organizations.total_pages,
-            total_count: organizations.total_count
-        }
-    end
-
     def handle_cover
         org = params[:organization]
         return if org.blank?

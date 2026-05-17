@@ -44,6 +44,7 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :profile, only: [:edit, :update]
     resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
+    resources :residential_properties, only: [:index, :new, :create, :edit, :update, :destroy]
     match "*path", to: "errors#not_found", via: :all
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

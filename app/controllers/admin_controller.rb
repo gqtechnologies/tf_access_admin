@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AdminController < InertiaController
+  include PaginationProps
+
   before_action :authenticate_user!
   before_action :set_locale
   # Usar `if:` en lugar de `only:` para no exigir la acción `index` en hijos sin esa acción

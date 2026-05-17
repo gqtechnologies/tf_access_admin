@@ -311,10 +311,89 @@ en:
             remove: "Remove avatar"
           submit:
             label: "Create User"
+      residential_properties:
+        title: "Properties"
+        created_successfully: "Property created successfully"
+        creation_failed: "Failed to create property"
+        updated_successfully: "Property updated successfully"
+        update_failed: "Failed to update property"
+        not_found: "Property not found"
+        validations:
+          name_required: "Name is required"
+          property_type_required: "Property type is required"
+          status_required: "Status is required"
+          country_required: "Country is required"
+          timezone_required: "Timezone is required"
+        property_types:
+          building: "Building"
+          condominium: "Condominium"
+          horizontal_community: "Horizontal community"
+          residential_complex: "Residential complex"
+          mixed_use: "Mixed use"
+          tower: "Tower"
+          sector: "Sector"
+          other: "Other"
+        statuses:
+          active: "Active"
+          inactive: "Inactive"
+        index:
+          title: "Residential properties"
+          input:
+            search:
+              placeholder: "Search by name, code or city"
+          table:
+            headers:
+              name: "Name"
+              code: "Code"
+              property_type: "Type"
+              city: "City"
+              status: "Status"
+          actions:
+            create: "New property"
+            delete: "Delete property"
+            delete_description: "Delete property {name}?"
+            delete_success: "Property deleted successfully"
+            delete_error: "Could not delete property"
+        new:
+          title: "New residential property"
+          description: "Register a property for your organization"
+          submit: "Create property"
+        edit:
+          title: "Edit residential property"
+          description: "Update property details"
+          submit: "Save changes"
+        input:
+          name:
+            label: "Name"
+            placeholder: "Property name"
+          code:
+            label: "Code"
+            placeholder: "Internal code (optional)"
+          property_type:
+            label: "Property type"
+            placeholder: "Select a type"
+          status:
+            label: "Status"
+          address_line:
+            label: "Address"
+            placeholder: "Street and number"
+          city:
+            label: "City"
+            placeholder: "City"
+          region:
+            label: "Region"
+            placeholder: "Region or state"
+          country:
+            label: "Country"
+            placeholder: "Country"
+          timezone:
+            label: "Timezone"
+            placeholder: "e.g. America/Santiago"
       sidebar:
         platform: "Platform"
         home: "Home"
         users: "Users"
+        residential_properties: "Properties"
         organizations: "Organizations"
         organization_settings: "Organization Settings"
         settings: "Settings"
