@@ -23,6 +23,7 @@ import Form from '@/components/admin/residential_property/Form.vue'
 import type { ResidentialPropertySchema } from '@/lib/schemas/residential_property'
 import { router } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
+import { applyErrorsToFormRef } from '@/lib/composables/forms/apply_errors_to_form_ref'
 import type { ResidentialProperty } from '@/types/residential_property'
 import { admin_residential_property_path } from '@/routes'
 
@@ -62,9 +63,7 @@ function onSubmit(data: ResidentialPropertySchema) {
       },
       onError: (errors) => {
         toast.error(t('admin.residential_properties.update_failed'))
-        if (errors && Object.keys(errors).length > 0) {
-          formRef.value?.applyServerErrors(errors)
-        }
+        applyErrorsToFormRef(formRef, errors)
       },
     }
   )

@@ -344,6 +344,7 @@ pt:
               status: "Estado"
           actions:
             create: "Nova propriedade"
+            structure: "Gerenciar estrutura"
             delete: "Excluir propriedade"
             delete_description: "Excluir a propriedade {name}?"
             delete_success: "Propriedade excluída com sucesso"
@@ -383,6 +384,111 @@ pt:
           timezone:
             label: "Fuso horário"
             placeholder: "ex. America/Santiago"
+        structure:
+          title: "Estrutura da propriedade"
+          subtitle: "Gerencie a hierarquia de seções dentro de uma propriedade residencial"
+          breadcrumb: "Estrutura"
+          create_multiple: "Criar múltiplas"
+          tree:
+            title: "Árvore de seções"
+            add_root: "Adicionar seção raiz"
+            add_subsection: "Adicionar subseção"
+            search_placeholder: "Buscar seção..."
+            root_badge: "Propriedade"
+            empty_title: "Ainda não há seções criadas"
+            empty_description: "Comece adicionando uma seção raiz para organizar a estrutura desta propriedade."
+            search_empty: "Nenhuma seção corresponde à sua busca."
+          form:
+            new_title: "Nova seção"
+            new_description: "Crie uma nova seção dentro da estrutura atual"
+            edit_title: "Editar seção"
+            edit_description: "Atualize os dados da seção"
+            property_label: "Propriedade"
+            placement_label: "Criar dentro de"
+            placement_root: "Como seção raiz"
+            placement_child: "Dentro de outra seção"
+            no_parents_hint: "Ainda não existem seções para selecionar"
+            code_label: "Código interno"
+            code_placeholder: "Ex. P01"
+            section_type_placeholder: "Selecione um tipo"
+            advanced_title: "Opções avançadas"
+            preview_title: "Pré-visualização"
+            submit_create: "Criar seção"
+            submit_edit: "Salvar alterações"
+      property_sections:
+        title: "Seções"
+        created_successfully: "Seção criada com sucesso"
+        creation_failed: "Falha ao criar a seção"
+        updated_successfully: "Seção atualizada com sucesso"
+        update_failed: "Falha ao atualizar a seção"
+        not_found: "Seção não encontrada"
+        validations:
+          name_required: "O nome é obrigatório"
+          section_type_required: "O tipo de seção é obrigatório"
+          residential_property_required: "A propriedade é obrigatória"
+          parent_required: "A seção pai é obrigatória"
+          parent_invalid: "A seção pai é inválida"
+          parent_same_property: "A seção pai deve pertencer à mesma propriedade"
+          parent_circular: "A seção pai não pode ser descendente desta seção"
+          position_min: "A posição deve ser pelo menos 1"
+        section_types:
+          block: "Bloco"
+          tower: "Torre"
+          floor: "Andar"
+          parking: "Estacionamento"
+          storage: "Depósito"
+          commercial: "Comercial"
+          amenities: "Áreas comuns"
+          entrance: "Entrada"
+          garden: "Jardim"
+          other: "Outro"
+        index:
+          title: "Seções da propriedade"
+          input:
+            search:
+              placeholder: "Buscar por nome ou código"
+          table:
+            headers:
+              name: "Nome"
+              code: "Código"
+              section_type: "Tipo"
+              residential_property: "Propriedade"
+              parent: "Seção pai"
+              position: "Posição"
+          actions:
+            create: "Nova seção"
+            manage_from_property: "Gerenciar pela propriedade"
+            manage_structure: "Gerenciar estrutura"
+            delete: "Excluir seção"
+            delete_description: "Excluir a seção {name}?"
+            delete_success: "Seção excluída com sucesso"
+            delete_error: "Não foi possível excluir a seção"
+        new:
+          title: "Nova seção da propriedade"
+          description: "Registre uma seção dentro de uma propriedade residencial"
+          submit: "Criar seção"
+        edit:
+          title: "Editar seção da propriedade"
+          description: "Atualize os dados da seção"
+          submit: "Salvar alterações"
+        input:
+          name:
+            label: "Nome"
+            placeholder: "Nome da seção"
+          code:
+            label: "Código"
+            placeholder: "Código interno (opcional)"
+          section_type:
+            label: "Tipo de seção"
+          residential_property_id:
+            label: "Propriedade residencial"
+            placeholder: "Selecione uma propriedade"
+          parent_id:
+            label: "Seção pai"
+            placeholder: "Nenhuma (seção raiz)"
+          position:
+            label: "Posição"
+            placeholder: "Ordem de exibição (opcional)"
       organizations:
         show:
           title: "Organization"
@@ -391,6 +497,7 @@ pt:
         home: "Home"
         users: "Users"
         residential_properties: "Propriedades"
+        property_sections: "Seções"
         organizations: "Organizations"
         organization_settings: "Configurações da Organização"
         settings: "Configurações"

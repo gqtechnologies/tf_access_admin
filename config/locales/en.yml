@@ -350,6 +350,7 @@ en:
               status: "Status"
           actions:
             create: "New property"
+            structure: "Manage structure"
             delete: "Delete property"
             delete_description: "Delete property {name}?"
             delete_success: "Property deleted successfully"
@@ -389,11 +390,117 @@ en:
           timezone:
             label: "Timezone"
             placeholder: "e.g. America/Santiago"
+        structure:
+          title: "Property structure"
+          subtitle: "Manage the section hierarchy within a residential property"
+          breadcrumb: "Structure"
+          create_multiple: "Create multiple"
+          tree:
+            title: "Section tree"
+            add_root: "Add root section"
+            add_subsection: "Add subsection"
+            search_placeholder: "Search section..."
+            root_badge: "Property"
+            empty_title: "No sections created yet"
+            empty_description: "Start by adding a root section to organize this property's structure."
+            search_empty: "No sections match your search."
+          form:
+            new_title: "New section"
+            new_description: "Create a new section within the current structure"
+            edit_title: "Edit section"
+            edit_description: "Update section details"
+            property_label: "Property"
+            placement_label: "Create within"
+            placement_root: "As root section"
+            placement_child: "Inside another section"
+            no_parents_hint: "No sections exist yet to select"
+            code_label: "Internal code"
+            code_placeholder: "e.g. P01"
+            section_type_placeholder: "Select a type"
+            advanced_title: "Advanced options"
+            preview_title: "Preview"
+            submit_create: "Create section"
+            submit_edit: "Save changes"
+      property_sections:
+        title: "Sections"
+        created_successfully: "Section created successfully"
+        creation_failed: "Failed to create section"
+        updated_successfully: "Section updated successfully"
+        update_failed: "Failed to update section"
+        not_found: "Section not found"
+        validations:
+          name_required: "Name is required"
+          section_type_required: "Section type is required"
+          residential_property_required: "Property is required"
+          parent_required: "Parent section is required"
+          parent_invalid: "Parent section is invalid"
+          parent_same_property: "Parent section must belong to the same property"
+          parent_circular: "Parent section cannot be a descendant of this section"
+          position_min: "Position must be at least 1"
+        section_types:
+          block: "Block"
+          tower: "Tower"
+          floor: "Floor"
+          parking: "Parking"
+          storage: "Storage"
+          commercial: "Commercial"
+          amenities: "Amenities"
+          entrance: "Entrance"
+          garden: "Garden"
+          other: "Other"
+        index:
+          title: "Property sections"
+          input:
+            search:
+              placeholder: "Search by name or code"
+          table:
+            headers:
+              name: "Name"
+              code: "Code"
+              section_type: "Type"
+              residential_property: "Property"
+              parent: "Parent section"
+              position: "Position"
+          actions:
+            create: "New section"
+            manage_from_property: "Manage from property"
+            manage_structure: "Manage structure"
+            delete: "Delete section"
+            delete_description: "Delete section {name}?"
+            delete_success: "Section deleted successfully"
+            delete_error: "Could not delete section"
+        new:
+          title: "New property section"
+          description: "Register a section within a residential property"
+          submit: "Create section"
+        edit:
+          title: "Edit property section"
+          description: "Update section details"
+          submit: "Save changes"
+        input:
+          name:
+            label: "Name"
+            placeholder: "Section name"
+          code:
+            label: "Code"
+            placeholder: "Internal code (optional)"
+          section_type:
+            label: "Section type"
+          residential_property_id:
+            label: "Residential property"
+            placeholder: "Select a property"
+          parent_id:
+            label: "Parent section"
+            placeholder: "None (root section)"
+          position:
+            label: "Position"
+            placeholder: "Display order (optional)"
       sidebar:
         platform: "Platform"
         home: "Home"
         users: "Users"
         residential_properties: "Properties"
+        property_sections: "Sections"
         organizations: "Organizations"
         organization_settings: "Organization Settings"
         settings: "Settings"

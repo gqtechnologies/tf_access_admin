@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, Field as VeeField } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
@@ -130,7 +130,7 @@ import SelectRol from '@/components/admin/user/roles/inputs/SelectRol.vue';
 import SelectLanguage from '@/components/admin/user/language/inputs/SelectLanguage.vue';
 import { UserSchema, UserEditSchema, userEditSchema, userSchema } from '@/lib/schemas/user';
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors';
-import type { InertiaErrors } from '@/types/globals';
+import { useServerFormErrors } from '@/lib/composables/forms/useServerFormErrors';
 import { admin_users_path } from "@/routes"
 import { User } from '@/types/user';
 
@@ -153,7 +153,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const { translateErrors, mapServerErrorsToForm } = useTranslateErrors();
+const { translateErrors } = useTranslateErrors();
 const formSchema = toTypedSchema( props.editMode ? userEditSchema : userSchema);
 
 const { handleSubmit, setErrors, setValues } = useForm({
@@ -177,21 +177,11 @@ onMounted(() => {
     }
 })
 
-function applyServerErrors( errors: InertiaErrors ) {
-    if (errors && Object.keys(errors).length > 0) {
-        nextTick(() => {
-            setErrors(mapServerErrorsToForm(errors))
-        })
-    }
-}
+const { applyServerErrors } = useServerFormErrors(setErrors)
 
 const onSubmit = handleSubmit((data) => {
     emit('submit', data as UserSchema)
 })
 
-defineExpose<{
-    applyServerErrors: ( errors: InertiaErrors ) => void
-}>({
-    applyServerErrors: ( errors: InertiaErrors ) => applyServerErrors(errors)
-})
+defineExpose({ applyServerErrors })
 </script>

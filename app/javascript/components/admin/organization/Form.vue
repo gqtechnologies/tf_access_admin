@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, Field as VeeField } from 'vee-validate'
 import { useI18n } from 'vue-i18n'
@@ -109,7 +109,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { nameMax, nameMin, organizationSubdomainMax, organizationSubdomainMin, OrganizationSchema, organizationSchema } from '@/lib/schemas/organization';
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors';
-import type { InertiaErrors } from '@/types/globals';
+import { useServerFormErrors } from '@/lib/composables/forms/useServerFormErrors';
 import { admin_organizations_path } from "@/routes"
 import { Organization } from '@/types/organization';
 import SelectPlan from '@/components/admin/user/plan/inputs/SelectPlan.vue';
@@ -132,7 +132,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 
-const { translateErrors, mapServerErrorsToForm } = useTranslateErrors({
+const { translateErrors } = useTranslateErrors({
     name_max: nameMax,
     name_min: nameMin,
     subdomain_max: organizationSubdomainMax,
@@ -161,13 +161,7 @@ onMounted(() => {
     }
 })
 
-function applyServerErrors( errors: InertiaErrors ) {
-    if (errors && Object.keys(errors).length > 0) {
-        nextTick(() => {
-            setErrors(mapServerErrorsToForm(errors))
-        })
-    }
-}
+const { applyServerErrors } = useServerFormErrors(setErrors)
 
 const onSubmit = handleSubmit((data) => {
     emit('submit', data as OrganizationSchema)
@@ -197,9 +191,5 @@ function clearLogo() {
     setFieldValue('logo', null)
 }
 
-defineExpose<{
-    applyServerErrors: ( errors: InertiaErrors ) => void
-}>({
-    applyServerErrors: ( errors: InertiaErrors ) => applyServerErrors(errors)
-})
+defineExpose({ applyServerErrors })
 </script>

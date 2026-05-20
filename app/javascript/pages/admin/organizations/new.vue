@@ -20,6 +20,7 @@ import { computed, ref } from 'vue'
 import Form from '@/components/admin/organization/Form.vue'
 import type { OrganizationSchema } from '@/lib/schemas/organization'
 import { toast } from 'vue-sonner'
+import { applyErrorsToFormRef } from '@/lib/composables/forms/apply_errors_to_form_ref'
 
 defineProps<{
     plans: string[]
@@ -42,11 +43,9 @@ function onSubmit(data: OrganizationSchema) {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => toast.success(t('admin.organizations.created_successfully')),
-        onError: (errors: any) => {
+        onError: (errors) => {
             toast.error(t('admin.organizations.creation_failed'))
-            if (errors && Object.keys(errors).length > 0) {
-                formRef.value?.applyServerErrors(errors)
-            }
+            applyErrorsToFormRef(formRef, errors)
         },
     })
 }

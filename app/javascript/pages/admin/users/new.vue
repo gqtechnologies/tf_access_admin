@@ -22,6 +22,7 @@ import type { UserSchema } from '@/lib/schemas/user'
 import { ref, computed } from 'vue'
 import { getUsersBreadcrumbs } from '@/lib/breadcrumbs/user'
 import Header from '@/components/admin/layout/Header.vue'
+import { applyErrorsToFormRef } from '@/lib/composables/forms/apply_errors_to_form_ref'
 
 const { t } = useI18n()
 
@@ -48,11 +49,9 @@ function onSubmit(data: UserSchema) {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => toast.success(t('admin.users.created_successfully')),
-        onError: (errors: any) => {
+        onError: (errors) => {
             toast.error(t('admin.users.creation_failed'))
-            if (errors && Object.keys(errors).length > 0) {
-                formRef.value?.applyServerErrors(errors)
-            }
+            applyErrorsToFormRef(formRef, errors)
         },
     })
 }

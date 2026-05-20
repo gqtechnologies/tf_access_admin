@@ -35,6 +35,7 @@
 #
 class PropertySection < ApplicationRecord
   include SectionTypes
+  include NormalizableAttributes
   include TenantScopedAssociations
 
   acts_as_tenant :organization
@@ -48,6 +49,74 @@ class PropertySection < ApplicationRecord
 
   validates :section_type, presence: true, inclusion: { in: SectionTypes::ALL }
   validates :name, presence: true
+  validates :residential_property, presence: true
 
   validates_same_tenant :residential_property, :parent
+  validate :parent_is_valid
+
+  before_validation :normalize_optional_attributes
+  before_validation :assign_default_position, on: :create
+  trims_attributes :name, :code
+
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[name code section_type position residential_property_id]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[residential_property parent]
+  end
+
+  private
+
+  def normalize_optional_attributes
+    self.code = code.presence
+    self.parent_id = parent_id.presence
+  end
+
+  def assign_default_position
+    return if position.present?
+
+    siblings = self.class.where(
+      residential_property_id: residential_property_id,
+      parent_id: parent_id
+    )
+    siblings = siblings.where.not(id: id) if persisted?
+    self.position = (siblings.maximum(:position) || 0) + 1
+  end
+
+  def parent_is_valid
+    return if parent_id.blank?
+
+    if id.present? && parent_id == id
+      errors.add(:parent_id, I18n.t("frontend.admin.property_sections.validations.parent_invalid"))
+      return
+    end
+
+    if parent.nil?
+      errors.add(:parent_id, I18n.t("frontend.admin.property_sections.validations.parent_invalid"))
+      return
+    end
+
+    unless parent.residential_property_id == residential_property_id
+      errors.add(:parent_id, I18n.t("frontend.admin.property_sections.validations.parent_same_property"))
+      return
+    end
+
+    return unless id.present?
+
+    if descendant_ids.include?(parent_id)
+      errors.add(:parent_id, I18n.t("frontend.admin.property_sections.validations.parent_circular"))
+    end
+  end
+
+  def descendant_ids
+    ids = []
+    queue = children.to_a
+    while queue.any?
+      child = queue.shift
+      ids << child.id
+      queue.concat(child.children.to_a)
+    end
+    ids
+  end
 end

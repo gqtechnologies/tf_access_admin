@@ -24,6 +24,8 @@ import { OrganizationSchema } from '@/lib/schemas/organization'
 import { router } from "@inertiajs/vue3"
 import { admin_organization_path } from "@/routes"
 import { toast } from "vue-sonner"
+import { applyErrorsToFormRef } from '@/lib/composables/forms/apply_errors_to_form_ref'
+
 const { t } = useI18n()
 
 const props = defineProps<{
@@ -50,11 +52,9 @@ const formRef = ref<InstanceType<typeof Form> | null>(null)
         onSuccess: () => {
             toast.success(t('admin.organizations.updated_successfully'))
         },
-        onError: (errors: any) => {
+        onError: (errors) => {
             toast.error(t('admin.organizations.update_failed'))
-            if (errors && Object.keys(errors).length > 0) {
-                formRef.value?.applyServerErrors(errors)
-            }
+            applyErrorsToFormRef(formRef, errors)
         },
     })
 }

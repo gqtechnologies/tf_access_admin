@@ -202,7 +202,7 @@ import {
   type ResidentialPropertySchema,
 } from '@/lib/schemas/residential_property'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
-import type { InertiaErrors } from '@/types/globals'
+import { useServerFormErrors } from '@/lib/composables/forms/useServerFormErrors'
 import { admin_residential_properties_path } from '@/routes'
 import type { ResidentialProperty } from '@/types/residential_property'
 
@@ -222,7 +222,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const { translateErrors, mapServerErrorsToForm } = useTranslateErrors()
+const { translateErrors } = useTranslateErrors()
 const formSchema = toTypedSchema(residentialPropertySchema)
 
 const { handleSubmit, setErrors, resetForm } = useForm({
@@ -289,22 +289,12 @@ watch(
   { immediate: true, deep: true }
 )
 
-function applyServerErrors(errors: InertiaErrors) {
-  if (errors && Object.keys(errors).length > 0) {
-    nextTick(() => {
-      setErrors(mapServerErrorsToForm(errors))
-    })
-  }
-}
+const { applyServerErrors } = useServerFormErrors(setErrors)
 
 const onSubmit = handleSubmit((data) => {
   emit('submit', data)
 })
 
-defineExpose<{
-  applyServerErrors: (errors: InertiaErrors) => void
-}>({
-  applyServerErrors: (errors: InertiaErrors) => applyServerErrors(errors),
-})
+defineExpose({ applyServerErrors })
 
 </script>

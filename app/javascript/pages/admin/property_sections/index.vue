@@ -1,13 +1,13 @@
 <template>
   <div>
-    <Header :itemsBreadcrumb="itemsBreadcrumb" :title="t('admin.residential_properties.index.title')" />
-    <AdminDataTable :columns="columns" :data="residential_properties">
+    <Header :itemsBreadcrumb="itemsBreadcrumb" :title="t('admin.property_sections.index.title')" />
+    <AdminDataTable :columns="columns" :data="property_sections">
       <template #actions-table>
         <div class="w-full flex items-center justify-between gap-2">
           <div class="w-full md:w-1/2 flex gap-2">
             <Input
               type="search"
-              :placeholder="t('admin.residential_properties.index.input.search.placeholder')"
+              :placeholder="t('admin.property_sections.index.input.search.placeholder')"
               v-model="search"
               @search="onSearchClear"
             />
@@ -16,33 +16,30 @@
               {{ t('common.actions.search') }}
             </Button>
           </div>
-          <Link :href="new_admin_residential_property_path()">
-            <Button>
-              <PlusIcon class="w-4 h-4" />
-              {{ t('admin.residential_properties.index.actions.create') }}
+          <Link :href="admin_residential_properties_path()">
+            <Button variant="outline">
+              {{ t('admin.property_sections.index.actions.manage_from_property') }}
             </Button>
           </Link>
         </div>
       </template>
       <template #actions="{ row }">
-        <ListItem as="link" :href="admin_residential_property_structure_path(row.id as string)">
-          <span class="flex items-center gap-2">
-            <Layers class="w-4 h-4" />
-            {{ t('admin.residential_properties.index.actions.structure') }}
-          </span>
-        </ListItem>
-        <ListItem as="link" :href="edit_admin_residential_property_path(row.id as string)">
+        <ListItem
+          v-if="row.residential_property_id"
+          as="link"
+          :href="admin_residential_property_structure_path(row.residential_property_id as string)"
+        >
           <span class="flex items-center gap-2">
             <PencilIcon class="w-4 h-4" />
-            {{ t('common.actions.edit') }}
+            {{ t('admin.property_sections.index.actions.manage_structure') }}
           </span>
         </ListItem>
         <ListItem
           as="confirm"
-          :onClick="() => deleteProperty(row.id as string)"
-          :confirmTitle="t('admin.residential_properties.index.actions.delete')"
+          :onClick="() => deleteSection(row.id as string)"
+          :confirmTitle="t('admin.property_sections.index.actions.delete')"
           :confirmDescription="
-            t('admin.residential_properties.index.actions.delete_description', { name: row.name })
+            t('admin.property_sections.index.actions.delete_description', { name: row.name })
           "
         >
           <span class="flex items-center gap-2">
@@ -75,24 +72,23 @@ import { useTable } from '@/lib/composables/useTable'
 import { useI18n } from 'vue-i18n'
 import type { ColumnDef } from '@/types/table'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, SearchIcon, PencilIcon, TrashIcon, Layers } from 'lucide-vue-next'
+import { PlusIcon, SearchIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import {
-  new_admin_residential_property_path,
-  edit_admin_residential_property_path,
-  admin_residential_property_path,
+  admin_residential_properties_path,
   admin_residential_property_structure_path,
+  admin_property_section_path,
 } from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'
-import type { ResidentialProperty } from '@/types/residential_property'
+import type { PropertySection } from '@/types/property_section'
 import { toast } from 'vue-sonner'
-import { getResidentialPropertiesBreadcrumbs } from '@/lib/breadcrumbs/residential_property'
+import { getPropertySectionsBreadcrumbs } from '@/lib/breadcrumbs/property_section'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  residential_properties: ResidentialProperty[]
+  property_sections: PropertySection[]
   pagination?: {
     current_page: number
     per_page: number
@@ -103,10 +99,14 @@ const props = defineProps<{
 }>()
 
 const fetchData = (search: string, page: number, itemsPerPage: number) => {
-  router.get('/admin/residential_properties', { page, per_page: itemsPerPage, q: { name_or_code_or_city_cont: search } }, { preserveState: true })
+  router.get(
+    '/admin/property_sections',
+    { page, per_page: itemsPerPage, q: { name_or_code_cont: search } },
+    { preserveState: true }
+  )
 }
 
-const itemsBreadcrumb = computed(() => getResidentialPropertiesBreadcrumbs(t))
+const itemsBreadcrumb = computed(() => getPropertySectionsBreadcrumbs(t))
 const {
   currentPage,
   totalPages,
@@ -141,33 +141,38 @@ onMounted(() => {
   }
 })
 
-const columns: ColumnDef<ResidentialProperty, unknown>[] = [
-  { accessorKey: 'name', header: () => t('admin.residential_properties.index.table.headers.name') },
-  { accessorKey: 'code', header: () => t('admin.residential_properties.index.table.headers.code') },
+const columns: ColumnDef<PropertySection, unknown>[] = [
+  { accessorKey: 'name', header: () => t('admin.property_sections.index.table.headers.name') },
+  { accessorKey: 'code', header: () => t('admin.property_sections.index.table.headers.code') },
   {
-    accessorKey: 'property_type',
-    header: () => t('admin.residential_properties.index.table.headers.property_type'),
+    accessorKey: 'section_type',
+    header: () => t('admin.property_sections.index.table.headers.section_type'),
     cell: ({ row }) =>
-      h(
-        'span',
-        t(`admin.residential_properties.property_types.${row.original.property_type}`)
-      ),
+      h('span', t(`admin.property_sections.section_types.${row.original.section_type}`)),
   },
-  { accessorKey: 'city', header: () => t('admin.residential_properties.index.table.headers.city') },
   {
-    accessorKey: 'status',
-    header: () => t('admin.residential_properties.index.table.headers.status'),
-    cell: ({ row }) => h('span', t(`admin.residential_properties.statuses.${row.original.status}`)),
+    accessorKey: 'residential_property_name',
+    header: () => t('admin.property_sections.index.table.headers.residential_property'),
+  },
+  {
+    accessorKey: 'parent_name',
+    header: () => t('admin.property_sections.index.table.headers.parent'),
+    cell: ({ row }) => h('span', row.original.parent_name ?? '—'),
+  },
+  {
+    accessorKey: 'position',
+    header: () => t('admin.property_sections.index.table.headers.position'),
+    cell: ({ row }) => h('span', row.original.position ?? '—'),
   },
 ]
 
-const deleteProperty = (id: string) => {
-  router.delete(admin_residential_property_path(id), {
+const deleteSection = (id: string) => {
+  router.delete(admin_property_section_path(id), {
     onSuccess: () => {
-      toast.success(t('admin.residential_properties.index.actions.delete_success'))
+      toast.success(t('admin.property_sections.index.actions.delete_success'))
     },
     onError: () => {
-      toast.error(t('admin.residential_properties.index.actions.delete_error'))
+      toast.error(t('admin.property_sections.index.actions.delete_error'))
     },
   })
 }

@@ -278,6 +278,7 @@ es:
               status: "Estado"
           actions:
             create: "Nueva propiedad"
+            structure: "Gestionar estructura"
             delete: "Eliminar propiedad"
             delete_description: "¿Eliminar la propiedad {name}?"
             delete_success: "Propiedad eliminada correctamente"
@@ -317,6 +318,111 @@ es:
           timezone:
             label: "Zona horaria"
             placeholder: "p. ej. America/Santiago"
+        structure:
+          title: "Estructura de la propiedad"
+          subtitle: "Administra la jerarquía de secciones dentro de una propiedad residencial"
+          breadcrumb: "Estructura"
+          create_multiple: "Crear múltiples"
+          tree:
+            title: "Árbol de secciones"
+            add_root: "Agregar sección raíz"
+            add_subsection: "Agregar subsección"
+            search_placeholder: "Buscar sección..."
+            root_badge: "Propiedad"
+            empty_title: "Aún no hay secciones creadas"
+            empty_description: "Comienza agregando una sección raíz para organizar la estructura de esta propiedad."
+            search_empty: "Ninguna sección coincide con tu búsqueda."
+          form:
+            new_title: "Nueva sección"
+            new_description: "Crea una nueva sección dentro de la estructura actual"
+            edit_title: "Editar sección"
+            edit_description: "Actualiza los datos de la sección"
+            property_label: "Propiedad"
+            placement_label: "Crear dentro de"
+            placement_root: "Como sección raíz"
+            placement_child: "Dentro de otra sección"
+            no_parents_hint: "Aún no existen secciones para seleccionar"
+            code_label: "Código interno"
+            code_placeholder: "Ej. P01"
+            section_type_placeholder: "Selecciona un tipo"
+            advanced_title: "Opciones avanzadas"
+            preview_title: "Vista previa"
+            submit_create: "Crear sección"
+            submit_edit: "Guardar cambios"
+      property_sections:
+        title: "Secciones"
+        created_successfully: "Sección creada correctamente"
+        creation_failed: "Error al crear la sección"
+        updated_successfully: "Sección actualizada correctamente"
+        update_failed: "Error al actualizar la sección"
+        not_found: "Sección no encontrada"
+        validations:
+          name_required: "El nombre es obligatorio"
+          section_type_required: "El tipo de sección es obligatorio"
+          residential_property_required: "La propiedad es obligatoria"
+          parent_required: "La sección padre es obligatoria"
+          parent_invalid: "La sección padre no es válida"
+          parent_same_property: "La sección padre debe pertenecer a la misma propiedad"
+          parent_circular: "La sección padre no puede ser descendiente de esta sección"
+          position_min: "La posición debe ser al menos 1"
+        section_types:
+          block: "Bloque"
+          tower: "Torre"
+          floor: "Piso"
+          parking: "Estacionamiento"
+          storage: "Bodega"
+          commercial: "Comercial"
+          amenities: "Amenidades"
+          entrance: "Acceso"
+          garden: "Jardín"
+          other: "Otro"
+        index:
+          title: "Secciones de propiedad"
+          input:
+            search:
+              placeholder: "Buscar por nombre o código"
+          table:
+            headers:
+              name: "Nombre"
+              code: "Código"
+              section_type: "Tipo"
+              residential_property: "Propiedad"
+              parent: "Sección padre"
+              position: "Posición"
+          actions:
+            create: "Nueva sección"
+            manage_from_property: "Gestionar desde propiedad"
+            manage_structure: "Gestionar estructura"
+            delete: "Eliminar sección"
+            delete_description: "¿Eliminar la sección {name}?"
+            delete_success: "Sección eliminada correctamente"
+            delete_error: "No se pudo eliminar la sección"
+        new:
+          title: "Nueva sección de propiedad"
+          description: "Registra una sección dentro de una propiedad residencial"
+          submit: "Crear sección"
+        edit:
+          title: "Editar sección de propiedad"
+          description: "Actualiza los datos de la sección"
+          submit: "Guardar cambios"
+        input:
+          name:
+            label: "Nombre"
+            placeholder: "Nombre de la sección"
+          code:
+            label: "Código"
+            placeholder: "Código interno (opcional)"
+          section_type:
+            label: "Tipo de sección"
+          residential_property_id:
+            label: "Propiedad residencial"
+            placeholder: "Selecciona una propiedad"
+          parent_id:
+            label: "Sección padre"
+            placeholder: "Ninguna (sección raíz)"
+          position:
+            label: "Posición"
+            placeholder: "Orden de visualización (opcional)"
       organizations:
         created_successfully: "Organización creada correctamente"
         creation_failed: "Error al crear la organización"
@@ -390,6 +496,7 @@ es:
         home: "Inicio"
         users: "Usuarios"
         residential_properties: "Propiedades"
+        property_sections: "Secciones"
         organizations: "Organizaciones"
         organization_settings: "Configuración de Organización"
         settings: "Configuración"

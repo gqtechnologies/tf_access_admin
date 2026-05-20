@@ -18,6 +18,7 @@
 import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import Header from '@/components/admin/layout/Header.vue'
+import { applyErrorsToFormRef } from '@/lib/composables/forms/apply_errors_to_form_ref'
 import { admin_profile_path } from '@/routes'
 import { useI18n } from 'vue-i18n'
 import { getProfileBreadcrumbs } from '@/lib/breadcrumbs/profile'
@@ -54,11 +55,9 @@ function onSubmit(data: ProfileEditSchema) {
         onSuccess: () => {
             toast.success(t('admin.profile.updated_successfully'))
         },
-        onError: (errors: any) => {
+        onError: (errors) => {
             toast.error(t('admin.profile.update_failed'))
-            if (errors && Object.keys(errors).length > 0) {
-                formRef.value?.applyServerErrors(errors)
-            }
+            applyErrorsToFormRef(formRef, errors)
         },
     })
 }

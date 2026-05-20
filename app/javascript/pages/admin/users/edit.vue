@@ -27,6 +27,7 @@ import { User } from '@/types/user'
 import { admin_user_path } from '@/routes'
 import Header from '@/components/admin/layout/Header.vue'
 import { getUsersBreadcrumbs } from '@/lib/breadcrumbs/user'
+import { applyErrorsToFormRef } from '@/lib/composables/forms/apply_errors_to_form_ref'
 const { t } = useI18n()
 
 const props = defineProps<{
@@ -55,11 +56,9 @@ function onSubmit(data: UserSchema | UserEditSchema) {
         onSuccess: () => {
             toast.success(t('admin.users.updated_successfully'))
         },
-        onError: (errors: any) => {
+        onError: (errors) => {
             toast.error(t('admin.users.update_failed'))
-            if (errors && Object.keys(errors).length > 0) {
-                formRef.value?.applyServerErrors(errors)
-            }
+            applyErrorsToFormRef(formRef, errors)
         },
     })
 }
