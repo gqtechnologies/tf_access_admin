@@ -15,7 +15,7 @@ class Admin::ResidentialProperties::StructuresController < AdminController
     render inertia: "admin/residential_properties/structure", props: {
       residential_property: Admin::ResidentialPropertySerializer.new(@residential_property).as_json,
       section_tree: tree_builder.as_json,
-      parent_options: tree_builder.flat_with_depth,
+      parent_options: tree_builder.root_parent_options,
       section_types: SectionTypes::ALL
     }, status: :ok
   end

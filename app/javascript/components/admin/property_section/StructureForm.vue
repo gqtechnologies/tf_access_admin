@@ -14,6 +14,9 @@
             ? t('admin.residential_properties.structure.form.edit_description')
             : t('admin.residential_properties.structure.form.new_description')
         }}
+        <div class="space-y-1 w-full flex justify-end">
+          <slot name="upload-multiple-units" />
+        </div>
       </CardDescription>
     </CardHeader>
     <CardContent class="flex-1 space-y-5 overflow-y-auto">

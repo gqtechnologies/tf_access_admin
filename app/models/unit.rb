@@ -58,4 +58,17 @@ class Unit < ApplicationRecord
   validates :status, presence: true
 
   validates_same_tenant :residential_property, :property_section
+  validate :property_section_accepts_units
+
+  private
+
+  def property_section_accepts_units
+    return if property_section_id.blank?
+    return if property_section.accepts_units?
+
+    errors.add(
+      :property_section_id,
+      I18n.t("frontend.admin.property_sections.validations.section_cannot_accept_units")
+    )
+  end
 end

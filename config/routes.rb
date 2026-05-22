@@ -47,6 +47,7 @@ Rails.application.routes.draw do
     resources :residential_properties, only: [:index, :new, :create, :edit, :update, :destroy] do
       resource :structure, only: [:show], module: :residential_properties
       resources :property_sections, only: [:create, :update, :destroy], module: :residential_properties
+      resources :bulk_imports, only: %i[create update], module: :residential_properties
     end
     resources :property_sections, only: [:index, :edit, :update, :destroy]
     match "*path", to: "errors#not_found", via: :all

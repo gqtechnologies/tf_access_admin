@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_15_203000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_19_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -241,6 +241,83 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_203000) do
     t.index ["person_id"], name: "index_authorized_residents_on_person_id"
     t.index ["unit_id"], name: "index_authorized_residents_on_unit_id"
     t.check_constraint "ends_at IS NULL OR ends_at >= starts_at", name: "authorized_residents_date_range_valid"
+  end
+
+  create_table "bulk_import_rows", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "bulk_import_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "failed_at"
+    t.text "failure_message"
+    t.string "group_key"
+    t.string "import_status", default: "pending", null: false
+    t.datetime "imported_at"
+    t.jsonb "normalized_payload", default: {}, null: false
+    t.string "operation"
+    t.jsonb "raw_payload", default: {}, null: false
+    t.integer "row_number", null: false
+    t.string "sheet_name"
+    t.datetime "skipped_at"
+    t.uuid "target_record_id"
+    t.string "target_record_type"
+    t.datetime "updated_at", null: false
+    t.datetime "validated_at"
+    t.jsonb "validation_errors", default: [], null: false
+    t.string "validation_status", default: "pending", null: false
+    t.jsonb "validation_warnings", default: [], null: false
+    t.index ["bulk_import_id", "group_key"], name: "index_bulk_import_rows_on_bulk_import_id_and_group_key"
+    t.index ["bulk_import_id", "import_status"], name: "index_bulk_import_rows_on_bulk_import_id_and_import_status"
+    t.index ["bulk_import_id", "row_number"], name: "index_bulk_import_rows_on_bulk_import_id_and_row_number", unique: true
+    t.index ["bulk_import_id", "validation_status"], name: "index_bulk_import_rows_on_bulk_import_id_and_validation_status"
+    t.index ["bulk_import_id"], name: "index_bulk_import_rows_on_bulk_import_id"
+    t.index ["normalized_payload"], name: "index_bulk_import_rows_on_normalized_payload", using: :gin
+    t.index ["raw_payload"], name: "index_bulk_import_rows_on_raw_payload", using: :gin
+    t.index ["row_number"], name: "index_bulk_import_rows_on_row_number"
+    t.index ["target_record_type", "target_record_id"], name: "idx_on_target_record_type_target_record_id_ce961e50be"
+  end
+
+  create_table "bulk_imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "cancelled_at"
+    t.datetime "confirmed_at"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.uuid "created_by_id", null: false
+    t.integer "error_rows", default: 0, null: false
+    t.datetime "expires_at"
+    t.integer "failed_rows", default: 0, null: false
+    t.text "failure_message"
+    t.string "file_checksum"
+    t.bigint "file_size"
+    t.datetime "finished_at"
+    t.string "import_type", null: false
+    t.integer "imported_rows", default: 0, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.string "original_filename"
+    t.datetime "processing_started_at"
+    t.uuid "property_section_id"
+    t.uuid "residential_property_id"
+    t.integer "skipped_rows", default: 0, null: false
+    t.string "status", default: "draft", null: false
+    t.jsonb "summary", default: {}, null: false
+    t.integer "total_rows", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.integer "valid_rows", default: 0, null: false
+    t.datetime "validated_at"
+    t.integer "warning_rows", default: 0, null: false
+    t.index ["created_at"], name: "index_bulk_imports_on_created_at"
+    t.index ["created_by_id"], name: "index_bulk_imports_on_created_by_id"
+    t.index ["expires_at"], name: "index_bulk_imports_on_expires_at"
+    t.index ["file_checksum"], name: "index_bulk_imports_on_file_checksum"
+    t.index ["import_type"], name: "index_bulk_imports_on_import_type"
+    t.index ["metadata"], name: "index_bulk_imports_on_metadata", using: :gin
+    t.index ["organization_id", "created_at"], name: "index_bulk_imports_on_organization_id_and_created_at"
+    t.index ["organization_id", "import_type"], name: "index_bulk_imports_on_organization_id_and_import_type"
+    t.index ["organization_id", "status"], name: "index_bulk_imports_on_organization_id_and_status"
+    t.index ["organization_id"], name: "index_bulk_imports_on_organization_id"
+    t.index ["property_section_id"], name: "index_bulk_imports_on_property_section_id"
+    t.index ["residential_property_id"], name: "index_bulk_imports_on_residential_property_id"
+    t.index ["status"], name: "index_bulk_imports_on_status"
+    t.index ["summary"], name: "index_bulk_imports_on_summary", using: :gin
   end
 
   create_table "common_area_reservation_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1092,6 +1169,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_203000) do
   add_foreign_key "authorized_residents", "people"
   add_foreign_key "authorized_residents", "people", column: "authorized_by_person_id"
   add_foreign_key "authorized_residents", "units"
+  add_foreign_key "bulk_import_rows", "bulk_imports"
+  add_foreign_key "bulk_imports", "organizations"
+  add_foreign_key "bulk_imports", "property_sections"
+  add_foreign_key "bulk_imports", "residential_properties"
+  add_foreign_key "bulk_imports", "users", column: "created_by_id"
   add_foreign_key "common_area_reservation_status_histories", "common_area_reservations"
   add_foreign_key "common_area_reservation_status_histories", "organizations"
   add_foreign_key "common_area_reservation_status_histories", "people", column: "changed_by_person_id"

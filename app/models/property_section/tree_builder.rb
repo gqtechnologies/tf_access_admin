@@ -14,6 +14,11 @@ class PropertySection::TreeBuilder
     flatten_nodes(build_nodes(@by_parent[nil] || []))
   end
 
+  # Only root sections may be parents of another section (one nesting level).
+  def root_parent_options
+    flat_with_depth.select { |option| option[:depth].zero? }
+  end
+
   private
 
   def build_nodes(nodes)

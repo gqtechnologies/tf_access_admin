@@ -7,10 +7,6 @@
           {{ t('admin.residential_properties.structure.subtitle') }}
         </p>
       </div>
-      <Button variant="outline" disabled class="shrink-0">
-        <Plus class="size-4" />
-        {{ t('admin.residential_properties.structure.create_multiple') }}
-      </Button>
     </div>
 
     <div class="grid min-h-[32rem] grid-cols-1 gap-6 lg:grid-cols-2">
@@ -20,6 +16,7 @@
         :tree="props.section_tree"
         :selected-id="selectedSectionId"
         @add-root="startCreateRoot"
+        @select="onSelectSection"
         @add-subsection="startCreateChild"
         @edit="startEdit"
         @delete="confirmDelete"
@@ -36,8 +33,24 @@
         :initial-parent-id="initialParentId"
         @submit="onSubmit"
         @cancel="resetFormState"
-      />
+      >
+        <template #upload-multiple-units>
+          <Button variant="outline" class="shrink-0" @click="onCreateMultipleClick">
+            <Plus class="size-4" />
+            {{ t('admin.residential_properties.structure.create_multiple') }}
+          </Button>
+        </template>
+      </StructureForm>
     </div>
+
+    <BulkUnitsImportDrawer
+      v-model:open="bulkImportOpen"
+      :property-name="props.residential_property.name"
+      :residential-property-id="propertyId"
+      :property-section-id="selectedSection?.id ?? ''"
+      :section-tree="props.section_tree"
+      :selected-section="selectedSection"
+    />
   </div>
 </template>
 
@@ -47,6 +60,7 @@ import { router, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { Plus } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
+import BulkUnitsImportDrawer from '@/components/admin/bulk_units/BulkUnitsImportDrawer.vue'
 import Header from '@/components/admin/layout/Header.vue'
 import SectionTree from '@/components/admin/property_section/SectionTree.vue'
 import StructureForm from '@/components/admin/property_section/StructureForm.vue'
@@ -88,9 +102,17 @@ const itemsBreadcrumb = computed(() =>
   getPropertyStructureBreadcrumbs(t, propertyId.value, props.residential_property.name)
 )
 
+const bulkImportOpen = ref(false)
+
 const treeRef = computed(() => props.section_tree)
 const searchRef = computed(() => treeSearch.value)
 const { findNodeById } = usePropertySectionTree(treeRef, searchRef)
+
+const selectedSection = computed(() => {
+  if (!selectedSectionId.value) return null
+
+  return findNodeById(props.section_tree, selectedSectionId.value) ?? null
+})
 
 const filteredParentOptions = computed(() => {
   if (!editingNode.value) return props.parent_options
@@ -109,6 +131,19 @@ function startCreateRoot() {
   resetFormState()
   initialPlacement.value = 'root'
   initialParentId.value = null
+}
+
+function onSelectSection(node: PropertySectionTreeNode) {
+  selectedSectionId.value = node.id
+}
+
+function onCreateMultipleClick() {
+  if (!selectedSection.value) {
+    toast.error(t('admin.residential_properties.structure.bulk_import.select_section_first'))
+    return
+  }
+
+  bulkImportOpen.value = true
 }
 
 function startCreateChild(parentId: string) {

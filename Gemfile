@@ -104,5 +104,7 @@ gem "flipper-active_record", "~> 1.4"
 
 gem "devise-jwt", "~> 0.13.0"
 gem "ahoy_matey"
-gem 'aasm'
+gem "aasm"
 gem "audited"
+gem "roo"
+gem "activerecord-import"

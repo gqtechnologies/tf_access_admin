@@ -47,7 +47,7 @@
 
       <ul
         v-else
-        class="relative m-0 mt-3 ml-4 list-none space-y-2 p-0"
+        class="relative m-0 mt-2 list-none space-y-0.5 p-0"
       >
         <SectionTreeNode
           v-for="(node, index) in filteredTree"
@@ -56,6 +56,8 @@
           :depth="0"
           :is-last="index === filteredTree.length - 1"
           :selected-id="selectedId"
+          :force-expanded="searchModel.trim().length > 0"
+          @select="emit('select', $event)"
           @add-subsection="emit('add-subsection', $event)"
           @edit="emit('edit', $event)"
           @delete="emit('delete', $event)"
@@ -93,6 +95,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:search', value: string): void
   (e: 'add-root'): void
+  (e: 'select', node: PropertySectionTreeNode): void
   (e: 'add-subsection', parentId: string): void
   (e: 'edit', node: PropertySectionTreeNode): void
   (e: 'delete', node: PropertySectionTreeNode): void

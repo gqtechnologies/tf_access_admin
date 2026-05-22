@@ -1,94 +1,139 @@
 <template>
   <li class="relative list-none">
-    <template v-if="!isRoot">
-      <span
-        aria-hidden="true"
-        class="pointer-events-none absolute -left-6 top-0 border-l border-dashed border-border"
-        :class="isLast ? 'h-6' : '-bottom-2'"
-      />
-      <span
-        aria-hidden="true"
-        class="pointer-events-none absolute -left-6 top-6 h-3 w-6 rounded-bl-xl border-b border-l border-dashed border-border"
-      />
-    </template>
-
-    <div
-      class="group relative z-10 flex h-12 items-center gap-2 rounded-lg border p-3"
-      :class="{
-        'border-primary/35 bg-primary/5': selectedId === node.id,
-      }"
-    >
-      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted/50">
-        <component
-          :is="iconFor(node.section_type)"
-          class="size-4 text-muted-foreground"
-        />
-      </div>
-
-      <span class="min-w-0 flex-1 truncate text-sm font-medium">
-        {{ node.name }}
-      </span>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
+    <Collapsible v-model:open="isOpen" class="w-full">
+      <div
+        class="group relative z-10 flex min-h-10 items-center gap-1 rounded-lg pr-1 transition-colors"
+        :class="isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'"
+      >
+        <CollapsibleTrigger
+          v-if="hasChildren"
+          as-child
+          @click.stop
+        >
           <Button
+            type="button"
             variant="ghost"
             size="icon"
-            class="size-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
+            class="size-7 shrink-0 text-muted-foreground hover:text-foreground hover:bg-transparent"
+            :aria-expanded="isOpen"
+            :aria-label="
+              isOpen
+                ? t('admin.residential_properties.structure.tree.collapse')
+                : t('admin.residential_properties.structure.tree.expand')
+            "
           >
-            <MoreVertical class="size-4" />
+            <ChevronRight
+              class="size-4 shrink-0 transition-transform duration-200"
+              :class="{ 'rotate-90': isOpen }"
+            />
           </Button>
-        </DropdownMenuTrigger>
+        </CollapsibleTrigger>
 
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem @click="emit('add-subsection', node.id)">
+        <span
+          v-else
+          class="flex size-7 shrink-0 items-center justify-center"
+          aria-hidden="true"
+        >
+         
+        </span>
+
+        <button
+          type="button"
+          class="flex min-w-0 flex-1 items-center gap-2 rounded-md py-1.5 pr-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          @click="emit('select', node)"
+        >
+          <div
+            class="flex size-8 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/50"
+            :class="isSelected ? 'border-primary/25 bg-primary/10' : ''"
+          >
+            <component
+              :is="iconFor(node.section_type)"
+              class="size-4"
+              :class="isSelected ? 'text-primary' : 'text-muted-foreground'"
+            />
+          </div>
+
+          <span
+            class="min-w-0 flex-1 truncate text-sm font-medium"
+            :class="isSelected ? 'text-primary' : ''"
+          >
+            {{ node.name }}
+          </span>
+        </button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="size-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 data-[state=open]:opacity-100"
+              @click.stop
+            >
+              <MoreVertical class="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            v-if="canAddSubsection"
+            @click="emit('add-subsection', node.id)"
+          >
             <Plus class="size-4" />
             {{ t('admin.residential_properties.structure.tree.add_subsection') }}
           </DropdownMenuItem>
 
-          <DropdownMenuItem @click="emit('edit', node)">
-            <Pencil class="size-4" />
-            {{ t('common.actions.edit') }}
-          </DropdownMenuItem>
+            <DropdownMenuItem @click="emit('edit', node)">
+              <Pencil class="size-4" />
+              {{ t('common.actions.edit') }}
+            </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+            <DropdownMenuSeparator />
 
-          <DropdownMenuItem
-            class="text-destructive focus:text-destructive"
-            @click="emit('delete', node)"
-          >
-            <Trash2 class="size-4" />
-            {{ t('common.actions.delete') }}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <DropdownMenuItem
+              class="text-destructive focus:text-destructive"
+              @click="emit('delete', node)"
+            >
+              <Trash2 class="size-4" />
+              {{ t('common.actions.delete') }}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
-    <ul
-      v-if="node.children.length > 0"
-      class="relative m-0 ml-2.5 mt-2 list-none space-y-2 pl-6"
-    >
-      <SectionTreeNode
-        v-for="(child, index) in node.children"
-        :key="child.id"
-        :node="child"
-        :depth="depth + 1"
-        :is-last="index === node.children.length - 1"
-        :selected-id="selectedId"
-        @add-subsection="emit('add-subsection', $event)"
-        @edit="emit('edit', $event)"
-        @delete="emit('delete', $event)"
-      />
-    </ul>
+      <CollapsibleContent v-if="hasChildren">
+        <ul
+          class="relative m-0 ml-3.5 mt-0.5 list-none space-y-0.5 border-l border-border/80 py-0.5 pl-3"
+        >
+          <SectionTreeNode
+            v-for="(child, index) in node.children"
+            :key="child.id"
+            :node="child"
+            :depth="depth + 1"
+            :is-last="index === node.children.length - 1"
+            :selected-id="selectedId"
+            :force-expanded="forceExpanded"
+            @select="emit('select', $event)"
+            @add-subsection="emit('add-subsection', $event)"
+            @edit="emit('edit', $event)"
+            @delete="emit('delete', $event)"
+          />
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
   </li>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { ChevronRight, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 
 import { Button } from '@/components/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -108,14 +153,17 @@ const props = withDefaults(
     depth: number
     isLast?: boolean
     selectedId?: string | null
+    forceExpanded?: boolean
   }>(),
   {
     isLast: false,
     selectedId: null,
+    forceExpanded: false,
   },
 )
 
 const emit = defineEmits<{
+  (e: 'select', node: PropertySectionTreeNode): void
   (e: 'add-subsection', parentId: string): void
   (e: 'edit', node: PropertySectionTreeNode): void
   (e: 'delete', node: PropertySectionTreeNode): void
@@ -124,5 +172,35 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const { iconFor } = useSectionTypeIcon()
 
-const isRoot = computed(() => props.depth === 0)
+const hasChildren = computed(() => props.node.children.length > 0)
+const isSelected = computed(() => props.selectedId === props.node.id)
+const canAddSubsection = computed(() => !props.node.parent_id)
+const isOpen = ref(true)
+
+function nodeContainsId(nodes: PropertySectionTreeNode[], id: string): boolean {
+  for (const item of nodes) {
+    if (item.id === id) return true
+    if (nodeContainsId(item.children, id)) return true
+  }
+  return false
+}
+
+watch(
+  () => props.selectedId,
+  (id) => {
+    if (id && hasChildren.value && nodeContainsId(props.node.children, id)) {
+      isOpen.value = true
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.forceExpanded,
+  (expanded) => {
+    if (expanded && hasChildren.value) {
+      isOpen.value = true
+    }
+  },
+)
 </script>
