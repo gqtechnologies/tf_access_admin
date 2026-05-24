@@ -1,10 +1,16 @@
 import { z } from 'zod'
-import { BULK_IMPORT_IMPORT_MODES, BULK_IMPORT_REQUIRED_TARGETS } from '@/lib/constants/bulk_import'
+import {
+  BULK_IMPORT_IMPORT_MODES,
+  BULK_IMPORT_OWNER_IMPORT_MODES,
+  BULK_IMPORT_REQUIRED_TARGETS,
+} from '@/lib/constants/bulk_import'
 import type { BulkImportColumnMapping } from '@/types/bulk_import'
 
 export const bulkImportConfigureValidationKeys = {
   selected_sheet_required: 'admin.residential_properties.structure.bulk_import.configure.validations.selected_sheet_required',
   import_mode_required: 'admin.residential_properties.structure.bulk_import.configure.validations.import_mode_required',
+  owner_import_mode_required:
+    'admin.residential_properties.structure.bulk_import.configure.validations.owner_import_mode_required',
   default_section_required:
     'admin.residential_properties.structure.bulk_import.configure.validations.default_section_required',
   required_columns_missing:
@@ -16,14 +22,19 @@ const importModeSchema = z.enum(BULK_IMPORT_IMPORT_MODES, {
   invalid_type_error: bulkImportConfigureValidationKeys.import_mode_required,
 })
 
+const ownerImportModeSchema = z.enum(BULK_IMPORT_OWNER_IMPORT_MODES, {
+  required_error: bulkImportConfigureValidationKeys.owner_import_mode_required,
+  invalid_type_error: bulkImportConfigureValidationKeys.owner_import_mode_required,
+})
+
 export const bulkImportConfigureFieldsSchema = z.object({
   selected_sheet: z.string().trim().min(1, bulkImportConfigureValidationKeys.selected_sheet_required),
   import_mode: importModeSchema,
-  default_property_section_id: z
+  property_section_id: z
     .string()
     .trim()
     .min(1, bulkImportConfigureValidationKeys.default_section_required),
-  validate_owners: z.boolean(),
+  owner_import_mode: ownerImportModeSchema,
 })
 
 export function createBulkImportConfigureSchema(columnMappings: BulkImportColumnMapping[]) {

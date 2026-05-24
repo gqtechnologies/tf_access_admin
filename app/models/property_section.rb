@@ -36,6 +36,7 @@
 class PropertySection < ApplicationRecord
   include SectionTypes
   include NormalizableAttributes
+  include AlphanumericHyphenCodeValidatable
   include TenantScopedAssociations
   include PropertySectionHierarchy
 
@@ -51,6 +52,7 @@ class PropertySection < ApplicationRecord
   validates :section_type, presence: true, inclusion: { in: SectionTypes::ALL }
   validates :name, presence: true
   validates :residential_property, presence: true
+  validates_alphanumeric_hyphen_code :code
 
   validates_same_tenant :residential_property, :parent
   validate :parent_is_valid

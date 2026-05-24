@@ -71,12 +71,12 @@ module BulkImportServices
       current = @bulk_import.metadata.fetch("options", {})
       defaults = {
         "import_mode" => current["import_mode"] || CreateUnitsImport::IMPORT_MODES[:create_skip_duplicates],
-        "default_property_section_id" => current["default_property_section_id"] || @bulk_import.property_section_id,
-        "validate_owners" => current.fetch("validate_owners", true)
+        "property_section_id" => current["property_section_id"] || @bulk_import.property_section_id,
+        "owner_import_mode" => current["owner_import_mode"] || CreateUnitsImport::OWNER_IMPORT_MODES[:link_existing]
       }
 
       defaults.merge(
-        @options.slice("import_mode", "default_property_section_id", "validate_owners")
+        @options.slice("import_mode", "property_section_id", "owner_import_mode")
       )
     end
 

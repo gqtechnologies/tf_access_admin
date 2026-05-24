@@ -3,14 +3,16 @@
 module BulkImportServices
   class UnitsColumnMapper
     TARGET_FIELDS = [
-      { key: "section_path", required: false },
       { key: "unit_identifier", required: true },
       { key: "unit_type", required: true },
       { key: "display_name", required: false },
       { key: "area_m2", required: false },
       { key: "status", required: false },
-      { key: "owner_name", required: false },
-      { key: "owner_email", required: false }
+      { key: "owner_document", required: false },
+      { key: "owner_email", required: false },
+      { key: "owner_first_name", required: false },
+      { key: "owner_last_name", required: false },
+      { key: "ownership_percentage", required: false }
     ].freeze
 
     HEADER_ALIASES = {
@@ -20,9 +22,6 @@ module BulkImportServices
       "numero_identificador" => "unit_identifier",
       "número_identificador" => "unit_identifier",
       "numero_/_identificador" => "unit_identifier",
-      "ruta_de_seccion" => "section_path",
-      "ruta_seccion" => "section_path",
-      "section_path" => "section_path",
       "tipo" => "unit_type",
       "tipo_unidad" => "unit_type",
       "unit_type" => "unit_type",
@@ -32,10 +31,24 @@ module BulkImportServices
       "area_m2" => "area_m2",
       "estado" => "status",
       "status" => "status",
-      "propietario" => "owner_name",
-      "owner_name" => "owner_name",
       "email_propietario" => "owner_email",
-      "owner_email" => "owner_email"
+      "owner_email" => "owner_email",
+      "correo_propietario" => "owner_email",
+      "documento_propietario" => "owner_document",
+      "owner_document" => "owner_document",
+      "documento" => "owner_document",
+      "dni_propietario" => "owner_document",
+      "cedula_propietario" => "owner_document",
+      "owner_first_name" => "owner_first_name",
+      "primer_nombre_propietario" => "owner_first_name",
+      "owner_last_name" => "owner_last_name",
+      "apellido" => "owner_last_name",
+      "apellidos" => "owner_last_name",
+      "apellido_propietario" => "owner_last_name",
+      "ownership_percentage" => "ownership_percentage",
+      "porcentaje_propiedad" => "ownership_percentage",
+      "porcentaje_de_propiedad" => "ownership_percentage",
+      "porcentaje" => "ownership_percentage"
     }.freeze
 
     def self.call(headers:)

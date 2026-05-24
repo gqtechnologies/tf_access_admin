@@ -8,15 +8,22 @@ module BulkImportServices
       update_only: "update_only"
     }.freeze
 
+    OWNER_IMPORT_MODES = {
+      ignore: "ignore",
+      link_existing: "link_existing",
+      create_missing: "create_missing"
+    }.freeze
+
     def self.call(**kwargs)
       new(**kwargs).call
     end
 
-    def initialize(residential_property:, property_section:, created_by:, file:)
+    def initialize(residential_property:, property_section:, created_by:, file:, options: {})
       @residential_property = residential_property
       @property_section = property_section
       @created_by = created_by
       @file = file
+      @options = options.stringify_keys
     end
 
     def call
@@ -72,12 +79,18 @@ module BulkImportServices
     def build_metadata(inspection)
       BulkImportServices::MetadataBuilder.call(
         inspection: inspection,
-        options: {
-          "import_mode" => IMPORT_MODES[:create_skip_duplicates],
-          "default_property_section_id" => @property_section.id,
-          "validate_owners" => true,
-        }
+        options: persisted_options
       )
+    end
+
+    def persisted_options
+      defaults = {
+        "import_mode" => IMPORT_MODES[:create_skip_duplicates],
+        "property_section_id" => @property_section.id,
+        "owner_import_mode" => OWNER_IMPORT_MODES[:link_existing]
+      }
+
+      defaults.merge(@options.slice("import_mode", "property_section_id", "owner_import_mode"))
     end
   end
 end

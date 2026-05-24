@@ -11,7 +11,7 @@
 #  identifier              :string           not null
 #  metadata                :jsonb            not null
 #  normalized_identifier   :string           not null
-#  status                  :string           default("active"), not null
+#  status                  :string           default("available"), not null
 #  unit_type               :string           not null
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
@@ -37,8 +37,11 @@
 #  fk_rails_...  (residential_property_id => residential_properties.id)
 #
 class Unit < ApplicationRecord
+  include AlphanumericHyphenCodeValidatable
+  include NormalizableAttributes
   include TenantScopedAssociations
   include UnitTypes
+  include UnitStatuses
 
   acts_as_tenant :organization
   acts_as_paranoid
@@ -54,14 +57,27 @@ class Unit < ApplicationRecord
 
   validates :unit_type, presence: true, inclusion: { in: UnitTypes::ALL }
   validates :identifier, presence: true
+  validates_alphanumeric_hyphen_code :identifier, allow_whitespace: true
   validates :normalized_identifier, presence: true
-  validates :status, presence: true
+  validates :status, presence: true, inclusion: { in: UnitStatuses::ALL }
+
+  normalizes :status, with: ->(value) { value.to_s.strip.downcase.presence }
 
   validates_same_tenant :residential_property, :property_section
   validate :property_section_accepts_units
 
+  before_validation :assign_normalized_identifier
+  trims_attributes :identifier
+
   private
 
+  def assign_normalized_identifier
+    return if identifier.blank?
+
+    self.normalized_identifier = AlphanumericHyphenCodeValidatable.normalize_identifier(identifier)
+  end
+
+  # if there is a property_section_id, check if the property_section accepts units
   def property_section_accepts_units
     return if property_section_id.blank?
     return if property_section.accepts_units?

@@ -97,24 +97,38 @@
                 </Field>
               </VeeField>
 
-              <VeeField v-slot="{ field }" name="validate_owners" type="checkbox" :value="true">
-                <div class="flex items-center gap-2">
-                  <Checkbox
-                    id="bulk-import-validate-owners"
-                    :checked="field.checked"
-                    @update:checked="field.onChange"
-                  />
-                  <div class="flex items-center gap-1.5">
-                    <Label for="bulk-import-validate-owners" class="font-normal">
-                      {{ t('admin.residential_properties.structure.bulk_import.configure.validate_owners') }}
-                    </Label>
-                    <Info class="size-3.5 text-muted-foreground" aria-hidden="true" />
-                  </div>
-                </div>
+              <VeeField v-slot="{ field, errors }" name="owner_import_mode">
+                <Field :data-invalid="!!errors.length">
+                  <FieldLabel for="bulk-import-owner-mode">
+                    {{ t('admin.residential_properties.structure.bulk_import.configure.owner_import_mode_label') }}
+                  </FieldLabel>
+                  <Select
+                    :model-value="field.value"
+                    @update:model-value="field.onChange"
+                  >
+                    <SelectTrigger id="bulk-import-owner-mode" class="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem
+                        v-for="mode in ownerImportModeOptions"
+                        :key="mode.value"
+                        :value="mode.value"
+                      >
+                        {{ mode.label }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p class="text-xs text-muted-foreground">
+                    {{ ownerImportModeDescription }}
+                  </p>
+                  <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
+                </Field>
               </VeeField>
             </CardContent>
           </Card>
         </div>
+
 
         <div class="space-y-6">
           <Card class="py-4">
@@ -235,9 +249,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -347,6 +359,26 @@ const importModeOptions = computed(() => [
     label: t('admin.residential_properties.structure.bulk_import.configure.import_modes.update_only'),
   },
 ])
+
+const ownerImportModeOptions = computed(() => [
+  {
+    value: 'ignore',
+    label: t('admin.residential_properties.structure.bulk_import.configure.owner_import_modes.ignore'),
+  },
+  {
+    value: 'link_existing',
+    label: t('admin.residential_properties.structure.bulk_import.configure.owner_import_modes.link_existing'),
+  },
+  {
+    value: 'create_missing',
+    label: t('admin.residential_properties.structure.bulk_import.configure.owner_import_modes.create_missing'),
+  },
+])
+
+const ownerImportModeDescription = computed(() => {
+  const mode = values.owner_import_mode ?? 'link_existing'
+  return t(`admin.residential_properties.structure.bulk_import.configure.owner_import_modes.${mode}_description`)
+})
 
 const validationRules = computed(() => {
   const messages = tm('admin.residential_properties.structure.bulk_import.configure.validation_rules.items')

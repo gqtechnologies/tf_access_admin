@@ -6,10 +6,18 @@ import { useRailsFetch } from '@/lib/composables/useRailsFetch'
 import type {
   BulkImportConfigureForm,
   BulkImportImportMode,
-  BulkImportMetadata,
+  BulkImportOwnerImportMode,
   BulkImportRecord,
+  BulkImportRowsResponse,
 } from '@/types/bulk_import'
-import { admin_residential_property_bulk_import_path, admin_residential_property_bulk_imports_path } from '@/routes'
+import {
+  admin_residential_property_bulk_import_path,
+  admin_residential_property_bulk_imports_path,
+} from '@/routes'
+
+function validateBulkImportPath(residentialPropertyId: string, bulkImportId: string) {
+  return `${admin_residential_property_bulk_import_path(residentialPropertyId, bulkImportId)}/validate`
+}
 
 export const BULK_UNITS_IMPORT_STEPS = ['method', 'configure', 'preview', 'import'] as const
 export type BulkUnitsImportStep = (typeof BULK_UNITS_IMPORT_STEPS)[number]
@@ -23,19 +31,35 @@ type BulkImportResponse = {
   bulk_import: BulkImportRecord
 }
 
+type BulkImportValidateResponse = BulkImportResponse & BulkImportRowsResponse
+
 type BulkImportErrorResponse = {
   errors?: Record<string, string[]>
 }
 
-function buildConfigureForm(metadata: BulkImportMetadata): BulkImportConfigureForm {
-  const inspection = metadata.file_inspection
-  const options = metadata.options
+function resolveOwnerImportMode(options: BulkImportRecord['metadata']['options']): BulkImportOwnerImportMode {
+  if (options.owner_import_mode === 'ignore' || options.owner_import_mode === 'link_existing' || options.owner_import_mode === 'create_missing') {
+    return options.owner_import_mode
+  }
+
+  const validateOwners = options.validate_owners ?? true
+  const createOwners = options.create_owners ?? false
+
+  if (!validateOwners) return 'ignore'
+  if (createOwners) return 'create_missing'
+  return 'link_existing'
+}
+
+function buildConfigureForm(record: BulkImportRecord): BulkImportConfigureForm {
+  const inspection = record.metadata.file_inspection
+  const options = record.metadata.options
 
   return {
     selected_sheet: inspection.selected_sheet ?? inspection.sheets[0] ?? '',
     import_mode: (options.import_mode ?? 'create_skip_duplicates') as BulkImportImportMode,
-    default_property_section_id: options.default_property_section_id ?? '',
-    validate_owners: options.validate_owners ?? true,
+    property_section_id:
+      options.property_section_id ?? record.property_section_id ?? '',
+    owner_import_mode: resolveOwnerImportMode(options),
   }
 }
 
@@ -59,11 +83,14 @@ export function useBulkUnitsImportWizard() {
     fileError: null as string | null,
     bulkImport: null as BulkImportRecord | null,
     configureForm: null as BulkImportConfigureForm | null,
+    initialPreview: null as BulkImportRowsResponse | null,
     isSubmitting: false,
     isRefreshingSheet: false,
+    isValidating: false,
   })
 
   const isConfigureStepValid = ref(false)
+  const isPreviewStepConfirmable = ref(false)
 
   const stepIndex = computed(() => BULK_UNITS_IMPORT_STEPS.indexOf(state.currentStep))
 
@@ -83,10 +110,19 @@ export function useBulkUnitsImportWizard() {
       )
     }
 
+    if (state.currentStep === 'preview') {
+      return isPreviewStepConfirmable.value && !state.isValidating
+    }
+
     return false
   })
 
-  const canGoBack = computed(() => state.currentStep === 'configure' && !state.isSubmitting)
+  const canGoBack = computed(
+    () =>
+      (state.currentStep === 'configure' || state.currentStep === 'preview') &&
+      !state.isSubmitting &&
+      !state.isValidating,
+  )
 
   function reset() {
     state.currentStep = 'method'
@@ -95,14 +131,17 @@ export function useBulkUnitsImportWizard() {
     state.fileError = null
     state.bulkImport = null
     state.configureForm = null
+    state.initialPreview = null
     state.isSubmitting = false
     state.isRefreshingSheet = false
+    state.isValidating = false
     isConfigureStepValid.value = false
+    isPreviewStepConfirmable.value = false
   }
 
   function applyBulkImportResponse(record: BulkImportRecord) {
     state.bulkImport = record
-    state.configureForm = buildConfigureForm(record.metadata)
+    state.configureForm = buildConfigureForm(record)
   }
 
   async function uploadBulkImport(
@@ -197,6 +236,93 @@ export function useBulkUnitsImportWizard() {
     }
   }
 
+  async function saveConfigureOptions(residentialPropertyId: string) {
+    const bulkImportId = state.bulkImport?.id
+    const form = state.configureForm
+    if (!bulkImportId || !form) return false
+
+    const formData = objectToRailsFormData('bulk_import', {
+      selected_sheet: form.selected_sheet,
+      import_mode: form.import_mode,
+      property_section_id: form.property_section_id,
+      owner_import_mode: form.owner_import_mode,
+    })
+
+    const { res, data } = await railsFetchJson<BulkImportResponse & BulkImportErrorResponse>(
+      'PATCH',
+      admin_residential_property_bulk_import_path(residentialPropertyId, bulkImportId),
+      formData,
+    )
+
+    if (!res.ok) {
+      toast.error(
+        errorMessage(
+          data,
+          t('admin.residential_properties.structure.bulk_import.errors.configure_save_failed'),
+        ),
+      )
+      return false
+    }
+
+    applyBulkImportResponse(data.bulk_import)
+    return true
+  }
+
+  async function validateBulkImport(residentialPropertyId: string) {
+    const bulkImportId = state.bulkImport?.id
+    if (!bulkImportId) return false
+
+    state.isValidating = true
+
+    try {
+      const { res, data } = await railsFetchJson<BulkImportValidateResponse & BulkImportErrorResponse>(
+        'POST',
+        validateBulkImportPath(residentialPropertyId, bulkImportId),
+      )
+
+      if (!res.ok) {
+        toast.error(
+          errorMessage(
+            data,
+            t('admin.residential_properties.structure.bulk_import.errors.validation_failed'),
+          ),
+        )
+        return false
+      }
+
+      applyBulkImportResponse(data.bulk_import)
+      state.initialPreview = {
+        rows: data.rows ?? [],
+        pagination: data.pagination,
+        summary: data.summary,
+      }
+      return true
+    } catch {
+      toast.error(t('admin.residential_properties.structure.bulk_import.errors.validation_failed'))
+      return false
+    } finally {
+      state.isValidating = false
+    }
+  }
+
+  async function proceedFromConfigure(
+    residentialPropertyId: string,
+  ) {
+    state.isSubmitting = true
+
+    try {
+      const saved = await saveConfigureOptions(residentialPropertyId)
+      if (!saved) return
+
+      const validated = await validateBulkImport(residentialPropertyId)
+      if (!validated) return
+
+      state.currentStep = 'preview'
+    } finally {
+      state.isSubmitting = false
+    }
+  }
+
   function goToNextStep(
     residentialPropertyId?: string,
     propertySectionId?: string | null,
@@ -207,6 +333,12 @@ export function useBulkUnitsImportWizard() {
       return
     }
 
+    if (state.currentStep === 'configure') {
+      if (!residentialPropertyId || !propertySectionId) return
+      void proceedFromConfigure(residentialPropertyId)
+      return
+    }
+
     const nextIndex = stepIndex.value + 1
     if (nextIndex < BULK_UNITS_IMPORT_STEPS.length) {
       state.currentStep = BULK_UNITS_IMPORT_STEPS[nextIndex]
@@ -214,6 +346,12 @@ export function useBulkUnitsImportWizard() {
   }
 
   function goToPreviousStep() {
+    if (state.currentStep === 'preview') {
+      state.initialPreview = null
+      state.currentStep = 'configure'
+      return
+    }
+
     if (state.currentStep === 'configure') {
       state.currentStep = 'method'
     }
@@ -224,11 +362,16 @@ export function useBulkUnitsImportWizard() {
     state.selectedFile = null
     state.fileError = null
     state.configureForm = null
+    state.initialPreview = null
     isConfigureStepValid.value = false
   }
 
   function setConfigureStepValid(valid: boolean) {
     isConfigureStepValid.value = valid
+  }
+
+  function setPreviewStepConfirmable(confirmable: boolean) {
+    isPreviewStepConfirmable.value = confirmable
   }
 
   return {
@@ -242,5 +385,6 @@ export function useBulkUnitsImportWizard() {
     prepareFileReplacement,
     refreshSheetInspection,
     setConfigureStepValid,
+    setPreviewStepConfirmable,
   }
 }

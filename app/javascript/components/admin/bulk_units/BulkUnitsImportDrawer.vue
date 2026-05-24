@@ -1,7 +1,12 @@
 <template>
   <Drawer v-model:open="open" direction="right">
     <DrawerContent
-      class="flex h-full max-h-screen flex-col data-[vaul-drawer-direction=right]:w-full data-[vaul-drawer-direction=right]:sm:max-w-3xl"
+      :class="[
+        'flex h-full max-h-screen flex-col data-[vaul-drawer-direction=right]:w-full',
+        currentStep === 'preview'
+          ? 'data-[vaul-drawer-direction=right]:sm:max-w-6xl'
+          : 'data-[vaul-drawer-direction=right]:sm:max-w-4xl',
+      ]"
     >
       <DrawerHeader class="shrink-0 border-b pb-4">
         <div class="flex items-start justify-between gap-4">
@@ -72,6 +77,17 @@
           @valid-change="setConfigureStepValid"
         />
 
+        <BulkUnitsImportPreviewStep
+          v-else-if="currentStep === 'preview' && bulkImport && configureForm"
+          ref="previewStepRef"
+          :residential-property-id="residentialPropertyId"
+          :bulk-import="bulkImport"
+          :initial-preview="initialPreview"
+          :is-validating="isValidating"
+          :owner-import-mode="configureForm.owner_import_mode"
+          @can-continue-change="setPreviewStepConfirmable"
+        />
+
         <div
           v-else
           class="flex min-h-48 items-center justify-center rounded-lg border border-dashed bg-muted/20 px-6 text-center text-sm text-muted-foreground"
@@ -81,25 +97,36 @@
       </div>
 
       <DrawerFooter class="shrink-0 gap-2 border-t sm:flex-row sm:justify-between">
-        <Button
-          v-if="canGoBack"
-          type="button"
-          variant="outline"
-          :disabled="isSubmitting"
-          @click="goToPreviousStep()"
-        >
-          {{ t('admin.residential_properties.structure.bulk_import.actions.back') }}
-        </Button>
-        <div v-else />
+        <div class="flex flex-wrap gap-2">
+          <Button
+            v-if="canGoBack"
+            type="button"
+            variant="outline"
+            :disabled="isSubmitting || isValidating"
+            @click="goToPreviousStep()"
+          >
+            {{ t('admin.residential_properties.structure.bulk_import.actions.back') }}
+          </Button>
+          <Button
+            v-if="currentStep === 'preview'"
+            type="button"
+            variant="outline"
+            :disabled="!canDownloadErrors || isSubmitting || isValidating"
+            @click="onDownloadErrors"
+          >
+            <Download class="size-4" />
+            {{ t('admin.residential_properties.structure.bulk_import.actions.download_errors') }}
+          </Button>
+        </div>
 
         <div class="flex flex-wrap justify-end gap-2">
           <DrawerClose as-child>
-            <Button type="button" variant="outline" :disabled="isSubmitting">
+            <Button type="button" variant="outline" :disabled="isSubmitting || isValidating">
               {{ t('common.actions.cancel') }}
             </Button>
           </DrawerClose>
-          <Button type="button" :disabled="!canGoNext || isSubmitting" @click="onNext">
-            <Loader2 v-if="isSubmitting" class="size-4 animate-spin" />
+          <Button type="button" :disabled="!canGoNext || isSubmitting || isValidating" @click="onNext">
+            <Loader2 v-if="isSubmitting || isValidating" class="size-4 animate-spin" />
             {{ nextButtonLabel }}
           </Button>
         </div>
@@ -109,11 +136,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs, watch } from 'vue'
+import { computed, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
-import { Layers, Loader2, X } from 'lucide-vue-next'
+import { Download, Layers, Loader2, X } from 'lucide-vue-next'
 import BulkUnitsImportConfigureStep from '@/components/admin/bulk_units/BulkUnitsImportConfigureStep.vue'
+import BulkUnitsImportPreviewStep from '@/components/admin/bulk_units/BulkUnitsImportPreviewStep.vue'
 import BulkUnitsImportMethodStep from '@/components/admin/bulk_units/BulkUnitsImportMethodStep.vue'
 import BulkUnitsImportStepper from '@/components/admin/bulk_units/BulkUnitsImportStepper.vue'
 import { Button } from '@/components/ui/button'
@@ -155,7 +183,10 @@ const {
   prepareFileReplacement,
   refreshSheetInspection,
   setConfigureStepValid,
+  setPreviewStepConfirmable,
 } = useBulkUnitsImportWizard()
+
+const previewStepRef = ref<InstanceType<typeof BulkUnitsImportPreviewStep> | null>(null)
 
 const {
   creationMethod,
@@ -164,8 +195,10 @@ const {
   currentStep,
   bulkImport,
   configureForm,
+  initialPreview,
   isSubmitting,
   isRefreshingSheet,
+  isValidating,
 } = toRefs(state)
 
 watch(open, (isOpen, wasOpen) => {
@@ -192,15 +225,29 @@ const sectionTypeLabel = computed(() => {
   return t(`admin.property_sections.section_types.${props.selectedSection.section_type}`)
 })
 
+const canDownloadErrors = computed(
+  () => previewStepRef.value?.hasDownloadableErrors ?? false,
+)
+
 const nextButtonLabel = computed(() => {
+  if (isValidating.value) {
+    return t('admin.residential_properties.structure.bulk_import.actions.validating')
+  }
   if (isSubmitting.value) {
     return t('admin.residential_properties.structure.bulk_import.actions.uploading')
   }
   if (isRefreshingSheet.value) {
     return t('admin.residential_properties.structure.bulk_import.actions.refreshing_sheet')
   }
+  if (currentStep.value === 'preview') {
+    return t('admin.residential_properties.structure.bulk_import.actions.continue_to_import')
+  }
   return t('admin.residential_properties.structure.bulk_import.actions.next')
 })
+
+function onDownloadErrors() {
+  toast.info(t('admin.residential_properties.structure.bulk_import.preview.download_errors_coming_soon'))
+}
 
 function onDownloadTemplate() {
   toast.info(t('admin.residential_properties.structure.bulk_import.upload.template_coming_soon'))

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_19_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -927,7 +927,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_19_120001) do
     t.uuid "organization_id", null: false
     t.uuid "property_section_id"
     t.uuid "residential_property_id", null: false
-    t.string "status", default: "active", null: false
+    t.string "status", default: "available", null: false
     t.string "unit_type", null: false
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_units_on_deleted_at"

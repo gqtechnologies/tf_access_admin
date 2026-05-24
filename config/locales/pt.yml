@@ -91,6 +91,9 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     admin:
+      validations:
+        alphanumeric_hyphen_code_invalid: "Apenas letras, números e hífens são permitidos"
+        identifier_format_invalid: "Apenas letras, números, espaços e hífens são permitidos"
       common:
         icon_picker:
           aria_select_icon: "Selecionar ícone"
@@ -451,8 +454,8 @@ pt:
               sheet_label: "Planilha"
               sheet_placeholder: "Selecione uma planilha"
               import_mode_label: "Modo de importação"
+              owner_import_mode_label: "Modo de importação de proprietários"
               default_section_label: "Seção padrão se vier vazia"
-              validate_owners: "Validar proprietários se informados"
               detected_columns: "Colunas detectadas"
               required_badge: "Obrigatório"
               missing_badge: "Ausente"
@@ -460,12 +463,20 @@ pt:
               validations:
                 selected_sheet_required: "Selecione uma planilha do arquivo"
                 import_mode_required: "Selecione um modo de importação"
+                owner_import_mode_required: "Selecione um modo de importação de proprietários"
                 default_section_required: "Selecione a seção padrão"
                 required_columns_missing: "Faltam colunas obrigatórias no arquivo. Revise a tabela de mapeamento."
               import_modes:
                 create_skip_duplicates: "Criar novas e omitir duplicadas"
                 create_only: "Somente criar novas"
                 update_only: "Somente atualizar existentes"
+              owner_import_modes:
+                ignore: "Ignorar proprietários"
+                ignore_description: "Os dados de proprietário do arquivo serão ignorados e não serão importados."
+                link_existing: "Vincular proprietários existentes"
+                link_existing_description: "Valida os dados do proprietário e vincula as unidades apenas a proprietários já cadastrados no sistema."
+                create_missing: "Criar proprietários faltantes"
+                create_missing_description: "Valida os dados do proprietário, vincula os existentes e cria os que não forem encontrados."
               table:
                 excel_column: "Coluna no Excel"
                 system_field: "Campo no sistema"
@@ -476,14 +487,46 @@ pt:
                 display_name: "Nome de exibição"
                 area_m2: "Área (m²)"
                 status: "Status"
-                owner_name: "Nome do proprietário"
+                owner_document: "Documento do proprietário"
                 owner_email: "E-mail do proprietário"
+                owner_first_name: "Nome do proprietário"
+                owner_last_name: "Sobrenome do proprietário"
+                owner_name: "Nome completo do proprietário"
+                ownership_percentage: "Percentual de propriedade"
               validation_rules:
                 title: "Regras de validação"
                 items:
                   - "A seção deve existir dentro da propriedade atual"
                   - "Número / identificador deve ser único na seção"
                   - "Tipo de unidade deve ser um valor permitido"
+            preview:
+              unit_types:
+                apartment: "Apartamento"
+                house: "Casa"
+                studio: "Estúdio"
+                duplex: "Duplex"
+                penthouse: "Penthouse"
+                parking: "Estacionamento"
+                storage: "Depósito"
+                commercial: "Comercial"
+                office: "Oficina"
+                warehouse: "Almoxarifado"
+                other: "Outro"
+              validation_statuses:
+                valid: "Válido"
+                warning: "Com advertência"
+                error: "Com erro"
+                duplicate: "Duplicado"
+                pending: "Pendente"
+              unit_statuses:
+                available: "Disponível"
+                occupied: "Ocupada"
+                inactive: "Inativa"
+                maintenance: "Em manutenção"
+              summary:
+                tip_owners_ignored: "Os dados de proprietário do arquivo serão ignorados e não serão importados."
+                tip_owners_link_existing: "Apenas proprietários existentes serão vinculados. Linhas com proprietários desconhecidos mostrarão erros."
+                tip_owners_create_missing: "Proprietários existentes serão vinculados e os faltantes serão criados durante a importação."
             actions:
               next: "Próximo"
               back: "Voltar"
@@ -522,6 +565,27 @@ pt:
       bulk_imports:
         property_section_required: "A seção é obrigatória para iniciar a importação"
         not_found: "Importação não encontrada"
+        validation:
+          section_not_found: "A seção não existe"
+          section_missing: "Falta a seção"
+          unit_identifier_missing: "Falta o identificador da unidade"
+          unit_type_missing: "Falta o tipo de unidade"
+          unit_type_invalid: "O tipo de unidade é inválido"
+          unit_status_invalid: "O status da unidade é inválido"
+          area_invalid: "A área tem um formato inválido"
+          owner_name_missing: "Falta o nome do proprietário"
+          owner_first_name_missing: "Falta o nome do proprietário"
+          owner_last_name_missing: "Falta o sobrenome do proprietário"
+          owner_document_missing: "Falta o documento do proprietário"
+          owner_email_missing: "Falta o e-mail do proprietário"
+          owner_email_invalid: "O e-mail do proprietário é inválido"
+          ownership_percentage_invalid: "A porcentagem de propriedade é inválida"
+          ownership_percentage_sum_exceeded: "A soma de coproprietários excede 100%"
+          owners_ignored: "As informações do proprietário serão ignoradas"
+          owner_identifier_missing: "Documento ou e-mail é necessário para vincular um proprietário existente"
+          owner_not_found: "Proprietário não encontrado no sistema"
+          duplicate_in_file: "Linha duplicada no arquivo"
+          duplicate_in_database: "A unidade já existe e será omitida"
       property_sections:
         title: "Seções"
         created_successfully: "Seção criada com sucesso"

@@ -9,6 +9,14 @@ class BulkImportPolicy < ApplicationPolicy
     admin? && record.residential_property_id.present?
   end
 
+  def validate?
+    update?
+  end
+
+  def rows?
+    update?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.none unless user.present?

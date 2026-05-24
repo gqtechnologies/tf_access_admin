@@ -10,7 +10,12 @@ class Admin::BulkImportSerializer < ActiveModel::Serializer
              :metadata,
              :residential_property_id,
              :property_section_id,
-             :created_at
+             :created_at,
+             :total_rows,
+             :valid_rows,
+             :warning_rows,
+             :error_rows,
+             :skipped_rows
 
   def metadata
     object.metadata.deep_stringify_keys

@@ -3,7 +3,7 @@
 class Admin::ResidentialProperties::BulkImportsController < AdminController
   before_action :set_residential_property
   before_action :set_property_section, only: :create
-  before_action :set_bulk_import, only: :update
+  before_action :set_bulk_import, only: %i[update validate rows]
 
   def create
     authorize BulkImport
@@ -12,7 +12,8 @@ class Admin::ResidentialProperties::BulkImportsController < AdminController
       residential_property: @residential_property,
       property_section: @property_section,
       created_by: current_user,
-      file: bulk_import_params.require(:file)
+      file: bulk_import_params.require(:file),
+      options: options_from_params
     )
 
     render_bulk_import(bulk_import, status: :created)
@@ -35,10 +36,62 @@ class Admin::ResidentialProperties::BulkImportsController < AdminController
     render_validation_errors(e.record)
   end
 
+  def validate
+    authorize @bulk_import, :validate?
+
+    bulk_import = BulkImportServices::ValidateUnitsImport.call(bulk_import: @bulk_import)
+    preview = preview_rows_result(bulk_import)
+
+    render json: preview_response(bulk_import, preview)
+  rescue ActiveRecord::RecordInvalid => e
+    render_validation_errors(e.record)
+  end
+
+  def rows
+    authorize @bulk_import, :rows?
+
+    preview = preview_rows_result(@bulk_import)
+    render json: rows_response(preview)
+  end
+
   private
 
+  def preview_rows_result(bulk_import)
+    BulkImportServices::ListBulkImportRows.call(
+      bulk_import: bulk_import,
+      page: rows_params[:page],
+      per_page: rows_params[:per_page],
+      filter: rows_params[:filter],
+      search: rows_params[:search]
+    )
+  end
+
+  def rows_params
+    params.permit(:page, :per_page, :filter, :search)
+  end
+
+  def preview_response(bulk_import, preview)
+    rows_response(preview).merge(
+      bulk_import: Admin::BulkImportSerializer.new(bulk_import).as_json
+    )
+  end
+
+  def rows_response(preview)
+    {
+      rows: preview.rows.map { |row| Admin::BulkImportRowSerializer.new(row).as_json },
+      pagination: preview.pagination,
+      summary: preview.summary
+    }
+  end
+
   def bulk_import_params
-    params.require(:bulk_import).permit(:file, :property_section_id, :import_type)
+    params.require(:bulk_import).permit(
+      :file,
+      :property_section_id,
+      :import_type,
+      :import_mode,
+      :owner_import_mode
+    )
   end
 
   def bulk_import_update_params
@@ -46,16 +99,17 @@ class Admin::ResidentialProperties::BulkImportsController < AdminController
       :file,
       :selected_sheet,
       :import_mode,
-      :default_property_section_id,
-      :validate_owners,
+      :property_section_id,
+      :owner_import_mode
     )
   end
 
+  def options_from_params
+    bulk_import_params.slice(:import_mode, :property_section_id, :owner_import_mode).compact
+  end
+
   def options_from_update_params
-    permitted = bulk_import_update_params
-    options = permitted.slice(:import_mode, :default_property_section_id, :validate_owners)
-    options[:validate_owners] = ActiveModel::Type::Boolean.new.cast(options[:validate_owners]) if options.key?(:validate_owners)
-    options.compact
+    bulk_import_update_params.slice(:import_mode, :property_section_id, :owner_import_mode).compact
   end
 
   def render_bulk_import(bulk_import, status: :ok)
