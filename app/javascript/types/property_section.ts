@@ -1,3 +1,10 @@
+export type PropertySectionUnitTreeNode = {
+  id: string
+  identifier: string
+  display_name: string | null
+  unit_type: string
+}
+
 export type PropertySectionTreeNode = {
   id: string
   name: string
@@ -6,6 +13,7 @@ export type PropertySectionTreeNode = {
   position: number | null
   parent_id: string | null
   children: PropertySectionTreeNode[]
+  units: PropertySectionUnitTreeNode[]
 }
 
 export type PropertySection = {

@@ -3,7 +3,7 @@
     <DrawerContent
       :class="[
         'flex h-full max-h-screen flex-col data-[vaul-drawer-direction=right]:w-full',
-        currentStep === 'preview'
+        currentStep === 'preview' || currentStep === 'import'
           ? 'data-[vaul-drawer-direction=right]:sm:max-w-6xl'
           : 'data-[vaul-drawer-direction=right]:sm:max-w-4xl',
       ]"
@@ -88,8 +88,21 @@
           @can-continue-change="setPreviewStepConfirmable"
         />
 
+        <BulkUnitsImportImportStep
+          v-else-if="currentStep === 'import' && bulkImport && configureForm && importSummary"
+          v-model:import-valid-rows-only="importValidRowsOnly"
+          :summary="importSummary"
+          :phase="importPhase"
+          :progress="importProgress"
+          :logs="importLogs"
+          :has-pending-issues="importHasPendingIssues"
+          :section-name="selectedSection?.name ?? ''"
+          :owner-import-mode="configureForm.owner_import_mode"
+          :format-log-time="formatImportLogTime"
+        />
+
         <div
-          v-else
+          v-else-if="currentStep !== 'import'"
           class="flex min-h-48 items-center justify-center rounded-lg border border-dashed bg-muted/20 px-6 text-center text-sm text-muted-foreground"
         >
           {{ t('admin.residential_properties.structure.bulk_import.placeholder_step') }}
@@ -99,11 +112,11 @@
       <DrawerFooter class="shrink-0 gap-2 border-t sm:flex-row sm:justify-between">
         <div class="flex flex-wrap gap-2">
           <Button
-            v-if="canGoBack"
+            v-if="showBackButton"
             type="button"
             variant="outline"
-            :disabled="isSubmitting || isValidating"
-            @click="goToPreviousStep()"
+            :disabled="isBackDisabled"
+            @click="onBack"
           >
             {{ t('admin.residential_properties.structure.bulk_import.actions.back') }}
           </Button>
@@ -117,17 +130,46 @@
             <Download class="size-4" />
             {{ t('admin.residential_properties.structure.bulk_import.actions.download_errors') }}
           </Button>
+          <Button
+            v-if="currentStep === 'import' && (importIsCompleted || importIsFailed)"
+            type="button"
+            variant="outline"
+            @click="onDownloadImportReport"
+          >
+            <Download class="size-4" />
+            {{ t('admin.residential_properties.structure.bulk_import.import.actions.download_report') }}
+          </Button>
         </div>
 
         <div class="flex flex-wrap justify-end gap-2">
-          <DrawerClose as-child>
-            <Button type="button" variant="outline" :disabled="isSubmitting || isValidating">
-              {{ t('common.actions.cancel') }}
+          <DrawerClose v-if="showCancelButton" as-child>
+            <Button type="button" variant="outline" :disabled="isCancelDisabled">
+              {{ cancelButtonLabel }}
             </Button>
           </DrawerClose>
-          <Button type="button" :disabled="!canGoNext || isSubmitting || isValidating" @click="onNext">
-            <Loader2 v-if="isSubmitting || isValidating" class="size-4 animate-spin" />
-            {{ nextButtonLabel }}
+          <Button
+            v-if="currentStep === 'import' && importIsCompleted"
+            type="button"
+            variant="outline"
+            @click="open = false"
+          >
+            {{ t('admin.residential_properties.structure.bulk_import.import.actions.close') }}
+          </Button>
+          <Button
+            v-if="currentStep === 'import' && importIsCompleted"
+            type="button"
+            @click="onViewUnits"
+          >
+            {{ t('admin.residential_properties.structure.bulk_import.import.actions.view_units') }}
+          </Button>
+          <Button
+            v-else-if="showPrimaryButton"
+            type="button"
+            :disabled="isPrimaryDisabled"
+            @click="onPrimaryAction"
+          >
+            <Loader2 v-if="showPrimaryLoading" class="size-4 animate-spin" />
+            {{ primaryButtonLabel }}
           </Button>
         </div>
       </DrawerFooter>
@@ -141,8 +183,10 @@ import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import { Download, Layers, Loader2, X } from 'lucide-vue-next'
 import BulkUnitsImportConfigureStep from '@/components/admin/bulk_units/BulkUnitsImportConfigureStep.vue'
+import BulkUnitsImportImportStep from '@/components/admin/bulk_units/BulkUnitsImportImportStep.vue'
 import BulkUnitsImportPreviewStep from '@/components/admin/bulk_units/BulkUnitsImportPreviewStep.vue'
 import BulkUnitsImportMethodStep from '@/components/admin/bulk_units/BulkUnitsImportMethodStep.vue'
+import { useBulkUnitsImportExecution } from '@/lib/composables/bulk_units/useBulkUnitsImportExecution'
 import BulkUnitsImportStepper from '@/components/admin/bulk_units/BulkUnitsImportStepper.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -201,9 +245,39 @@ const {
   isValidating,
 } = toRefs(state)
 
+const {
+  summary: importSummary,
+  phase: importPhase,
+  importValidRowsOnly,
+  progress: importProgress,
+  logs: importLogs,
+  isConfirming,
+  hasPendingIssues: importHasPendingIssues,
+  canConfirmImport,
+  isProcessing: importIsProcessing,
+  isCompleted: importIsCompleted,
+  isFailed: importIsFailed,
+  resetExecutionState,
+  resumeIfInProgress,
+  confirmImport,
+  downloadReport,
+  formatLogTime: formatImportLogTime,
+} = useBulkUnitsImportExecution({
+  residentialPropertyId: () => props.residentialPropertyId,
+  bulkImportId: () => bulkImport.value?.id ?? null,
+  previewSummary: () => initialPreview.value?.summary ?? null,
+})
+
 watch(open, (isOpen, wasOpen) => {
   if (isOpen && !wasOpen) {
     reset()
+    resetExecutionState()
+  }
+})
+
+watch(currentStep, (step) => {
+  if (step === 'import') {
+    resumeIfInProgress(bulkImport.value?.status)
   }
 })
 
@@ -229,7 +303,69 @@ const canDownloadErrors = computed(
   () => previewStepRef.value?.hasDownloadableErrors ?? false,
 )
 
-const nextButtonLabel = computed(() => {
+const showBackButton = computed(() => {
+  if (currentStep.value === 'import') {
+    return !importIsProcessing.value && !importIsCompleted.value
+  }
+  return canGoBack.value
+})
+
+const isBackDisabled = computed(
+  () => isSubmitting.value || isValidating.value || importIsProcessing.value,
+)
+
+const showCancelButton = computed(() => {
+  if (currentStep.value === 'import') {
+    return !importIsProcessing.value
+  }
+  return true
+})
+
+const isCancelDisabled = computed(
+  () => isSubmitting.value || isValidating.value || importIsProcessing.value,
+)
+
+const cancelButtonLabel = computed(() => {
+  if (currentStep.value === 'import' && importIsCompleted.value) {
+    return t('common.actions.cancel')
+  }
+  return t('common.actions.cancel')
+})
+
+const showPrimaryButton = computed(() => {
+  if (currentStep.value === 'import') {
+    return !importIsCompleted.value
+  }
+  return true
+})
+
+const isPrimaryDisabled = computed(() => {
+  if (currentStep.value === 'import') {
+    if (importIsFailed.value) return true
+    if (importIsProcessing.value || isConfirming.value) return true
+    return !canConfirmImport.value
+  }
+  return !canGoNext.value || isSubmitting.value || isValidating.value
+})
+
+const showPrimaryLoading = computed(
+  () =>
+    isSubmitting.value ||
+    isValidating.value ||
+    isConfirming.value ||
+    importIsProcessing.value,
+)
+
+const primaryButtonLabel = computed(() => {
+  if (currentStep.value === 'import') {
+    if (importIsProcessing.value || isConfirming.value) {
+      return t('admin.residential_properties.structure.bulk_import.import.actions.importing')
+    }
+    if (importIsFailed.value) {
+      return t('admin.residential_properties.structure.bulk_import.import.actions.retry')
+    }
+    return t('admin.residential_properties.structure.bulk_import.import.actions.confirm')
+  }
   if (isValidating.value) {
     return t('admin.residential_properties.structure.bulk_import.actions.validating')
   }
@@ -253,8 +389,27 @@ function onDownloadTemplate() {
   toast.info(t('admin.residential_properties.structure.bulk_import.upload.template_coming_soon'))
 }
 
-function onNext() {
+function onBack() {
+  if (currentStep.value === 'import' && !importIsProcessing.value) {
+    resetExecutionState()
+  }
+  goToPreviousStep()
+}
+
+function onPrimaryAction() {
+  if (currentStep.value === 'import') {
+    void confirmImport()
+    return
+  }
   goToNextStep(props.residentialPropertyId, props.propertySectionId)
+}
+
+function onDownloadImportReport() {
+  downloadReport()
+}
+
+function onViewUnits() {
+  open.value = false
 }
 
 function onChangeFile() {

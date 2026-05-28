@@ -573,6 +573,56 @@ en:
                 tip_owners_ignored: "Owner data in the file will be ignored and not imported."
                 tip_owners_link_existing: "Only existing owners will be linked. Rows with unknown owners will show errors."
                 tip_owners_create_missing: "Existing owners will be linked and missing owners will be created during import."
+            import:
+              ready:
+                title: "Ready to import"
+                description: "We reviewed your file and found records ready to process."
+                errors_pending: "Some rows still have errors. Only valid rows will be imported if you keep the option below enabled."
+                valid_rows_only: "Import only valid rows and skip the rest"
+                stats:
+                  new_units: "new units"
+                  duplicates: "duplicates will be skipped"
+                  errors: "pending errors"
+              on_confirm:
+                title: "What happens when you confirm"
+                actions_title: "Import actions"
+                recommendations_title: "Recommendations"
+                actions:
+                  create_units: "Create new units in {section}"
+                  owners_ignored: "Owner data will be ignored"
+                  owners_link: "Link owners when possible"
+                  owners_create: "Link or create owners when possible"
+                  save_metadata: "Save internal code, area, and notes"
+                  skip_duplicates: "Skip duplicate rows"
+                recommendations:
+                  fix_errors: "Fix errors for a complete import"
+                  download_report: "You can download the final report after the process"
+                  duration: "Import may take a few seconds"
+              progress:
+                title: "Import progress"
+                waiting:
+                  title: "Waiting for confirmation"
+                  description: "The import will start when you confirm the process."
+                processing:
+                  title: "Processing file..."
+                  description: "Creating units from validated rows."
+                completed:
+                  title: "Import completed"
+                  description: "{created} units created, {skipped} rows skipped, {failed} rows with errors."
+                failed:
+                  title: "Import failed"
+                  description: "Something went wrong during import. You can download the report for details."
+                counter: "{processed} of {total} units created"
+                log_line: "Row {row}: {message}"
+              actions:
+                confirm: "Confirm import"
+                importing: "Importing..."
+                retry: "Retry"
+                download_report: "Download report"
+                view_units: "View units"
+                close: "Close"
+              errors:
+                confirm_failed: "Could not start the import. Try again."
             actions:
               next: "Next"
               back: "Back"
@@ -635,6 +685,12 @@ en:
           owner_not_found: "Owner was not found in the system"
           duplicate_in_file: "Duplicate row in file"
           duplicate_in_database: "Unit already exists and will be skipped"
+        import:
+          logs:
+            unit_created: "Unit %{identifier} created"
+            duplicate_skipped: "Skipped as duplicate"
+            skipped: "Row skipped"
+            failed: "Import failed"
       property_sections:
         title: "Sections"
         created_successfully: "Section created successfully"
@@ -753,6 +809,13 @@ en:
       unconfirmed_account: "Account not confirmed"
       token_expired: "Token expired"
       token_invalid: "Token invalid"
+  activerecord:
+    errors:
+      models:
+        bulk_import:
+          attributes:
+            status:
+              invalid: "The import is not in a valid state for this operation"
   mailer:
     verification:
       title: "Confirm your email address"

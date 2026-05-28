@@ -55,6 +55,16 @@ export function buildSectionPreviewPath(
   return `${propertyName} > ${parent.name} > ${name}`
 }
 
+function unitMatchesQuery(
+  unit: PropertySectionTreeNode['units'][number],
+  query: string
+): boolean {
+  return (
+    unit.identifier.toLowerCase().includes(query) ||
+    (unit.display_name?.toLowerCase().includes(query) ?? false)
+  )
+}
+
 function filterTree(
   nodes: PropertySectionTreeNode[],
   query: string
@@ -62,12 +72,17 @@ function filterTree(
   return nodes
     .map((node) => {
       const children = filterTree(node.children, query)
+      const units = (node.units ?? []).filter((unit) => unitMatchesQuery(unit, query))
       const matches =
         node.name.toLowerCase().includes(query) ||
         (node.code?.toLowerCase().includes(query) ?? false)
 
-      if (matches || children.length > 0) {
-        return { ...node, children }
+      if (matches || children.length > 0 || units.length > 0) {
+        return {
+          ...node,
+          children: matches ? node.children : children,
+          units: matches ? node.units : units,
+        }
       }
       return null
     })

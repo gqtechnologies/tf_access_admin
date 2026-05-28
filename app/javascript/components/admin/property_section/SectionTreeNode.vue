@@ -109,7 +109,7 @@
             :key="child.id"
             :node="child"
             :depth="depth + 1"
-            :is-last="index === node.children.length - 1"
+            :is-last="index === node.children.length - 1 && (node.units?.length ?? 0) === 0"
             :selected-id="selectedId"
             :force-expanded="forceExpanded"
             @select="emit('select', $event)"
@@ -117,6 +117,26 @@
             @edit="emit('edit', $event)"
             @delete="emit('delete', $event)"
           />
+          <li
+            v-for="(unit, index) in node.units ?? []"
+            :key="unit.id"
+            class="relative list-none"
+          >
+            <div
+              class="flex min-h-9 items-center gap-2 rounded-lg py-1 pr-1 text-muted-foreground"
+              :class="index < node.units.length - 1 ? '' : ''"
+            >
+              <span class="flex size-7 shrink-0" aria-hidden="true" />
+              <div
+                class="flex size-8 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/30"
+              >
+                <Home class="size-4" />
+              </div>
+              <span class="min-w-0 flex-1 truncate text-sm">
+                {{ unitLabel(unit) }}
+              </span>
+            </div>
+          </li>
         </ul>
       </CollapsibleContent>
     </Collapsible>
@@ -126,7 +146,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ChevronRight, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { ChevronRight, Home, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -143,7 +163,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { useSectionTypeIcon } from '@/lib/composables/property_section/useSectionTypeIcon'
-import type { PropertySectionTreeNode } from '@/types/property_section'
+import type {
+  PropertySectionTreeNode,
+  PropertySectionUnitTreeNode,
+} from '@/types/property_section'
 
 defineOptions({ name: 'SectionTreeNode' })
 
@@ -172,10 +195,16 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const { iconFor } = useSectionTypeIcon()
 
-const hasChildren = computed(() => props.node.children.length > 0)
+const hasChildren = computed(
+  () => props.node.children.length > 0 || (props.node.units?.length ?? 0) > 0,
+)
 const isSelected = computed(() => props.selectedId === props.node.id)
 const canAddSubsection = computed(() => !props.node.parent_id)
 const isOpen = ref(true)
+
+function unitLabel(unit: PropertySectionUnitTreeNode) {
+  return unit.display_name?.trim() || unit.identifier
+}
 
 function nodeContainsId(nodes: PropertySectionTreeNode[], id: string): boolean {
   for (const item of nodes) {

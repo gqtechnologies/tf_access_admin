@@ -50,7 +50,10 @@ Rails.application.routes.draw do
       resources :bulk_imports, only: %i[create update], module: :residential_properties do
         member do
           post :validate
+          post :confirm
           get :rows
+          get :status
+          get :report
         end
       end
     end

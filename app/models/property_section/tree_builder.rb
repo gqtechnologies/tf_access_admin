@@ -23,7 +23,9 @@ class PropertySection::TreeBuilder
 
   def build_nodes(nodes)
     nodes.sort_by { |section| [ section.position || Float::INFINITY, section.name ] }.map do |section|
-      children = @by_parent[section.id] || []
+      child_sections = @by_parent[section.id] || []
+      children = build_nodes(child_sections)
+
       {
         id: section.id,
         name: section.name,
@@ -31,7 +33,21 @@ class PropertySection::TreeBuilder
         section_type: section.section_type,
         position: section.position,
         parent_id: section.parent_id,
-        children: build_nodes(children)
+        children: children,
+        units: build_units(section, child_sections)
+      }
+    end
+  end
+
+  def build_units(section, child_sections)
+    return [] if child_sections.any?
+
+    section.units.sort_by { |unit| [ unit.identifier.to_s.downcase, unit.id ] }.map do |unit|
+      {
+        id: unit.id,
+        identifier: unit.identifier,
+        display_name: unit.display_name,
+        unit_type: unit.unit_type
       }
     end
   end

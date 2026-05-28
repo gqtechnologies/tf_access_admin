@@ -3,7 +3,7 @@
 class Admin::ResidentialProperties::BulkImportsController < AdminController
   before_action :set_residential_property
   before_action :set_property_section, only: :create
-  before_action :set_bulk_import, only: %i[update validate rows]
+  before_action :set_bulk_import, only: %i[update validate rows confirm status report]
 
   def create
     authorize BulkImport
@@ -54,6 +54,45 @@ class Admin::ResidentialProperties::BulkImportsController < AdminController
     render json: rows_response(preview)
   end
 
+  def confirm
+    authorize @bulk_import, :confirm?
+
+    bulk_import = BulkImportServices::ConfirmUnitsImport.call(
+      bulk_import: @bulk_import,
+      import_valid_rows_only: confirm_params[:import_valid_rows_only]
+    )
+
+    render json: {
+      bulk_import: Admin::BulkImportSerializer.new(bulk_import).as_json,
+      status: bulk_import.status
+    }
+  rescue ActiveRecord::RecordInvalid => e
+    render_validation_errors(e.record)
+  end
+
+  def status
+    authorize @bulk_import, :status?
+
+    payload = BulkImportServices::BulkImportImportStatus.call(
+      bulk_import: @bulk_import,
+      logs_after: status_params[:logs_after]
+    )
+
+    render json: payload
+  end
+
+  def report
+    authorize @bulk_import, :report?
+
+    csv = BulkImportServices::BulkImportReport.call(bulk_import: @bulk_import)
+    filename = "bulk-import-#{@bulk_import.id}-report.csv"
+
+    send_data csv,
+              type: "text/csv; charset=utf-8",
+              disposition: "attachment",
+              filename: filename
+  end
+
   private
 
   def preview_rows_result(bulk_import)
@@ -68,6 +107,14 @@ class Admin::ResidentialProperties::BulkImportsController < AdminController
 
   def rows_params
     params.permit(:page, :per_page, :filter, :search)
+  end
+
+  def confirm_params
+    params.permit(:import_valid_rows_only)
+  end
+
+  def status_params
+    params.permit(:logs_after)
   end
 
   def preview_response(bulk_import, preview)

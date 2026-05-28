@@ -17,6 +17,18 @@ class BulkImportPolicy < ApplicationPolicy
     update?
   end
 
+  def confirm?
+    update?
+  end
+
+  def status?
+    update?
+  end
+
+  def report?
+    update?
+  end
+
   class Scope < ApplicationPolicy::Scope
     def resolve
       return scope.none unless user.present?

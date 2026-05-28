@@ -114,12 +114,18 @@ export function useBulkUnitsImportWizard() {
       return isPreviewStepConfirmable.value && !state.isValidating
     }
 
+    if (state.currentStep === 'import') {
+      return false
+    }
+
     return false
   })
 
   const canGoBack = computed(
     () =>
-      (state.currentStep === 'configure' || state.currentStep === 'preview') &&
+      (state.currentStep === 'configure' ||
+        state.currentStep === 'preview' ||
+        state.currentStep === 'import') &&
       !state.isSubmitting &&
       !state.isValidating,
   )
@@ -346,6 +352,11 @@ export function useBulkUnitsImportWizard() {
   }
 
   function goToPreviousStep() {
+    if (state.currentStep === 'import') {
+      state.currentStep = 'preview'
+      return
+    }
+
     if (state.currentStep === 'preview') {
       state.initialPreview = null
       state.currentStep = 'configure'

@@ -8,6 +8,7 @@ class Admin::ResidentialProperties::StructuresController < AdminController
 
     sections = policy_scope(PropertySection)
       .where(residential_property: @residential_property)
+      .includes(:units)
       .order(:position, :name)
 
     tree_builder = PropertySection::TreeBuilder.new(sections)

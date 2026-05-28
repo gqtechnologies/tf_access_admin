@@ -15,7 +15,9 @@ class Admin::BulkImportSerializer < ActiveModel::Serializer
              :valid_rows,
              :warning_rows,
              :error_rows,
-             :skipped_rows
+             :skipped_rows,
+             :imported_rows,
+             :failed_rows
 
   def metadata
     object.metadata.deep_stringify_keys

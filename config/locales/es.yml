@@ -500,6 +500,56 @@ es:
                 tip_owners_ignored: "Los datos de propietario del archivo serán ignorados y no se importarán."
                 tip_owners_link_existing: "Solo se vincularán propietarios existentes. Las filas con propietarios desconocidos mostrarán errores."
                 tip_owners_create_missing: "Se vincularán propietarios existentes y se crearán los faltantes durante la importación."
+            import:
+              ready:
+                title: "Listo para importar"
+                description: "Revisamos tu archivo y encontramos registros listos para procesar."
+                errors_pending: "Algunas filas tienen errores pendientes. Solo se importarán las filas válidas si mantienes activada la opción siguiente."
+                valid_rows_only: "Importar solo las filas válidas y omitir las demás"
+                stats:
+                  new_units: "unidades nuevas"
+                  duplicates: "duplicadas se omitirán"
+                  errors: "errores pendientes"
+              on_confirm:
+                title: "Qué ocurrirá al confirmar"
+                actions_title: "Acciones de importación"
+                recommendations_title: "Recomendaciones"
+                actions:
+                  create_units: "Crear unidades nuevas en {section}"
+                  owners_ignored: "Se ignorarán los datos de propietario"
+                  owners_link: "Asignar propietario cuando sea posible"
+                  owners_create: "Vincular o crear propietarios cuando sea posible"
+                  save_metadata: "Guardar código interno, área y observaciones"
+                  skip_duplicates: "Omitir filas duplicadas"
+                recommendations:
+                  fix_errors: "Corrige los errores para una importación completa"
+                  download_report: "Puedes descargar el reporte final después del proceso"
+                  duration: "La importación puede tardar unos segundos"
+              progress:
+                title: "Progreso de importación"
+                waiting:
+                  title: "Esperando confirmación"
+                  description: "La importación comenzará cuando confirmes el proceso."
+                processing:
+                  title: "Procesando archivo..."
+                  description: "Creando unidades a partir de las filas validadas."
+                completed:
+                  title: "Importación completada"
+                  description: "{created} unidades creadas, {skipped} filas omitidas, {failed} filas con error."
+                failed:
+                  title: "Importación fallida"
+                  description: "Ocurrió un error durante la importación. Puedes descargar el reporte para más detalles."
+                counter: "{processed} de {total} unidades creadas"
+                log_line: "Fila {row}: {message}"
+              actions:
+                confirm: "Confirmar importación"
+                importing: "Importando..."
+                retry: "Reintentar"
+                download_report: "Descargar reporte"
+                view_units: "Ver unidades"
+                close: "Cerrar"
+              errors:
+                confirm_failed: "No se pudo iniciar la importación. Inténtalo de nuevo."
             actions:
               next: "Siguiente"
               back: "Atrás"
@@ -562,6 +612,12 @@ es:
           owner_not_found: "El propietario no fue encontrado en el sistema"
           duplicate_in_file: "Fila duplicada en el archivo"
           duplicate_in_database: "La unidad ya existe y será omitida"
+        import:
+          logs:
+            unit_created: "Unidad %{identifier} creada"
+            duplicate_skipped: "Omitida por duplicado"
+            skipped: "Fila omitida"
+            failed: "Error al importar"
       property_sections:
         title: "Secciones"
         created_successfully: "Sección creada correctamente"
@@ -744,6 +800,13 @@ es:
       unconfirmed_account: "Cuenta no confirmada"
       token_expired: "Token expirado"
       token_invalid: "Token inválido"
+  activerecord:
+    errors:
+      models:
+        bulk_import:
+          attributes:
+            status:
+              invalid: "La importación no está en un estado válido para esta operación"
   mailer:
     verification:
       title: "Confirma tu dirección de correo electrónico"

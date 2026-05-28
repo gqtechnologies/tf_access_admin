@@ -118,3 +118,47 @@ export type BulkImportConfigureForm = {
   property_section_id: string
   owner_import_mode: BulkImportOwnerImportMode
 }
+
+export type BulkImportImportSummary = {
+  totalRows: number
+  validRows: number
+  warningRows: number
+  errorRows: number
+  duplicateRows: number
+  newUnits: number
+}
+
+export type BulkImportImportProgress = {
+  total: number
+  processed: number
+  created: number
+  skipped: number
+  failed: number
+  percentage: number
+}
+
+export type BulkImportImportLogStatus = 'success' | 'warning' | 'error'
+
+export type BulkImportImportLog = {
+  rowNumber: number
+  status: BulkImportImportLogStatus
+  message: string
+  createdAt?: string
+}
+
+export type BulkImportImportPhase = 'ready' | 'processing' | 'completed' | 'failed'
+
+export type BulkImportStatusResponse = {
+  status: string
+  progress: BulkImportImportProgress
+  logs: Array<{
+    row_number: number
+    status: BulkImportImportLogStatus
+    message: string
+    created_at?: string
+  }>
+  summary: BulkImportPreviewSummary & {
+    imported_rows: number
+    failed_rows: number
+  }
+}
