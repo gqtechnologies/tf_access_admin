@@ -25,6 +25,7 @@ module BulkImportServices
       end
 
       apply_group_percentage_errors!(results, context)
+      context.apply_owner_identity_conflicts!(results)
 
       BulkImportRow.transaction do
         results.each { |result| create_row!(result) }

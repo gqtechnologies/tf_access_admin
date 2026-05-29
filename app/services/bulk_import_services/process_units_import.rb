@@ -49,8 +49,10 @@ module BulkImportServices
         import_valid_rows_only: @import_valid_rows_only
       )
 
+      import_context = ImportUnitsImportContext.new(bulk_import: @bulk_import)
+
       rows.find_each do |row|
-        ImportUnitsRow.call(row:, bulk_import: @bulk_import)
+        ImportUnitsRow.call(row:, bulk_import: @bulk_import, import_context:)
         @rows_processed_since_refresh += 1
         refresh_counters_if_needed!
       end

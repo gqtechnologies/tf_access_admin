@@ -422,6 +422,9 @@ pt:
               create_failed: "Não foi possível iniciar a importação. Verifique o arquivo e tente novamente."
               upload_failed: "Não foi possível carregar o arquivo. Verifique o arquivo e tente novamente."
               sheet_refresh_failed: "Não foi possível atualizar a planilha selecionada."
+              configure_save_failed: "Não foi possível salvar a configuração da importação."
+              validation_failed: "Não foi possível validar o arquivo. Verifique a configuração e tente novamente."
+              wizard_locked: "A importação já está em andamento ou finalizada; etapas anteriores não podem ser alteradas."
             upload:
               uploaded_success: "Arquivo carregado com sucesso"
               replaced_success: "Arquivo atualizado com sucesso"
@@ -629,6 +632,7 @@ pt:
           owner_document_missing: "Falta o documento do proprietário"
           owner_email_missing: "Falta o e-mail do proprietário"
           owner_email_invalid: "O e-mail do proprietário é inválido"
+          ownership_percentage_missing: "Falta o percentual de propriedade"
           ownership_percentage_invalid: "A porcentagem de propriedade é inválida"
           ownership_percentage_sum_exceeded: "A soma de coproprietários excede 100%"
           owners_ignored: "As informações do proprietário serão ignoradas"
@@ -636,6 +640,9 @@ pt:
           owner_not_found: "Proprietário não encontrado no sistema"
           duplicate_in_file: "Linha duplicada no arquivo"
           duplicate_in_database: "A unidade já existe e será omitida"
+          unit_not_found_for_update: "A unidade não existe nesta seção e não pode ser atualizada"
+          owner_document_email_conflict: "O mesmo documento do proprietário aparece com e-mails diferentes no arquivo"
+          owner_email_document_conflict: "O mesmo e-mail do proprietário aparece com documentos diferentes no arquivo"
         import:
           logs:
             unit_created: "Unidade %{identifier} criada"

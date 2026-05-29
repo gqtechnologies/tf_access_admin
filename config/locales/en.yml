@@ -430,6 +430,7 @@ en:
               sheet_refresh_failed: "Could not refresh the selected sheet."
               configure_save_failed: "Could not save the import configuration."
               validation_failed: "Could not validate the file. Check the configuration and try again."
+              wizard_locked: "This import is already in progress or finished; earlier steps cannot be changed."
             upload:
               uploaded_success: "File uploaded successfully"
               replaced_success: "File updated successfully"
@@ -678,6 +679,7 @@ en:
           owner_document_missing: "Owner document is missing"
           owner_email_missing: "Owner email is missing"
           owner_email_invalid: "Owner email is invalid"
+          ownership_percentage_missing: "Ownership percentage is missing"
           ownership_percentage_invalid: "Ownership percentage is invalid"
           ownership_percentage_sum_exceeded: "Co-owner percentages exceed 100%"
           owners_ignored: "Owner information will be ignored"
@@ -685,6 +687,9 @@ en:
           owner_not_found: "Owner was not found in the system"
           duplicate_in_file: "Duplicate row in file"
           duplicate_in_database: "Unit already exists and will be skipped"
+          unit_not_found_for_update: "Unit does not exist in this section and cannot be updated"
+          owner_document_email_conflict: "The same owner document appears with different emails in the file"
+          owner_email_document_conflict: "The same owner email appears with different documents in the file"
         import:
           logs:
             unit_created: "Unit %{identifier} created"

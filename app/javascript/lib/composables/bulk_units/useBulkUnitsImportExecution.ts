@@ -4,6 +4,7 @@ import { toast } from 'vue-sonner'
 import { useRailsFetch } from '@/lib/composables/useRailsFetch'
 import { admin_residential_property_bulk_import_path } from '@/routes'
 import type {
+  BulkImportRecord,
   BulkImportImportLog,
   BulkImportImportPhase,
   BulkImportImportProgress,
@@ -24,7 +25,7 @@ const FAST_POLL_INTERVAL_MS = 800
 const FAST_POLL_DURATION_MS = 12_000
 
 type BulkImportConfirmResponse = {
-  bulk_import: { status: string }
+  bulk_import: BulkImportRecord
   status: string
 }
 
@@ -74,7 +75,9 @@ function formatLogTime(iso?: string) {
 export function useBulkUnitsImportExecution(options: {
   residentialPropertyId: () => string
   bulkImportId: () => string | null
+  bulkImportStatus: () => string | undefined | null
   previewSummary: () => BulkImportPreviewSummary | null
+  onBulkImportUpdated?: (record: BulkImportRecord) => void
 }) {
   const { t } = useI18n()
   const { railsFetchJson } = useRailsFetch()
@@ -103,6 +106,7 @@ export function useBulkUnitsImportExecution(options: {
 
   const canConfirmImport = computed(() => {
     if (phase.value !== 'ready' || isConfirming.value) return false
+    if (options.bulkImportStatus() !== 'validated') return false
     const current = summary.value
     if (!current) return false
     if (current.newUnits === 0 && current.warningRows === 0) return false
@@ -219,6 +223,16 @@ export function useBulkUnitsImportExecution(options: {
     const bulkImportId = options.bulkImportId()
     if (!bulkImportId || !canConfirmImport.value) return
 
+    const currentStatus = options.bulkImportStatus()
+    if (currentStatus === 'confirmed' || currentStatus === 'processing') {
+      resumeIfInProgress(currentStatus)
+      return
+    }
+    if (currentStatus && currentStatus !== 'validated') {
+      toast.error(t('admin.residential_properties.structure.bulk_import.errors.wizard_locked'))
+      return
+    }
+
     isConfirming.value = true
     phase.value = 'processing'
     pollStartedAt.value = Date.now()
@@ -243,6 +257,10 @@ export function useBulkUnitsImportExecution(options: {
         phase.value = 'ready'
         toast.error(t('admin.residential_properties.structure.bulk_import.import.errors.confirm_failed'))
         return
+      }
+
+      if (data.bulk_import) {
+        options.onBulkImportUpdated?.(data.bulk_import)
       }
 
       if (TERMINAL_STATUSES.has(data.status)) {

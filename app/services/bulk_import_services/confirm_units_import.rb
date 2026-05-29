@@ -3,6 +3,7 @@
 module BulkImportServices
   class ConfirmUnitsImport
     CONFIRMABLE_STATUSES = %w[validated].freeze
+    IN_PROGRESS_STATUSES = %w[confirmed processing].freeze
 
     def self.call(**kwargs)
       new(**kwargs).call
@@ -14,6 +15,8 @@ module BulkImportServices
     end
 
     def call
+      return @bulk_import if in_progress_import?
+
       ensure_confirmable!
 
       target_rows = importable_rows.count
@@ -38,6 +41,10 @@ module BulkImportServices
     end
 
     private
+
+    def in_progress_import?
+      IN_PROGRESS_STATUSES.include?(@bulk_import.status)
+    end
 
     def ensure_confirmable!
       return if CONFIRMABLE_STATUSES.include?(@bulk_import.status)

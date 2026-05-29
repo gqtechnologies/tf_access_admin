@@ -117,7 +117,7 @@ class BulkImport < ApplicationRecord
     end
 
     event :start_validation do
-      transitions from: :uploaded, to: :validating
+      transitions from: %i[uploaded validated validation_failed], to: :validating
     end
 
     event :complete_validation do

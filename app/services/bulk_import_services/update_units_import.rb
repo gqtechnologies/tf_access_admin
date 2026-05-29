@@ -2,7 +2,7 @@
 
 module BulkImportServices
   class UpdateUnitsImport
-    CONFIGURABLE_STATUSES = %w[uploaded draft].freeze
+    CONFIGURABLE_STATUSES = %w[draft uploaded validated validation_failed].freeze
 
     def self.call(**kwargs)
       new(**kwargs).call

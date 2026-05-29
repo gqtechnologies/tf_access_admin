@@ -11,6 +11,10 @@ import type {
   BulkImportRowsResponse,
 } from '@/types/bulk_import'
 import {
+  canRevalidateBulkImport,
+  isBulkImportLocked,
+} from '@/lib/constants/bulk_import'
+import {
   admin_residential_property_bulk_import_path,
   admin_residential_property_bulk_imports_path,
 } from '@/routes'
@@ -106,7 +110,8 @@ export function useBulkUnitsImportWizard() {
       return (
         state.bulkImport !== null &&
         state.configureForm !== null &&
-        isConfigureStepValid.value
+        isConfigureStepValid.value &&
+        !isBulkImportLocked(state.bulkImport.status)
       )
     }
 
@@ -311,14 +316,27 @@ export function useBulkUnitsImportWizard() {
     }
   }
 
-  async function proceedFromConfigure(
-    residentialPropertyId: string,
-  ) {
+  async function proceedFromConfigure(residentialPropertyId: string) {
+    if (isBulkImportLocked(state.bulkImport?.status)) {
+      toast.error(
+        t('admin.residential_properties.structure.bulk_import.errors.wizard_locked'),
+      )
+      return
+    }
+
     state.isSubmitting = true
 
     try {
       const saved = await saveConfigureOptions(residentialPropertyId)
       if (!saved) return
+
+      if (
+        state.bulkImport?.status === 'validated' &&
+        state.initialPreview !== null
+      ) {
+        state.currentStep = 'preview'
+        return
+      }
 
       const validated = await validateBulkImport(residentialPropertyId)
       if (!validated) return
@@ -358,6 +376,12 @@ export function useBulkUnitsImportWizard() {
     }
 
     if (state.currentStep === 'preview') {
+      if (isBulkImportLocked(state.bulkImport?.status)) {
+        toast.error(
+          t('admin.residential_properties.structure.bulk_import.errors.wizard_locked'),
+        )
+        return
+      }
       state.initialPreview = null
       state.currentStep = 'configure'
       return
@@ -366,6 +390,10 @@ export function useBulkUnitsImportWizard() {
     if (state.currentStep === 'configure') {
       state.currentStep = 'method'
     }
+  }
+
+  function isBulkImportEditable() {
+    return canRevalidateBulkImport(state.bulkImport?.status)
   }
 
   function prepareFileReplacement() {
@@ -397,5 +425,8 @@ export function useBulkUnitsImportWizard() {
     refreshSheetInspection,
     setConfigureStepValid,
     setPreviewStepConfirmable,
+    applyBulkImportResponse,
+    isBulkImportEditable,
+    isBulkImportLocked: () => isBulkImportLocked(state.bulkImport?.status),
   }
 }

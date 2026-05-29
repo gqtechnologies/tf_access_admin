@@ -228,6 +228,7 @@ const {
   refreshSheetInspection,
   setConfigureStepValid,
   setPreviewStepConfirmable,
+  applyBulkImportResponse,
 } = useBulkUnitsImportWizard()
 
 const previewStepRef = ref<InstanceType<typeof BulkUnitsImportPreviewStep> | null>(null)
@@ -265,7 +266,9 @@ const {
 } = useBulkUnitsImportExecution({
   residentialPropertyId: () => props.residentialPropertyId,
   bulkImportId: () => bulkImport.value?.id ?? null,
+  bulkImportStatus: () => bulkImport.value?.status ?? null,
   previewSummary: () => initialPreview.value?.summary ?? null,
+  onBulkImportUpdated: applyBulkImportResponse,
 })
 
 watch(open, (isOpen, wasOpen) => {

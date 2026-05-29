@@ -40,6 +40,7 @@ module BulkImportServices
 
       owner_fingerprint = owner_fingerprint_for(normalized)
       validate_owner_fields!(normalized, owner_fingerprint)
+      @context.register_owner_identity!(normalized) if owner_data_present?(normalized)
 
       group_key = @context.build_group_key(property_section_id, normalized["unit_identifier"])
       uniqueness_key = @context.uniqueness_key(
@@ -53,7 +54,7 @@ module BulkImportServices
         validate_file_duplicate!(uniqueness_key)
       end
 
-      validate_database_duplicate!(property_section_id, normalized["unit_identifier"])
+      validate_database_unit!(property_section_id, normalized)
       track_group_percentage!(group_key, normalized["ownership_percentage"])
 
       Result.new(
@@ -128,7 +129,7 @@ module BulkImportServices
       add_error("owner_last_name", "missing", :owner_last_name_missing) if normalized["owner_last_name"].blank?
       add_error("owner_document", "missing", :owner_document_missing) if normalized["owner_document"].blank?
       add_error("owner_email", "missing", :owner_email_missing) if normalized["owner_email"].blank?
-      add_error("ownership_percentage", "missing", :ownership_percentage_missing) if normalized["ownership_percentage"].blank?
+      # add_error("ownership_percentage", "missing", :ownership_percentage_missing) if normalized["ownership_percentage"].blank?
 
       if normalized["owner_email"].present? && normalized["owner_email"] !~ EMAIL_REGEX
         add_error("owner_email", "invalid", :owner_email_invalid)
@@ -150,8 +151,7 @@ module BulkImportServices
     end
 
     def validate_ownership_percentage!(normalized)
-      value = normalized["ownership_percentage"]
-      return if value.blank?
+      value = normalized["ownership_percentage"] || 100
 
       percentage = Float(value)
       if percentage.negative? || percentage > 100
@@ -171,8 +171,21 @@ module BulkImportServices
       end
     end
 
-    def validate_database_duplicate!(property_section_id, unit_identifier)
-      return unless @context.existing_unit?(property_section_id, unit_identifier)
+    def validate_database_unit!(property_section_id, normalized)
+      unit_identifier = normalized["unit_identifier"]
+      existing_unit = @context.find_existing_unit(property_section_id, unit_identifier)
+
+      if @context.update_only?
+        if existing_unit.nil?
+          add_error("unit_identifier", "not_found", :unit_not_found_for_update)
+        else
+          normalized["target_unit_id"] = existing_unit.id
+          normalized["operation"] = "update"
+        end
+        return
+      end
+
+      return unless existing_unit
 
       if @context.skip_duplicates?
         add_warning("unit_identifier", "duplicate_in_database", :duplicate_in_database)

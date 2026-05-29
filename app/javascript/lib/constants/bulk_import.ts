@@ -30,3 +30,22 @@ export type BulkImportPreviewFilter = (typeof BULK_IMPORT_PREVIEW_FILTERS)[numbe
 export const BULK_IMPORT_PREVIEW_PER_PAGE = 10
 
 export const BULK_IMPORT_PREVIEW_PER_PAGE_OPTIONS = [10, 25, 50] as const
+
+/** Import session can no longer be edited in earlier wizard steps */
+export const BULK_IMPORT_LOCKED_STATUSES = [
+  'confirmed',
+  'processing',
+  'completed',
+  'completed_with_errors',
+  'failed',
+] as const
+
+export function isBulkImportLocked(status: string | undefined | null): boolean {
+  if (!status) return false
+  return (BULK_IMPORT_LOCKED_STATUSES as readonly string[]).includes(status)
+}
+
+export function canRevalidateBulkImport(status: string | undefined | null): boolean {
+  if (!status) return false
+  return ['uploaded', 'validated', 'validation_failed'].includes(status)
+}

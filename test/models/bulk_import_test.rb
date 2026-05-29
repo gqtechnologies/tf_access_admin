@@ -126,6 +126,20 @@ class BulkImportTest < ActiveSupport::TestCase
     assert bulk_import.confirmed?
   end
 
+  test "may restart validation from validated state" do
+    bulk_import = BulkImport.create!(
+      organization: @organization,
+      created_by: @user,
+      residential_property: @property,
+      import_type: BulkImport::IMPORT_TYPES[:units],
+      status: "validated"
+    )
+
+    assert bulk_import.may_start_validation?
+    bulk_import.start_validation!
+    assert bulk_import.validating?
+  end
+
   test "progress_percentage reflects processed rows" do
     bulk_import = BulkImport.create!(
       organization: @organization,
