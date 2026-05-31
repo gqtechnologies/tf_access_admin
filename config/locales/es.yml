@@ -242,6 +242,83 @@ es:
           title: "Editar Usuario"
           description: "Editar un usuario para tu organización"
           submit: "Actualizar Usuario"
+      people:
+        title: "Personas"
+        created_successfully: "Persona creada correctamente"
+        creation_failed: "Error al crear la persona"
+        updated_successfully: "Persona actualizada correctamente"
+        update_failed: "Error al actualizar la persona"
+        not_found: "Persona no encontrada"
+        validations:
+          display_name_required: "Indica nombre, apellido o nombre para mostrar"
+          person_type_required: "El tipo de persona es obligatorio"
+          status_required: "El estado es obligatorio"
+          email_invalid: "Dirección de email no válida"
+          role_required: "El rol es obligatorio"
+          role_invalid: "Rol no válido"
+        person_types:
+          natural: "Natural"
+          legal: "Jurídica"
+        statuses:
+          active: "Activa"
+          inactive: "Inactiva"
+        index:
+          title: "Personas"
+          input:
+            search:
+              placeholder: "Buscar persona"
+          table:
+            headers:
+              display_name: "Nombre"
+              document_number: "Documento"
+              email: "Email"
+              unit_ownerships_count: "Propiedades"
+              status: "Estado"
+          actions:
+            create: "Crear persona"
+            delete: "Eliminar persona"
+            delete_description: "¿Eliminar a {name}?"
+            delete_success: "Persona eliminada correctamente"
+            delete_error: "Error al eliminar la persona"
+        new:
+          title: "Nueva persona"
+          description: "Registra una persona en la organización"
+          submit: "Crear persona"
+        edit:
+          title: "Editar persona"
+          description: "Actualiza los datos de la persona"
+          submit: "Actualizar persona"
+        input:
+          display_name:
+            label: "Nombre para mostrar"
+            placeholder: "Nombre visible en listados"
+          first_name:
+            label: "Nombre"
+            placeholder: "Nombre"
+          last_name:
+            label: "Apellido"
+            placeholder: "Apellido"
+          person_type:
+            label: "Tipo"
+          status:
+            label: "Estado"
+          document_number:
+            label: "Documento"
+            placeholder: "Número de documento"
+          email:
+            label: "Email"
+            placeholder: "correo@ejemplo.com"
+          phone:
+            label: "Teléfono"
+            placeholder: "Teléfono de contacto"
+          birthdate:
+            label: "Fecha de nacimiento"
+            placeholder: "Selecciona una fecha"
+          user_id:
+            label: "Usuario vinculado"
+            none: "Sin usuario"
+          role:
+            label: "Rol"
       residential_properties:
         title: "Propiedades"
         created_successfully: "Propiedad creada correctamente"
@@ -775,6 +852,7 @@ es:
         platform: "Plataforma"
         home: "Inicio"
         users: "Usuarios"
+        people: "Personas"
         residential_properties: "Propiedades"
         property_sections: "Secciones"
         organizations: "Organizaciones"

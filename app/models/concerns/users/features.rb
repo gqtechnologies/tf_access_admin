@@ -4,6 +4,7 @@ module Users::Features
   BASIC_FEATURES = [
     :home,
     :users,
+    :people,
     :residential_properties,
     # :settings
   ].freeze
@@ -39,6 +40,7 @@ module Users::Features
     {
       home: h.admin_home_index_path,
       users: h.admin_users_path,
+      people: h.admin_people_path,
       residential_properties: h.admin_residential_properties_path,
       # No hay ruta admin/organizations aún; mismo destino que home hasta que exista.
       organizations: h.admin_organizations_path,

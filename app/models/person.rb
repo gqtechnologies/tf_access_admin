@@ -42,30 +42,130 @@
 #
 class Person < ApplicationRecord
   include PersonTypes
+  include PersonStatuses
 
   acts_as_tenant :organization
   acts_as_paranoid
   rolify
 
+  attr_accessor :document_number, :contact_email, :contact_phone
+
   belongs_to :organization
   belongs_to :user, optional: true
   has_one :organization_membership, dependent: :destroy
+  has_many :unit_ownerships, dependent: :destroy
 
   validates :display_name, presence: true
   validates :person_type, presence: true, inclusion: { in: PersonTypes::ALL }
+  validates :status, presence: true, inclusion: { in: PersonStatuses::ALL }
+  validates :user_id, uniqueness: {
+    scope: :organization_id,
+    allow_nil: true,
+    conditions: -> { where(deleted_at: nil) }
+  }
+
+  before_validation :assign_display_name
+  before_validation :sync_document_attributes
+  before_validation :sync_contact_attributes
+  before_validation :assign_person_type
+  before_validation :assign_default_status
+  before_validation :assign_default_document_type
+
+  def document_number
+    @document_number || metadata["document_number"]
+  end
+
+  def document_number=(value)
+    @document_number = value.to_s.strip.presence
+  end
+
+  def contact_email
+    @contact_email || metadata["import_email"] || user&.email
+  end
+
+  def contact_email=(value)
+    @contact_email = value.to_s.downcase.strip.presence
+  end
+
+  def contact_phone
+    @contact_phone || metadata["phone"]
+  end
+
+  def contact_phone=(value)
+    @contact_phone = value.to_s.strip.presence
+  end
+
+  def tenant_role
+    tenant_roles = roles.select do |role|
+      role.resource_type == "Organization" && role.resource_id == organization_id.to_s
+    end
+    return nil if tenant_roles.blank?
+
+    tenant_roles.min_by { |role| AvailableRoles.priority_index(role.name, :tenant) }.name
+  end
 
   def set_tenant_role(role_name)
     delete_tenant_roles
     add_role(role_name, organization) unless has_role?(role_name, organization)
   end
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[display_name first_name last_name status person_type document_number_digest]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[user]
+  end
+
   private
+
+  def assign_display_name
+    return if display_name.present?
+
+    parts = [ first_name, last_name ].compact_blank
+    self.display_name = parts.join(" ").presence || contact_email || document_number || "—"
+  end
+
+  def assign_person_type
+    return if person_type.present?
+
+    self.person_type = "natural"
+  end
+
+  def assign_default_status
+    return if status.present?
+
+    self.status = "active"
+  end
+
+  def assign_default_document_type
+    return if document_type.present?
+
+    self.document_type ||= "national_id"
+  end
+
+  def sync_document_attributes
+    return if @document_number.blank?
+
+    self.document_number_digest = self.class.document_digest(@document_number)
+    self.metadata = metadata.merge("document_number" => @document_number)
+  end
+
+  def sync_contact_attributes
+    self.metadata = metadata.except("import_email", "phone")
+    self.metadata = metadata.merge("import_email" => @contact_email) if @contact_email.present?
+    self.metadata = metadata.merge("phone" => @contact_phone) if @contact_phone.present?
+  end
+
+  def self.document_digest(document_number)
+    BulkImportServices::UnitsImportValidationContext.document_digest(document_number)
+  end
 
   def delete_tenant_roles
     return [] if roles.blank?
 
-    tenant_roles = roles.select do |r|
-      r.resource_type == "Organization" && r.resource_id == organization_id.to_s
+    tenant_roles = roles.select do |role|
+      role.resource_type == "Organization" && role.resource_id == organization_id.to_s
     end
 
     role_names = tenant_roles.map(&:name)

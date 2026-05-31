@@ -25,13 +25,13 @@ module BulkImportServices
 
       unit = nil
       ActiveRecord::Base.transaction do
-        unit = create_unit!
+        unit = find_or_create_unit!
         import_ownership!(unit)
       end
       mark_imported!(unit)
       :imported
     rescue ActiveRecord::RecordInvalid => e
-      mark_failed!(e.record.errors.full_messages.join(", "))
+      mark_failed!(localized_record_invalid_message(e.record))
       :failed
     rescue ActiveRecord::RecordNotUnique
       mark_skipped!(I18n.t("frontend.admin.bulk_imports.import.logs.duplicate_skipped"))
@@ -75,7 +75,7 @@ module BulkImportServices
       mark_imported!(unit)
       :imported
     rescue ActiveRecord::RecordInvalid => e
-      mark_failed!(e.record.errors.full_messages.join(", "))
+      mark_failed!(localized_record_invalid_message(e.record))
       :failed
     rescue StandardError => e
       mark_failed!(e.message)
@@ -83,6 +83,7 @@ module BulkImportServices
     end
 
     def import_ownership!(unit)
+      return unless ActiveModel::Type::Boolean.new.cast(@payload["will_import_ownership"])
       return if @import_context.ignore_owners?
       return unless owner_data_present?
 
@@ -104,16 +105,7 @@ module BulkImportServices
         return Unit.find_by(id: unit_id, organization_id: @bulk_import.organization_id)
       end
 
-      section_id = @payload["property_section_id"].presence || @bulk_import.property_section_id
-      normalized = AlphanumericHyphenCodeValidatable.normalize_identifier(@payload["unit_identifier"])
-      return nil if section_id.blank? || normalized.blank?
-
-      Unit.find_by(
-        organization_id: @bulk_import.organization_id,
-        residential_property_id: @bulk_import.residential_property_id,
-        property_section_id: section_id,
-        normalized_identifier: normalized
-      )
+      resolve_unit_by_identifier
     end
 
     def unit_attributes
@@ -124,6 +116,23 @@ module BulkImportServices
         status: normalized_status
       }
       attrs.compact
+    end
+
+    def find_or_create_unit!
+      resolve_unit_by_identifier || create_unit!
+    end
+
+    def resolve_unit_by_identifier
+      section_id = @payload["property_section_id"].presence || @bulk_import.property_section_id
+      normalized = AlphanumericHyphenCodeValidatable.normalize_identifier(@payload["unit_identifier"])
+      return nil if section_id.blank? || normalized.blank?
+
+      Unit.find_by(
+        organization_id: @bulk_import.organization_id,
+        residential_property_id: @bulk_import.residential_property_id,
+        property_section_id: section_id,
+        normalized_identifier: normalized
+      )
     end
 
     def create_unit!
@@ -180,6 +189,15 @@ module BulkImportServices
         failed_at: Time.current,
         failure_message: message
       )
+    end
+
+    def localized_record_invalid_message(record)
+      if record.is_a?(UnitOwnership) &&
+         record.errors[:ownership_percentage].any? { |message| message.include?("100%") }
+        return I18n.t("frontend.admin.bulk_imports.validation.ownership_percentage_sum_exceeded")
+      end
+
+      record.errors.full_messages.join(", ")
     end
   end
 end

@@ -50,6 +50,7 @@ module BulkImportServices
       results.each do |result|
         group_key = result.group_key
         next if group_key.blank?
+        next unless result.normalized_payload["will_import_ownership"]
         next unless context.group_percentage_exceeded?(group_key)
 
         result.validation_errors << {

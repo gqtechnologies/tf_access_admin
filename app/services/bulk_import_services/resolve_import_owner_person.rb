@@ -51,17 +51,24 @@ module BulkImportServices
     private
 
     def create_person!
-      Person.create!(
+      person = Person.new(
         organization: @organization,
         first_name: @normalized["owner_first_name"],
         last_name: @normalized["owner_last_name"],
         display_name: display_name,
         person_type: PersonTypes::NATURAL,
         status: "active",
-        document_number_digest: document_digest,
+        # document_number_digest: document_digest,
         document_type: "national_id",
-        metadata: owner_metadata
+        # metadata: owner_metadata
       )
+
+      person.document_number = @normalized["owner_document"]
+      person.contact_email = owner_email
+      person.save!
+
+      person.add_role(AvailableRoles::CLIENT) unless person.has_role?(AvailableRoles::CLIENT)
+      person
     end
 
     def display_name

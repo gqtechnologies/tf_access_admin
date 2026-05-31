@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, Settings, Building, Building2 } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2 } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -31,6 +31,8 @@ const getFeatureIcon = (key: string) => {
       return Home
     case 'users':
       return Users
+    case 'people':
+      return UserRound
     case 'organizations':
         return Building
     case 'residential_properties':

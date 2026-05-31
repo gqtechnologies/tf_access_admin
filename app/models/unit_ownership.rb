@@ -5,6 +5,7 @@
 # Table name: unit_ownerships
 #
 #  id                   :uuid             not null, primary key
+#  deleted_at           :datetime
 #  ends_at              :date
 #  metadata             :jsonb            not null
 #  ownership_percentage :decimal(5, 2)    default(100.0), not null
@@ -21,6 +22,7 @@
 # Indexes
 #
 #  index_unit_ownerships_on_created_by_person_id  (created_by_person_id)
+#  index_unit_ownerships_on_deleted_at            (deleted_at)
 #  index_unit_ownerships_on_ended_by_person_id    (ended_by_person_id)
 #  index_unit_ownerships_on_metadata              (metadata) USING gin
 #  index_unit_ownerships_on_org_person_status     (organization_id,person_id,status)
@@ -42,6 +44,7 @@ class UnitOwnership < ApplicationRecord
   include TenantScopedAssociations
 
   acts_as_tenant :organization
+  acts_as_paranoid
 
   STATUS_ACTIVE = "active"
 

@@ -314,6 +314,83 @@ en:
             remove: "Remove avatar"
           submit:
             label: "Create User"
+      people:
+        title: "People"
+        created_successfully: "Person created successfully"
+        creation_failed: "Failed to create person"
+        updated_successfully: "Person updated successfully"
+        update_failed: "Failed to update person"
+        not_found: "Person not found"
+        validations:
+          display_name_required: "Enter a first name, last name, or display name"
+          person_type_required: "Person type is required"
+          status_required: "Status is required"
+          email_invalid: "Invalid email address"
+          role_required: "Role is required"
+          role_invalid: "Invalid role"
+        person_types:
+          natural: "Natural person"
+          legal: "Legal entity"
+        statuses:
+          active: "Active"
+          inactive: "Inactive"
+        index:
+          title: "People"
+          input:
+            search:
+              placeholder: "Search person"
+          table:
+            headers:
+              display_name: "Name"
+              document_number: "Document"
+              email: "Email"
+              unit_ownerships_count: "Properties"
+              status: "Status"
+          actions:
+            create: "Create person"
+            delete: "Delete person"
+            delete_description: "Are you sure you want to delete {name}?"
+            delete_success: "Person deleted successfully"
+            delete_error: "Failed to delete person"
+        new:
+          title: "New person"
+          description: "Register a person in the organization"
+          submit: "Create person"
+        edit:
+          title: "Edit person"
+          description: "Update person details"
+          submit: "Update person"
+        input:
+          display_name:
+            label: "Display name"
+            placeholder: "Name shown in lists"
+          first_name:
+            label: "First name"
+            placeholder: "First name"
+          last_name:
+            label: "Last name"
+            placeholder: "Last name"
+          person_type:
+            label: "Type"
+          status:
+            label: "Status"
+          document_number:
+            label: "Document"
+            placeholder: "Document number"
+          email:
+            label: "Email"
+            placeholder: "email@example.com"
+          phone:
+            label: "Phone"
+            placeholder: "Contact phone"
+          birthdate:
+            label: "Date of birth"
+            placeholder: "Pick a date"
+          user_id:
+            label: "Linked user"
+            none: "No user"
+          role:
+            label: "Role"
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"
@@ -780,6 +857,7 @@ en:
         platform: "Platform"
         home: "Home"
         users: "Users"
+        people: "People"
         residential_properties: "Properties"
         property_sections: "Sections"
         organizations: "Organizations"

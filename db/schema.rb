@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -893,6 +893,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_23_120000) do
   create_table "unit_ownerships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "created_by_person_id"
+    t.datetime "deleted_at"
     t.uuid "ended_by_person_id"
     t.date "ends_at"
     t.jsonb "metadata", default: {}, null: false
@@ -904,6 +905,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_23_120000) do
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
     t.index ["created_by_person_id"], name: "index_unit_ownerships_on_created_by_person_id"
+    t.index ["deleted_at"], name: "index_unit_ownerships_on_deleted_at"
     t.index ["ended_by_person_id"], name: "index_unit_ownerships_on_ended_by_person_id"
     t.index ["metadata"], name: "index_unit_ownerships_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "index_unit_ownerships_on_org_person_status"

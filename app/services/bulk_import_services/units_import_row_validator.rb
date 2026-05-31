@@ -55,7 +55,12 @@ module BulkImportServices
       end
 
       validate_database_unit!(property_section_id, normalized)
-      track_group_percentage!(group_key, normalized["ownership_percentage"])
+      normalized["will_import_ownership"] = UnitsImportOwnershipRules.will_import_ownership?(
+        context: @context,
+        normalized: normalized,
+        row_errors: @errors
+      )
+      track_group_percentage!(group_key, normalized)
 
       Result.new(
         row_number: @parsed_row.row_number,
@@ -194,10 +199,14 @@ module BulkImportServices
       end
     end
 
-    def track_group_percentage!(group_key, ownership_percentage)
-      return if group_key.blank? || ownership_percentage.blank?
-
-      @context.add_group_percentage(group_key, ownership_percentage)
+    def track_group_percentage!(group_key, normalized)
+      return if group_key.blank?
+      return unless normalized["will_import_ownership"]
+      
+      @context.add_group_percentage(
+        group_key,
+        UnitsImportOwnershipRules.resolved_ownership_percentage(normalized)
+      )
     end
 
     def owner_data_present?(normalized)
