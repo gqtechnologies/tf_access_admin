@@ -46,6 +46,8 @@ class UnitOwnership < ApplicationRecord
   acts_as_tenant :organization
   acts_as_paranoid
 
+  audited associated_with: :unit, only: %i[ownership_percentage starts_at ends_at status person_id]
+
   STATUS_ACTIVE = "active"
 
   belongs_to :organization
@@ -59,6 +61,14 @@ class UnitOwnership < ApplicationRecord
   validates :status, presence: true
 
   validates_same_tenant :unit, :person, :created_by_person, :ended_by_person
+
+  scope :ordered_for_display, lambda {
+    active_first = sanitize_sql_array([
+      "CASE WHEN #{table_name}.status = ? THEN 0 ELSE 1 END",
+      STATUS_ACTIVE
+    ])
+    order(Arel.sql(active_first), starts_at: :desc, created_at: :desc)
+  }
 
   validate :ends_on_or_after_starts
   validate :active_ownership_share_within_unit_cap

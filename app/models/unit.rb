@@ -46,6 +46,8 @@ class Unit < ApplicationRecord
   acts_as_tenant :organization
   acts_as_paranoid
 
+  audited only: %i[identifier display_name status unit_type area_m2 property_section_id]
+
   belongs_to :organization
   belongs_to :residential_property
   belongs_to :property_section, optional: true

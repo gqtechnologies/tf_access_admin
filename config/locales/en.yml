@@ -391,6 +391,121 @@ en:
             none: "No user"
           role:
             label: "Role"
+      units:
+        not_found: "Unit not found"
+        show:
+          unit_title: "Unit %{identifier}"
+          actions:
+            edit: "Edit unit"
+            more_coming_soon: "More actions coming soon"
+          summary:
+            type: "Type"
+            area: "Area"
+            area_value: "%{value} m²"
+            owners: "Owners"
+            owners_value: "%{count} active"
+            assigned_percentage: "Assigned share"
+          tabs:
+            aria_label: "Unit sections"
+            summary: "Summary"
+            owners: "Owners"
+            residents: "Residents"
+            vehicles: "Vehicles"
+            visits: "Visits"
+            documents: "Documents"
+            history: "History"
+            coming_soon: "This section will be available soon."
+          owners:
+            title: "Unit owners"
+            description: "View and manage owners linked to this unit."
+            add_owner:
+              title: "Add owner"
+              unit_label: "Unit"
+              steps_nav: "Add owner steps"
+              steps:
+                choose: "Choose option"
+                search: "Search person"
+                create: "Create person"
+                assign: "Assign ownership"
+              choose:
+                title: "How do you want to add the owner?"
+                description: "You can search for an existing person or create a new one."
+                search:
+                  title: "Search person"
+                  description: "Search among people registered in the system."
+                create:
+                  title: "Create new person"
+                  description: "Create a new person and assign them as the owner of this unit."
+              search:
+                title: "Search person"
+                coming_soon: "Person search will be available soon."
+              create:
+                title: "Create new person"
+                coming_soon: "Creating people from this unit will be available soon."
+              assign:
+                title: "Assign ownership"
+                coming_soon: "Ownership assignment will be available soon."
+              actions:
+                cancel: "Cancel"
+                close: "Close"
+            open_ended: "No end date"
+            pagination_summary: "Showing {from} to {to} of {total} owners"
+            metrics:
+              active: "Active owners"
+              assigned: "Assigned share"
+              available: "Available share"
+              historical: "Historical / inactive"
+            table:
+              owner: "Owner"
+              document: "Document"
+              email: "Email"
+              percentage: "Ownership %"
+              validity: "Validity"
+              status: "Status"
+              empty: "No owners registered for this unit."
+            statuses:
+              active: "Active"
+              inactive: "Inactive"
+            validity_states:
+              current: "Current"
+              finished: "Ended"
+              pending: "Pending"
+              inactive: "Inactive"
+          change_history:
+            title: "Change history"
+            empty_title: "No changes recorded"
+            empty_description: "Actions on this unit will appear here."
+            view_all: "View full history"
+            actor_fallback: "System"
+            ownership_statuses:
+              active: "Active"
+              inactive: "Inactive"
+            events:
+              blank_value: "—"
+              unknown_person: "Unknown owner"
+              unit_created: "Unit registered in the system"
+              unit_updated: "%{actor} updated %{changes}"
+              unit_status_changed: "%{actor} changed the unit status to \"%{to}\""
+              unit_destroyed: "%{actor} removed the unit"
+              generic_update: "%{actor} recorded changes on the unit"
+              ownership_created: "%{actor} added %{person} as owner (%{percentage})"
+              ownership_updated: "%{actor} updated ownership for %{person}"
+              ownership_percentage_changed: "%{actor} changed %{person}'s ownership share from %{from} to %{to}"
+              ownership_status_changed: "%{actor} changed %{person}'s status to \"%{to}\""
+              ownership_removed: "%{actor} removed %{person} as owner"
+              change_pair: "%{label} from \"%{from}\" to \"%{to}\""
+              area_value: "%{value} m²"
+            attributes:
+              identifier: "identifier"
+              display_name: "display name"
+              status: "status"
+              unit_type: "unit type"
+              area_m2: "area"
+              property_section_id: "section"
+              ownership_percentage: "ownership share"
+              starts_at: "start date"
+              ends_at: "end date"
+              person_id: "owner"
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"
@@ -722,6 +837,7 @@ en:
             search_empty: "No sections match your search."
             expand: "Expand section"
             collapse: "Collapse section"
+            manage_unit: "Manage unit"
           form:
             new_title: "New section"
             new_description: "Create a new section within the current structure"

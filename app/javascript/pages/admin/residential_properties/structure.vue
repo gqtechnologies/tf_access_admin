@@ -13,6 +13,7 @@
       <SectionTree
         v-model:search="treeSearch"
         :property-name="props.residential_property.name"
+        :residential-property-id="propertyId"
         :tree="props.section_tree"
         :selected-id="selectedSectionId"
         @add-root="startCreateRoot"

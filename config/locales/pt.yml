@@ -385,6 +385,121 @@ pt:
             none: "Sem usuário"
           role:
             label: "Cargo"
+      units:
+        not_found: "Unidade não encontrada"
+        show:
+          unit_title: "Unidade %{identifier}"
+          actions:
+            edit: "Editar unidade"
+            more_coming_soon: "Mais ações em breve"
+          summary:
+            type: "Tipo"
+            area: "Área"
+            area_value: "%{value} m²"
+            owners: "Proprietários"
+            owners_value: "%{count} ativos"
+            assigned_percentage: "Percentual atribuído"
+          tabs:
+            aria_label: "Seções da unidade"
+            summary: "Resumo"
+            owners: "Proprietários"
+            residents: "Residentes"
+            vehicles: "Veículos"
+            visits: "Visitas"
+            documents: "Documentos"
+            history: "Histórico"
+            coming_soon: "Esta seção estará disponível em breve."
+          owners:
+            title: "Proprietários da unidade"
+            description: "Consulte e gerencie os proprietários vinculados a esta unidade."
+            add_owner:
+              title: "Adicionar proprietário"
+              unit_label: "Unidade"
+              steps_nav: "Passos para adicionar proprietário"
+              steps:
+                choose: "Escolher opção"
+                search: "Buscar pessoa"
+                create: "Criar pessoa"
+                assign: "Atribuir propriedade"
+              choose:
+                title: "Como deseja adicionar o proprietário?"
+                description: "Você pode buscar uma pessoa existente ou criar uma nova."
+                search:
+                  title: "Buscar pessoa"
+                  description: "Busque entre as pessoas registradas no sistema."
+                create:
+                  title: "Criar nova pessoa"
+                  description: "Crie uma nova pessoa e atribua-a como proprietária desta unidade."
+              search:
+                title: "Buscar pessoa"
+                coming_soon: "A busca de pessoas estará disponível em breve."
+              create:
+                title: "Criar nova pessoa"
+                coming_soon: "A criação de pessoas a partir desta unidade estará disponível em breve."
+              assign:
+                title: "Atribuir propriedade"
+                coming_soon: "A atribuição de percentual estará disponível em breve."
+              actions:
+                cancel: "Cancelar"
+                close: "Fechar"
+            open_ended: "Sem data de término"
+            pagination_summary: "Mostrando {from} a {to} de {total} proprietários"
+            metrics:
+              active: "Proprietários ativos"
+              assigned: "Percentual atribuído"
+              available: "Percentual disponível"
+              historical: "Históricos / inativos"
+            table:
+              owner: "Proprietário"
+              document: "Documento"
+              email: "Email"
+              percentage: "% Propriedade"
+              validity: "Vigência"
+              status: "Estado"
+              empty: "Não há proprietários registrados nesta unidade."
+            statuses:
+              active: "Ativo"
+              inactive: "Inativo"
+            validity_states:
+              current: "Vigente"
+              finished: "Finalizado"
+              pending: "Pendente"
+              inactive: "Inativo"
+          change_history:
+            title: "Histórico de alterações"
+            empty_title: "Sem alterações registradas"
+            empty_description: "As ações sobre esta unidade aparecerão aqui."
+            view_all: "Ver histórico completo"
+            actor_fallback: "Sistema"
+            ownership_statuses:
+              active: "Ativo"
+              inactive: "Inativo"
+            events:
+              blank_value: "—"
+              unknown_person: "Proprietário desconhecido"
+              unit_created: "Unidade registrada no sistema"
+              unit_updated: "%{actor} atualizou %{changes}"
+              unit_status_changed: "%{actor} alterou o estado da unidade para \"%{to}\""
+              unit_destroyed: "%{actor} removeu a unidade"
+              generic_update: "%{actor} registrou alterações na unidade"
+              ownership_created: "%{actor} adicionou %{person} como proprietário (%{percentage})"
+              ownership_updated: "%{actor} atualizou a propriedade de %{person}"
+              ownership_percentage_changed: "%{actor} alterou o percentual de %{person} de %{from} para %{to}"
+              ownership_status_changed: "%{actor} alterou o estado de %{person} para \"%{to}\""
+              ownership_removed: "%{actor} removeu %{person} como proprietário"
+              change_pair: "%{label} de \"%{from}\" para \"%{to}\""
+              area_value: "%{value} m²"
+            attributes:
+              identifier: "identificador"
+              display_name: "nome para exibição"
+              status: "estado"
+              unit_type: "tipo de unidade"
+              area_m2: "área"
+              property_section_id: "seção"
+              ownership_percentage: "percentual de propriedade"
+              starts_at: "data de início"
+              ends_at: "data de término"
+              person_id: "proprietário"
       residential_properties:
         title: "Propriedades"
         created_successfully: "Propriedade criada com sucesso"
@@ -675,6 +790,7 @@ pt:
             search_empty: "Nenhuma seção corresponde à sua busca."
             expand: "Expandir seção"
             collapse: "Recolher seção"
+            manage_unit: "Gerenciar unidade"
           form:
             new_title: "Nova seção"
             new_description: "Crie uma nova seção dentro da estrutura atual"

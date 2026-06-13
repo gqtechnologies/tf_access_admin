@@ -56,6 +56,7 @@
           :depth="0"
           :is-last="index === filteredTree.length - 1"
           :selected-id="selectedId"
+          :residential-property-id="residentialPropertyId"
           :force-expanded="searchModel.trim().length > 0"
           @select="emit('select', $event)"
           @add-subsection="emit('add-subsection', $event)"
@@ -87,6 +88,7 @@ import type { PropertySectionTreeNode } from '@/types/property_section'
 
 const props = defineProps<{
   propertyName: string
+  residentialPropertyId: string
   tree: PropertySectionTreeNode[]
   selectedId?: string | null
   search: string
