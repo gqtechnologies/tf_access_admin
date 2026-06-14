@@ -48,3 +48,5 @@ node_modules
 .agents/*
 .cursor/*
 skills-lock.json
+
+app/graphify-out/*

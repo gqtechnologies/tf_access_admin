@@ -1,0 +1,45 @@
+# Dependencias / generados
+node_modules/
+vendor/
+tmp/
+log/
+storage/
+coverage/
+.graphify-out/
+graphify-out/
+
+# Assets compilados o públicos
+public/
+app/assets/images/
+app/frontend/assets/images/
+app/javascript/images/
+app/images/
+
+# Docs / markdown / textos
+docs/
+doc/
+*.md
+*.pdf
+*.doc
+*.docx
+*.txt
+
+# Imágenes
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.svg
+*.ico
+
+# Otros binarios comunes
+*.zip
+*.tar
+*.gz
+*.dump
+*.sql
+
+# Entorno
+.env
+.env.*
