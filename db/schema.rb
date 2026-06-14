@@ -367,7 +367,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
     t.index ["residential_property_id"], name: "index_common_area_reservations_on_residential_property_id"
     t.index ["unit_id"], name: "index_common_area_reservations_on_unit_id"
     t.check_constraint "ends_at > starts_at", name: "common_area_reservations_time_range_valid"
-    t.exclusion_constraint "organization_id WITH =, common_area_id WITH =, tsrange(starts_at, ends_at, '[)'::text) WITH &&", where: "(status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying])::text[])", using: :gist, name: "common_area_reservations_no_overlap"
+    t.exclusion_constraint "organization_id WITH =, common_area_id WITH =, tsrange(starts_at, ends_at, '[)'::text) WITH &&", where: "(status)::text = ANY (ARRAY[('pending'::character varying)::text, ('approved'::character varying)::text])", using: :gist, name: "common_area_reservations_no_overlap"
   end
 
   create_table "common_area_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -592,7 +592,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_organization_memberships_on_deleted_at"
     t.index ["metadata"], name: "index_organization_memberships_on_metadata", using: :gin
-    t.index ["organization_id", "person_id"], name: "idx_org_memberships_unique_active_invited", unique: true, where: "(((status)::text = ANY ((ARRAY['invited'::character varying, 'active'::character varying])::text[])) AND (deleted_at IS NULL))"
+    t.index ["organization_id", "person_id"], name: "idx_org_memberships_unique_active_invited", unique: true, where: "(((status)::text = ANY (ARRAY[('invited'::character varying)::text, ('active'::character varying)::text])) AND (deleted_at IS NULL))"
     t.index ["organization_id"], name: "index_organization_memberships_on_organization_id"
     t.index ["person_id"], name: "index_organization_memberships_on_person_id"
     t.index ["status"], name: "index_organization_memberships_on_status"
@@ -1057,7 +1057,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
     t.index ["visit_id"], name: "index_visit_recurrences_on_visit_id"
     t.check_constraint "\"interval\" > 0", name: "visit_recurrences_interval_positive"
     t.check_constraint "count IS NULL OR count > 0", name: "visit_recurrences_count_positive"
-    t.check_constraint "freq::text = ANY (ARRAY['DAILY'::character varying, 'WEEKLY'::character varying, 'MONTHLY'::character varying, 'YEARLY'::character varying]::text[])", name: "visit_recurrences_freq_allowed"
+    t.check_constraint "freq::text = ANY (ARRAY['DAILY'::character varying::text, 'WEEKLY'::character varying::text, 'MONTHLY'::character varying::text, 'YEARLY'::character varying::text])", name: "visit_recurrences_freq_allowed"
     t.check_constraint "until_at IS NULL OR count IS NULL", name: "visit_recurrences_until_or_count"
     t.check_constraint "until_at IS NULL OR until_at >= dtstart", name: "visit_recurrences_until_after_dtstart"
   end
@@ -1133,7 +1133,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
     t.index ["concierge_validated_by_person_id"], name: "index_visits_on_concierge_validated_by_person_id"
     t.index ["created_by_person_id"], name: "index_visits_on_created_by_person_id"
     t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
-    t.index ["organization_id", "residential_property_id", "scheduled_starts_at"], name: "index_visits_on_org_property_pending_statuses", where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'concierge_validation_pending'::character varying, 'resident_notified'::character varying])::text[]))"
+    t.index ["organization_id", "residential_property_id", "scheduled_starts_at"], name: "index_visits_on_org_property_pending_statuses", where: "((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('concierge_validation_pending'::character varying)::text, ('resident_notified'::character varying)::text]))"
     t.index ["organization_id", "residential_property_id", "status", "scheduled_starts_at"], name: "index_visits_on_org_property_status_scheduled_starts"
     t.index ["organization_id", "staff_shift_id"], name: "index_visits_on_organization_id_and_staff_shift_id"
     t.index ["organization_id", "unit_id", "scheduled_starts_at"], name: "index_visits_on_org_unit_scheduled_starts"

@@ -54,10 +54,13 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
+group :development, :test do
+  gem "dotenv-rails"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem "dotenv-rails"
   gem "annotaterb", "~> 4.22"
 end
 

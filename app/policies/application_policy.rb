@@ -49,10 +49,10 @@ class ApplicationPolicy
   def same_organization?
     return false unless user.present?
     return true if user.super_admin?
-    return false if user.client_global?
 
     tenant = ActsAsTenant.current_tenant
     return false unless tenant&.id
+    return false if user.client_global? && !user.tenant_admin?(tenant)
 
     if record.is_a?(User)
       user.people.exists?(organization_id: tenant.id) && record.people.exists?(organization_id: tenant.id)

@@ -35,7 +35,7 @@
 #  index_visits_on_concierge_validated_by_person_id      (concierge_validated_by_person_id)
 #  index_visits_on_created_by_person_id                  (created_by_person_id)
 #  index_visits_on_metadata                              (metadata) USING gin
-#  index_visits_on_org_property_pending_statuses         (organization_id,residential_property_id,scheduled_starts_at) WHERE ((status)::text = ANY ((ARRAY['pending'::character varying, 'concierge_validation_pending'::character varying, 'resident_notified'::character varying])::text[]))
+#  index_visits_on_org_property_pending_statuses         (organization_id,residential_property_id,scheduled_starts_at) WHERE ((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('concierge_validation_pending'::character varying)::text, ('resident_notified'::character varying)::text]))
 #  index_visits_on_org_property_status_scheduled_starts  (organization_id,residential_property_id,status,scheduled_starts_at)
 #  index_visits_on_org_unit_scheduled_starts             (organization_id,unit_id,scheduled_starts_at)
 #  index_visits_on_organization_id                       (organization_id)

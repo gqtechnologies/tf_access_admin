@@ -58,9 +58,31 @@
               />
             </TableCell>
             <TableCell class="text-right">
-              <Button variant="ghost" size="icon" disabled :aria-label="t('common.table.actions')">
-                <MoreHorizontal class="size-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    :aria-label="t('common.table.actions')"
+                  >
+                    <MoreHorizontal class="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem @click="emit('edit', ownership)">
+                    <Pencil class="size-4" />
+                    {{ t('common.actions.edit') }}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    class="text-destructive focus:text-destructive"
+                    @click="emit('delete', ownership)"
+                  >
+                    <Trash2 class="size-4" />
+                    {{ t('common.actions.delete') }}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         </TableBody>
@@ -84,12 +106,19 @@
 import { computed, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
-import { MoreHorizontal } from 'lucide-vue-next'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-vue-next'
 import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
 import OwnershipProgress from '@/components/admin/shared/OwnershipProgress.vue'
 import StatusDotBadge from '@/components/admin/shared/StatusDotBadge.vue'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -110,13 +139,18 @@ const props = defineProps<{
   ownershipsPagination?: UnitOwnershipsPagination
 }>()
 
+const emit = defineEmits<{
+  (e: 'edit', ownership: UnitOwnership): void
+  (e: 'delete', ownership: UnitOwnership): void
+}>()
+
 const { t, locale } = useI18n()
 
 const fetchData = (_search: string, page: number, itemsPerPage: number) => {
   router.get(
     admin_residential_property_unit_path(props.residentialPropertyId, props.unitId),
     { page, per_page: itemsPerPage },
-    { preserveState: true, preserveScroll: true }
+    { preserveState: true, preserveScroll: true },
   )
 }
 
@@ -141,7 +175,7 @@ watch(
   (meta) => {
     if (meta) setPagination(meta)
   },
-  { immediate: false }
+  { immediate: false },
 )
 
 function documentLabel(ownership: UnitOwnership) {

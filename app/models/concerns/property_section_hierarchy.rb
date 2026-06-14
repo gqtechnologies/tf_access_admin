@@ -8,7 +8,7 @@ module PropertySectionHierarchy
 
   included do
     validate :parent_must_be_root_section
-    validate :child_sections_cannot_have_children
+    validate :section_with_children_cannot_be_nested
     validate :parent_cannot_have_units
     validate :container_cannot_have_units
   end
@@ -44,11 +44,11 @@ module PropertySectionHierarchy
     errors.add(:parent_id, I18n.t("frontend.admin.property_sections.validations.parent_must_be_root"))
   end
 
-  def child_sections_cannot_have_children
+  def section_with_children_cannot_be_nested
     return if parent_id.blank?
     return unless children.exists?
 
-    errors.add(:base, I18n.t("frontend.admin.property_sections.validations.child_cannot_have_children"))
+    errors.add(:parent_id, I18n.t("frontend.admin.property_sections.validations.cannot_nest_with_children"))
   end
 
   def parent_cannot_have_units

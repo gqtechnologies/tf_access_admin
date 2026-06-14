@@ -379,7 +379,7 @@ en:
             placeholder: "Document number"
           email:
             label: "Email"
-            placeholder: "email@example.com"
+            placeholder: "email{'@'}example.com"
           phone:
             label: "Phone"
             placeholder: "Contact phone"
@@ -420,6 +420,7 @@ en:
             description: "View and manage owners linked to this unit."
             add_owner:
               title: "Add owner"
+              capacity_full: "100% of ownership is already assigned. Edit or remove an existing owner to free up capacity."
               unit_label: "Unit"
               steps_nav: "Add owner steps"
               steps:
@@ -438,16 +439,57 @@ en:
                   description: "Create a new person and assign them as the owner of this unit."
               search:
                 title: "Search person"
-                coming_soon: "Person search will be available soon."
+                description: "Enter a document, name, or email to search."
+                placeholder: "Search by document, name, or email..."
+                results_title: "Results found"
+                loading: "Searching..."
+                empty: "No people found."
+                not_found_prompt: "Can't find the person?"
+                create_new: "Create new person"
               create:
                 title: "Create new person"
-                coming_soon: "Creating people from this unit will be available soon."
+                description: "Complete the new person's details and define their ownership."
+                person_section_title: "New person"
+                person_section_description: "Complete the new person's details."
+                actions:
+                  submit: "Create person and add"
+                validations:
+                  document_required: "Document is required"
+                  first_name_required: "First name is required"
+                  last_name_required: "Last name is required"
               assign:
-                title: "Assign ownership"
-                coming_soon: "Ownership assignment will be available soon."
+                title: "Selected person details"
+                description: "Review the person's information."
+                person_section_title: "Selected person"
+                person_section_description: "Review the person's information."
+                existing_person_badge: "Existing person"
+                change_person: "Change person"
+                available_preview: "Available share after assignment:"
+                ownership:
+                  title: "Ownership details"
+                  description: "Define the ownership share and validity period."
+                fields:
+                  percentage: "Ownership share"
+                  starts_at: "Start date"
+                  starts_at_placeholder: "Select a date"
+                  ends_at: "End date"
+                  ends_at_placeholder: "Optional"
+                actions:
+                  submit: "Add owner"
               actions:
                 cancel: "Cancel"
                 close: "Close"
+            edit_owner:
+              title: "Edit ownership"
+              assign:
+                title: "Ownership details"
+                description: "Update the ownership share and validity period."
+              actions:
+                submit: "Save changes"
+            actions:
+              delete_description: "Remove {name} as an owner of this unit?"
+              delete_success: "Owner removed successfully"
+              delete_error: "Could not remove the owner"
             open_ended: "No end date"
             pagination_summary: "Showing {from} to {to} of {total} owners"
             metrics:
@@ -506,6 +548,16 @@ en:
               starts_at: "start date"
               ends_at: "end date"
               person_id: "owner"
+      unit_ownerships:
+        not_found: "Ownership not found"
+        validations:
+          percentage_required: "Ownership share is required"
+          percentage_invalid: "Ownership share is invalid"
+          starts_at_required: "Start date is required"
+          percentage_sum_exceeded: "The combined ownership percentages of active owners on this unit cannot exceed 100%"
+          duplicate_active_person: "This person already has an active ownership on this unit"
+          ends_at_before_starts_at: "End date must be on or after start date"
+          existing_person_match: "A person with this document or email already exists (%{display_name}). Search and reuse them."
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"

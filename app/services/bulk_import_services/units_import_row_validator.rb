@@ -78,7 +78,17 @@ module BulkImportServices
 
     def normalize_payload(raw)
       normalized = raw.transform_keys(&:to_s).transform_values { |value| value.presence }
+      split_owner_name!(normalized)
       normalized
+    end
+
+    def split_owner_name!(normalized)
+      owner_name = normalized["owner_name"]
+      return if owner_name.blank?
+
+      first_name, last_name = owner_name.split(/\s+/, 2)
+      normalized["owner_first_name"] ||= first_name
+      normalized["owner_last_name"] ||= last_name if last_name.present?
     end
 
     def validate_unit_identifier!(normalized)
@@ -182,7 +192,7 @@ module BulkImportServices
 
       if @context.update_only?
         if existing_unit.nil?
-          add_error("unit_identifier", "not_found", :unit_not_found_for_update)
+          add_error("unit_identifier", "unit_not_found_for_update", :unit_not_found_for_update)
         else
           normalized["target_unit_id"] = existing_unit.id
           normalized["operation"] = "update"

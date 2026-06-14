@@ -26,5 +26,14 @@ module AdminBase
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
     end
+
+    config.active_record.yaml_column_permitted_classes = [
+      Symbol,
+      Date,
+      Time,
+      ActiveSupport::TimeWithZone,
+      ActiveSupport::Duration,
+      BigDecimal
+    ]
   end
 end

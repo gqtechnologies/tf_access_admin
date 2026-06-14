@@ -14,6 +14,7 @@
           :unit="props.unit"
           :ownerships="props.ownerships"
           :ownerships-pagination="props.ownerships_pagination"
+          :errors="props.errors"
         />
         <UnitPlaceholderTab
           v-else
@@ -62,6 +63,7 @@ const props = defineProps<{
   ownerships: UnitOwnership[]
   ownerships_pagination?: UnitOwnershipsPagination
   change_history: UnitChangeHistoryEntry[]
+  errors?: Record<string, string[]>
 }>()
 
 const { t } = useI18n()

@@ -96,7 +96,7 @@ module BulkImportServices
           "options" => {
             "import_mode" => "create_skip_duplicates",
             "property_section_id" => @section.id,
-            "owner_import_mode" => "link_existing"
+            "owner_import_mode" => "create_missing"
           },
           "file_inspection" => { "sheets" => [], "headers" => [], "row_count" => 0 }
         }

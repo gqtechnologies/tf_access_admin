@@ -6,6 +6,7 @@ class Unit::ChangeHistoryTest < ActiveSupport::TestCase
   test "formats unit status update audit entry" do
     organization = organizations(:one)
     user = users(:one)
+    user.update_columns(name: "Fixture Admin")
     property = ResidentialProperty.create!(
       organization: organization,
       name: "Property A",
@@ -14,13 +15,15 @@ class Unit::ChangeHistoryTest < ActiveSupport::TestCase
       country: "Chile",
       timezone: "America/Santiago"
     )
-    unit = Unit.create!(
-      organization: organization,
-      residential_property: property,
-      identifier: "101",
-      unit_type: UnitTypes::APARTMENT,
-      status: UnitStatuses::AVAILABLE
-    )
+    unit = Unit.without_auditing do
+      Unit.create!(
+        organization: organization,
+        residential_property: property,
+        identifier: "101",
+        unit_type: UnitTypes::APARTMENT,
+        status: UnitStatuses::AVAILABLE
+      )
+    end
 
     audit = TenantAudit.create!(
       organization: organization,
@@ -36,7 +39,7 @@ class Unit::ChangeHistoryTest < ActiveSupport::TestCase
 
     assert_equal 1, entries.length
     assert_equal audit.id, entries.first[:id]
-    assert_includes entries.first[:description], user.name
+    assert_includes entries.first[:description], "Fixture Admin"
     assert_equal "warning", entries.first[:tone]
   end
 end

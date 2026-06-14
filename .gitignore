@@ -50,3 +50,4 @@ node_modules
 skills-lock.json
 
 app/graphify-out/*
+/graphify-out

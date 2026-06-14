@@ -35,19 +35,20 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Check } from 'lucide-vue-next'
-import { UNIT_ADD_OWNER_STEPS } from '@/lib/composables/unit/useUnitAddOwnerDrawer'
+import type { UnitAddOwnerStep } from '@/lib/composables/unit/useUnitAddOwnerDrawer'
 
 const props = defineProps<{
   stepIndex: number
+  visibleSteps: readonly UnitAddOwnerStep[]
 }>()
 
 const { t } = useI18n()
 
 const steps = computed(() =>
-  UNIT_ADD_OWNER_STEPS.map((id) => ({
+  props.visibleSteps.map((id) => ({
     id,
     label: t(`admin.units.show.owners.add_owner.steps.${id}`),
-  }))
+  })),
 )
 
 function indicatorClass(index: number) {

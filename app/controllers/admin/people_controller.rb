@@ -14,10 +14,16 @@ class Admin::PeopleController < AdminController
       .per(@filters[:per_page])
 
     pagination = pagination_info(people)
-    render inertia: "admin/people/index", props: {
+    payload = {
       people: people.map { |person| Admin::PersonSerializer.new(person).as_json },
       pagination: pagination
-    }, status: :ok
+    }
+
+    if request.format.json?
+      render json: payload
+    else
+      render inertia: "admin/people/index", props: payload, status: :ok
+    end
   end
 
   def new

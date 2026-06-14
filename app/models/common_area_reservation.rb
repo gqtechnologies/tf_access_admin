@@ -23,7 +23,7 @@
 #
 # Indexes
 #
-#  common_area_reservations_no_overlap                           (organization_id, common_area_id, tsrange(starts_at, ends_at, '[)'::text)) WHERE ((status)::text = ANY ((ARRAY['pending'::character varying, 'approved'::character varying])::text[])) USING gist
+#  common_area_reservations_no_overlap                           (organization_id, common_area_id, tsrange(starts_at, ends_at, '[)'::text)) WHERE ((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('approved'::character varying)::text])) USING gist
 #  idx_on_organization_id_unit_id_status_00945a979c              (organization_id,unit_id,status)
 #  index_common_area_reservations_on_approved_by_person_id       (approved_by_person_id)
 #  index_common_area_reservations_on_common_area_id              (common_area_id)

@@ -18,7 +18,7 @@
 #
 # Indexes
 #
-#  idx_org_memberships_unique_active_invited          (organization_id,person_id) UNIQUE WHERE (((status)::text = ANY ((ARRAY['invited'::character varying, 'active'::character varying])::text[])) AND (deleted_at IS NULL))
+#  idx_org_memberships_unique_active_invited          (organization_id,person_id) UNIQUE WHERE (((status)::text = ANY (ARRAY[('invited'::character varying)::text, ('active'::character varying)::text])) AND (deleted_at IS NULL))
 #  index_organization_memberships_on_deleted_at       (deleted_at)
 #  index_organization_memberships_on_metadata         (metadata) USING gin
 #  index_organization_memberships_on_organization_id  (organization_id)

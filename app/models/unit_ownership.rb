@@ -72,24 +72,49 @@ class UnitOwnership < ApplicationRecord
 
   validate :ends_on_or_after_starts
   validate :active_ownership_share_within_unit_cap
+  validate :no_duplicate_active_ownership_for_person_on_unit, if: :active_status?
 
   private
+
+  def active_status?
+    status == STATUS_ACTIVE
+  end
+
+  def no_duplicate_active_ownership_for_person_on_unit
+    return if person_id.blank? || unit_id.blank?
+
+    scope = UnitOwnership.where(
+      unit_id: unit_id,
+      person_id: person_id,
+      organization_id: organization_id,
+      status: STATUS_ACTIVE
+    )
+    scope = scope.where.not(id: id) if persisted?
+    return unless scope.exists?
+
+    errors.add(:person_id, "admin.unit_ownerships.validations.duplicate_active_person")
+  end
 
   def ends_on_or_after_starts
     return if ends_at.blank?
     return if ends_at >= starts_at
 
-    errors.add(:ends_at, "must be on or after starts_at")
+    errors.add(:ends_at, "admin.unit_ownerships.validations.ends_at_before_starts_at")
   end
 
   def active_ownership_share_within_unit_cap
     return unless status == STATUS_ACTIVE && unit_id.present? && ownership_percentage.present?
 
-    others = UnitOwnership.where(unit_id: unit_id, organization_id: organization_id, status: STATUS_ACTIVE)
-    others = others.where.not(id: id) if persisted?
-    total = others.sum(:ownership_percentage).to_d + ownership_percentage.to_d
+    total = active_ownership_scope_for_cap.where.not(id: id).sum(:ownership_percentage).to_d + ownership_percentage.to_d
     return if total <= 100
 
-    errors.add(:ownership_percentage, "sum of active ownership shares on this unit cannot exceed 100%")
+    errors.add(:ownership_percentage, "admin.unit_ownerships.validations.percentage_sum_exceeded")
+  end
+
+  def active_ownership_scope_for_cap
+    UnitOwnership
+      .joins(:person)
+      .where(unit_id: unit_id, organization_id: organization_id, status: STATUS_ACTIVE)
+      .where(people: { status: PersonStatuses::ACTIVE, deleted_at: nil })
   end
 end

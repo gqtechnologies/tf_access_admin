@@ -373,7 +373,7 @@ pt:
             placeholder: "Número do documento"
           email:
             label: "Email"
-            placeholder: "email@exemplo.com"
+            placeholder: "email{'@'}exemplo.com"
           phone:
             label: "Telefone"
             placeholder: "Telefone de contato"
@@ -414,6 +414,7 @@ pt:
             description: "Consulte e gerencie os proprietários vinculados a esta unidade."
             add_owner:
               title: "Adicionar proprietário"
+              capacity_full: "100% da propriedade já está atribuída. Edite ou remova um proprietário existente para liberar percentual."
               unit_label: "Unidade"
               steps_nav: "Passos para adicionar proprietário"
               steps:
@@ -432,16 +433,57 @@ pt:
                   description: "Crie uma nova pessoa e atribua-a como proprietária desta unidade."
               search:
                 title: "Buscar pessoa"
-                coming_soon: "A busca de pessoas estará disponível em breve."
+                description: "Digite um documento, nome ou email para buscar."
+                placeholder: "Buscar por documento, nome ou email..."
+                results_title: "Resultados encontrados"
+                loading: "Buscando..."
+                empty: "Nenhuma pessoa encontrada."
+                not_found_prompt: "Não encontra a pessoa?"
+                create_new: "Criar nova pessoa"
               create:
                 title: "Criar nova pessoa"
-                coming_soon: "A criação de pessoas a partir desta unidade estará disponível em breve."
+                description: "Complete os dados da nova pessoa e defina a propriedade."
+                person_section_title: "Nova pessoa"
+                person_section_description: "Complete os dados da nova pessoa."
+                actions:
+                  submit: "Criar pessoa e adicionar"
+                validations:
+                  document_required: "O documento é obrigatório"
+                  first_name_required: "O nome é obrigatório"
+                  last_name_required: "O sobrenome é obrigatório"
               assign:
-                title: "Atribuir propriedade"
-                coming_soon: "A atribuição de percentual estará disponível em breve."
+                title: "Detalhe da pessoa selecionada"
+                description: "Revise as informações da pessoa."
+                person_section_title: "Pessoa selecionada"
+                person_section_description: "Revise as informações da pessoa."
+                existing_person_badge: "Pessoa existente"
+                change_person: "Trocar pessoa"
+                available_preview: "Percentual disponível após atribuição:"
+                ownership:
+                  title: "Dados de propriedade"
+                  description: "Defina o percentual de propriedade e a vigência."
+                fields:
+                  percentage: "Percentual de propriedade"
+                  starts_at: "Data de início"
+                  starts_at_placeholder: "Selecione uma data"
+                  ends_at: "Data de término"
+                  ends_at_placeholder: "Opcional"
+                actions:
+                  submit: "Adicionar proprietário"
               actions:
                 cancel: "Cancelar"
                 close: "Fechar"
+            edit_owner:
+              title: "Editar propriedade"
+              assign:
+                title: "Dados de propriedade"
+                description: "Atualize o percentual de propriedade e a vigência."
+              actions:
+                submit: "Salvar alterações"
+            actions:
+              delete_description: "Remover {name} como proprietário desta unidade?"
+              delete_success: "Proprietário removido com sucesso"
+              delete_error: "Não foi possível remover o proprietário"
             open_ended: "Sem data de término"
             pagination_summary: "Mostrando {from} a {to} de {total} proprietários"
             metrics:
@@ -500,6 +542,16 @@ pt:
               starts_at: "data de início"
               ends_at: "data de término"
               person_id: "proprietário"
+      unit_ownerships:
+        not_found: "Propriedade não encontrada"
+        validations:
+          percentage_required: "O percentual de propriedade é obrigatório"
+          percentage_invalid: "O percentual de propriedade é inválido"
+          starts_at_required: "A data de início é obrigatória"
+          percentage_sum_exceeded: "A soma dos percentuais de propriedade dos proprietários ativos nesta unidade não pode exceder 100%"
+          duplicate_active_person: "Esta pessoa já possui uma propriedade ativa na unidade"
+          ends_at_before_starts_at: "A data de término deve ser igual ou posterior à de início"
+          existing_person_match: "Já existe uma pessoa com este documento ou email (%{display_name}). Pesquise e reutilize-a."
       residential_properties:
         title: "Propriedades"
         created_successfully: "Propriedade criada com sucesso"

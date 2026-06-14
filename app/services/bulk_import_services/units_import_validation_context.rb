@@ -20,6 +20,7 @@ module BulkImportServices
       @owner_document_emails = Hash.new { |hash, key| hash[key] = Set.new }
       @owner_email_documents = Hash.new { |hash, key| hash[key] = Set.new }
       load_owner_lookup_index
+      load_existing_group_percentages
     end
 
     def owner_exists?(normalized)
@@ -201,6 +202,26 @@ module BulkImportServices
     def load_existing_units
       Unit.where(residential_property_id: @residential_property.id)
         .index_by { |unit| [ unit.property_section_id, unit.normalized_identifier ] }
+    end
+
+    def load_existing_group_percentages
+      return unless update_only?
+
+      UnitOwnership
+        .joins(:person, :unit)
+        .where(
+          organization_id: @bulk_import.organization_id,
+          status: UnitOwnership::STATUS_ACTIVE,
+          units: { residential_property_id: @residential_property.id },
+          people: { status: PersonStatuses::ACTIVE, deleted_at: nil }
+        )
+        .includes(:unit)
+        .find_each do |ownership|
+          key = build_group_key(ownership.unit.property_section_id, ownership.unit.identifier)
+          next if key.blank?
+
+          @group_percentages[key] += ownership.ownership_percentage.to_f
+        end
     end
 
     def normalize_identifier(identifier)
