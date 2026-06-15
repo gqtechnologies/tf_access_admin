@@ -322,6 +322,14 @@ en:
         updated_successfully: "Person updated successfully"
         update_failed: "Failed to update person"
         not_found: "Person not found"
+        profile:
+          change_history:
+            actor_fallback: "System"
+            events:
+              person_created: "%{actor} registered the person profile"
+              person_updated: "%{actor} updated the person profile"
+              person_status_changed: "%{actor} changed the person status to \"%{to}\""
+              person_removed: "%{actor} removed the person profile"
         validations:
           display_name_required: "Enter a first name, last name, or display name"
           person_type_required: "Person type is required"

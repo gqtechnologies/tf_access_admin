@@ -316,6 +316,14 @@ pt:
         updated_successfully: "Pessoa atualizada com sucesso"
         update_failed: "Falha ao atualizar a pessoa"
         not_found: "Pessoa não encontrada"
+        profile:
+          change_history:
+            actor_fallback: "Sistema"
+            events:
+              person_created: "%{actor} registrou o perfil da pessoa"
+              person_updated: "%{actor} atualizou o perfil da pessoa"
+              person_status_changed: "%{actor} alterou o status da pessoa para \"%{to}\""
+              person_removed: "%{actor} removeu o perfil da pessoa"
         validations:
           display_name_required: "Informe nome, sobrenome ou nome de exibição"
           person_type_required: "O tipo de pessoa é obrigatório"

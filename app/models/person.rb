@@ -48,6 +48,8 @@ class Person < ApplicationRecord
   acts_as_paranoid
   rolify
 
+  audited only: %i[display_name first_name last_name status user_id document_type]
+
   attr_accessor :document_number, :contact_email, :contact_phone
 
   belongs_to :organization

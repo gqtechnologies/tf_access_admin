@@ -6,7 +6,7 @@ class PersonPolicy < ApplicationPolicy
   end
 
   def show?
-    admin?
+    admin? && same_organization?
   end
 
   def new?

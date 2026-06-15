@@ -2,7 +2,8 @@
 
 class Admin::PeopleController < AdminController
   before_action :set_person, only: [ :create ]
-  before_action :get_person, only: [ :edit, :update, :destroy ]
+  before_action :get_person, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_profile_filters, only: [ :show ]
   before_action :validate_role, only: [ :create, :update ]
 
   def index
@@ -24,6 +25,23 @@ class Admin::PeopleController < AdminController
     else
       render inertia: "admin/people/index", props: payload, status: :ok
     end
+  end
+
+  def show
+    authorize @person, :show?
+
+    ownerships = ownerships_scope
+      .page(@profile_filters[:ownerships_page])
+      .per(@profile_filters[:ownerships_per_page])
+
+    occupancies = occupancies_scope
+      .page(@profile_filters[:occupancies_page])
+      .per(@profile_filters[:occupancies_per_page])
+
+    render inertia: "admin/people/show", props: profile_props(
+      ownerships: ownerships,
+      occupancies: occupancies
+    ), status: :ok
   end
 
   def new
@@ -67,6 +85,57 @@ class Admin::PeopleController < AdminController
 
   private
 
+  def profile_props(ownerships:, occupancies:)
+    {
+      person: Admin::PersonSerializer.new(@person).as_json,
+      contextual_roles: People::ContextualRoles.call(@person),
+      summary: Person::ProfileSummary.for(@person),
+      ownerships: ownerships.map { |ownership| Admin::PersonOwnershipRowSerializer.new(ownership).as_json },
+      ownerships_pagination: pagination_info(
+        ownerships,
+        per_page: @profile_filters[:ownerships_per_page]
+      ),
+      occupancies: occupancies.map { |occupancy| Admin::PersonOccupancyRowSerializer.new(occupancy).as_json },
+      occupancies_pagination: pagination_info(
+        occupancies,
+        per_page: @profile_filters[:occupancies_per_page]
+      ),
+      change_history: Person::ChangeHistory.for(@person),
+      staff_assignments: [],
+      visits: [],
+      permissions: profile_permissions
+    }
+  end
+
+  def profile_permissions
+    {
+      update: policy(@person).update?,
+      destroy: policy(@person).destroy?,
+      edit: policy(@person).edit?
+    }
+  end
+
+  def ownerships_scope
+    @person.unit_ownerships
+      .includes(unit: [ :residential_property, :property_section ])
+      .ordered_for_display
+  end
+
+  def occupancies_scope
+    @person.unit_occupancies
+      .includes(unit: [ :residential_property, :property_section ])
+      .ordered_for_display
+  end
+
+  def set_profile_filters
+    @profile_filters = {
+      ownerships_page: params[:ownerships_page] || 1,
+      ownerships_per_page: params[:ownerships_per_page] || 10,
+      occupancies_page: params[:occupancies_page] || 1,
+      occupancies_per_page: params[:occupancies_per_page] || 10
+    }
+  end
+
   def form_props(person: nil)
     {
       person: person,
@@ -92,7 +161,7 @@ class Admin::PeopleController < AdminController
   def get_person
     @person = policy_scope(Person).includes(:user).find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to admin_people_path, inertia: { errors: [ I18n.t("frontend.admin.people.not_found") ] }
+    redirect_to admin_people_path, inertia: { errors: { base: [ I18n.t("frontend.admin.people.not_found") ] } }
   end
 
   def save_person_with_membership(person)

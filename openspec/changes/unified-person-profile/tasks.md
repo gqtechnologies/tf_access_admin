@@ -21,14 +21,14 @@
 
 ## 4. Backend perfil unificado
 
-- [ ] 4.1 Añadir ruta `show` en `resources :people` y acción `Admin::PeopleController#show`
-- [ ] 4.2 Implementar `PersonPolicy#show?` y eager loading para ownerships/occupancies
-- [ ] 4.3 Crear serializers de filas: ownership y occupancy con property, section, unit
-- [ ] 4.4 Exponer props: person, contextual_roles, ownerships, occupancies, paginación, change_history, staff_assignments [], visits [], permissions
-- [ ] 4.5 Implementar agregador de historial combinando audits de Person, UnitOwnership y UnitOccupancy
-- [ ] 4.6 Ordenar historial descendente por fecha y normalizar payload para UI
-- [ ] 4.7 Tests de controller, policy y serializers del perfil
-- [ ] 4.8 Exponer métricas resumen del perfil (active_ownerships_count, active_occupancies_count, visits_count, staff_assignments_count)
+- [x] 4.1 Añadir ruta `show` en `resources :people` y acción `Admin::PeopleController#show`
+- [x] 4.2 Implementar `PersonPolicy#show?` y eager loading para ownerships/occupancies
+- [x] 4.3 Crear serializers de filas: ownership y occupancy con property, section, unit
+- [x] 4.4 Exponer props: person, contextual_roles, ownerships, occupancies, paginación, change_history, staff_assignments [], visits [], permissions
+- [x] 4.5 Implementar agregador de historial combinando audits de Person, UnitOwnership y UnitOccupancy
+- [x] 4.6 Ordenar historial descendente por fecha y normalizar payload para UI
+- [x] 4.7 Tests de controller, policy y serializers del perfil
+- [x] 4.8 Exponer métricas resumen del perfil (active_ownerships_count, active_occupancies_count, visits_count, staff_assignments_count)
 
 ## 5. Página Perfil Unificado (Vue)
 

@@ -42,7 +42,7 @@ Rails.application.routes.draw do
   get "admin/home/index"
   namespace :admin do
     resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
-    resources :people, only: [:index, :new, :create, :edit, :update, :destroy]
+    resources :people, only: [:index, :show, :new, :create, :edit, :update, :destroy]
     resources :profile, only: [:edit, :update]
     resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
     resources :residential_properties, only: [:index, :new, :create, :edit, :update, :destroy] do
