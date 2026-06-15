@@ -12,7 +12,8 @@ class Admin::UnitSerializer < ActiveModel::Serializer
     :residential_property_name,
     :property_section_id,
     :location_path,
-    :ownership_stats
+    :ownership_stats,
+    :occupancy_stats
 
   def title
     return object.display_name if object.display_name.present?
@@ -30,5 +31,9 @@ class Admin::UnitSerializer < ActiveModel::Serializer
 
   def ownership_stats
     instance_options[:ownership_stats] || Unit::OwnershipStats.for(object)
+  end
+
+  def occupancy_stats
+    instance_options[:occupancy_stats] || Unit::OccupancyStats.for(object)
   end
 end

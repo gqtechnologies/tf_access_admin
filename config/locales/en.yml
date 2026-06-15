@@ -513,6 +513,15 @@ en:
               finished: "Ended"
               pending: "Pending"
               inactive: "Inactive"
+          occupants:
+            statuses:
+              active: "Active"
+              inactive: "Inactive"
+            validity_states:
+              current: "Current"
+              finished: "Ended"
+              pending: "Pending"
+              inactive: "Inactive"
           change_history:
             title: "Change history"
             empty_title: "No changes recorded"
@@ -522,9 +531,15 @@ en:
             ownership_statuses:
               active: "Active"
               inactive: "Inactive"
+            occupancy_statuses:
+              active: "Active"
+              inactive: "Inactive"
             events:
               blank_value: "—"
               unknown_person: "Unknown owner"
+              unknown_occupant: "Unknown occupant"
+              boolean_yes: "Yes"
+              boolean_no: "No"
               unit_created: "Unit registered in the system"
               unit_updated: "%{actor} updated %{changes}"
               unit_status_changed: "%{actor} changed the unit status to \"%{to}\""
@@ -535,6 +550,12 @@ en:
               ownership_percentage_changed: "%{actor} changed %{person}'s ownership share from %{from} to %{to}"
               ownership_status_changed: "%{actor} changed %{person}'s status to \"%{to}\""
               ownership_removed: "%{actor} removed %{person} as owner"
+              occupancy_created: "%{actor} added %{person} as occupant (%{type})"
+              occupancy_updated: "%{actor} updated occupancy for %{person}"
+              occupancy_type_changed: "%{actor} changed %{person}'s occupancy type to \"%{to}\""
+              occupancy_status_changed: "%{actor} changed %{person}'s status to \"%{to}\""
+              occupancy_authorization_changed: "%{actor} changed visit authorization for %{person} to \"%{to}\""
+              occupancy_removed: "%{actor} removed %{person} as occupant"
               change_pair: "%{label} from \"%{from}\" to \"%{to}\""
               area_value: "%{value} m²"
             attributes:

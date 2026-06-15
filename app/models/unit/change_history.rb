@@ -55,11 +55,15 @@ class Unit::ChangeHistory
       person_ids = Set.new
       section_ids = Set.new
       ownership_ids = []
+      occupancy_ids = []
 
       audits.each do |audit|
         case audit.auditable_type
         when "UnitOwnership"
           ownership_ids << audit.auditable_id
+          collect_ids_from_changes(audit.audited_changes, :person_id, person_ids)
+        when "UnitOccupancy"
+          occupancy_ids << audit.auditable_id
           collect_ids_from_changes(audit.audited_changes, :person_id, person_ids)
         when "Unit"
           collect_ids_from_changes(audit.audited_changes, :property_section_id, section_ids)
@@ -72,10 +76,17 @@ class Unit::ChangeHistory
         .index_by(&:id)
       ownerships.each_value { |ownership| person_ids << ownership.person_id if ownership.person_id.present? }
 
+      occupancies = UnitOccupancy.with_deleted
+        .where(id: occupancy_ids)
+        .includes(:person)
+        .index_by(&:id)
+      occupancies.each_value { |occupancy| person_ids << occupancy.person_id if occupancy.person_id.present? }
+
       {
         people: Person.with_deleted.where(id: person_ids.to_a).index_by(&:id),
         sections: PropertySection.where(id: section_ids.to_a).index_by(&:id),
-        ownerships: ownerships
+        ownerships: ownerships,
+        occupancies: occupancies
       }
     end
   end
@@ -94,6 +105,8 @@ class Unit::ChangeHistory
       unit_description(audit, context)
     when "UnitOwnership"
       ownership_description(audit, context)
+    when "UnitOccupancy"
+      occupancy_description(audit, context)
     end
   end
 
@@ -158,6 +171,54 @@ class Unit::ChangeHistory
     end
   end
 
+  def occupancy_description(audit, context)
+    actor = actor_name_for(audit)
+    occupancy = context[:occupancies][audit.auditable_id]
+    person = person_for_occupancy(audit, occupancy, context)
+
+    case audit.action
+    when "create"
+      occupancy_type = occupancy&.occupancy_type || Array(audit.audited_changes.to_h["occupancy_type"]).last
+      t(
+        "events.occupancy_created",
+        actor:,
+        person:,
+        type: format_occupancy_type(occupancy_type)
+      )
+    when "update"
+      changes = audit.audited_changes.to_h
+
+      if changes.key?("occupancy_type") || changes.key?(:occupancy_type)
+        _, to = Array(changes["occupancy_type"] || changes[:occupancy_type])
+        return t(
+          "events.occupancy_type_changed",
+          actor:,
+          person:,
+          to: format_occupancy_type(to)
+        )
+      end
+
+      if changes.key?("status") || changes.key?(:status)
+        _, to = Array(changes["status"] || changes[:status])
+        return t("events.occupancy_status_changed", actor:, person:, to: format_occupancy_status(to))
+      end
+
+      if changes.key?("can_authorize_visits") || changes.key?(:can_authorize_visits)
+        _, to = Array(changes["can_authorize_visits"] || changes[:can_authorize_visits])
+        return t(
+          "events.occupancy_authorization_changed",
+          actor:,
+          person:,
+          to: format_boolean(to)
+        )
+      end
+
+      t("events.occupancy_updated", actor:, person:)
+    when "destroy"
+      t("events.occupancy_removed", actor:, person:)
+    end
+  end
+
   def format_unit_changes(changes, context)
     changes.filter_map do |attribute, values|
       from, to = Array(values)
@@ -196,6 +257,23 @@ class Unit::ChangeHistory
     t("ownership_statuses.#{status}", default: status.to_s.humanize)
   end
 
+  def format_occupancy_status(status)
+    t("occupancy_statuses.#{status}", default: status.to_s.humanize)
+  end
+
+  def format_occupancy_type(occupancy_type)
+    return t("events.blank_value") if occupancy_type.blank?
+
+    I18n.t(
+      "frontend.admin.unit_occupancies.occupancy_types.#{occupancy_type}",
+      default: occupancy_type.to_s.humanize
+    )
+  end
+
+  def format_boolean(value)
+    ActiveModel::Type::Boolean.new.cast(value) ? t("events.boolean_yes") : t("events.boolean_no")
+  end
+
   def format_percentage(value)
     return "—" if value.blank?
 
@@ -208,6 +286,12 @@ class Unit::ChangeHistory
     changes = audit.audited_changes.to_h
     person_id = ownership&.person_id || Array(changes["person_id"] || changes[:person_id]).last
     context[:people][person_id]&.display_name || t("events.unknown_person")
+  end
+
+  def person_for_occupancy(audit, occupancy, context)
+    changes = audit.audited_changes.to_h
+    person_id = occupancy&.person_id || Array(changes["person_id"] || changes[:person_id]).last
+    context[:people][person_id]&.display_name || t("events.unknown_occupant")
   end
 
   def actor_name_for(audit)

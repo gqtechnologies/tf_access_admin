@@ -7,10 +7,10 @@ module PaginationProps
 
   private
 
-  def pagination_info(collection)
+  def pagination_info(collection, per_page: nil)
     {
       current_page: collection.current_page,
-      per_page: @filters[:per_page],
+      per_page: per_page || @filters[:per_page],
       total_pages: collection.total_pages,
       total_count: collection.total_count
     }

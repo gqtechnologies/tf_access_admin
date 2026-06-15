@@ -28,11 +28,11 @@
 
 ## 4. Backend — serializers y respuestas Inertia
 
-- [ ] 4.1 Crear `Admin::UnitOccupancySerializer` incluyendo labels traducidos para `occupancy_type`
-- [ ] 4.2 Extender `UnitsController#show` con props `occupancies` y paginación (pestaña occupants)
-- [ ] 4.3 Strong params para ocupación y persona mínima en create
-- [ ] 4.4 Redirección Inertia a `units#show` con errores en drawer/form (patrón ownerships)
-- [ ] 4.5 Extender `Unit::ChangeHistory` para eventos de `UnitOccupancy`
+- [x] 4.1 Crear `Admin::UnitOccupancySerializer` incluyendo labels traducidos para `occupancy_type`
+- [x] 4.2 Extender `UnitsController#show` con props `occupancies` y paginación (pestaña occupants)
+- [x] 4.3 Strong params para ocupación y persona mínima en create
+- [x] 4.4 Redirección Inertia a `units#show` con errores en drawer/form (patrón ownerships)
+- [x] 4.5 Extender `Unit::ChangeHistory` para eventos de `UnitOccupancy`
 
 ## 5. Frontend — pestaña y tabla de ocupantes
 

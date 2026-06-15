@@ -507,6 +507,15 @@ pt:
               finished: "Finalizado"
               pending: "Pendente"
               inactive: "Inativo"
+          occupants:
+            statuses:
+              active: "Ativo"
+              inactive: "Inativo"
+            validity_states:
+              current: "Vigente"
+              finished: "Finalizado"
+              pending: "Pendente"
+              inactive: "Inativo"
           change_history:
             title: "Histórico de alterações"
             empty_title: "Sem alterações registradas"
@@ -516,9 +525,15 @@ pt:
             ownership_statuses:
               active: "Ativo"
               inactive: "Inativo"
+            occupancy_statuses:
+              active: "Ativo"
+              inactive: "Inativo"
             events:
               blank_value: "—"
               unknown_person: "Proprietário desconhecido"
+              unknown_occupant: "Ocupante desconhecido"
+              boolean_yes: "Sim"
+              boolean_no: "Não"
               unit_created: "Unidade registrada no sistema"
               unit_updated: "%{actor} atualizou %{changes}"
               unit_status_changed: "%{actor} alterou o estado da unidade para \"%{to}\""
@@ -529,6 +544,12 @@ pt:
               ownership_percentage_changed: "%{actor} alterou o percentual de %{person} de %{from} para %{to}"
               ownership_status_changed: "%{actor} alterou o estado de %{person} para \"%{to}\""
               ownership_removed: "%{actor} removeu %{person} como proprietário"
+              occupancy_created: "%{actor} adicionou %{person} como ocupante (%{type})"
+              occupancy_updated: "%{actor} atualizou a ocupação de %{person}"
+              occupancy_type_changed: "%{actor} alterou o tipo de ocupação de %{person} para \"%{to}\""
+              occupancy_status_changed: "%{actor} alterou o estado de %{person} para \"%{to}\""
+              occupancy_authorization_changed: "%{actor} alterou a autorização de visitas de %{person} para \"%{to}\""
+              occupancy_removed: "%{actor} removeu %{person} como ocupante"
               change_pair: "%{label} de \"%{from}\" para \"%{to}\""
               area_value: "%{value} m²"
             attributes:

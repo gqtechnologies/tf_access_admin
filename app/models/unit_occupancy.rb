@@ -78,6 +78,14 @@ class UnitOccupancy < ApplicationRecord
       .where("#{table_name}.ends_at IS NULL OR #{table_name}.ends_at >= ?", day_start)
   }
 
+  scope :ordered_for_display, lambda {
+    active_first = sanitize_sql_array([
+      "CASE WHEN #{table_name}.status = ? THEN 0 ELSE 1 END",
+      OccupancyStatuses::ACTIVE
+    ])
+    order(Arel.sql(active_first), starts_at: :desc, created_at: :desc)
+  }
+
   def self.active_authorizers_for(unit, at: Time.zone.now)
     active_authorizers(at: at).where(unit_id: unit.id, organization_id: unit.organization_id)
   end
