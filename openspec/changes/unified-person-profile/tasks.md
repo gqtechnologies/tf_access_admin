@@ -32,23 +32,23 @@
 
 ## 5. Página Perfil Unificado (Vue)
 
-- [ ] 5.1 Crear `admin/people/show.vue` con `TabNav` (Resumen, Propiedades, Residencias, Staff, Visitas, Historial)
-- [ ] 5.2 Crear `PersonProfileHeader` (nombre, documento, email, teléfono, estado, badges, enlace Editar)
-- [ ] 5.2.1 Mostrar badges de roles contextuales derivados
-- [ ] 5.3 Crear `PersonSummaryTab` (datos personales, usuario, roles, fechas)
-- [ ] 5.3.1 Mostrar cards de métricas rápidas debajo del header
-- [ ] 5.4 Crear `PersonOwnershipsTab` con `AdminDataTable` (propiedad, sección, unidad, %, estado)
-- [ ] 5.4.1 Enlazar propiedad y unidad desde PersonOwnershipsTab
-- [ ] 5.5 Crear `PersonOccupanciesTab` con `AdminDataTable` (propiedad, sección, unidad, tipo, estado)
-- [ ] 5.5.1 Enlazar propiedad y unidad desde PersonOccupanciesTab
-- [ ] 5.6 Crear `PersonStaffTab` con columnas preparadas y empty state
-- [ ] 5.6.1 Crear empty state para Staff
-- [ ] 5.7 Crear `PersonVisitsTab` con estructura preparada y empty state
-- [ ] 5.7.1 Crear empty state para Visitas
-- [ ] 5.8 Crear `PersonHistoryTab` con tabla/listado de auditoría
-- [ ] 5.9 Tipos TypeScript para props del perfil (`types/person_profile.ts` o extensión de `person.ts`)
-- [ ] 5.10 Breadcrumbs: `Personas > {display_name}`
-- [ ] 5.11 Implementar perfil siguiendo:
+- [x] 5.1 Crear `admin/people/show.vue` con `TabNav` (Resumen, Propiedades, Residencias, Staff, Visitas, Historial)
+- [x] 5.2 Crear `PersonProfileHeader` (nombre, documento, email, teléfono, estado, badges, enlace Editar)
+- [x] 5.2.1 Mostrar badges de roles contextuales derivados
+- [x] 5.3 Crear `PersonSummaryTab` (datos personales, usuario, roles, fechas)
+- [x] 5.3.1 Mostrar cards de métricas rápidas debajo del header
+- [x] 5.4 Crear `PersonOwnershipsTab` con `AdminDataTable` (propiedad, sección, unidad, %, estado)
+- [x] 5.4.1 Enlazar propiedad y unidad desde PersonOwnershipsTab
+- [x] 5.5 Crear `PersonOccupanciesTab` con `AdminDataTable` (propiedad, sección, unidad, tipo, estado)
+- [x] 5.5.1 Enlazar propiedad y unidad desde PersonOccupanciesTab
+- [x] 5.6 Crear `PersonStaffTab` con columnas preparadas y empty state
+- [x] 5.6.1 Crear empty state para Staff
+- [x] 5.7 Crear `PersonVisitsTab` con estructura preparada y empty state
+- [x] 5.7.1 Crear empty state para Visitas
+- [x] 5.8 Crear `PersonHistoryTab` con tabla/listado de auditoría
+- [x] 5.9 Tipos TypeScript para props del perfil (`types/person_profile.ts` o extensión de `person.ts`)
+- [x] 5.10 Breadcrumbs: `Personas > {display_name}`
+- [x] 5.11 Implementar perfil siguiendo:
   - mockups/person-profile-overview.png
   - mockups/person-profile-properties.png
   - mockups/person-profile-residences.png

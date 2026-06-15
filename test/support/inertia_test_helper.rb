@@ -16,4 +16,8 @@ module InertiaTestHelper
   def inertia_props
     JSON.parse(response.body)["props"]
   end
+
+  def inertia_component
+    JSON.parse(response.body)["component"]
+  end
 end

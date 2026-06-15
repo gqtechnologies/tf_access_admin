@@ -87,9 +87,11 @@ class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
     inertia_get admin_person_path(@person)
 
     assert_response :success
+    assert_equal "admin/people/show", inertia_component
     props = inertia_props
 
     assert_equal @person.id, props["person"]["id"]
+    assert_equal "People Show Person", props["person"]["display_name"]
     assert_includes props["contextual_roles"], People::ContextualRoles::OWNER
     assert_includes props["contextual_roles"], People::ContextualRoles::RESIDENT
     assert_equal 1, props["summary"]["active_ownerships_count"]
@@ -109,6 +111,28 @@ class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert props["ownerships_pagination"]["total_count"].present?
     assert props["occupancies_pagination"]["total_count"].present?
     assert props["change_history"].is_a?(Array)
+  end
+
+  test "show change history is ordered from newest to oldest" do
+    sign_in_as(@tenant_admin)
+
+    travel_to 2.days.ago do
+      Person.without_auditing do
+        @person.update!(display_name: "People Show Person Older")
+      end
+      @person.update!(display_name: "People Show Person Older Audited")
+    end
+
+    travel_to 1.day.ago do
+      @person.update!(display_name: "People Show Person Newer")
+    end
+
+    inertia_get admin_person_path(@person)
+
+    assert_response :success
+    timestamps = inertia_props["change_history"].map { |entry| Time.zone.parse(entry["occurred_at"]) }
+    assert_operator timestamps.size, :>=, 2
+    assert_equal timestamps.sort.reverse, timestamps
   end
 
   test "show denies access for non admin user" do
