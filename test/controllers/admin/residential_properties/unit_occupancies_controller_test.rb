@@ -156,6 +156,130 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
     end
   end
 
+  test "tenant admin create with new person delegates to CreateWithPerson service" do
+    sign_in_as(@tenant_admin)
+
+    assert_raises(NotImplementedError) do
+      post @occupancies_path, params: {
+        unit_occupancy: {
+          occupancy_type: OccupancyTypes::TENANT,
+          starts_at: Time.current
+        },
+        person: {
+          first_name: "New",
+          last_name: "Occupant",
+          person_type: PersonTypes::NATURAL
+        }
+      }
+    end
+  end
+
+  test "tenant admin update delegates to service layer" do
+    sign_in_as(@tenant_admin)
+
+    assert_raises(NotImplementedError) do
+      patch @occupancy_path, params: {
+        unit_occupancy: { can_authorize_visits: true }
+      }
+    end
+  end
+
+  test "tenant admin destroy delegates to Destroy service for soft delete" do
+    sign_in_as(@tenant_admin)
+
+    assert_raises(NotImplementedError) do
+      delete @occupancy_path
+    end
+  end
+
+  test "update is forbidden for tenant admin from another organization" do
+    other_occupancy = ActsAsTenant.without_tenant do
+      other_organization = organizations(:two)
+      other_property = ResidentialProperty.create!(
+        organization: other_organization,
+        name: "Other Org Update Property",
+        property_type: PropertyTypes::BUILDING,
+        status: "active",
+        country: "Chile",
+        timezone: "America/Santiago"
+      )
+      other_unit = Unit.create!(
+        organization: other_organization,
+        residential_property: other_property,
+        identifier: "OTH-OCC-UPD-101",
+        unit_type: UnitTypes::APARTMENT,
+        status: UnitStatuses::AVAILABLE
+      )
+      other_person = Person.create!(
+        organization: other_organization,
+        display_name: "Other Org Update Occupant",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+      UnitOccupancy.create!(
+        organization: other_organization,
+        unit: other_unit,
+        person: other_person,
+        occupancy_type: OccupancyTypes::TENANT,
+        starts_at: Time.current,
+        status: "active"
+      )
+    end
+
+    sign_in_as(@tenant_admin)
+
+    assert_no_changes -> { other_occupancy.reload.can_authorize_visits } do
+      patch admin_residential_property_unit_occupancy_path(@property, @unit, other_occupancy), params: {
+        unit_occupancy: { can_authorize_visits: true }
+      }
+    end
+
+    assert_redirected_to @unit_show_path
+  end
+
+  test "destroy is forbidden for tenant admin from another organization" do
+    other_occupancy = ActsAsTenant.without_tenant do
+      other_organization = organizations(:two)
+      other_property = ResidentialProperty.create!(
+        organization: other_organization,
+        name: "Other Org Destroy Property",
+        property_type: PropertyTypes::BUILDING,
+        status: "active",
+        country: "Chile",
+        timezone: "America/Santiago"
+      )
+      other_unit = Unit.create!(
+        organization: other_organization,
+        residential_property: other_property,
+        identifier: "OTH-OCC-DEL-101",
+        unit_type: UnitTypes::APARTMENT,
+        status: UnitStatuses::AVAILABLE
+      )
+      other_person = Person.create!(
+        organization: other_organization,
+        display_name: "Other Org Destroy Occupant",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+      UnitOccupancy.create!(
+        organization: other_organization,
+        unit: other_unit,
+        person: other_person,
+        occupancy_type: OccupancyTypes::TENANT,
+        starts_at: Time.current,
+        status: "active"
+      )
+    end
+
+    sign_in_as(@tenant_admin)
+
+    assert_no_changes -> { other_occupancy.reload.deleted_at } do
+      delete admin_residential_property_unit_occupancy_path(@property, @unit, other_occupancy)
+    end
+
+    assert_redirected_to @unit_show_path
+  end
+
   private
 
   def sign_in_as(user)

@@ -12,7 +12,7 @@ module UnitOccupancies
     end
 
     def call
-      raise NotImplementedError, "UnitOccupancies::Destroy is not implemented yet"
+      raise NotImplementedError, "UnitOccupancies::Destroy is not implemented yet (soft delete via acts_as_paranoid)"
     end
   end
 end
