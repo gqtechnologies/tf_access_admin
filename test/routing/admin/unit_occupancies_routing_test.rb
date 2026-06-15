@@ -34,4 +34,14 @@ class Admin::ResidentialProperties::UnitOccupanciesRoutingTest < ActionDispatch:
       id: "occupancy-id"
     )
   end
+
+  test "GET active_elsewhere maps to active_elsewhere action" do
+    assert_routing(
+      { method: "get", path: "/admin/residential_properties/rp-id/units/unit-id/occupancies/active_elsewhere" },
+      controller: "admin/residential_properties/unit_occupancies",
+      action: "active_elsewhere",
+      residential_property_id: "rp-id",
+      unit_id: "unit-id"
+    )
+  end
 end

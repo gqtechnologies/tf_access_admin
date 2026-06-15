@@ -36,6 +36,20 @@ class Admin::ResidentialProperties::UnitOccupanciesController < AdminController
     redirect_to_unit_show_with_errors(e.record)
   end
 
+  def active_elsewhere
+    authorize UnitOccupancy, :create?
+
+    person = @unit.organization.people.find(params.require(:person_id))
+    occupancies = UnitOccupancies::ActiveElsewhereForPerson.call(
+      person: person,
+      exclude_unit: @unit
+    )
+
+    render json: { active_elsewhere_occupancies: occupancies }
+  rescue ActiveRecord::RecordNotFound
+    render json: { active_elsewhere_occupancies: [] }, status: :not_found
+  end
+
   private
 
   def create_occupancy!

@@ -488,11 +488,19 @@ es:
           existing_person_match: "Ya existe una persona con este documento o email (%{display_name}). Búsquela y reutilícela."
       unit_occupancies:
         not_found: "Ocupación no encontrada"
+        occupancy_types:
+          owner_resident: "Propietario residente"
+          tenant: "Arrendatario"
+          family_member: "Familiar"
+          temporary_resident: "Residente temporal"
+          authorized_manager: "Administrador autorizado"
+          other: "Otro"
         validations:
           duplicate_active_person: "Esta persona ya tiene una ocupación activa en la unidad"
           ends_at_before_starts_at: "La fecha de término debe ser igual o posterior a la de inicio"
           invalid_occupancy_type: "El tipo de ocupación no es válido"
           invalid_status: "El estado no es válido"
+          existing_person_match: "Ya existe una persona con este documento o email (%{display_name}). Búsquela y reutilícela."
       residential_properties:
         title: "Propiedades"
         created_successfully: "Propiedad creada correctamente"

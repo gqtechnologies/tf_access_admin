@@ -13,7 +13,26 @@ module UnitOccupancies
     end
 
     def call
-      raise NotImplementedError, "UnitOccupancies::Create is not implemented yet"
+      person = find_person!
+
+      Mutation.with_unit_lock(@unit) do
+        occupancy = UnitOccupancy.new(
+          Mutation.occupancy_attributes(
+            unit: @unit,
+            person: person,
+            occupancy_params: @occupancy_params
+          )
+        )
+        occupancy.save!
+        occupancy
+      end
+    end
+
+    private
+
+    def find_person!
+      person_id = @occupancy_params.fetch(:person_id)
+      @unit.organization.people.find(person_id)
     end
   end
 end

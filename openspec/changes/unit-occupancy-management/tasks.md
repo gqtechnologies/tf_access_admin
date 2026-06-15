@@ -17,14 +17,14 @@
 
 ## 3. Backend — servicios y validaciones
 
-- [ ] 3.1 Implementar `UnitOccupancies::Create` (persona existente + datos de ocupación)
-- [ ] 3.2 Implementar `UnitOccupancies::CreateWithPerson` (persona nueva + ocupación en transacción)
-- [ ] 3.3 Implementar `UnitOccupancies::Update` (tipo, `can_authorize_visits`, fechas, status)
-- [ ] 3.4 Normalizar `starts_at` al inicio del día y `ends_at` al final del día durante create/update
-- [ ] 3.5 Implementar `UnitOccupancies::Destroy` como soft delete vía `acts_as_paranoid`
-- [ ] 3.6 Reutilizar o extraer deduplicación de personas (`document_number_digest`, email normalizado) del flujo de propietarios
-- [ ] 3.7 Añadir traducciones de errores y labels de `occupancy_type` en `es` / `en` / `pt`
-- [ ] 3.8 Exponer ocupaciones activas de la persona seleccionada (propiedad, sección, unidad, tipo y fechas) para mostrar warning contextual durante la asignación
+- [x] 3.1 Implementar `UnitOccupancies::Create` (persona existente + datos de ocupación)
+- [x] 3.2 Implementar `UnitOccupancies::CreateWithPerson` (persona nueva + ocupación en transacción)
+- [x] 3.3 Implementar `UnitOccupancies::Update` (tipo, `can_authorize_visits`, fechas, status)
+- [x] 3.4 Normalizar `starts_at` al inicio del día y `ends_at` al final del día durante create/update
+- [x] 3.5 Implementar `UnitOccupancies::Destroy` como soft delete vía `acts_as_paranoid`
+- [x] 3.6 Reutilizar o extraer deduplicación de personas (`document_number_digest`, email normalizado) del flujo de propietarios
+- [x] 3.7 Añadir traducciones de errores y labels de `occupancy_type` en `es` / `en` / `pt`
+- [x] 3.8 Exponer ocupaciones activas de la persona seleccionada (propiedad, sección, unidad, tipo y fechas) para mostrar warning contextual durante la asignación
 
 ## 4. Backend — serializers y respuestas Inertia
 

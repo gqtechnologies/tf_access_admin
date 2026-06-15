@@ -143,53 +143,108 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
 
   test "tenant admin create delegates to service layer" do
     sign_in_as(@tenant_admin)
+    other_person = Person.create!(
+      organization: @organization,
+      display_name: "Controller Create Occupant",
+      person_type: PersonTypes::NATURAL,
+      status: PersonStatuses::ACTIVE
+    )
 
-    assert_raises(NotImplementedError) do
+    assert_difference -> { @unit.unit_occupancies.count }, 1 do
       post @occupancies_path, params: {
         unit_occupancy: {
-          person_id: @person.id,
+          person_id: other_person.id,
           occupancy_type: OccupancyTypes::TENANT,
           can_authorize_visits: true,
-          starts_at: Time.current
+          starts_at: Date.current
         }
       }
     end
+
+    assert_redirected_to @unit_show_path
   end
 
   test "tenant admin create with new person delegates to CreateWithPerson service" do
     sign_in_as(@tenant_admin)
 
-    assert_raises(NotImplementedError) do
-      post @occupancies_path, params: {
-        unit_occupancy: {
-          occupancy_type: OccupancyTypes::TENANT,
-          starts_at: Time.current
-        },
-        person: {
-          first_name: "New",
-          last_name: "Occupant",
-          person_type: PersonTypes::NATURAL
+    assert_difference -> { Person.count }, 1 do
+      assert_difference -> { @unit.unit_occupancies.count }, 1 do
+        post @occupancies_path, params: {
+          unit_occupancy: {
+            occupancy_type: OccupancyTypes::TENANT,
+            starts_at: Date.current
+          },
+          person: {
+            first_name: "Drawer",
+            last_name: "Occupant",
+            document_number: "99.999.999-9",
+            email: "drawer-occupant@example.test",
+            person_type: PersonTypes::NATURAL
+          }
         }
-      }
+      end
     end
+
+    assert_redirected_to @unit_show_path
   end
 
   test "tenant admin update delegates to service layer" do
     sign_in_as(@tenant_admin)
 
-    assert_raises(NotImplementedError) do
-      patch @occupancy_path, params: {
-        unit_occupancy: { can_authorize_visits: true }
-      }
-    end
+    patch @occupancy_path, params: {
+      unit_occupancy: { can_authorize_visits: true, occupancy_type: OccupancyTypes::FAMILY_MEMBER }
+    }
+
+    assert_redirected_to @unit_show_path
+    assert @occupancy.reload.can_authorize_visits
+    assert_equal OccupancyTypes::FAMILY_MEMBER, @occupancy.occupancy_type
   end
 
   test "tenant admin destroy delegates to Destroy service for soft delete" do
     sign_in_as(@tenant_admin)
+    occupancy_id = @occupancy.id
 
-    assert_raises(NotImplementedError) do
-      delete @occupancy_path
-    end
+    delete @occupancy_path
+
+    assert_redirected_to @unit_show_path
+    assert_nil UnitOccupancy.find_by(id: occupancy_id)
+    assert UnitOccupancy.with_deleted.exists?(id: occupancy_id)
+  end
+
+  test "active_elsewhere returns occupancies for selected person in other units" do
+    sign_in_as(@tenant_admin)
+
+    other_property = ResidentialProperty.create!(
+      organization: @organization,
+      name: "Other Active Elsewhere Property",
+      property_type: PropertyTypes::BUILDING,
+      status: "active",
+      country: "Chile",
+      timezone: "America/Santiago"
+    )
+    other_unit = Unit.create!(
+      organization: @organization,
+      residential_property: other_property,
+      identifier: "OTH-WARN-101",
+      unit_type: UnitTypes::APARTMENT,
+      status: UnitStatuses::AVAILABLE
+    )
+    UnitOccupancy.create!(
+      organization: @organization,
+      unit: other_unit,
+      person: @person,
+      occupancy_type: OccupancyTypes::TENANT,
+      starts_at: Time.current,
+      status: OccupancyStatuses::ACTIVE
+    )
+
+    get active_elsewhere_admin_residential_property_unit_occupancies_path(@property, @unit, person_id: @person.id)
+
+    assert_response :success
+    payload = JSON.parse(response.body)
+    assert_equal 1, payload["active_elsewhere_occupancies"].size
+    assert_equal "OTH-WARN-101", payload.dig("active_elsewhere_occupancies", 0, "unit", "identifier")
+    assert_equal other_property.name, payload.dig("active_elsewhere_occupancies", 0, "property", "name")
   end
 
   test "update is forbidden for tenant admin from another organization" do

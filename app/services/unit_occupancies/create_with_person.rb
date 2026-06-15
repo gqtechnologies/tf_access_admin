@@ -14,7 +14,76 @@ module UnitOccupancies
     end
 
     def call
-      raise NotImplementedError, "UnitOccupancies::CreateWithPerson is not implemented yet"
+      reject_duplicate_person!
+
+      Mutation.with_unit_lock(@unit) do
+        ActiveRecord::Base.transaction do
+          person = build_person
+          person.save!
+          ensure_membership!(person)
+
+          occupancy = UnitOccupancy.new(
+            Mutation.occupancy_attributes(
+              unit: @unit,
+              person: person,
+              occupancy_params: @occupancy_params
+            )
+          )
+          occupancy.save!
+          occupancy
+        end
+      end
+    end
+
+    private
+
+    def reject_duplicate_person!
+      existing = UnitOwnerships::FindExistingPerson.call(
+        organization: @unit.organization,
+        document_number: @person_params[:document_number],
+        email: normalized_email
+      )
+      return unless existing
+
+      person = Person.new(organization: @unit.organization)
+      person.errors.add(
+        :base,
+        I18n.t(
+          "frontend.admin.unit_occupancies.validations.existing_person_match",
+          display_name: existing.display_name
+        )
+      )
+      raise ActiveRecord::RecordInvalid, person
+    end
+
+    def build_person
+      first_name = @person_params[:first_name].to_s.strip.presence
+      last_name = @person_params[:last_name].to_s.strip.presence
+
+      person = Person.new(
+        organization: @unit.organization,
+        first_name: first_name,
+        last_name: last_name,
+        display_name: @person_params[:display_name],
+        person_type: @person_params[:person_type].presence || PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+      person.document_number = @person_params[:document_number]
+      person.contact_email = normalized_email
+      person
+    end
+
+    def ensure_membership!(person)
+      membership = person.organization_membership
+      return membership if membership.present?
+
+      membership = OrganizationMembership.create!(organization: person.organization, person: person)
+      membership.accept! if membership.may_accept?
+      membership
+    end
+
+    def normalized_email
+      (@person_params[:contact_email] || @person_params[:email]).to_s.downcase.strip.presence
     end
   end
 end

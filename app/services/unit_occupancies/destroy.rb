@@ -12,7 +12,10 @@ module UnitOccupancies
     end
 
     def call
-      raise NotImplementedError, "UnitOccupancies::Destroy is not implemented yet (soft delete via acts_as_paranoid)"
+      Mutation.with_unit_lock(@occupancy.unit) do
+        @occupancy.destroy!
+        @occupancy
+      end
     end
   end
 end
