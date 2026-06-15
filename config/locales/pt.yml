@@ -537,6 +537,8 @@ pt:
               deactivate_success: "Ocupante inativado com sucesso"
               status_error: "Não foi possível atualizar o estado do ocupante"
               delete_description: "Remover {name} como ocupante desta unidade?"
+              activate_description: "Ativar {name} como ocupante desta unidade?"
+              deactivate_description: "Inativar {name} como ocupante desta unidade?"
               delete_success: "Ocupante removido com sucesso"
               delete_error: "Não foi possível remover o ocupante"
               edit_coming_soon: "A edição completa estará disponível em breve."
@@ -626,6 +628,16 @@ pt:
               actions:
                 cancel: "Cancelar"
                 close: "Fechar"
+            edit_occupant:
+              title: "Editar ocupação"
+              assign:
+                title: "Dados da ocupação"
+                description: "Atualize o tipo de ocupação, permissões, vigência e estado."
+              fields:
+                status: "Estado"
+                status_placeholder: "Selecione um estado"
+              actions:
+                submit: "Salvar alterações"
             statuses:
               active: "Ativo"
               inactive: "Inativo"

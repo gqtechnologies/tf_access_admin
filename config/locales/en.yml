@@ -543,6 +543,8 @@ en:
               deactivate_success: "Occupant deactivated successfully"
               status_error: "Could not update occupant status"
               delete_description: "Remove {name} as an occupant of this unit?"
+              activate_description: "Activate {name} as an occupant of this unit?"
+              deactivate_description: "Deactivate {name} as an occupant of this unit?"
               delete_success: "Occupant removed successfully"
               delete_error: "Could not remove the occupant"
               edit_coming_soon: "Full editing will be available soon."
@@ -632,6 +634,16 @@ en:
               actions:
                 cancel: "Cancel"
                 close: "Close"
+            edit_occupant:
+              title: "Edit occupancy"
+              assign:
+                title: "Occupancy details"
+                description: "Update occupancy type, permissions, validity, and status."
+              fields:
+                status: "Status"
+                status_placeholder: "Select a status"
+              actions:
+                submit: "Save changes"
             statuses:
               active: "Active"
               inactive: "Inactive"

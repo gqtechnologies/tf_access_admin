@@ -57,9 +57,9 @@
 
 ## 7. Frontend — drawer editar ocupación
 
-- [ ] 7.1 Drawer/modal de edición reutilizando campos del paso `assign`
-- [ ] 7.2 Conectar a `PATCH occupancies/:id` con `preserveScroll`
-- [ ] 7.3 Acciones activar/inactivar y eliminar desde fila o drawer según patrón owners
+- [x] 7.1 Drawer/modal de edición reutilizando campos del paso `assign`
+- [x] 7.2 Conectar a `PATCH occupancies/:id` con `preserveScroll`
+- [x] 7.3 Acciones activar/inactivar y eliminar desde fila o drawer según patrón owners
 
 ## 8. Tests
 

@@ -200,6 +200,45 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
     assert_equal OccupancyTypes::FAMILY_MEMBER, @occupancy.occupancy_type
   end
 
+  test "update with invalid dates redirects with inertia errors" do
+    sign_in_as(@tenant_admin)
+
+    assert_no_changes -> { @occupancy.reload.starts_at } do
+      patch @occupancy_path, params: {
+        unit_occupancy: {
+          occupancy_type: OccupancyTypes::TENANT,
+          starts_at: Date.current,
+          ends_at: Date.current - 1.day
+        }
+      }
+    end
+
+    assert_redirected_to @unit_show_path
+    assert_equal(
+      { ends_at: [ validation_key("ends_at_before_starts_at") ] },
+      session[:inertia_errors]
+    )
+  end
+
+  test "update occupancy type and status via patch" do
+    sign_in_as(@tenant_admin)
+
+    patch @occupancy_path, params: {
+      unit_occupancy: {
+        occupancy_type: OccupancyTypes::OWNER_RESIDENT,
+        can_authorize_visits: false,
+        status: OccupancyStatuses::INACTIVE,
+        starts_at: Date.current
+      }
+    }
+
+    assert_redirected_to @unit_show_path
+    @occupancy.reload
+    assert_equal OccupancyTypes::OWNER_RESIDENT, @occupancy.occupancy_type
+    assert_equal OccupancyStatuses::INACTIVE, @occupancy.status
+    assert_not @occupancy.can_authorize_visits
+  end
+
   test "tenant admin destroy delegates to Destroy service for soft delete" do
     sign_in_as(@tenant_admin)
     occupancy_id = @occupancy.id

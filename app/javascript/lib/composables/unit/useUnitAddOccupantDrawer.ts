@@ -53,6 +53,7 @@ const OCCUPANCY_DRAWER_ERROR_KEYS = [
   'first_name',
   'last_name',
   'can_authorize_visits',
+  'status',
 ] as const
 
 export function createEmptyPersonForm(): AddOccupantPersonForm {

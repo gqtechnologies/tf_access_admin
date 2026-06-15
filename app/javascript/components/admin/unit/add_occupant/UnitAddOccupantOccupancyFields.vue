@@ -48,6 +48,26 @@
         />
       </Field>
 
+      <Field v-if="showStatus">
+        <FieldLabel :for="`${idPrefix}-status`">
+          {{ t('admin.units.show.occupants.edit_occupant.fields.status') }}
+        </FieldLabel>
+        <Select v-model="statusModel">
+          <SelectTrigger :id="`${idPrefix}-status`" :aria-invalid="!!fieldErrors.status">
+            <SelectValue :placeholder="t('admin.units.show.occupants.edit_occupant.fields.status_placeholder')" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">
+              {{ t('admin.units.show.occupants.statuses.active') }}
+            </SelectItem>
+            <SelectItem value="inactive">
+              {{ t('admin.units.show.occupants.statuses.inactive') }}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+        <FieldError v-if="fieldErrors.status" :errors="translateErrors([fieldErrors.status])" />
+      </Field>
+
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field>
           <FieldLabel :for="`${idPrefix}-starts-at`">
@@ -96,22 +116,35 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
-import type { UnitOccupancyAssignForm } from '@/lib/schemas/unit_occupancy'
+import type { UnitOccupancyAssignForm, UnitOccupancyEditForm } from '@/lib/schemas/unit_occupancy'
 import type { OccupancyTypeOption } from '@/types/unit'
 
-const occupancyForm = defineModel<UnitOccupancyAssignForm>('occupancyForm', { required: true })
+const occupancyForm = defineModel<UnitOccupancyAssignForm | UnitOccupancyEditForm>(
+  'occupancyForm',
+  { required: true },
+)
 
 const props = withDefaults(
   defineProps<{
     occupancyTypes: OccupancyTypeOption[]
     fieldErrors?: Record<string, string | undefined>
     idPrefix?: string
+    showStatus?: boolean
   }>(),
-  { idPrefix: 'add-occupant' },
+  { idPrefix: 'add-occupant', showStatus: false },
 )
 
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 
 const fieldErrors = computed(() => props.fieldErrors ?? {})
+
+const statusModel = computed({
+  get: () => ('status' in occupancyForm.value ? occupancyForm.value.status : 'active'),
+  set: (value: 'active' | 'inactive') => {
+    if ('status' in occupancyForm.value) {
+      occupancyForm.value.status = value
+    }
+  },
+})
 </script>

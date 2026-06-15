@@ -145,6 +145,39 @@ class Admin::UnitOccupancyCreateFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1, inertia_props.dig("unit", "occupancy_stats", "historical_occupants_count")
   end
 
+  test "update occupancy refreshes occupancies list and metrics on unit show" do
+    sign_in_as(@tenant_admin)
+
+    occupancy = UnitOccupancies::Create.call(
+      unit: @unit,
+      occupancy_params: {
+        person_id: @existing_person.id,
+        occupancy_type: OccupancyTypes::TENANT,
+        can_authorize_visits: true,
+        starts_at: Date.current
+      },
+      actor: @tenant_admin
+    )
+
+    patch admin_residential_property_unit_occupancy_path(@property, @unit, occupancy), params: {
+      unit_occupancy: {
+        occupancy_type: OccupancyTypes::FAMILY_MEMBER,
+        can_authorize_visits: false,
+        status: OccupancyStatuses::ACTIVE,
+        starts_at: Date.current
+      }
+    }
+
+    assert_redirected_to @unit_show_path
+
+    inertia_get @unit_show_path
+    row = inertia_props["occupancies"].find { |item| item["id"] == occupancy.id }
+    assert_equal OccupancyTypes::FAMILY_MEMBER, row["occupancy_type"]
+    assert_equal false, row["can_authorize_visits"]
+    assert_equal 1, inertia_props.dig("unit", "occupancy_stats", "active_occupants_count")
+    assert_equal 0, inertia_props.dig("unit", "occupancy_stats", "active_authorizers_count")
+  end
+
   test "active_elsewhere returns warning payload for person with occupancy in another unit" do
     sign_in_as(@tenant_admin)
 

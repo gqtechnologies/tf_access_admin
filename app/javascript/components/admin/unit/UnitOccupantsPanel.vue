@@ -32,8 +32,8 @@
       :include-inactive="includeInactive"
       :permissions="permissions"
       @update:include-inactive="updateIncludeInactive"
-      @edit="handleEdit"
-      @toggle-status="toggleStatus"
+      @edit="openEditDrawer"
+      @toggle-status="confirmToggleStatus"
       @delete="confirmDelete"
     />
 
@@ -42,6 +42,14 @@
       :unit="unit"
       :occupancy-types="occupancyTypes"
       :errors="addDrawerErrors"
+    />
+
+    <UnitEditOccupantDrawer
+      v-model:open="editOccupantOpen"
+      :unit="unit"
+      :occupancy="editingOccupancy"
+      :occupancy-types="occupancyTypes"
+      :errors="editDrawerErrors"
     />
   </div>
 </template>
@@ -55,12 +63,14 @@ import { History, Plus, ShieldCheck, UserRound, Users } from 'lucide-vue-next'
 import MetricCard from '@/components/admin/shared/MetricCard.vue'
 import PanelHeader from '@/components/admin/shared/PanelHeader.vue'
 import UnitAddOccupantDrawer from '@/components/admin/unit/add_occupant/UnitAddOccupantDrawer.vue'
+import UnitEditOccupantDrawer from '@/components/admin/unit/edit_occupant/UnitEditOccupantDrawer.vue'
 import UnitOccupantsTable from '@/components/admin/unit/UnitOccupantsTable.vue'
 import { Button } from '@/components/ui/button'
 import {
   isOccupancyDrawerError,
   loadSuccessState,
 } from '@/lib/composables/unit/useUnitAddOccupantDrawer'
+import { loadEditDrawerState } from '@/lib/composables/unit/useUnitEditOccupantDrawer'
 import { adminResidentialPropertyUnitOccupancyPath } from '@/lib/paths/unit_occupancies'
 import { admin_residential_property_unit_path } from '@/routes'
 import type {
@@ -84,18 +94,43 @@ const props = defineProps<{
 const { t } = useI18n()
 const page = usePage()
 const addOccupantOpen = ref(!!loadSuccessState())
+const editOccupantOpen = ref(false)
+const editingOccupancy = ref<UnitOccupancy | null>(null)
 
-const addDrawerErrors = computed(() => props.errors)
+const addDrawerErrors = computed(() => {
+  if (!props.errors || loadEditDrawerState()?.occupancyId) return undefined
+  return props.errors
+})
+
+const editDrawerErrors = computed(() => {
+  if (!props.errors || !loadEditDrawerState()?.occupancyId) return undefined
+  return props.errors
+})
 
 function openAddOccupantDrawer() {
   if (!props.permissions.create) return
   addOccupantOpen.value = true
 }
 
+function openEditDrawer(occupancy: UnitOccupancy) {
+  if (!props.permissions.update) return
+  editingOccupancy.value = occupancy
+  editOccupantOpen.value = true
+}
+
 watch(
   () => props.errors,
   (errors) => {
     if (!isOccupancyDrawerError(errors)) return
+
+    const editState = loadEditDrawerState()
+    if (editState?.occupancyId) {
+      const occupancy = props.occupancies.find((item) => item.id === editState.occupancyId) ?? null
+      editingOccupancy.value = occupancy
+      editOccupantOpen.value = true
+      return
+    }
+
     if (props.permissions.create) addOccupantOpen.value = true
   },
   { immediate: true },
@@ -132,14 +167,20 @@ function updateIncludeInactive(checked: boolean) {
   )
 }
 
-function handleEdit(_occupancy: UnitOccupancy) {
-  toast.info(t('admin.units.show.occupants.actions.edit_coming_soon'))
-}
-
-function toggleStatus(occupancy: UnitOccupancy) {
+function confirmToggleStatus(occupancy: UnitOccupancy) {
   if (!props.permissions.update) return
 
   const nextStatus = occupancy.status === 'active' ? 'inactive' : 'active'
+  const message =
+    nextStatus === 'inactive'
+      ? t('admin.units.show.occupants.actions.deactivate_description', {
+          name: occupancy.person_display_name,
+        })
+      : t('admin.units.show.occupants.actions.activate_description', {
+          name: occupancy.person_display_name,
+        })
+
+  if (!window.confirm(message)) return
 
   router.patch(
     adminResidentialPropertyUnitOccupancyPath(
