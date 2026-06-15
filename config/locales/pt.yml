@@ -321,6 +321,8 @@ pt:
           person_type_required: "O tipo de pessoa é obrigatório"
           status_required: "O status é obrigatório"
           email_invalid: "Endereço de email inválido"
+          document_taken: "O documento já está registrado nesta organização"
+          email_taken: "O email já está registrado nesta organização"
           role_required: "O cargo é obrigatório"
           role_invalid: "Cargo inválido"
         person_types:

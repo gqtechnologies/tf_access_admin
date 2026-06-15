@@ -327,6 +327,8 @@ en:
           person_type_required: "Person type is required"
           status_required: "Status is required"
           email_invalid: "Invalid email address"
+          document_taken: "Document is already registered in this organization"
+          email_taken: "Email is already registered in this organization"
           role_required: "Role is required"
           role_invalid: "Invalid role"
         person_types:

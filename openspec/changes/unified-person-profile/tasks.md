@@ -7,10 +7,10 @@
 
 ## 2. Modelo Person y roles derivados
 
-- [ ] 2.1 Añadir `has_many :unit_occupancies` y `has_many :visitor_profiles` en `Person`
-- [ ] 2.2 Crear `People::ContextualRoles` con owner, resident, visitor, concierge, property_admin, cleaning_staff, system_user
-- [ ] 2.3 Añadir validación de unicidad por documento y email en la organización
-- [ ] 2.4 Tests de modelo: roles múltiples simultáneos, duplicados, asociaciones
+- [x] 2.1 Añadir `has_many :unit_occupancies` y `has_many :visitor_profiles` en `Person`
+- [x] 2.2 Crear `People::ContextualRoles` con owner, resident, visitor, concierge, property_admin, cleaning_staff, system_user
+- [x] 2.3 Añadir validación de unicidad por documento y email en la organización
+- [x] 2.4 Tests de modelo: roles múltiples simultáneos, duplicados, asociaciones
 
 ## 3. Integración con flujos existentes
 

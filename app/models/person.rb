@@ -54,6 +54,8 @@ class Person < ApplicationRecord
   belongs_to :user, optional: true
   has_one :organization_membership, dependent: :destroy
   has_many :unit_ownerships, dependent: :destroy
+  has_many :unit_occupancies, dependent: :destroy
+  has_many :visitor_profiles, dependent: :destroy
 
   validates :display_name, presence: true
   validates :person_type, presence: true, inclusion: { in: PersonTypes::ALL }
@@ -63,6 +65,9 @@ class Person < ApplicationRecord
     allow_nil: true,
     conditions: -> { where(deleted_at: nil) }
   }
+
+  validate :document_unique_within_organization
+  validate :email_unique_within_organization
 
   before_validation :assign_display_name
   before_validation :sync_document_attributes
@@ -107,6 +112,10 @@ class Person < ApplicationRecord
   def set_tenant_role(role_name)
     delete_tenant_roles
     add_role(role_name, organization) unless has_role?(role_name, organization)
+  end
+
+  def contextual_roles
+    People::ContextualRoles.call(self)
   end
 
   def self.ransackable_attributes(_auth_object = nil)
@@ -159,6 +168,48 @@ class Person < ApplicationRecord
 
   def self.document_digest(document_number)
     BulkImportServices::UnitsImportValidationContext.document_digest(document_number)
+  end
+
+  def document_unique_within_organization
+    return if document_number_digest.blank?
+
+    scope = Person.where(
+      organization_id: organization_id,
+      document_type: document_type,
+      document_number_digest: document_number_digest
+    )
+    scope = scope.where.not(id: id) if persisted?
+
+    return unless scope.exists?
+
+    errors.add(:document_number, "admin.people.validations.document_taken")
+  end
+
+  def email_unique_within_organization
+    normalized = normalized_email_for_uniqueness
+    return if normalized.blank?
+
+    return unless email_taken_in_organization?(normalized)
+
+    errors.add(:contact_email, "admin.people.validations.email_taken")
+  end
+
+  def normalized_email_for_uniqueness
+    email = @contact_email.presence || metadata["import_email"].presence || user&.email
+    email.to_s.downcase.strip.presence
+  end
+
+  def email_taken_in_organization?(normalized)
+    metadata_scope = Person.where(organization_id: organization_id)
+      .where("metadata->>'import_email' = ?", normalized)
+    metadata_scope = metadata_scope.where.not(id: id) if persisted?
+    return true if metadata_scope.exists?
+
+    linked_user = User.where("LOWER(email) = ?", normalized).first
+    return false unless linked_user
+
+    existing = linked_user.person_for(organization)
+    existing.present? && (!persisted? || existing.id != id)
   end
 
   def delete_tenant_roles

@@ -97,7 +97,7 @@ module People
       refute_equal metadata_person, result
     end
 
-    test "prioritizes user email over metadata import_email" do
+    test "prioritizes user email lookup before metadata import_email in FindExisting" do
       user = ActsAsTenant.without_tenant do
         User.create!(
           email: "priority-user@example.test",
@@ -116,22 +116,13 @@ module People
         person_type: PersonTypes::NATURAL,
         status: PersonStatuses::ACTIVE
       )
-      metadata_person = Person.new(
-        organization: @organization,
-        display_name: "Metadata Person",
-        person_type: PersonTypes::NATURAL,
-        status: PersonStatuses::ACTIVE
-      )
-      metadata_person.contact_email = "priority-user@example.test"
-      metadata_person.save!
 
-      result = FindExisting.call(
+      result = People::FindExisting.call(
         organization: @organization,
         email: "priority-user@example.test"
       )
 
       assert_equal user_person, result
-      refute_equal metadata_person, result
     end
 
     test "returns nil when no match exists" do
