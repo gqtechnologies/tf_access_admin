@@ -1,9 +1,9 @@
 ## 1. Servicio central de identidad
 
-- [ ] 1.1 Crear `People::FindExisting` con prioridad documento → email vía User → email en metadata
-- [ ] 1.2 Añadir tests del resolver (match, sin match, soft-deleted excluido)
-- [ ] 1.3 Refactorizar `UnitOwnerships::FindExistingPerson` para delegar al servicio central
-- [ ] 1.4 Refactorizar `BulkImportServices::ResolveImportOwnerPerson` para delegar al servicio central
+- [x] 1.1 Crear `People::FindExisting` con prioridad documento → email vía User → email en metadata
+- [x] 1.2 Añadir tests del resolver (match, sin match, soft-deleted excluido)
+- [x] 1.3 Refactorizar `UnitOwnerships::FindExistingPerson` para delegar al servicio central
+- [x] 1.4 Refactorizar `BulkImportServices::ResolveImportOwnerPerson` para delegar al servicio central
 
 ## 2. Modelo Person y roles derivados
 

@@ -25,27 +25,11 @@ module BulkImportServices
     end
 
     def find_existing_person
-      person = find_by_document_digest
-      return person if person
-
-      find_by_user_email
-    end
-
-    def find_by_document_digest
-      digest = document_digest
-      return nil if digest.blank?
-
-      Person.find_by(organization_id: @organization.id, document_number_digest: digest)
-    end
-
-    def find_by_user_email
-      email = owner_email
-      return nil if email.blank?
-
-      user = User.where("LOWER(email) = ?", email).first
-      return nil unless user
-
-      user.person_for(@organization)
+      People::FindExisting.call(
+        organization: @organization,
+        document_number: @normalized["owner_document"],
+        email: owner_email
+      )
     end
 
     private
