@@ -211,7 +211,55 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
     assert UnitOccupancy.with_deleted.exists?(id: occupancy_id)
   end
 
-  test "active_elsewhere returns occupancies for selected person in other units" do
+  test "create with duplicate active occupancy redirects with inertia errors" do
+    sign_in_as(@tenant_admin)
+
+    assert_no_difference -> { @unit.unit_occupancies.count } do
+      post @occupancies_path, params: {
+        unit_occupancy: {
+          person_id: @person.id,
+          occupancy_type: OccupancyTypes::TENANT,
+          starts_at: Date.current
+        }
+      }
+    end
+
+    assert_redirected_to @unit_show_path
+    assert_equal(
+      { person_id: [ validation_key("duplicate_active_person") ] },
+      session[:inertia_errors]
+    )
+  end
+
+  test "create with invalid dates redirects with inertia errors" do
+    sign_in_as(@tenant_admin)
+
+    other_person = Person.create!(
+      organization: @organization,
+      display_name: "Invalid Dates Occupant",
+      person_type: PersonTypes::NATURAL,
+      status: PersonStatuses::ACTIVE
+    )
+
+    assert_no_difference -> { @unit.unit_occupancies.count } do
+      post @occupancies_path, params: {
+        unit_occupancy: {
+          person_id: other_person.id,
+          occupancy_type: OccupancyTypes::TENANT,
+          starts_at: Date.current,
+          ends_at: Date.current - 1.day
+        }
+      }
+    end
+
+    assert_redirected_to @unit_show_path
+    assert_equal(
+      { ends_at: [ validation_key("ends_at_before_starts_at") ] },
+      session[:inertia_errors]
+    )
+  end
+
+  test "active_elsewhere includes property section when present" do
     sign_in_as(@tenant_admin)
 
     other_property = ResidentialProperty.create!(
@@ -222,9 +270,16 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
       country: "Chile",
       timezone: "America/Santiago"
     )
+    other_section = PropertySection.create!(
+      organization: @organization,
+      residential_property: other_property,
+      name: "Tower A",
+      section_type: SectionTypes::TOWER
+    )
     other_unit = Unit.create!(
       organization: @organization,
       residential_property: other_property,
+      property_section: other_section,
       identifier: "OTH-WARN-101",
       unit_type: UnitTypes::APARTMENT,
       status: UnitStatuses::AVAILABLE
@@ -245,6 +300,7 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
     assert_equal 1, payload["active_elsewhere_occupancies"].size
     assert_equal "OTH-WARN-101", payload.dig("active_elsewhere_occupancies", 0, "unit", "identifier")
     assert_equal other_property.name, payload.dig("active_elsewhere_occupancies", 0, "property", "name")
+    assert_equal "Tower A", payload.dig("active_elsewhere_occupancies", 0, "property_section", "name")
   end
 
   test "update is forbidden for tenant admin from another organization" do
@@ -336,6 +392,10 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
   end
 
   private
+
+  def validation_key(name)
+    "admin.unit_occupancies.validations.#{name}"
+  end
 
   def sign_in_as(user)
     host! "#{@organization.subdomain}.example.com"

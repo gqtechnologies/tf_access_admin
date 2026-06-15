@@ -44,16 +44,16 @@
 
 ## 6. Frontend — drawer agregar ocupante
 
-- [ ] 6.1 Composable `useUnitAddOccupantDrawer` (pasos, estado, snapshot sessionStorage)
-- [ ] 6.2 Paso `choose`: buscar persona existente vs crear nueva
-- [ ] 6.3 Paso `search`: búsqueda paginada de personas (reutilizar patrón add-owner)
-- [ ] 6.4 Paso `create`: formulario persona mínima (nombre, documento, email)
-- [ ] 6.5 Paso `assign`: tipo de ocupación, `can_authorize_visits`, fechas
-- [ ] 6.6 Paso `confirm`: resumen antes de submit
-- [ ] 6.7 Footer drawer con `flex justify-between` (secundario izquierda, primario derecha)
-- [ ] 6.8 Conectar submit a `POST occupancies` vía Inertia con manejo de errores
-- [ ] 6.9 Mostrar warning destacado si la persona seleccionada posee una ocupación activa en otra unidad, indicando propiedad, sección y unidad actual
-- [ ] 6.10 Paso `success`: pantalla de éxito mostrando ocupante asignado, unidad y acciones disponibles (cerrar drawer / ver ocupantes)
+- [x] 6.1 Composable `useUnitAddOccupantDrawer` (pasos, estado, snapshot sessionStorage)
+- [x] 6.2 Paso `choose`: buscar persona existente vs crear nueva
+- [x] 6.3 Paso `search`: búsqueda paginada de personas (reutilizar patrón add-owner)
+- [x] 6.4 Paso `create`: formulario persona mínima (nombre, documento, email)
+- [x] 6.5 Paso `assign`: tipo de ocupación, `can_authorize_visits`, fechas
+- [x] 6.6 Paso `confirm`: resumen antes de submit
+- [x] 6.7 Footer drawer con `flex justify-between` (secundario izquierda, primario derecha)
+- [x] 6.8 Conectar submit a `POST occupancies` vía Inertia con manejo de errores
+- [x] 6.9 Mostrar warning destacado si la persona seleccionada posee una ocupación activa en otra unidad, indicando propiedad, sección y unidad actual
+- [x] 6.10 Paso `success`: pantalla de éxito mostrando ocupante asignado, unidad y acciones disponibles (cerrar drawer / ver ocupantes)
 
 ## 7. Frontend — drawer editar ocupación
 

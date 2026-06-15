@@ -546,6 +546,92 @@ en:
               delete_success: "Occupant removed successfully"
               delete_error: "Could not remove the occupant"
               edit_coming_soon: "Full editing will be available soon."
+            add_occupant:
+              title: "Add occupant"
+              unit_label: "Unit"
+              steps_nav: "Steps to add occupant"
+              steps:
+                choose: "Choose option"
+                search: "Search person"
+                create: "Create person"
+                assign: "Occupancy details"
+                confirm: "Confirm"
+              choose:
+                title: "How would you like to add the occupant?"
+                description: "You can search for an existing person or create a new one."
+                search:
+                  title: "Search person"
+                  description: "Search among people registered in the organization."
+                create:
+                  title: "Create new person"
+                  description: "Create a new person and assign them as an occupant of this unit."
+              search:
+                title: "Search person"
+                description: "Enter a document, name, or email to search."
+                placeholder: "Search by document, name, or email..."
+                results_title: "Results found"
+                loading: "Searching..."
+                empty: "No people found."
+                not_found_prompt: "Can't find the person?"
+                create_new: "Create new person"
+              create:
+                title: "Create new person"
+                description: "Complete the minimum details for the new person."
+                person_section_title: "New person"
+                person_section_description: "Complete the new person's details."
+                actions:
+                  continue: "Continue"
+                validations:
+                  document_required: "Document is required"
+                  first_name_required: "First name is required"
+                  last_name_required: "Last name is required"
+              assign:
+                title: "Selected person details"
+                description: "Review the person and define occupancy details."
+                person_section_title: "Selected person"
+                person_section_description: "Review the person's information."
+                occupancy:
+                  title: "Occupancy details"
+                  description: "Define occupancy type, permissions, and validity."
+                fields:
+                  occupancy_type: "Occupancy type"
+                  occupancy_type_placeholder: "Select a type"
+                  can_authorize_visits: "Can authorize visits"
+                  can_authorize_visits_help: "Only active occupants with this permission can authorize visits."
+                  starts_at: "Start date"
+                  starts_at_placeholder: "Select a date"
+                  ends_at: "End date"
+                  ends_at_placeholder: "Optional"
+                actions:
+                  continue: "Continue"
+                validations:
+                  occupancy_type_required: "Occupancy type is required"
+                  starts_at_required: "Start date is required"
+              confirm:
+                title: "Confirm assignment"
+                description: "Review the summary before creating the occupancy."
+                person: "Occupant"
+                unit: "Unit"
+                occupancy_type: "Occupancy type"
+                can_authorize_visits: "Can authorize visits"
+                validity: "Validity"
+                actions:
+                  submit: "Confirm and add"
+              success:
+                title: "Occupant added"
+                description: "The occupancy was successfully registered on this unit."
+                occupant: "Occupant"
+                unit: "Unit"
+                occupancy_type: "Occupancy type"
+                actions:
+                  view_occupants: "View occupants"
+              warning:
+                title: "Active occupancy in another unit"
+                description: "This person is already an active occupant in another unit. You can continue with the assignment."
+                starts_at: "Start: {date}"
+              actions:
+                cancel: "Cancel"
+                close: "Close"
             statuses:
               active: "Active"
               inactive: "Inactive"

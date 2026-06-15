@@ -474,6 +474,92 @@ es:
               delete_success: "Ocupante eliminado correctamente"
               delete_error: "No se pudo eliminar el ocupante"
               edit_coming_soon: "La edición completa estará disponible próximamente."
+            add_occupant:
+              title: "Agregar ocupante"
+              unit_label: "Unidad"
+              steps_nav: "Pasos para agregar ocupante"
+              steps:
+                choose: "Elegir opción"
+                search: "Buscar persona"
+                create: "Crear persona"
+                assign: "Datos de ocupación"
+                confirm: "Confirmar"
+              choose:
+                title: "¿Cómo deseas agregar al ocupante?"
+                description: "Puedes buscar una persona existente o crear una nueva."
+                search:
+                  title: "Buscar persona"
+                  description: "Busca entre las personas registradas en la organización."
+                create:
+                  title: "Crear nueva persona"
+                  description: "Crea una nueva persona y asígnala como ocupante de esta unidad."
+              search:
+                title: "Buscar persona"
+                description: "Ingresa un documento, nombre o email para buscar."
+                placeholder: "Buscar por documento, nombre o email..."
+                results_title: "Resultados encontrados"
+                loading: "Buscando..."
+                empty: "No se encontraron personas."
+                not_found_prompt: "¿No encuentras a la persona?"
+                create_new: "Crear nueva persona"
+              create:
+                title: "Crear nueva persona"
+                description: "Completa los datos mínimos de la nueva persona."
+                person_section_title: "Nueva persona"
+                person_section_description: "Completa los datos de la nueva persona."
+                actions:
+                  continue: "Continuar"
+                validations:
+                  document_required: "El documento es obligatorio"
+                  first_name_required: "El nombre es obligatorio"
+                  last_name_required: "El apellido es obligatorio"
+              assign:
+                title: "Detalle de persona seleccionada"
+                description: "Revisa la persona y define los datos de ocupación."
+                person_section_title: "Persona seleccionada"
+                person_section_description: "Revisa la información de la persona."
+                occupancy:
+                  title: "Datos de ocupación"
+                  description: "Define el tipo de ocupación, permisos y vigencia."
+                fields:
+                  occupancy_type: "Tipo de ocupación"
+                  occupancy_type_placeholder: "Selecciona un tipo"
+                  can_authorize_visits: "Puede autorizar visitas"
+                  can_authorize_visits_help: "Solo ocupantes activos con este permiso pueden autorizar visitas."
+                  starts_at: "Fecha de inicio"
+                  starts_at_placeholder: "Selecciona una fecha"
+                  ends_at: "Fecha de término"
+                  ends_at_placeholder: "Opcional"
+                actions:
+                  continue: "Continuar"
+                validations:
+                  occupancy_type_required: "El tipo de ocupación es obligatorio"
+                  starts_at_required: "La fecha de inicio es obligatoria"
+              confirm:
+                title: "Confirmar asignación"
+                description: "Revisa el resumen antes de crear la ocupación."
+                person: "Ocupante"
+                unit: "Unidad"
+                occupancy_type: "Tipo de ocupación"
+                can_authorize_visits: "Autoriza visitas"
+                validity: "Vigencia"
+                actions:
+                  submit: "Confirmar y agregar"
+              success:
+                title: "Ocupante agregado"
+                description: "La ocupación se registró correctamente en esta unidad."
+                occupant: "Ocupante"
+                unit: "Unidad"
+                occupancy_type: "Tipo de ocupación"
+                actions:
+                  view_occupants: "Ver ocupantes"
+              warning:
+                title: "Ocupación activa en otra unidad"
+                description: "Esta persona ya figura como residente/ocupante activo en otra unidad. Puedes continuar con la asignación."
+                starts_at: "Inicio: {date}"
+              actions:
+                cancel: "Cancelar"
+                close: "Cerrar"
             statuses:
               active: "Activo"
               inactive: "Inactivo"

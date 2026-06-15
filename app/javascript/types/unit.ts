@@ -64,6 +64,27 @@ export type UnitOccupancyPermissions = {
   destroy: boolean
 }
 
+export type ActiveElsewhereOccupancy = {
+  occupancy_id: string
+  occupancy_type: string
+  occupancy_type_label: string
+  starts_at: string
+  ends_at: string | null
+  unit: {
+    id: string
+    identifier: string
+    display_name: string | null
+  }
+  property: {
+    id: string
+    name: string
+  }
+  property_section: {
+    id: string
+    name: string
+  } | null
+}
+
 export type UnitChangeHistoryEntry = {
   id: string
   occurred_at: string

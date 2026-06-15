@@ -21,8 +21,10 @@
           :unit="props.unit"
           :occupancies="props.occupancies"
           :occupancies-pagination="props.occupancies_pagination"
+          :occupancy-types="props.occupancy_types ?? []"
           :permissions="props.occupancy_permissions"
           :occupancies-include-inactive="props.occupancies_include_inactive"
+          :errors="props.errors"
         />
         <UnitPlaceholderTab
           v-else

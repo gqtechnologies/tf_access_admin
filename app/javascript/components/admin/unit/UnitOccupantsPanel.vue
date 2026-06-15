@@ -3,7 +3,14 @@
     <PanelHeader
       :title="t('admin.units.show.occupants.title')"
       :description="t('admin.units.show.occupants.description')"
-    />
+    >
+      <template #actions>
+        <Button v-if="permissions.create" @click="openAddOccupantDrawer">
+          <Plus class="size-4" />
+          {{ t('admin.units.show.occupants.add_occupant.title') }}
+        </Button>
+      </template>
+    </PanelHeader>
 
     <div class="flex flex-col lg:flex-row lg:justify-start lg:items-start lg:gap-2 gap-4">
       <MetricCard
@@ -29,6 +36,13 @@
       @toggle-status="toggleStatus"
       @delete="confirmDelete"
     />
+
+    <UnitAddOccupantDrawer
+      v-model:open="addOccupantOpen"
+      :unit="unit"
+      :occupancy-types="occupancyTypes"
+      :errors="addDrawerErrors"
+    />
   </div>
 </template>
 
@@ -37,13 +51,20 @@ import { computed, ref, watch } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
-import { History, ShieldCheck, UserRound, Users } from 'lucide-vue-next'
+import { History, Plus, ShieldCheck, UserRound, Users } from 'lucide-vue-next'
 import MetricCard from '@/components/admin/shared/MetricCard.vue'
 import PanelHeader from '@/components/admin/shared/PanelHeader.vue'
+import UnitAddOccupantDrawer from '@/components/admin/unit/add_occupant/UnitAddOccupantDrawer.vue'
 import UnitOccupantsTable from '@/components/admin/unit/UnitOccupantsTable.vue'
+import { Button } from '@/components/ui/button'
+import {
+  isOccupancyDrawerError,
+  loadSuccessState,
+} from '@/lib/composables/unit/useUnitAddOccupantDrawer'
 import { adminResidentialPropertyUnitOccupancyPath } from '@/lib/paths/unit_occupancies'
 import { admin_residential_property_unit_path } from '@/routes'
 import type {
+  OccupancyTypeOption,
   UnitDetail,
   UnitOccupanciesPagination,
   UnitOccupancy,
@@ -54,12 +75,31 @@ const props = defineProps<{
   unit: UnitDetail
   occupancies: UnitOccupancy[]
   occupanciesPagination?: UnitOccupanciesPagination
+  occupancyTypes: OccupancyTypeOption[]
   permissions: UnitOccupancyPermissions
   occupanciesIncludeInactive?: boolean
+  errors?: Record<string, string[]>
 }>()
 
 const { t } = useI18n()
 const page = usePage()
+const addOccupantOpen = ref(!!loadSuccessState())
+
+const addDrawerErrors = computed(() => props.errors)
+
+function openAddOccupantDrawer() {
+  if (!props.permissions.create) return
+  addOccupantOpen.value = true
+}
+
+watch(
+  () => props.errors,
+  (errors) => {
+    if (!isOccupancyDrawerError(errors)) return
+    if (props.permissions.create) addOccupantOpen.value = true
+  },
+  { immediate: true },
+)
 
 const includeInactive = ref(props.occupanciesIncludeInactive ?? readIncludeInactiveFromUrl())
 
