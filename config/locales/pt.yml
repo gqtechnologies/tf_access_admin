@@ -53,6 +53,7 @@ pt:
         continue: "Continuar"
         confirm: "Confirmar"
         cancel: "Cancelar"
+        back: "Voltar"
       table:
         pagination:
           rows_per_page: "Linhas por página"
@@ -519,8 +520,8 @@ pt:
               historical: "Históricos / inativos"
               total: "Total registrados"
             authorization:
-              yes: "Sim"
-              no: "Não"
+              "yes": "Sim"
+              "no": "Não"
             table:
               occupant: "Ocupante"
               document: "Documento"

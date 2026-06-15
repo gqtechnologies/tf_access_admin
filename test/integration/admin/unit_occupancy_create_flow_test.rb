@@ -120,8 +120,8 @@ class Admin::UnitOccupancyCreateFlowTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to @unit_show_path
 
-    created_person = Person.find_by!(contact_email: "integration-new-occupant@example.test")
-    created = @unit.unit_occupancies.find_by!(person_id: created_person.id)
+    created = @unit.unit_occupancies.order(created_at: :desc).first!
+    created_person = created.person
 
     inertia_get @unit_show_path
     assert_response :success

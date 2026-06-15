@@ -53,6 +53,7 @@ en:
         continue: "Continue"
         confirm: "Confirm"
         cancel: "Cancel"
+        back: "Back"
       table:
         pagination:
           rows_per_page: "Rows per page"
@@ -525,8 +526,8 @@ en:
               historical: "Historical / inactive"
               total: "Total registered"
             authorization:
-              yes: "Yes"
-              no: "No"
+              "yes": "Yes"
+              "no": "No"
             table:
               occupant: "Occupant"
               document: "Document"

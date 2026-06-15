@@ -29,16 +29,16 @@ module UnitOccupancies
 
     def normalize_starts_at(value, unit)
       zone = time_zone_for(unit)
-      return Time.current.in_time_zone(zone).beginning_of_day if value.blank?
+      return Time.current.in_time_zone(zone).beginning_of_day.utc if value.blank?
 
-      parse_datetime(value, zone).beginning_of_day
+      parse_datetime(value, zone).beginning_of_day.utc
     end
 
     def normalize_ends_at(value, unit)
       return nil if value.blank?
 
       zone = time_zone_for(unit)
-      parse_datetime(value, zone).end_of_day
+      parse_datetime(value, zone).end_of_day.utc
     end
 
     def time_zone_for(unit)
