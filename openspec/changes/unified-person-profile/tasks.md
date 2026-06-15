@@ -14,10 +14,10 @@
 
 ## 3. Integración con flujos existentes
 
-- [ ] 3.1 Actualizar `UnitOccupancies::CreateWithPerson` para usar resolver central
-- [ ] 3.2 Actualizar flujo `UnitOwnerships::CreateWithPerson` (o equivalente) para usar resolver central
-- [ ] 3.3 Verificar importación masiva sin duplicados
-- [ ] 3.4 Tests de integración para alta propietario/residente con documento/email duplicado
+- [x] 3.1 Actualizar `UnitOccupancies::CreateWithPerson` para usar resolver central
+- [x] 3.2 Actualizar flujo `UnitOwnerships::CreateWithPerson` (o equivalente) para usar resolver central
+- [x] 3.3 Verificar importación masiva sin duplicados
+- [x] 3.4 Tests de integración para alta propietario/residente con documento/email duplicado
 
 ## 4. Backend perfil unificado
 
