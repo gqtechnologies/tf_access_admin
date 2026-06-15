@@ -46,6 +46,16 @@ class PrepareUnitOccupanciesForManagementTest < ActiveSupport::TestCase
     assert_equal OccupancyTypes::FAMILY_MEMBER, occupancy.reload.occupancy_type
   end
 
+  test "migrate_legacy_occupancy_types leaves tenant and other unchanged" do
+    tenant = create_occupancy_with_legacy_type!("tenant")
+    other = create_occupancy_with_legacy_type!("other")
+
+    @migration.migrate_legacy_occupancy_types!
+
+    assert_equal "tenant", tenant.reload.occupancy_type
+    assert_equal "other", other.reload.occupancy_type
+  end
+
   private
 
   def create_occupancy_with_legacy_type!(legacy_type)

@@ -96,6 +96,61 @@ class Admin::UnitOccupancyCreateFlowTest < ActionDispatch::IntegrationTest
     assert props["change_history"].any? { |entry| entry["description"].include?(@existing_person.display_name) }
   end
 
+  test "create with new person refreshes occupancies metrics and change history" do
+    sign_in_as(@tenant_admin)
+
+    assert_difference -> { Person.count }, 1 do
+      assert_difference -> { @unit.unit_occupancies.count }, 1 do
+        post @occupancies_path, params: {
+          unit_occupancy: {
+            occupancy_type: OccupancyTypes::FAMILY_MEMBER,
+            can_authorize_visits: false,
+            starts_at: Date.current
+          },
+          person: {
+            first_name: "Integration",
+            last_name: "New Occupant",
+            document_number: "88.888.888-8",
+            email: "integration-new-occupant@example.test",
+            person_type: PersonTypes::NATURAL
+          }
+        }
+      end
+    end
+
+    assert_redirected_to @unit_show_path
+
+    created_person = Person.find_by!(contact_email: "integration-new-occupant@example.test")
+    created = @unit.unit_occupancies.find_by!(person_id: created_person.id)
+
+    inertia_get @unit_show_path
+    assert_response :success
+
+    props = inertia_props
+    assert props["occupancies"].any? { |occupancy| occupancy["id"] == created.id }
+    assert_equal OccupancyTypes::FAMILY_MEMBER, props["occupancies"].find { |row| row["id"] == created.id }["occupancy_type"]
+    assert_equal 1, props.dig("unit", "occupancy_stats", "active_occupants_count")
+    assert props["change_history"].any? { |entry| entry["description"].include?(created_person.display_name) }
+  end
+
+  test "create with existing person succeeds when person is active elsewhere" do
+    sign_in_as(@tenant_admin)
+
+    assert_difference -> { @unit.unit_occupancies.count }, 1 do
+      post @occupancies_path, params: {
+        unit_occupancy: {
+          person_id: @existing_person.id,
+          occupancy_type: OccupancyTypes::TENANT,
+          starts_at: Date.current
+        }
+      }
+    end
+
+    assert_redirected_to @unit_show_path
+    assert @unit.unit_occupancies.exists?(person_id: @existing_person.id)
+    assert @other_unit.unit_occupancies.exists?(person_id: @existing_person.id, status: OccupancyStatuses::ACTIVE)
+  end
+
   test "destroy soft deletes occupancy and refreshes metrics" do
     sign_in_as(@tenant_admin)
 

@@ -63,13 +63,13 @@
 
 ## 8. Tests
 
-- [ ] 8.1 Tests de servicios: unicidad activa, fechas, duplicado persona, rollback transaccional, soft delete
-- [ ] 8.2 Tests de modelo: validaciones, scopes de authorizers, migración de tipos
-- [ ] 8.3 Tests de controller/policy: autorización y respuestas Inertia
-- [ ] 8.4 Tests de routing para rutas anidadas `occupancies`
-- [ ] 8.5 Test de integración mínimo: create con persona existente y con persona nueva
-- [ ] 8.6 Validar vigencia de autorizadores considerando status, deleted_at, starts_at y ends_at
-- [ ] 8.7 Test de warning cuando la persona seleccionada posee ocupación activa en otra unidad
+- [x] 8.1 Tests de servicios: unicidad activa, fechas, duplicado persona, rollback transaccional, soft delete
+- [x] 8.2 Tests de modelo: validaciones, scopes de authorizers, migración de tipos
+- [x] 8.3 Tests de controller/policy: autorización y respuestas Inertia
+- [x] 8.4 Tests de routing para rutas anidadas `occupancies`
+- [x] 8.5 Test de integración mínimo: create con persona existente y con persona nueva
+- [x] 8.6 Validar vigencia de autorizadores considerando status, deleted_at, starts_at y ends_at
+- [x] 8.7 Test de warning cuando la persona seleccionada posee ocupación activa en otra unidad
 
 ## 9. Verificación manual
 

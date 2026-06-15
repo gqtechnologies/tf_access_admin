@@ -114,6 +114,7 @@ class Admin::ResidentialProperties::UnitsControllerTest < ActionDispatch::Integr
     occupant_ids = inertia_props["occupancies"].map { |occupancy| occupancy["id"] }
     assert_includes occupant_ids, @active_occupancy.id
     assert_includes occupant_ids, @inactive_occupancy.id
+    assert_equal @active_occupancy.id, occupant_ids.first
   end
 
   test "show reflects translated occupancy type and status labels in occupancies" do

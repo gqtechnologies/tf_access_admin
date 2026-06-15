@@ -236,6 +236,65 @@ class UnitOccupancyTest < ActiveSupport::TestCase
     assert_empty UnitOccupancy.active_authorizers_for(@unit, at: today)
   end
 
+  test "active_authorizers_for includes occupancies ending today and starting today" do
+    today = Time.zone.parse("2026-06-14 15:00")
+
+    ending_today = create_occupancy!(
+      can_authorize_visits: true,
+      starts_at: today.beginning_of_day - 5.days,
+      ends_at: today.end_of_day
+    )
+    starting_today = create_occupancy!(
+      person: @other_person,
+      can_authorize_visits: true,
+      starts_at: today.beginning_of_day,
+      ends_at: nil
+    )
+
+    results = UnitOccupancy.active_authorizers_for(@unit, at: today)
+
+    assert_includes results.pluck(:id), ending_today.id
+    assert_includes results.pluck(:id), starting_today.id
+  end
+
+  test "active_authorizers_for excludes occupancies without visit authorization permission" do
+    today = Time.zone.parse("2026-06-14 15:00")
+
+    create_occupancy!(
+      can_authorize_visits: false,
+      starts_at: today.beginning_of_day
+    )
+
+    assert_empty UnitOccupancy.active_authorizers_for(@unit, at: today)
+  end
+
+  test "ordered_for_display lists active occupancies before inactive ordered by starts_at desc" do
+    newer_active_person = Person.create!(
+      organization: @organization,
+      display_name: "Newer Active Occupant",
+      person_type: PersonTypes::NATURAL,
+      status: PersonStatuses::ACTIVE
+    )
+    newer_active = create_occupancy!(
+      person: newer_active_person,
+      starts_at: Time.zone.parse("2026-06-15 00:00"),
+      status: OccupancyStatuses::ACTIVE
+    )
+    older_active = create_occupancy!(
+      starts_at: Time.zone.parse("2026-06-01 00:00"),
+      status: OccupancyStatuses::ACTIVE
+    )
+    inactive = create_occupancy!(
+      person: @other_person,
+      starts_at: Time.zone.parse("2026-06-10 00:00"),
+      status: OccupancyStatuses::INACTIVE
+    )
+
+    ids = @unit.unit_occupancies.ordered_for_display.pluck(:id)
+
+    assert_equal [ newer_active.id, older_active.id, inactive.id ], ids
+  end
+
   test "audited tracks key fields associated with unit" do
     occupancy = create_occupancy!
 

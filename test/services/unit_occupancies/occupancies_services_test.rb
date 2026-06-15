@@ -224,6 +224,38 @@ module UnitOccupancies
       end
     end
 
+    test "rejects duplicate person by normalized email" do
+      existing = Person.create!(
+        organization: @organization,
+        display_name: "Existing Email Occupant",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE,
+        contact_email: "existing-email-occupant@example.test"
+      )
+
+      assert_no_difference -> { Person.count } do
+        assert_no_difference -> { UnitOccupancy.count } do
+          error = assert_raises(ActiveRecord::RecordInvalid) do
+            CreateWithPerson.call(
+              unit: @unit,
+              occupancy_params: {
+                occupancy_type: OccupancyTypes::TENANT,
+                starts_at: Date.current
+              },
+              person_params: {
+                display_name: "Duplicate Email",
+                document_number: "33.333.333-3",
+                email: "EXISTING-EMAIL-OCCUPANT@example.test"
+              },
+              actor: nil
+            )
+          end
+
+          assert_equal existing_person_match_message(existing.display_name), error.record.errors[:base].first
+        end
+      end
+    end
+
     test "rolls back person creation when occupancy validation fails" do
       Create.call(
         unit: @unit,
