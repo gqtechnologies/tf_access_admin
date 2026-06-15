@@ -1,19 +1,19 @@
 ## 1. Backend — modelo y migraciones
 
-- [ ] 1.1 Ampliar `OccupancyTypes` con: `owner_resident`, `tenant`, `family_member`, `temporary_resident`, `authorized_manager`, `other`
-- [ ] 1.2 Migración de datos legacy (`owner` → `owner_resident`, `family` → `family_member`)
-- [ ] 1.3 Añadir `deleted_at` a `unit_occupancies` y habilitar `acts_as_paranoid` en `UnitOccupancy`
-- [ ] 1.4 Añadir índice único parcial por `(organization_id, unit_id, person_id)` considerando únicamente registros no eliminados (`deleted_at IS NULL`)
-- [ ] 1.5 Validaciones modelo: unicidad activa persona+unidad, `ends_at >= starts_at`, inclusión de `occupancy_type` y `status`
-- [ ] 1.6 Añadir `audited` a `UnitOccupancy` (campos clave, `associated_with: :unit`)
-- [ ] 1.7 Scope/query `active_authorizers_for(unit)` para regla de visitas (sin integrar en `Visit` aún)
+- [x] 1.1 Ampliar `OccupancyTypes` con: `owner_resident`, `tenant`, `family_member`, `temporary_resident`, `authorized_manager`, `other`
+- [x] 1.2 Migración de datos legacy (`owner` → `owner_resident`, `family` → `family_member`)
+- [x] 1.3 Añadir `deleted_at` a `unit_occupancies` y habilitar `acts_as_paranoid` en `UnitOccupancy`
+- [x] 1.4 Añadir índice único parcial por `(organization_id, unit_id, person_id)` considerando únicamente registros no eliminados (`deleted_at IS NULL`)
+- [x] 1.5 Validaciones modelo: unicidad activa persona+unidad, `ends_at >= starts_at`, inclusión de `occupancy_type` y `status`
+- [x] 1.6 Añadir `audited` a `UnitOccupancy` (campos clave, `associated_with: :unit`)
+- [x] 1.7 Scope/query `active_authorizers_for(unit)` para regla de visitas (sin integrar en `Visit` aún)
 
 ## 2. Backend — autorización y rutas
 
-- [ ] 2.1 Crear `UnitOccupancyPolicy` con `create?`, `update?`, `destroy?` y scope por tenant
-- [ ] 2.2 Agregar rutas anidadas `occupancies` bajo `residential_properties/:id/units/:unit_id`
-- [ ] 2.3 Crear `Admin::ResidentialProperties::UnitOccupanciesController` (create, update, destroy)
-- [ ] 2.4 Registrar policy en convención Pundit existente
+- [x] 2.1 Crear `UnitOccupancyPolicy` con `create?`, `update?`, `destroy?` y scope por tenant
+- [x] 2.2 Agregar rutas anidadas `occupancies` bajo `residential_properties/:id/units/:unit_id`
+- [x] 2.3 Crear `Admin::ResidentialProperties::UnitOccupanciesController` (create, update, destroy)
+- [x] 2.4 Registrar policy en convención Pundit existente
 
 ## 3. Backend — servicios y validaciones
 

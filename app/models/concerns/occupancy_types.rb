@@ -2,10 +2,24 @@
 
 # Allowed +unit_occupancies.occupancy_type+ values (string-backed).
 module OccupancyTypes
-  OWNER   = "owner"
-  TENANT  = "tenant"
-  FAMILY  = "family"
-  OTHER   = "other"
+  OWNER_RESIDENT       = "owner_resident"
+  TENANT               = "tenant"
+  FAMILY_MEMBER        = "family_member"
+  TEMPORARY_RESIDENT   = "temporary_resident"
+  AUTHORIZED_MANAGER   = "authorized_manager"
+  OTHER                = "other"
 
-  ALL = [ OWNER, TENANT, FAMILY, OTHER ].freeze
+  ALL = [
+    OWNER_RESIDENT,
+    TENANT,
+    FAMILY_MEMBER,
+    TEMPORARY_RESIDENT,
+    AUTHORIZED_MANAGER,
+    OTHER
+  ].freeze
+
+  LEGACY_TYPE_MAP = {
+    "owner" => OWNER_RESIDENT,
+    "family" => FAMILY_MEMBER
+  }.freeze
 end

@@ -32,6 +32,7 @@ module AdminBase
       Date,
       Time,
       ActiveSupport::TimeWithZone,
+      ActiveSupport::TimeZone,
       ActiveSupport::Duration,
       BigDecimal
     ]

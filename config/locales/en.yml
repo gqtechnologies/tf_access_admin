@@ -558,6 +558,13 @@ en:
           duplicate_active_person: "This person already has an active ownership on this unit"
           ends_at_before_starts_at: "End date must be on or after start date"
           existing_person_match: "A person with this document or email already exists (%{display_name}). Search and reuse them."
+      unit_occupancies:
+        not_found: "Occupancy not found"
+        validations:
+          duplicate_active_person: "This person already has an active occupancy on this unit"
+          ends_at_before_starts_at: "End date must be on or after start date"
+          invalid_occupancy_type: "Occupancy type is not valid"
+          invalid_status: "Status is not valid"
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"

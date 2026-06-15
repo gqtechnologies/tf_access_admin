@@ -49,6 +49,7 @@ Rails.application.routes.draw do
       resource :structure, only: [:show], module: :residential_properties
       resources :units, only: [:show], module: :residential_properties do
         resources :ownerships, only: [:create, :update, :destroy], controller: "unit_ownerships"
+        resources :occupancies, only: [:create, :update, :destroy], controller: "unit_occupancies"
       end
       resources :property_sections, only: [:create, :update, :destroy], module: :residential_properties
       resources :bulk_imports, only: %i[create update], module: :residential_properties do

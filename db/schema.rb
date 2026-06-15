@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_14_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -869,6 +869,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
     t.boolean "can_reserve_common_areas", default: false, null: false
     t.boolean "can_withdraw_parcels", default: false, null: false
     t.datetime "created_at", null: false
+    t.datetime "deleted_at"
     t.datetime "ends_at"
     t.jsonb "metadata", default: {}, null: false
     t.string "occupancy_type", null: false
@@ -880,9 +881,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_24_120000) do
     t.string "status", default: "active", null: false
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_unit_occupancies_on_deleted_at"
     t.index ["metadata"], name: "index_unit_occupancies_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "index_unit_occupancies_on_org_person_status"
     t.index ["organization_id", "source_type", "source_id"], name: "index_unit_occupancies_on_org_source"
+    t.index ["organization_id", "unit_id", "person_id"], name: "index_unit_occupancies_on_org_unit_person_not_deleted", unique: true, where: "(deleted_at IS NULL)"
     t.index ["organization_id", "unit_id", "status", "starts_at", "ends_at"], name: "index_unit_occupancies_on_org_unit_status_dates"
     t.index ["organization_id"], name: "index_unit_occupancies_on_organization_id"
     t.index ["person_id"], name: "index_unit_occupancies_on_person_id"

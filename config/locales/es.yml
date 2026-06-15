@@ -486,6 +486,13 @@ es:
           duplicate_active_person: "Esta persona ya tiene una propiedad activa en la unidad"
           ends_at_before_starts_at: "La fecha de término debe ser igual o posterior a la de inicio"
           existing_person_match: "Ya existe una persona con este documento o email (%{display_name}). Búsquela y reutilícela."
+      unit_occupancies:
+        not_found: "Ocupación no encontrada"
+        validations:
+          duplicate_active_person: "Esta persona ya tiene una ocupación activa en la unidad"
+          ends_at_before_starts_at: "La fecha de término debe ser igual o posterior a la de inicio"
+          invalid_occupancy_type: "El tipo de ocupación no es válido"
+          invalid_status: "El estado no es válido"
       residential_properties:
         title: "Propiedades"
         created_successfully: "Propiedad creada correctamente"
