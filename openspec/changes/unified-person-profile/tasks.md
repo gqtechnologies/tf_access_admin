@@ -55,11 +55,11 @@
   - mockups/person-profile-history.png
 ## 6. Navegación y listado
 
-- [ ] 6.1 Actualizar `admin/people/index` — acción "Ver perfil" y/o clic en fila hacia `show`
-- [ ] 6.2 Enlazar nombre de persona en `UnitOwnersTable` al perfil unificado
-- [ ] 6.3 Enlazar nombre de persona en `UnitOccupantsTable` al perfil unificado
-- [ ] 6.4 Mostrar badges de roles contextuales en listado de personas (columna o chips)
-- [ ] 6.5 Traducciones `es` / `en` / `pt` para perfil, tabs, badges y empty states
+- [x] 6.1 Actualizar `admin/people/index` — acción "Ver perfil" y/o clic en fila hacia `show`
+- [x] 6.2 Enlazar nombre de persona en `UnitOwnersTable` al perfil unificado
+- [x] 6.3 Enlazar nombre de persona en `UnitOccupantsTable` al perfil unificado
+- [x] 6.4 Mostrar badges de roles contextuales en listado de personas (columna o chips)
+- [x] 6.5 Traducciones `es` / `en` / `pt` para perfil, tabs, badges y empty states
 
 ## 7. Preparación visitantes y staff
 

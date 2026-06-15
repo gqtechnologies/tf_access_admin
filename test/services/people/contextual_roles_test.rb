@@ -180,6 +180,43 @@ module People
       assert_not roles.intersect?(ContextualRoles::STAFF_ROLES)
     end
 
+    test "batch_for returns contextual roles without per-person queries" do
+      other_person = Person.create!(
+        organization: @organization,
+        display_name: "Batch Other Person",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+
+      UnitOwnership.create!(
+        organization: @organization,
+        unit: @unit,
+        person: @person,
+        ownership_percentage: 100,
+        starts_at: Date.current,
+        status: UnitOwnership::STATUS_ACTIVE
+      )
+      UnitOccupancy.create!(
+        organization: @organization,
+        unit: @unit,
+        person: other_person,
+        occupancy_type: OccupancyTypes::TENANT,
+        status: OccupancyStatuses::ACTIVE,
+        starts_at: Time.current
+      )
+
+      roles_by_person = ContextualRoles.batch_for([ @person, other_person ])
+
+      assert_includes roles_by_person[@person.id], ContextualRoles::OWNER
+      refute_includes roles_by_person[@person.id], ContextualRoles::RESIDENT
+      assert_includes roles_by_person[other_person.id], ContextualRoles::RESIDENT
+      refute_includes roles_by_person[other_person.id], ContextualRoles::OWNER
+    end
+
+    test "batch_for returns empty hash for blank collection" do
+      assert_equal({}, ContextualRoles.batch_for([]))
+    end
+
     test "person contextual_roles delegates to service" do
       UnitOwnership.create!(
         organization: @organization,

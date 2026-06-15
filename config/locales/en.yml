@@ -433,10 +433,12 @@ en:
               display_name: "Name"
               document_number: "Document"
               email: "Email"
+              contextual_roles: "Roles"
               unit_ownerships_count: "Properties"
               status: "Status"
           actions:
             create: "Create person"
+            view_profile: "View profile"
             delete: "Delete person"
             delete_description: "Are you sure you want to delete {name}?"
             delete_success: "Person deleted successfully"

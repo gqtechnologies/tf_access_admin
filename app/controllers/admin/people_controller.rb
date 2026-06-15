@@ -10,13 +10,20 @@ class Admin::PeopleController < AdminController
     authorize Person
     @q = policy_scope(Person).ransack(params[:q])
     people = @q.result(distinct: true)
+      .includes(:user)
       .order(created_at: :desc)
       .page(@filters[:page])
       .per(@filters[:per_page])
 
+    people_records = people.to_a
+    contextual_roles_by_person = People::ContextualRoles.batch_for(people_records)
     pagination = pagination_info(people)
     payload = {
-      people: people.map { |person| Admin::PersonSerializer.new(person).as_json },
+      people: people_records.map do |person|
+        Admin::PersonSerializer.new(person).as_json.merge(
+          contextual_roles: contextual_roles_by_person.fetch(person.id, [])
+        )
+      end,
       pagination: pagination
     }
 

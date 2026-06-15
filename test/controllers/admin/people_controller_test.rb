@@ -81,6 +81,19 @@ class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
     ActsAsTenant.current_tenant = nil
   end
 
+  test "index includes contextual roles for each person" do
+    sign_in_as(@tenant_admin)
+
+    inertia_get admin_people_path
+
+    assert_response :success
+    assert_equal "admin/people/index", inertia_component
+
+    person_row = inertia_props["people"].find { |row| row["id"] == @person.id }
+    assert_includes person_row["contextual_roles"], People::ContextualRoles::OWNER
+    assert_includes person_row["contextual_roles"], People::ContextualRoles::RESIDENT
+  end
+
   test "show route renders unified profile props" do
     sign_in_as(@tenant_admin)
 

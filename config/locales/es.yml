@@ -361,10 +361,12 @@ es:
               display_name: "Nombre"
               document_number: "Documento"
               email: "Email"
+              contextual_roles: "Roles"
               unit_ownerships_count: "Propiedades"
               status: "Estado"
           actions:
             create: "Crear persona"
+            view_profile: "Ver perfil"
             delete: "Eliminar persona"
             delete_description: "¿Eliminar a {name}?"
             delete_success: "Persona eliminada correctamente"

@@ -25,6 +25,12 @@
         </div>
       </template>
       <template #actions="{ row }">
+        <ListItem as="link" :href="admin_person_path(row.id as string)">
+          <span class="flex items-center gap-2">
+            <EyeIcon class="w-4 h-4" />
+            {{ t('admin.people.index.actions.view_profile') }}
+          </span>
+        </ListItem>
         <ListItem as="link" :href="edit_admin_person_path(row.id as string)">
           <span class="flex items-center gap-2">
             <PencilIcon class="w-4 h-4" />
@@ -69,11 +75,12 @@ import { useTable } from '@/lib/composables/useTable'
 import { useI18n } from 'vue-i18n'
 import type { ColumnDef } from '@/types/table'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, SearchIcon, PencilIcon, TrashIcon } from 'lucide-vue-next'
+import { PlusIcon, SearchIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { new_admin_person_path, admin_person_path, edit_admin_person_path } from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'
+import PersonContextualRoleBadges from '@/components/admin/person/PersonContextualRoleBadges.vue'
 import type { Person } from '@/types/person'
 import { toast } from 'vue-sonner'
 import { getPeopleBreadcrumbs } from '@/lib/breadcrumbs/person'
@@ -136,6 +143,27 @@ const columns: ColumnDef<Person, unknown>[] = [
   {
     accessorKey: 'display_name',
     header: () => t('admin.people.index.table.headers.display_name'),
+    cell: ({ row }) => {
+      const person = row.original
+      if (!person.id) return h('span', person.display_name)
+
+      return h(
+        Link,
+        {
+          href: admin_person_path(person.id),
+          class: 'font-medium text-primary hover:underline',
+        },
+        () => person.display_name,
+      )
+    },
+  },
+  {
+    accessorKey: 'contextual_roles',
+    header: () => t('admin.people.index.table.headers.contextual_roles'),
+    cell: ({ row }) =>
+      h(PersonContextualRoleBadges, {
+        roles: row.original.contextual_roles ?? [],
+      }),
   },
   {
     accessorKey: 'document_number',

@@ -427,10 +427,12 @@ pt:
               display_name: "Nome"
               document_number: "Documento"
               email: "Email"
+              contextual_roles: "Papéis"
               unit_ownerships_count: "Propriedades"
               status: "Status"
           actions:
             create: "Criar pessoa"
+            view_profile: "Ver perfil"
             delete: "Excluir pessoa"
             delete_description: "Excluir {name}?"
             delete_success: "Pessoa excluída com sucesso"
