@@ -16,6 +16,14 @@
           :ownerships-pagination="props.ownerships_pagination"
           :errors="props.errors"
         />
+        <UnitOccupantsPanel
+          v-else-if="activeTab === 'residents'"
+          :unit="props.unit"
+          :occupancies="props.occupancies"
+          :occupancies-pagination="props.occupancies_pagination"
+          :permissions="props.occupancy_permissions"
+          :occupancies-include-inactive="props.occupancies_include_inactive"
+        />
         <UnitPlaceholderTab
           v-else
           :title="placeholderTitle"
@@ -27,12 +35,12 @@
         <UnitChangeHistorySidebar :entries="props.change_history" />
       </div>
     </div>
-   
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import {
   Car,
@@ -46,28 +54,57 @@ import {
 import Breadcrumb from '@/components/admin/layout/Breadcrumb.vue'
 import TabNav, { type TabNavItem } from '@/components/admin/shared/TabNav.vue'
 import UnitChangeHistorySidebar from '@/components/admin/unit/UnitChangeHistorySidebar.vue'
+import UnitOccupantsPanel from '@/components/admin/unit/UnitOccupantsPanel.vue'
 import UnitOwnersPanel from '@/components/admin/unit/UnitOwnersPanel.vue'
 import UnitPageHeader from '@/components/admin/unit/UnitPageHeader.vue'
 import UnitPlaceholderTab from '@/components/admin/unit/UnitPlaceholderTab.vue'
 import { getUnitShowBreadcrumbs } from '@/lib/breadcrumbs/unit'
 import type {
+  OccupancyTypeOption,
   UnitChangeHistoryEntry,
   UnitDetail,
+  UnitOccupanciesPagination,
+  UnitOccupancy,
+  UnitOccupancyPermissions,
   UnitOwnership,
   UnitOwnershipsPagination,
 } from '@/types/unit'
 import { Card, CardContent } from '@/components/ui/card'
 
-const props = defineProps<{
-  unit: UnitDetail
-  ownerships: UnitOwnership[]
-  ownerships_pagination?: UnitOwnershipsPagination
-  change_history: UnitChangeHistoryEntry[]
-  errors?: Record<string, string[]>
-}>()
+const props = withDefaults(
+  defineProps<{
+    unit: UnitDetail
+    ownerships: UnitOwnership[]
+    ownerships_pagination?: UnitOwnershipsPagination
+    occupancies?: UnitOccupancy[]
+    occupancies_pagination?: UnitOccupanciesPagination
+    occupancy_types?: OccupancyTypeOption[]
+    occupancy_permissions?: UnitOccupancyPermissions
+    occupancies_include_inactive?: boolean
+    change_history: UnitChangeHistoryEntry[]
+    errors?: Record<string, string[]>
+  }>(),
+  {
+    occupancies: () => [],
+    occupancy_permissions: () => ({ create: false, update: false, destroy: false }),
+    occupancies_include_inactive: false,
+  },
+)
 
 const { t } = useI18n()
-const activeTab = ref('owners')
+const page = usePage()
+
+function resolveInitialTab() {
+  const url = new URL(page.url, window.location.origin)
+  const tab = url.searchParams.get('tab')
+
+  if (tab === 'occupants' || tab === 'residents') return 'residents'
+  if (tab === 'owners') return 'owners'
+
+  return 'owners'
+}
+
+const activeTab = ref(resolveInitialTab())
 
 const itemsBreadcrumb = computed(() =>
   getUnitShowBreadcrumbs(
@@ -75,8 +112,8 @@ const itemsBreadcrumb = computed(() =>
     props.unit.residential_property_id,
     props.unit.residential_property_name,
     props.unit.location_path,
-    props.unit.title
-  )
+    props.unit.title,
+  ),
 )
 
 const tabs = computed<TabNavItem[]>(() => [

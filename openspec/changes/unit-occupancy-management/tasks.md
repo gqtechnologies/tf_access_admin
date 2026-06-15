@@ -36,11 +36,11 @@
 
 ## 5. Frontend — pestaña y tabla de ocupantes
 
-- [ ] 5.1 Habilitar pestaña **Residentes / Ocupantes** en `admin/units/show.vue` (separada de Propietarios)
-- [ ] 5.2 Crear `UnitOccupantsPanel` con tabla: nombre, documento, tipo, puede autorizar visitas, inicio, fin, estado, acciones
-- [ ] 5.3 Paginación server-side y orden (activos primero, luego por `starts_at` desc)
-- [ ] 5.4 Menú de acciones por fila: editar, activar/inactivar, eliminar (soft delete con confirmación)
-- [ ] 5.5 Mostrar únicamente ocupantes activos por defecto y habilitar filtro/toggle para historial
+- [x] 5.1 Habilitar pestaña **Residentes / Ocupantes** en `admin/units/show.vue` (separada de Propietarios)
+- [x] 5.2 Crear `UnitOccupantsPanel` con tabla: nombre, documento, tipo, puede autorizar visitas, inicio, fin, estado, acciones
+- [x] 5.3 Paginación server-side y orden (activos primero, luego por `starts_at` desc)
+- [x] 5.4 Menú de acciones por fila: editar, activar/inactivar, eliminar (soft delete con confirmación)
+- [x] 5.5 Mostrar únicamente ocupantes activos por defecto y habilitar filtro/toggle para historial
 
 ## 6. Frontend — drawer agregar ocupante
 

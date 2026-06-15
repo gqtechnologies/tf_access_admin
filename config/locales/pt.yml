@@ -508,6 +508,38 @@ pt:
               pending: "Pendente"
               inactive: "Inativo"
           occupants:
+            title: "Residentes / Ocupantes"
+            description: "Consulte e gerencie os ocupantes vinculados a esta unidade."
+            open_ended: "Sem data de término"
+            filters:
+              include_inactive: "Incluir ocupantes inativos e históricos"
+            metrics:
+              active: "Ocupantes ativos"
+              authorizers: "Autorizadores de visitas"
+              historical: "Históricos / inativos"
+              total: "Total registrados"
+            authorization:
+              yes: "Sim"
+              no: "Não"
+            table:
+              occupant: "Ocupante"
+              document: "Documento"
+              occupancy_type: "Tipo de ocupação"
+              can_authorize_visits: "Autoriza visitas"
+              validity: "Vigência"
+              status: "Estado"
+              empty: "Não há ocupantes ativos nesta unidade."
+              empty_all: "Não há ocupantes registrados nesta unidade."
+            actions:
+              activate: "Ativar"
+              deactivate: "Inativar"
+              activate_success: "Ocupante ativado com sucesso"
+              deactivate_success: "Ocupante inativado com sucesso"
+              status_error: "Não foi possível atualizar o estado do ocupante"
+              delete_description: "Remover {name} como ocupante desta unidade?"
+              delete_success: "Ocupante removido com sucesso"
+              delete_error: "Não foi possível remover o ocupante"
+              edit_coming_soon: "A edição completa estará disponível em breve."
             statuses:
               active: "Ativo"
               inactive: "Inativo"

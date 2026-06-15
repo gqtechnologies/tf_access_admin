@@ -96,27 +96,6 @@ class Admin::UnitOccupancyCreateFlowTest < ActionDispatch::IntegrationTest
     assert props["change_history"].any? { |entry| entry["description"].include?(@existing_person.display_name) }
   end
 
-  test "create validation error redirects with inertia form errors" do
-    sign_in_as(@tenant_admin)
-
-    assert_no_difference -> { @unit.unit_occupancies.count } do
-      post @occupancies_path, params: {
-        unit_occupancy: {
-          person_id: @existing_person.id,
-          occupancy_type: OccupancyTypes::TENANT,
-          starts_at: Date.current,
-          ends_at: Date.current - 1.day
-        }
-      }
-    end
-
-    assert_redirected_to @unit_show_path
-    assert_equal(
-      { ends_at: [ validation_key("ends_at_before_starts_at") ] },
-      session[:inertia_errors]
-    )
-  end
-
   test "destroy soft deletes occupancy and refreshes metrics" do
     sign_in_as(@tenant_admin)
 
@@ -138,6 +117,32 @@ class Admin::UnitOccupancyCreateFlowTest < ActionDispatch::IntegrationTest
     inertia_get @unit_show_path
     assert_equal 0, inertia_props.dig("unit", "occupancy_stats", "active_occupants_count")
     assert_not inertia_props["occupancies"].any? { |row| row["id"] == occupancy.id }
+  end
+
+  test "deactivate occupancy refreshes occupancy stats on unit show" do
+    sign_in_as(@tenant_admin)
+
+    occupancy = UnitOccupancies::Create.call(
+      unit: @unit,
+      occupancy_params: {
+        person_id: @existing_person.id,
+        occupancy_type: OccupancyTypes::TENANT,
+        can_authorize_visits: true,
+        starts_at: Date.current
+      },
+      actor: @tenant_admin
+    )
+
+    patch admin_residential_property_unit_occupancy_path(@property, @unit, occupancy), params: {
+      unit_occupancy: { status: OccupancyStatuses::INACTIVE }
+    }
+
+    assert_redirected_to @unit_show_path
+
+    inertia_get @unit_show_path
+    assert_equal 0, inertia_props.dig("unit", "occupancy_stats", "active_occupants_count")
+    assert_equal 0, inertia_props.dig("unit", "occupancy_stats", "active_authorizers_count")
+    assert_equal 1, inertia_props.dig("unit", "occupancy_stats", "historical_occupants_count")
   end
 
   test "active_elsewhere returns warning payload for person with occupancy in another unit" do

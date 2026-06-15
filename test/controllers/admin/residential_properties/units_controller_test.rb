@@ -83,6 +83,10 @@ class Admin::ResidentialProperties::UnitsControllerTest < ActionDispatch::Integr
     assert_equal 1, props.dig("unit", "occupancy_stats", "active_authorizers_count")
     assert_equal 1, props.dig("unit", "occupancy_stats", "historical_occupants_count")
     assert_equal 2, props.dig("unit", "occupancy_stats", "total_occupants_count")
+    assert_equal true, props.dig("occupancy_permissions", "create")
+    assert_equal true, props.dig("occupancy_permissions", "update")
+    assert_equal true, props.dig("occupancy_permissions", "destroy")
+    assert_equal false, props["occupancies_include_inactive"]
   end
 
   test "show excludes inactive occupancies by default" do
@@ -110,6 +114,36 @@ class Admin::ResidentialProperties::UnitsControllerTest < ActionDispatch::Integr
     occupant_ids = inertia_props["occupancies"].map { |occupancy| occupancy["id"] }
     assert_includes occupant_ids, @active_occupancy.id
     assert_includes occupant_ids, @inactive_occupancy.id
+  end
+
+  test "show reflects translated occupancy type and status labels in occupancies" do
+    sign_in_as(@tenant_admin)
+
+    inertia_get @unit_show_path
+    assert_response :success
+
+    row = inertia_props["occupancies"].first
+    assert_equal I18n.t("frontend.admin.unit_occupancies.occupancy_types.tenant"), row["occupancy_type_label"]
+    assert_equal I18n.t("frontend.admin.units.show.occupants.statuses.active"), row["status_label"]
+  end
+
+  test "show returns empty occupancies list when unit has no active occupants" do
+    sign_in_as(@tenant_admin)
+
+    empty_unit = Unit.create!(
+      organization: @organization,
+      residential_property: @property,
+      identifier: "UNIT-SHOW-EMPTY",
+      unit_type: UnitTypes::APARTMENT,
+      status: UnitStatuses::AVAILABLE
+    )
+
+    inertia_get admin_residential_property_unit_path(@property, empty_unit, tab: "occupants")
+    assert_response :success
+
+    assert_equal [], inertia_props["occupancies"]
+    assert_equal 0, inertia_props.dig("occupancies_pagination", "total_count")
+    assert_equal 0, inertia_props.dig("unit", "occupancy_stats", "active_occupants_count")
   end
 
   private
