@@ -63,8 +63,8 @@
 
 ## 7. Preparación visitantes y staff
 
-- [ ] 7.1 Documentar en código que `VisitorProfile` es perfil extendido con `person_id` canónico
-- [ ] 7.2 Documentar contrato de futura tabla de asignaciones staff (person + residential_property + role)
+- [x] 7.1 Documentar en código que `VisitorProfile` es perfil extendido con `person_id` canónico
+- [x] 7.2 Documentar contrato de futura tabla de asignaciones staff (person + residential_property + role)
 
 ## 8. Cierre
 

@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+# Derives contextual domain roles for a +Person+ from active relationships.
+#
+# Staff contextual roles (+concierge+, +property_admin+, +cleaning_staff+) will
+# be derived from active +StaffAssignment+ rows (+person_id+, +residential_property_id+,
+# +staff_type+) when staff is wired operationally; see +StaffAssignment+.
 module People
   class ContextualRoles
     OWNER = "owner"

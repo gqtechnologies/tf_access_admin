@@ -1,5 +1,27 @@
 # frozen_string_literal: true
 
+# Property staff assignment linking a canonical +Person+ to a +ResidentialProperty+.
+#
+# +Person+ is the only identity store per organization. This table records where
+# and how someone works on a property; it does not create a separate staff
+# identity. Operational staff flows (shifts, profile Staff tab, contextual badges)
+# are not wired yet in the unified person profile change.
+#
+# Persistence contract (already migrated; no new tables required):
+# - +person_id+ — required FK to +people+ (canonical identity)
+# - +residential_property_id+ — required FK to +residential_properties+
+# - +staff_type+ — required operational role on that property (+StaffTypes+;
+#   OpenSpec refers to this concept as +staff_role+)
+# - +status+, +starts_at+, +ends_at+ — assignment validity (same pattern as
+#   ownerships/occupancies)
+# - +organization_id+ — tenant scope; all queries must stay org-scoped
+#
+# Future integration points (not implemented in unified-person-profile):
+# - +People::ContextualRoles+ staff badges (+concierge+, +property_admin+,
+#   +cleaning_staff+) from active +staff_assignments+
+# - +Admin::PeopleController#show+ +staff_assignments+ prop and Staff tab data
+# - +Person::ProfileSummary#staff_assignments_count+
+#
 # == Schema Information
 #
 # Table name: staff_assignments
