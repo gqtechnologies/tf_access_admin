@@ -167,6 +167,14 @@ Sin migración de datos. Servicios `CreateWithPerson` adoptan resolver central. 
 
 Rollback: revertir ruta/show y enlaces; sin cambios destructivos.
 
+## Decision: email_digest y deduplicación
+
+**Decisión (cerrada):** No se añade columna `email_digest` ni índice único de email a nivel DB en este change.
+
+- **Documento:** deduplicación vía `document_number_digest` con índice DB existente.
+- **Email:** validación en aplicación (`Person` uniqueness scope) y resolución central en `People::FindExisting` (prioridad: digest → `User#person_for` → `metadata.import_email`).
+- **Follow-up opcional:** migración `email_digest` + índice único parcial si el volumen o colisiones lo justifican.
+
 ## Open Questions
 
 - ¿Paginación en tabs Propiedades/Residencias desde v1 o cargar todo si < N registros?

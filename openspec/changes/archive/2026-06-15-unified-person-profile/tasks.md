@@ -68,6 +68,6 @@
 
 ## 8. Cierre
 
-- [ ] 8.1 Documentar decisión sobre email_digest y deduplicación
-- [ ] 8.2 Ejecutar suite de tests afectados
-- [ ] 8.3 Ejecutar `graphify update app` tras cambios en código
+- [x] 8.1 Documentar decisión sobre email_digest y deduplicación
+- [x] 8.2 Ejecutar suite de tests afectados
+- [x] 8.3 Ejecutar `graphify update app` tras cambios en código
