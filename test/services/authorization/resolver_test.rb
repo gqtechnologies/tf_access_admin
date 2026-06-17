@@ -40,6 +40,29 @@ class AuthorizationResolverTest < ActiveSupport::TestCase
     assert_includes resolver.accessible_property_ids, @property_b.id
   end
 
+  test "tenant_admin cannot access another organization" do
+    user = create_user_for_organization(
+      organization: @organization,
+      email: "tenant-admin-cross-org@example.test",
+      role: AvailableRoles::TENANT_ADMIN
+    )
+
+    other_org_resolver = Authorization::Resolver.new(
+      user: user,
+      organization: @other_organization,
+      property: @other_org_property
+    )
+
+    refute other_org_resolver.allowed?(:manage_users)
+    refute other_org_resolver.allowed?(:manage_units)
+    refute other_org_resolver.property_accessible?(@other_org_property)
+    refute_includes other_org_resolver.accessible_property_ids, @other_org_property.id
+
+    own_org_resolver = build_resolver(user, property: @other_org_property)
+    refute own_org_resolver.allowed?(:manage_units)
+    refute own_org_resolver.property_accessible?(@other_org_property)
+  end
+
   test "property_admin accesses only assigned property" do
     user = create_staff_user(
       email: "property-admin-a@example.test",
@@ -91,6 +114,19 @@ class AuthorizationResolverTest < ActiveSupport::TestCase
     refute resolver.allowed?(:manage_people)
     refute resolver.allowed?(:manage_ownerships)
     refute resolver.allowed?(:manage_users)
+  end
+
+  test "concierge cannot access another property" do
+    user = create_staff_user(
+      email: "concierge-deny-b@example.test",
+      staff_type: StaffTypes::CONCIERGE,
+      property: @property_a
+    )
+    resolver = build_resolver(user, property: @property_b)
+
+    refute resolver.allowed?(:view_visits)
+    refute resolver.allowed?(:register_visit_entry)
+    refute_includes resolver.accessible_property_ids, @property_b.id
   end
 
   test "cleaning_staff and internal_staff do not receive administrative permissions by default" do

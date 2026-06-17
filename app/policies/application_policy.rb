@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationPolicy
+  include ResidentialPropertyContext
+
   attr_reader :user, :record
 
   def initialize(user, record)
@@ -38,6 +40,18 @@ class ApplicationPolicy
     false
   end
 
+  def resolver
+    @resolver ||= build_resolver
+  end
+
+  def allowed?(capability)
+    resolver&.allowed?(capability) || false
+  end
+
+  def property_accessible?(property)
+    resolver&.property_accessible?(property) || false
+  end
+
   def admin?
     user.present? && (user.super_admin? || user.tenant_admin?(ActsAsTenant.current_tenant))
   end
@@ -48,18 +62,22 @@ class ApplicationPolicy
 
   def same_organization?
     return false unless user.present?
-    return true if user.super_admin?
 
-    tenant = ActsAsTenant.current_tenant
-    return false unless tenant&.id
-    return false if user.client_global? && !user.tenant_admin?(tenant)
+    org = current_organization
+    return false unless org&.id
+    return true if user.super_admin?
+    return false unless member_of_current_organization?
 
     if record.is_a?(User)
-      user.people.exists?(organization_id: tenant.id) && record.people.exists?(organization_id: tenant.id)
-    elsif record.respond_to?(:organization_id)
-      record.organization_id == tenant.id && user.people.exists?(organization_id: tenant.id)
-    else
+      same_user_organization_membership?(org)
+    elsif record.is_a?(Organization)
+      record.id == org.id
+    elsif index_record?
       true
+    elsif record.respond_to?(:organization_id)
+      record.organization_id == org.id
+    else
+      false
     end
   end
 
@@ -67,12 +85,14 @@ class ApplicationPolicy
     return false unless user.present?
     return false unless record.respond_to?(:id)
     return false unless user.respond_to?(:id)
+
     record.id == user.id
   end
 
   class Scope
     def initialize(user, scope)
       raise Pundit::NotAuthorizedError, "User must be logged in" unless user
+
       @user = user
       @scope = scope
     end
@@ -84,5 +104,60 @@ class ApplicationPolicy
     private
 
     attr_reader :user, :scope
+  end
+
+  private
+
+  def build_resolver
+    org = current_organization
+    return nil if org.blank?
+
+    context = resolver_context
+
+    if resolver_via_current?(org)
+      Current.authorization_resolver(**context)
+    else
+      Authorization::Resolver.new(
+        user: user,
+        organization: org,
+        **context
+      )
+    end
+  end
+
+  def resolver_via_current?(org)
+    Current.user == user && Current.organization == org
+  end
+
+  def resolver_context
+    if index_record?
+      { property: nil, unit: nil, record: nil }
+    else
+      {
+        property: record_residential_property,
+        unit: record_unit,
+        record: record
+      }
+    end
+  end
+
+  def current_organization
+    Current.organization || ActsAsTenant.current_tenant
+  end
+
+  def member_of_current_organization?
+    org = current_organization
+    return false unless org
+
+    user.member_of_tenant?(org)
+  end
+
+  def same_user_organization_membership?(org)
+    user.people.exists?(organization_id: org.id) &&
+      record.people.exists?(organization_id: org.id)
+  end
+
+  def index_record?
+    record.is_a?(Class) || record.nil?
   end
 end

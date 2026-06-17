@@ -61,6 +61,7 @@ module Authorization
 
     def evaluate_allowed?(capability)
       return false unless profile.member_of_organization?
+      return false if cross_organization_context?
 
       return true if profile.organization_capabilities.include?(capability)
 
@@ -120,6 +121,14 @@ module Authorization
 
     def same_context?(property, unit, record)
       self.property == property && self.unit == unit && self.record == record
+    end
+
+    def cross_organization_context?
+      return true if property.present? && !same_organization?(property)
+      return true if unit.present? && !same_organization?(unit)
+      return true if record.present? && record.respond_to?(:organization_id) && !same_organization?(record)
+
+      false
     end
   end
 end

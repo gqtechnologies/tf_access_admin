@@ -10,10 +10,10 @@
 
 ## 2. Extensión de ApplicationPolicy
 
-- [ ] 2.1 Añadir `resolver`, `allowed?(capability)`, `property_accessible?(property)` a `ApplicationPolicy`
-- [ ] 2.2 Implementar `record_residential_property` helper (o concern) para resolver propiedad del recurso
-- [ ] 2.3 Mantener `same_organization?` y alinear con resolver
-- [ ] 2.4 Tests de helpers de policy base
+- [x] 2.1 Añadir `resolver`, `allowed?(capability)`, `property_accessible?(property)` a `ApplicationPolicy`
+- [x] 2.2 Implementar `record_residential_property` helper (o concern) para resolver propiedad del recurso
+- [x] 2.3 Mantener `same_organization?` y alinear con resolver
+- [x] 2.4 Tests de helpers de policy base
 
 ## 3. Actualización de políticas existentes
 
