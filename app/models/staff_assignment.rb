@@ -59,13 +59,39 @@ class StaffAssignment < ApplicationRecord
 
   acts_as_tenant :organization
 
+  audited associated_with: :residential_property,
+          only: %i[status staff_type starts_at ends_at person_id residential_property_id]
+
+  STATUS_ACTIVE = "active"
+  STATUS_INACTIVE = "inactive"
+  STATUSES = [ STATUS_ACTIVE, STATUS_INACTIVE ].freeze
+
   belongs_to :organization
   belongs_to :person
   belongs_to :residential_property
 
   validates :staff_type, presence: true, inclusion: { in: StaffTypes::ALL }
+  validates :status, presence: true, inclusion: { in: STATUSES }
+  validate :ends_at_not_before_starts_at
 
   validates_same_tenant :person, :residential_property
 
   has_many :staff_shifts, dependent: :restrict_with_error
+
+  scope :active, -> { where(status: STATUS_ACTIVE) }
+  scope :currently_active, ->(at: Date.current) {
+    active
+      .where("starts_at IS NULL OR starts_at <= ?", at)
+      .where("ends_at IS NULL OR ends_at >= ?", at)
+  }
+  scope :for_property, ->(property) { where(residential_property: property) }
+  scope :for_person, ->(person) { where(person: person) }
+
+  private
+
+  def ends_at_not_before_starts_at
+    return unless starts_at.present? && ends_at.present?
+
+    errors.add(:ends_at, :before_starts_at, message: "must be on or after starts_at") if ends_at < starts_at
+  end
 end

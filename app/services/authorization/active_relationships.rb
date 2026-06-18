@@ -2,18 +2,18 @@
 
 module Authorization
   module ActiveRelationships
-    STAFF_STATUS_ACTIVE = "active"
-
     module_function
 
+    # Returns active and currently-valid StaffAssignment rows for a person
+    # within an explicit organization context. This is the single authoritative
+    # query for operational property roles; the Resolver and GrantProfile MUST
+    # use this method — never build ad-hoc status/date filters elsewhere.
     def active_staff_assignments_for(person, organization, at: Date.current)
       return StaffAssignment.none if person.blank? || organization.blank?
 
       StaffAssignment
         .where(organization_id: organization.id, person_id: person.id)
-        .where(status: STAFF_STATUS_ACTIVE)
-        .where("starts_at IS NULL OR starts_at <= ?", at)
-        .where("ends_at IS NULL OR ends_at >= ?", at)
+        .currently_active(at: at)
     end
 
     def active_ownerships_for(person, organization, at: Date.current)

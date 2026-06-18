@@ -15,12 +15,17 @@ module Authorization
     ].freeze
 
     STAFF_TYPE_TO_ROLE = {
+      # Canonical persisted types (StaffTypes::ALL)
       StaffTypes::MANAGER => PROPERTY_ADMIN,
       StaffTypes::CONCIERGE => CONCIERGE,
       StaffTypes::SECURITY => CONCIERGE,
       StaffTypes::CLEANING => CLEANING_STAFF,
       StaffTypes::MAINTENANCE => INTERNAL_STAFF,
-      StaffTypes::OTHER => INTERNAL_STAFF
+      StaffTypes::OTHER => INTERNAL_STAFF,
+      # Legacy alias values that may exist in older data
+      StaffTypes::PROPERTY_ADMIN => PROPERTY_ADMIN,
+      StaffTypes::CLEANING_STAFF => CLEANING_STAFF,
+      StaffTypes::INTERNAL_STAFF => INTERNAL_STAFF
     }.freeze
 
     module_function

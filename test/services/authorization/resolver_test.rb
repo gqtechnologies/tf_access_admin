@@ -216,6 +216,7 @@ class AuthorizationResolverTest < ActiveSupport::TestCase
       email: "expired-staff@example.test",
       staff_type: StaffTypes::MANAGER,
       property: @property_a,
+      starts_at: 30.days.ago.to_date,
       ends_at: Date.current - 1.day
     )
     resolver = build_resolver(user, property: @property_a)
@@ -301,7 +302,7 @@ class AuthorizationResolverTest < ActiveSupport::TestCase
     )
   end
 
-  def create_staff_user(email:, staff_type:, property:, status: "active", ends_at: nil)
+  def create_staff_user(email:, staff_type:, property:, status: "active", starts_at: Date.current, ends_at: nil)
     user = create_user_for_organization(
       organization: @organization,
       email: email,
@@ -315,7 +316,7 @@ class AuthorizationResolverTest < ActiveSupport::TestCase
       residential_property: property,
       staff_type: staff_type,
       status: status,
-      starts_at: Date.current,
+      starts_at: starts_at,
       ends_at: ends_at
     )
 

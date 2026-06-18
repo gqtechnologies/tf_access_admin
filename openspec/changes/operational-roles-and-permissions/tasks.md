@@ -35,17 +35,17 @@
 
 ## 5. StaffAssignment operacional
 
-- [ ] 5.1 Añadir scopes activos en `StaffAssignment` (`active`, vigencia por fechas)
-- [ ] 5.2 Verificar que `StaffAssignment` activo sea la única fuente de roles operativos por propiedad dentro de `Authorization::Resolver`
-- [ ] 5.3 Mapear `StaffTypes::MANAGER` ↔ `property_admin` en resolver y badges
-- [ ] 5.4 Definir mapa de capacidades para staff types existentes, normalizando:
+- [x] 5.1 Añadir scopes activos en `StaffAssignment` (`active`, vigencia por fechas)
+- [x] 5.2 Verificar que `StaffAssignment` activo sea la única fuente de roles operativos por propiedad dentro de `Authorization::Resolver`
+- [x] 5.3 Mapear `StaffTypes::MANAGER` ↔ `property_admin` en resolver y badges
+- [x] 5.4 Definir mapa de capacidades para staff types existentes, normalizando:
   - `manager` / `property_admin` → `property_admin`
   - `concierge` / `security` → `concierge`
   - `cleaning` / `cleaning_staff` → `cleaning_staff`
   - `maintenance` / `other` → `internal_staff`
-- [ ] 5.5 Auditar `StaffAssignment` (create/update status)
-- [ ] 5.6 Tests de integración staff → capacidades
-- [ ] 5.7 Añadir validaciones de vigencia en `StaffAssignment`: `ends_at >= starts_at` y estado activo/inactivo consistente
+- [x] 5.5 Auditar `StaffAssignment` (create/update status)
+- [x] 5.6 Tests de integración staff → capacidades
+- [x] 5.7 Añadir validaciones de vigencia en `StaffAssignment`: `ends_at >= starts_at` y estado activo/inactivo consistente
 
 ## 6. Contextual roles y perfil unificado
 
