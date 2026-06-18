@@ -29,9 +29,9 @@
 
 ## 4. VisitPolicy placeholder
 
-- [ ] 4.1 Crear contrato documentado para futura `VisitPolicy` sin crear modelo, migración, controller ni rutas de visitas
-- [ ] 4.2 Definir métodos esperados: `index?`, `show?`, `create?`, `authorize?`, `check_in?`, `check_out?`
-- [ ] 4.3 Definir reglas esperadas por capability: `create_visits`, `authorize_visits`, `register_visit_entry`, `register_visit_exit`
+- [x] 4.1 Crear contrato documentado para futura `VisitPolicy` sin crear modelo, migración, controller ni rutas de visitas
+- [x] 4.2 Definir métodos esperados: `index?`, `show?`, `create?`, `authorize?`, `check_in?`, `check_out?`
+- [x] 4.3 Definir reglas esperadas por capability: `create_visits`, `authorize_visits`, `register_visit_entry`, `register_visit_exit`
 
 ## 5. StaffAssignment operacional
 
