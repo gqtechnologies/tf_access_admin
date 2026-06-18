@@ -108,14 +108,22 @@ class Admin::PeopleController < AdminController
         per_page: @profile_filters[:occupancies_per_page]
       ),
       change_history: Person::ChangeHistory.for(@person),
-      staff_assignments: [],
+      staff_assignments: staff_assignments_props,
       visits: [],
       permissions: profile_permissions
     }
   end
 
+  def staff_assignments_props
+    @person.staff_assignments
+      .currently_active
+      .includes(:residential_property)
+      .map { |assignment| Admin::PersonStaffAssignmentSerializer.new(assignment).as_json }
+  end
+
   def profile_permissions
     {
+      view: policy(@person).show?,
       update: policy(@person).update?,
       destroy: policy(@person).destroy?,
       edit: policy(@person).edit?

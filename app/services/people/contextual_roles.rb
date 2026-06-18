@@ -2,9 +2,10 @@
 
 # Derives contextual domain roles for a +Person+ from active relationships.
 #
-# Staff contextual roles (+concierge+, +property_admin+, +cleaning_staff+) will
-# be derived from active +StaffAssignment+ rows (+person_id+, +residential_property_id+,
-# +staff_type+) when staff is wired operationally; see +StaffAssignment+.
+# Staff contextual roles (+concierge+, +property_admin+, +cleaning_staff+,
+# +internal_staff+) are derived from active +StaffAssignment+ rows via
+# +Authorization::StaffRoleMapper+, never stored as a direct attribute on
+# +Person+.
 module People
   class ContextualRoles
     OWNER = "owner"
@@ -13,6 +14,7 @@ module People
     CONCIERGE = "concierge"
     PROPERTY_ADMIN = "property_admin"
     CLEANING_STAFF = "cleaning_staff"
+    INTERNAL_STAFF = "internal_staff"
     SYSTEM_USER = "system_user"
 
     DOMAIN_ROLES = [
@@ -22,10 +24,11 @@ module People
       CONCIERGE,
       PROPERTY_ADMIN,
       CLEANING_STAFF,
+      INTERNAL_STAFF,
       SYSTEM_USER
     ].freeze
 
-    STAFF_ROLES = [ CONCIERGE, PROPERTY_ADMIN, CLEANING_STAFF ].freeze
+    STAFF_ROLES = [ CONCIERGE, PROPERTY_ADMIN, CLEANING_STAFF, INTERNAL_STAFF ].freeze
 
     def self.call(person)
       new(person).call
@@ -54,21 +57,32 @@ module People
         person_id: person_ids
       ).distinct.pluck(:person_id).to_set
 
+      staff_roles_by_person = StaffAssignment
+        .where(organization_id: organization_id, person_id: person_ids)
+        .currently_active
+        .pluck(:person_id, :staff_type)
+        .each_with_object(Hash.new { |h, k| h[k] = [] }) do |(person_id, staff_type), hash|
+          role = Authorization::StaffRoleMapper.operational_role_for(staff_type)
+          hash[person_id] << role if role
+        end
+
       people.each_with_object({}) do |person, roles_by_person|
         roles_by_person[person.id] = build_roles(
           owner: owner_ids.include?(person.id),
           resident: resident_ids.include?(person.id),
           visitor: visitor_ids.include?(person.id),
-          system_user: person.user_id.present?
+          system_user: person.user_id.present?,
+          staff_roles: staff_roles_by_person[person.id]
         )
       end
     end
 
-    def self.build_roles(owner:, resident:, visitor:, system_user:)
+    def self.build_roles(owner:, resident:, visitor:, system_user:, staff_roles: [])
       [].tap do |roles|
         roles << OWNER if owner
         roles << RESIDENT if resident
         roles << VISITOR if visitor
+        STAFF_ROLES.each { |r| roles << r if staff_roles.include?(r) }
         roles << SYSTEM_USER if system_user
       end
     end
@@ -82,7 +96,8 @@ module People
         owner: owner?,
         resident: resident?,
         visitor: visitor?,
-        system_user: system_user?
+        system_user: system_user?,
+        staff_roles: operational_staff_roles
       )
     end
 
@@ -102,6 +117,12 @@ module People
 
     def system_user?
       @person.user_id.present?
+    end
+
+    def operational_staff_roles
+      @person.staff_assignments.currently_active.pluck(:staff_type).filter_map do |staff_type|
+        Authorization::StaffRoleMapper.operational_role_for(staff_type)
+      end.uniq
     end
   end
 end

@@ -8,6 +8,7 @@ export type PersonContextualRole =
   | 'concierge'
   | 'property_admin'
   | 'cleaning_staff'
+  | 'internal_staff'
   | 'system_user'
 
 export type PersonProfileSummary = {
@@ -64,6 +65,8 @@ export type PersonStaffAssignment = {
   residential_property_name: string
   role: string
   status: string
+  starts_at: string | null
+  ends_at: string | null
 }
 
 export type PersonVisitRow = {
@@ -75,6 +78,7 @@ export type PersonVisitRow = {
 }
 
 export type PersonProfilePermissions = {
+  view: boolean
   update: boolean
   destroy: boolean
   edit: boolean

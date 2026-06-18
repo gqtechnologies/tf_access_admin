@@ -49,12 +49,12 @@
 
 ## 6. Contextual roles y perfil unificado
 
-- [ ] 6.1 Extender `People::ContextualRoles` con badges staff desde `StaffAssignment` activo
-- [ ] 6.2 Actualizar `People::ContextualRoles.batch_for` para staff en batch
-- [ ] 6.3 Exponer `staff_assignments` reales en `Admin::PeopleController#show`
-- [ ] 6.4 Actualizar `PersonStaffTab` para listar asignaciones activas
-- [ ] 6.5 Alinear `permissions` prop del perfil con `Authorization::Resolver`
-- [ ] 6.6 Tests de contextual roles staff y permisos de perfil
+- [x] 6.1 Extender `People::ContextualRoles` con badges staff desde `StaffAssignment` activo
+- [x] 6.2 Actualizar `People::ContextualRoles.batch_for` para staff en batch
+- [x] 6.3 Exponer `staff_assignments` reales en `Admin::PeopleController#show`
+- [x] 6.4 Actualizar `PersonStaffTab` para listar asignaciones activas
+- [x] 6.5 Alinear `permissions` prop del perfil con `Authorization::Resolver`
+- [x] 6.6 Tests de contextual roles staff y permisos de perfil
 
 ## 7. Contratos de dominio para UI futura
 

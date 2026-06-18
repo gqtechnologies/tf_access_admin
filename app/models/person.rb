@@ -64,6 +64,7 @@ class Person < ApplicationRecord
   has_many :unit_occupancies, dependent: :destroy
   # Extended visitor profiles; see +VisitorProfile+ for the person_id contract.
   has_many :visitor_profiles, dependent: :destroy
+  has_many :staff_assignments, dependent: :destroy
 
   validates :display_name, presence: true
   validates :person_type, presence: true, inclusion: { in: PersonTypes::ALL }

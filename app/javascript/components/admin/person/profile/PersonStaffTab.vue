@@ -37,5 +37,15 @@ const columns = computed<ColumnDef<PersonStaffAssignment, unknown>[]>(() => [
     header: () => t('admin.people.profile.staff.table.status'),
     cell: ({ getValue }) => h('span', (getValue() as string) || '—'),
   },
+  {
+    accessorKey: 'starts_at',
+    header: () => t('admin.people.profile.staff.table.starts_at'),
+    cell: ({ getValue }) => h('span', (getValue() as string) || '—'),
+  },
+  {
+    accessorKey: 'ends_at',
+    header: () => t('admin.people.profile.staff.table.ends_at'),
+    cell: ({ getValue }) => h('span', (getValue() as string) || '—'),
+  },
 ])
 </script>

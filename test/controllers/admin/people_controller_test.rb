@@ -113,6 +113,7 @@ class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, props["summary"]["staff_assignments_count"]
     assert_equal [], props["staff_assignments"]
     assert_equal [], props["visits"]
+    assert props["permissions"]["view"]
     assert props["permissions"]["edit"]
     assert props["permissions"]["update"]
     assert props["permissions"]["destroy"]
@@ -162,6 +163,81 @@ class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
     inertia_get admin_person_path(@other_org_person)
 
     assert_redirected_to admin_people_url(host: "#{@organization.subdomain}.example.com")
+  end
+
+  test "show exposes real staff_assignments for person with active assignment" do
+    assignment = StaffAssignment.create!(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::MANAGER,
+      status: StaffAssignment::STATUS_ACTIVE,
+      starts_at: Date.current
+    )
+
+    sign_in_as(@tenant_admin)
+    inertia_get admin_person_path(@person)
+
+    assert_response :success
+    staff = inertia_props["staff_assignments"]
+    assert_equal 1, staff.size
+    row = staff.first
+    assert_equal assignment.id, row["id"]
+    assert_equal "People Show Property", row["residential_property_name"]
+    assert_equal Authorization::StaffRoleMapper::PROPERTY_ADMIN, row["role"]
+    assert_equal StaffAssignment::STATUS_ACTIVE, row["status"]
+  end
+
+  test "show staff_assignments excludes inactive assignments" do
+    StaffAssignment.create!(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::CONCIERGE,
+      status: StaffAssignment::STATUS_INACTIVE,
+      starts_at: Date.current
+    )
+
+    sign_in_as(@tenant_admin)
+    inertia_get admin_person_path(@person)
+
+    assert_response :success
+    assert_equal [], inertia_props["staff_assignments"]
+  end
+
+  test "show staff_assignments excludes expired assignments" do
+    StaffAssignment.create!(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::MANAGER,
+      status: StaffAssignment::STATUS_ACTIVE,
+      starts_at: 30.days.ago.to_date,
+      ends_at: Date.yesterday
+    )
+
+    sign_in_as(@tenant_admin)
+    inertia_get admin_person_path(@person)
+
+    assert_response :success
+    assert_equal [], inertia_props["staff_assignments"]
+  end
+
+  test "show includes staff contextual role for person with active assignment" do
+    StaffAssignment.create!(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::CONCIERGE,
+      status: StaffAssignment::STATUS_ACTIVE,
+      starts_at: Date.current
+    )
+
+    sign_in_as(@tenant_admin)
+    inertia_get admin_person_path(@person)
+
+    assert_response :success
+    assert_includes inertia_props["contextual_roles"], People::ContextualRoles::CONCIERGE
   end
 
   test "show serializes multiple ownership rows with preloaded property context" do
