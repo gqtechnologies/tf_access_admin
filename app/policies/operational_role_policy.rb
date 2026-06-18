@@ -26,11 +26,14 @@ class OperationalRolePolicy < ApplicationPolicy
   class Scope < ApplicationPolicy::Scope
     def resolve
       org = ActsAsTenant.current_tenant
-      base = Authorization::Resolver.new(user: user, organization: org)
-      if base.profile.organization_wide?
+      profile = Authorization::GrantProfile.build(user, org)
+      if profile.organization_capabilities.include?(:manage_staff_assignments)
         scope.all
       else
-        scope.where(residential_property_id: base.accessible_property_ids)
+        property_ids = profile.property_capabilities
+          .select { |_, caps| caps.include?(:manage_staff_assignments) }
+          .keys
+        scope.where(residential_property_id: property_ids)
       end
     end
   end

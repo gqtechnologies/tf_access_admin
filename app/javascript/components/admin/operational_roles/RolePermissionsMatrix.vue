@@ -1,15 +1,15 @@
 <template>
   <div class="rounded-lg border bg-card">
     <div class="px-6 py-4 border-b">
-      <h2 class="font-semibold text-base">Matriz de permisos</h2>
-      <p class="text-sm text-muted-foreground mt-0.5">Capacidades por rol operativo y organizacional.</p>
+      <h2 class="font-semibold text-base">{{ t('admin.operational_roles.permissions_matrix.title') }}</h2>
+      <p class="text-sm text-muted-foreground mt-0.5">{{ t('admin.operational_roles.permissions_matrix.subtitle') }}</p>
     </div>
 
     <div class="overflow-x-auto">
       <table class="w-full text-xs min-w-[700px]">
         <thead>
           <tr class="border-b bg-muted/30">
-            <th class="text-left px-4 py-3 font-medium text-muted-foreground w-48">Capacidad</th>
+            <th class="text-left px-4 py-3 font-medium text-muted-foreground w-48">{{ t('common.capability') }}</th>
             <th
               v-for="role in roleColumns"
               :key="role.key"
@@ -49,18 +49,21 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n"
 import type { CapabilityModuleGroup } from "@/types/operational_roles"
+
+const { t } = useI18n()
 
 defineProps<{
   capability_matrix: CapabilityModuleGroup[]
 }>()
 
 const roleColumns = [
-  { key: "tenant_admin", label: "Admin org." },
-  { key: "content_manager", label: "Gestor cont." },
-  { key: "property_admin", label: "Admin prop." },
-  { key: "concierge", label: "Conserje" },
-  { key: "cleaning_staff", label: "Aseo" },
-  { key: "internal_staff", label: "Interno" }
+  { key: "tenant_admin", label: t('admin.operational_roles.roles.tenant_admin') },
+  { key: "content_manager", label: t('admin.operational_roles.roles.content_manager') },
+  { key: "property_admin", label: t('admin.operational_roles.roles.property_admin') },
+  { key: "concierge", label: t('admin.operational_roles.roles.concierge') },
+  { key: "cleaning_staff", label: t('admin.operational_roles.roles.cleaning_staff') },
+  { key: "internal_staff", label: t('admin.operational_roles.roles.internal_staff') }
 ]
 </script>

@@ -92,16 +92,16 @@
 
 ## 10. Aislamiento y regresión
 
-- [ ] 10.1 Tests cross-organization denial en todas las políticas actualizadas
-- [ ] 10.2 Tests cross-property denial para property_admin y concierge
-- [ ] 10.3 Verificar que `tenant_admin` existentes conservan acceso org-wide
-- [ ] 10.4 Ejecutar suite de tests afectados (policies, resolver, people, units)
-- [ ] 10.5 Ejecutar `graphify update app` tras cambios en código
-- [ ] 10.6 Test explícito: usuario `property_admin` de Propiedad A no puede acceder ni modificar Propiedad B
-- [ ] 10.7 Test explícito: usuario `concierge` de Propiedad A no puede consultar datos de Propiedad B
+- [x] 10.1 Tests cross-organization denial en todas las políticas actualizadas
+- [x] 10.2 Tests cross-property denial para property_admin y concierge
+- [x] 10.3 Verificar que `tenant_admin` existentes conservan acceso org-wide
+- [x] 10.4 Ejecutar suite de tests afectados (policies, resolver, people, units)
+- [x] 10.5 Ejecutar `graphify update app` tras cambios en código
+- [x] 10.6 Test explícito: usuario `property_admin` de Propiedad A no puede acceder ni modificar Propiedad B
+- [x] 10.7 Test explícito: usuario `concierge` de Propiedad A no puede consultar datos de Propiedad B
 
 ## 11. Cierre
 
-- [ ] 11.1 Revisar navegación admin: ocultar ítems según `capabilities` en layout
-- [ ] 11.2 Documentar decisión Rolify-on-Person vs User (follow-up opcional)
-- [ ] 11.3 Archivar/sync specs delta al completar implementación
+- [x] 11.1 Revisar navegación admin: ocultar ítems según `capabilities` en layout
+- [x] 11.2 Documentar decisión Rolify-on-Person vs User (follow-up opcional)
+- [x] 11.3 Archivar/sync specs delta al completar implementación

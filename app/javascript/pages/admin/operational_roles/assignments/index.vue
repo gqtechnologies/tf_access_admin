@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header :itemsBreadcrumb="breadcrumbs" title="Asignaciones de roles operativos" />
+    <Header :itemsBreadcrumb="breadcrumbs" :title="t('admin.operational_roles.assignments.title')" />
 
     <div class="p-6 space-y-4">
       <!-- Filters row + action button -->
@@ -8,7 +8,7 @@
         <div class="flex items-center gap-2 flex-1">
           <Input
             type="search"
-            placeholder="Buscar persona..."
+            :placeholder="t('admin.operational_roles.assignments.filters.search_person')"
             v-model="searchQuery"
             class="max-w-xs"
             @keyup.enter="applyFilters"
@@ -18,7 +18,7 @@
             class="h-9 rounded-md border border-input bg-background px-3 text-sm"
             @change="applyFilters"
           >
-            <option value="">Todos los roles</option>
+            <option value="">{{ t('admin.operational_roles.assignments.filters.all_roles') }}</option>
             <option v-for="r in available_roles" :key="r.key" :value="r.key">{{ r.name }}</option>
           </select>
           <select
@@ -26,29 +26,29 @@
             class="h-9 rounded-md border border-input bg-background px-3 text-sm"
             @change="applyFilters"
           >
-            <option value="">Todas las propiedades</option>
+            <option value="">{{ t('admin.operational_roles.assignments.filters.all_properties') }}</option>
             <option v-for="p in accessible_properties" :key="p.id" :value="p.id">{{ p.name }}</option>
           </select>
         </div>
         <Button v-if="permissions.create" @click="drawerOpen = true">
           <PlusIcon class="w-4 h-4 mr-1" />
-          Nueva asignación
+          {{ t('admin.operational_roles.assignments.new_assignment_button') }}
         </Button>
       </div>
 
       <!-- Assignments table -->
       <div class="rounded-lg border bg-card">
         <div v-if="assignments.length === 0" class="px-6 py-12 text-center text-muted-foreground text-sm">
-          No hay asignaciones activas.
+          {{ t('admin.operational_roles.assignments.empty_message') }}
         </div>
         <table v-else class="w-full text-sm">
           <thead>
             <tr class="border-b bg-muted/40">
-              <th class="text-left px-6 py-3 font-medium text-muted-foreground">Persona</th>
-              <th class="text-left px-6 py-3 font-medium text-muted-foreground">Rol</th>
-              <th class="text-left px-6 py-3 font-medium text-muted-foreground">Propiedad</th>
-              <th class="text-left px-6 py-3 font-medium text-muted-foreground">Desde</th>
-              <th class="text-left px-6 py-3 font-medium text-muted-foreground">Hasta</th>
+              <th class="text-left px-6 py-3 font-medium text-muted-foreground">{{ t('admin.operational_roles.assignments.table_headers.person') }}</th>
+              <th class="text-left px-6 py-3 font-medium text-muted-foreground">{{ t('admin.operational_roles.assignments.table_headers.role') }}</th>
+              <th class="text-left px-6 py-3 font-medium text-muted-foreground">{{ t('admin.operational_roles.assignments.table_headers.property') }}</th>
+              <th class="text-left px-6 py-3 font-medium text-muted-foreground">{{ t('admin.operational_roles.assignments.table_headers.from') }}</th>
+              <th class="text-left px-6 py-3 font-medium text-muted-foreground">{{ t('admin.operational_roles.assignments.table_headers.to') }}</th>
               <th class="px-6 py-3"></th>
             </tr>
           </thead>
@@ -74,7 +74,7 @@
                       @click="confirmRevoke(a)"
                     >
                       <XCircleIcon class="w-4 h-4 mr-2" />
-                      Revocar asignación
+                      {{ t('admin.operational_roles.assignments.revoke_action') }}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -101,15 +101,17 @@
     <AlertDialog :open="!!revokeTarget" @update:open="revokeTarget = null">
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Revocar asignación</AlertDialogTitle>
+          <AlertDialogTitle>{{ t('admin.operational_roles.assignments.revoke_confirmation_title') }}</AlertDialogTitle>
           <AlertDialogDescription>
-            ¿Seguro que deseas revocar el rol <strong>{{ revokeTarget?.role }}</strong> de
-            <strong>{{ revokeTarget?.person_name }}</strong>? Esta acción no se puede deshacer.
+            {{ t('admin.operational_roles.assignments.revoke_confirmation_description', {
+              role: revokeTarget?.role,
+              person: revokeTarget?.person_name
+            }) }}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel @click="revokeTarget = null">Cancelar</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" @click="submitRevoke">Revocar</AlertDialogAction>
+          <AlertDialogCancel @click="revokeTarget = null">{{ t('admin.operational_roles.assignments.revoke_cancel') }}</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" @click="submitRevoke">{{ t('admin.operational_roles.assignments.revoke_confirm') }}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -127,6 +129,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue"
 import { router } from "@inertiajs/vue3"
+import { useI18n } from "vue-i18n"
 import Header from "@/components/admin/layout/Header.vue"
 import DataTablePagination from "@/components/admin/table/DataTablePagination.vue"
 import { Button } from "@/components/ui/button"
@@ -142,6 +145,8 @@ import {
 import { PlusIcon, MoreHorizontalIcon, XCircleIcon } from "lucide-vue-next"
 import AssignRoleDrawer from "@/components/admin/operational_roles/AssignRoleDrawer.vue"
 import type { AssignmentRow, AccessibleProperty } from "@/types/operational_roles"
+
+const { t } = useI18n()
 
 interface PaginationMeta {
   current_page: number
@@ -159,9 +164,9 @@ const props = defineProps<{
 }>()
 
 const breadcrumbs = [
-  { label: "Inicio", href: "/admin/home/index" },
-  { label: "Roles operativos", href: "/admin/operational_roles" },
-  { label: "Asignaciones" }
+  { label: t('admin.sidebar.home'), href: "/admin/home/index" },
+  { label: t('admin.operational_roles.index.title'), href: "/admin/operational_roles" },
+  { label: t('admin.operational_roles.assignments.title') }
 ]
 
 const drawerOpen = ref(false)

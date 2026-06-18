@@ -80,6 +80,14 @@ Organizations · Residential Properties · Property Sections · Units · Persons
 - Do not duplicate business rules in Vue; do not introduce new UI libraries unless requested.
 - Follow `.agents/skills/vue-best-practices/SKILL.md` and `.agents/skills/rails-expert/SKILL.md`.
 
+### i18n (required for ALL user-facing text)
+- Every user-facing string MUST be internationalized. Never hardcode literal text in views, components, serializers, flash messages, validations, or emails.
+- Supported locales live in `config/locales/` (`es`, `en`, `pt`; plus `devise.*`). Add a key to every locale file when introducing a new string.
+- Rails: use `I18n.t` / `t(".key")`; rely on locale YAML and Rails conventions for model/attribute names and error messages.
+- Vue: use `vue-i18n` via `const { t } = useI18n()` and `t('some.key')` / `{{ t('some.key') }}`. Do not inline literal strings in templates.
+- Frontend translations are sourced from Rails and passed to `vue-i18n` through Inertia shared props (`app.locale`, `app.translations`) in `app/javascript/entrypoints/inertia.ts`. Add frontend-facing keys to the Rails locale files so they reach both sides; keep `fallbackLocale: 'en'` populated.
+- Use nested, namespaced keys mirroring the feature (e.g. `admin.sidebar.operational_roles`). Use interpolation/pluralization instead of string concatenation.
+
 ## Workflow
 
 - Follow the OpenSpec workflow for non-trivial changes (`openspec/` + `.claude/skills/openspec-*`). Implement tasks from the change's `tasks.md`; mark `- [ ]` → `- [x]` as each completes; keep changes minimal and scoped.

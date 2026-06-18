@@ -54,6 +54,11 @@ en:
         confirm: "Confirm"
         cancel: "Cancel"
         back: "Back"
+      capability: "Capability"
+      capabilities: "Capabilities"
+      status:
+        active: "Active"
+        inactive: "Inactive"
       table:
         pagination:
           rows_per_page: "Rows per page"
@@ -1280,6 +1285,7 @@ en:
             placeholder: "Display order (optional)"
       sidebar:
         platform: "Platform"
+        operations: "Operations"
         home: "Home"
         users: "Users"
         people: "People"
@@ -1288,6 +1294,7 @@ en:
         organizations: "Organizations"
         organization_settings: "Organization Settings"
         settings: "Settings"
+        operational_roles: "Operational Roles"
         categories: "Categories"
         components: "Components"
         products: "Products"
@@ -1298,6 +1305,79 @@ en:
           profile: Profile
           logout_success: "Logged out successfully"
           logout_error: "Failed to log out"
+      operational_roles:
+        roles:
+          tenant_admin: "Org Admin"
+          content_manager: "Content Manager"
+          property_admin: "Prop Admin"
+          concierge: "Concierge"
+          cleaning_staff: "Cleaning"
+          internal_staff: "Internal"
+        index:
+          title: "Operational Roles"
+          summary_defined_roles: "Defined roles"
+          summary_active_assignments: "Active assignments"
+          summary_properties_with_staff: "Properties with staff"
+          defined_roles_heading: "Defined roles"
+          assign_role_button: "Assign role"
+          table_headers:
+            role: "Role"
+            description: "Description"
+            scope: "Scope"
+            active_users: "Active users"
+            actions: ""
+          role_scope_property: "Property"
+          view_detail: "View detail"
+          assign_persons: "Assign persons"
+        show:
+          permissions_heading: "Permissions"
+          users_heading: "Users"
+          assign_persons_button: "Assign persons"
+          no_assigned_users: "No persons assigned to this role."
+          table_headers:
+            person: "Person"
+            property: "Property"
+            from: "From"
+            to: "Until"
+          permission_status_allowed: "Allowed"
+          permission_status_restricted: "Restricted"
+        permissions_matrix:
+          title: "Permissions Matrix"
+          subtitle: "Capabilities by operational and organizational role."
+        assignments:
+          title: "Operational Role Assignments"
+          filters:
+            search_person: "Search person..."
+            all_roles: "All roles"
+            all_properties: "All properties"
+          new_assignment_button: "New assignment"
+          table_headers:
+            person: "Person"
+            role: "Role"
+            property: "Property"
+            from: "From"
+            to: "Until"
+            actions: ""
+          empty_message: "No active assignments."
+          revoke_action: "Revoke assignment"
+          revoke_confirmation_title: "Revoke assignment"
+          revoke_confirmation_description: "Are you sure you want to revoke the role {role} from {person}? This action cannot be undone."
+          revoke_cancel: "Cancel"
+          revoke_confirm: "Revoke"
+        assignment_drawer:
+          title: "New assignment"
+          description: "Assign an operational role to a person at a property."
+          label_operational_role: "Operational role"
+          label_operational_role_placeholder: "Select a role..."
+          label_person_id: "Person ID"
+          label_person_id_placeholder: "Person ID"
+          label_person_id_hint: "Enter the numeric ID of the person to assign."
+          label_property: "Property"
+          label_property_placeholder: "Select a property..."
+          errors_heading: "Errors"
+          button_cancel: "Cancel"
+          button_submit: "Save assignment"
+          button_saving: "Saving..."
       profile:
         title: "Profile"
         updated_successfully: "Profile updated successfully"
