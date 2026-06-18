@@ -74,20 +74,20 @@
 
 ## 9. Gestión visual de roles operativos
 
- - [ ] 9.1 Crear rutas admin para gestión de roles operativos
- - [ ] 9.2 Crear controller admin para listar usuarios operativos, roles disponibles, matriz de permisos y asignaciones actuales
- - [ ] 9.3 Conectar acciones de asignar/revocar roles con los servicios `OperationalRoles::*`
- - [ ] 9.4 Crear serializers/props para `OperationalUserSummary`, roles disponibles, propiedades accesibles, staff assignments y capabilities efectivas
- - [ ] 9.5 Crear vista de listado de roles/usuarios operativos basada en `mockups/roles_list.png`
- - [ ] 9.6 Crear vista de detalle por rol basada en `mockups/details_per_rol.png`
- - [ ] 9.7 Crear vista o componente de matriz de permisos basada en `mockups/matrix_of_permissions.png`
- - [ ] 9.8 Crear vista o drawer de asignación de roles basada en `mockups/assign_roles_view.png`
- - [ ] 9.9 Restringir propiedades seleccionables según el alcance del usuario actual
- - [ ] 9.10 Ocultar o deshabilitar acciones según `capabilities` del usuario actual
- - [ ] 9.11 Mantener todas las acciones de filas dentro de dropdowns
- - [ ] 9.12 Agregar estados empty, loading, success y error para asignación/revocación de roles
- - [ ] 9.13 Agregar tests de autorización para endpoints admin de gestión de roles operativos
- - [ ] 9.14 Agregar tests frontend mínimos para renderizado condicional según capabilities
+ - [x] 9.1 Crear rutas admin para gestión de roles operativos
+ - [x] 9.2 Crear controller admin para listar usuarios operativos, roles disponibles, matriz de permisos y asignaciones actuales
+ - [x] 9.3 Conectar acciones de asignar/revocar roles con los servicios `OperationalRoles::*`
+ - [x] 9.4 Crear serializers/props para `OperationalUserSummary`, roles disponibles, propiedades accesibles, staff assignments y capabilities efectivas
+ - [x] 9.5 Crear vista de listado de roles/usuarios operativos basada en `mockups/roles_list.png`
+ - [x] 9.6 Crear vista de detalle por rol basada en `mockups/details_per_rol.png`
+ - [x] 9.7 Crear vista o componente de matriz de permisos basada en `mockups/matrix_of_permissions.png`
+ - [x] 9.8 Crear vista o drawer de asignación de roles basada en `mockups/assign_roles_view.png`
+ - [x] 9.9 Restringir propiedades seleccionables según el alcance del usuario actual
+ - [x] 9.10 Ocultar o deshabilitar acciones según `capabilities` del usuario actual
+ - [x] 9.11 Mantener todas las acciones de filas dentro de dropdowns
+ - [x] 9.12 Agregar estados empty, loading, success y error para asignación/revocación de roles
+ - [x] 9.13 Agregar tests de autorización para endpoints admin de gestión de roles operativos
+ - [x] 9.14 Agregar tests frontend mínimos para renderizado condicional según capabilities
 
 
 ## 10. Aislamiento y regresión

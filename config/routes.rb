@@ -67,6 +67,10 @@ Rails.application.routes.draw do
       end
     end
     resources :property_sections, only: [:index, :edit, :update, :destroy]
+    namespace :operational_roles do
+      resources :assignments, only: [:index, :create, :destroy]
+    end
+    resources :operational_roles, only: [:index, :show], param: :role
     match "*path", to: "errors#not_found", via: :all
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
