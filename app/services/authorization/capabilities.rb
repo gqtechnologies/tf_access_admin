@@ -7,6 +7,7 @@ module Authorization
     MANAGE_PROPERTIES = :manage_properties
     MANAGE_PROPERTY = :manage_property
     MANAGE_SECTIONS = :manage_sections
+    VIEW_UNITS = :view_units
     MANAGE_UNITS = :manage_units
     VIEW_PEOPLE = :view_people
     MANAGE_PEOPLE = :manage_people
@@ -30,6 +31,7 @@ module Authorization
       MANAGE_PROPERTIES,
       MANAGE_PROPERTY,
       MANAGE_SECTIONS,
+      VIEW_UNITS,
       MANAGE_UNITS,
       VIEW_PEOPLE,
       MANAGE_PEOPLE,
@@ -53,6 +55,7 @@ module Authorization
     CONTENT_MANAGER = [
       MANAGE_PROPERTIES,
       MANAGE_SECTIONS,
+      VIEW_UNITS,
       MANAGE_UNITS,
       VIEW_PEOPLE,
       MANAGE_PEOPLE,
@@ -65,6 +68,7 @@ module Authorization
     PROPERTY_ADMIN = [
       MANAGE_PROPERTY,
       MANAGE_SECTIONS,
+      VIEW_UNITS,
       MANAGE_UNITS,
       VIEW_PEOPLE,
       MANAGE_PEOPLE,

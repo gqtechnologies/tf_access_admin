@@ -17,15 +17,15 @@
 
 ## 3. Actualización de políticas existentes
 
-- [ ] 3.1 Actualizar `ResidentialPropertyPolicy` — capacidades y scope por propiedades accesibles
-- [ ] 3.2 Actualizar `PropertySectionPolicy` — heredar alcance de propiedad padre
-- [ ] 3.3 Actualizar `UnitPolicy` — `view_units` / `manage_units` scoped
-- [ ] 3.4 Actualizar `PersonPolicy` — `view_people` / `manage_people`; residente ve su propia persona
-- [ ] 3.5 Actualizar `UnitOwnershipPolicy` — `manage_ownerships` scoped
-- [ ] 3.6 Actualizar `UnitOccupancyPolicy` — `manage_occupancies` scoped
-- [ ] 3.7 Actualizar `UserPolicy` — `manage_users` solo Super Admin Org
-- [ ] 3.8 Actualizar `BulkImportPolicy` — capacidades según alcance de propiedad
-- [ ] 3.9 Tests de policy por rol y alcance: tenant_admin, property_admin de propiedad asignada, property_admin de otra propiedad, concierge de propiedad asignada, concierge de otra propiedad, resident/owner de unidad propia, client sin acceso
+- [x] 3.1 Actualizar `ResidentialPropertyPolicy` — capacidades y scope por propiedades accesibles
+- [x] 3.2 Actualizar `PropertySectionPolicy` — heredar alcance de propiedad padre
+- [x] 3.3 Actualizar `UnitPolicy` — `view_units` / `manage_units` scoped
+- [x] 3.4 Actualizar `PersonPolicy` — `view_people` / `manage_people`; residente ve su propia persona
+- [x] 3.5 Actualizar `UnitOwnershipPolicy` — `manage_ownerships` scoped
+- [x] 3.6 Actualizar `UnitOccupancyPolicy` — `manage_occupancies` scoped
+- [x] 3.7 Actualizar `UserPolicy` — `manage_users` solo Super Admin Org
+- [x] 3.8 Actualizar `BulkImportPolicy` — capacidades según alcance de propiedad
+- [x] 3.9 Tests de policy por rol y alcance: tenant_admin, property_admin de propiedad asignada, property_admin de otra propiedad, concierge de propiedad asignada, concierge de otra propiedad, resident/owner de unidad propia, client sin acceso
 
 ## 4. VisitPolicy placeholder
 

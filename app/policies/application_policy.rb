@@ -52,6 +52,31 @@ class ApplicationPolicy
     resolver&.property_accessible?(property) || false
   end
 
+  def any_accessible_property?(capability)
+    return allowed?(capability) if resolver&.profile&.organization_wide?
+
+    resolver.accessible_property_ids.any? do |property_id|
+      property_allowed?(capability, property_id: property_id)
+    end
+  end
+
+  def property_allowed?(capability, property: nil, property_id: nil)
+    target_property = property || ResidentialProperty.find_by(
+      id: property_id,
+      organization_id: current_organization&.id
+    )
+    return false unless target_property
+
+    scoped = scoped_resolver(property: target_property)
+    scoped&.allowed?(capability) || false
+  end
+
+  def viewing_own_person?
+    return false unless record.is_a?(Person)
+
+    user.person_for(current_organization)&.id == record.id
+  end
+
   def admin?
     user.present? && (user.super_admin? || user.tenant_admin?(ActsAsTenant.current_tenant))
   end
@@ -159,5 +184,19 @@ class ApplicationPolicy
 
   def index_record?
     record.is_a?(Class) || record.nil?
+  end
+
+  def scoped_resolver(property: nil, unit: nil, record: nil)
+    base = resolver
+    return nil unless base
+
+    Authorization::Resolver.new(
+      user: user,
+      organization: current_organization,
+      property: property,
+      unit: unit,
+      record: record,
+      profile: base.profile
+    )
   end
 end

@@ -1,30 +1,49 @@
 # frozen_string_literal: true
 
 class UnitOwnershipPolicy < ApplicationPolicy
+  def index?
+    allowed?(:manage_ownerships) || any_accessible_property?(:manage_ownerships)
+  end
+
+  def show?
+    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
+  end
+
   def create?
-    admin? && same_organization?
+    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
   end
 
   def update?
-    admin? && same_organization?
+    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
   end
 
   def destroy?
-    admin? && same_organization?
+    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
   end
 
   class Scope < ApplicationPolicy::Scope
+    include PolicyScopeAuthorization
+
     def resolve
       return scope.none unless user.present?
 
-      tenant = ActsAsTenant.current_tenant
-      return scope.none unless tenant
+      ids = accessible_property_ids
+      return scope.none if ids.empty?
 
-      if user.super_admin? || user.tenant_admin?(tenant)
-        scope.where(organization_id: tenant.id)
-      else
-        scope.none
-      end
+      organization_scoped.joins(:unit).where(units: { residential_property_id: ids })
     end
+  end
+
+  private
+
+  def unit_and_person_same_organization?
+    return false unless record.respond_to?(:unit) && record.respond_to?(:person)
+    return false if record.unit.blank? || record.person.blank?
+
+    org_id = current_organization&.id
+    return false unless org_id
+
+    record.unit.organization_id == org_id &&
+      record.person.organization_id == org_id
   end
 end

@@ -2,45 +2,40 @@
 
 class PropertySectionPolicy < ApplicationPolicy
   def index?
-    admin?
+    any_accessible_property?(:manage_sections) || allowed?(:manage_sections)
   end
 
   def show?
-    admin?
+    same_organization? && allowed?(:manage_sections)
   end
 
   def new?
-    admin?
+    create?
   end
 
   def create?
-    admin?
+    allowed?(:manage_sections)
   end
 
   def edit?
-    admin?
+    update?
   end
 
   def update?
-    admin?
+    same_organization? && allowed?(:manage_sections)
   end
 
   def destroy?
-    admin?
+    same_organization? && allowed?(:manage_sections)
   end
 
   class Scope < ApplicationPolicy::Scope
+    include PolicyScopeAuthorization
+
     def resolve
       return scope.none unless user.present?
 
-      tenant = ActsAsTenant.current_tenant
-      return scope.none unless tenant
-
-      if user.super_admin? || user.tenant_admin?(tenant)
-        scope.all
-      else
-        scope.none
-      end
+      scoped_to_accessible_properties
     end
   end
 end
