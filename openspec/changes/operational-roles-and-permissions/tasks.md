@@ -65,12 +65,12 @@
 
 ## 8. Servicios de asignación (sin UI)
 
-- [ ] 8.1 Implementar `OperationalRoles::AssignPropertyAdmin`
-- [ ] 8.2 Implementar `OperationalRoles::AssignConcierge`
-- [ ] 8.3 Implementar `OperationalRoles::AssignInternalStaff`
-- [ ] 8.4 Implementar `OperationalRoles::RevokeAssignment`
-- [ ] 8.5 Validar `person.user_id` presente cuando la asignación requiere acceso al sistema
-- [ ] 8.6 Tests de servicios de asignación
+- [x] 8.1 Implementar `OperationalRoles::AssignPropertyAdmin`
+- [x] 8.2 Implementar `OperationalRoles::AssignConcierge`
+- [x] 8.3 Implementar `OperationalRoles::AssignInternalStaff`
+- [x] 8.4 Implementar `OperationalRoles::RevokeAssignment`
+- [x] 8.5 Validar `person.user_id` presente cuando la asignación requiere acceso al sistema
+- [x] 8.6 Tests de servicios de asignación
 
 ## 9. Aislamiento y regresión
 

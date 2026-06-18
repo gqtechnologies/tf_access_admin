@@ -3,19 +3,19 @@
 module OperationalRoles
   # Assigns the +concierge+ operational role to a person on a property.
   #
-  # Creates or activates a +StaffAssignment+ with +staff_type: StaffTypes::CONCIERGE+
-  # scoped to the given +residential_property+. The assignment grants capabilities
-  # from +Authorization::Capabilities::CONCIERGE+ (visit access-control) within
-  # that property only. No administrative capabilities are granted.
-  #
-  # Requires the person to have a linked +User+ because concierge role implies
-  # interactive system access.
-  #
-  # Implemented in section 8 of the operational-roles-and-permissions OpenSpec.
+  # Creates or reactivates a +StaffAssignment+ with +staff_type: StaffTypes::CONCIERGE+.
+  # Grants visit access-control capabilities from +Authorization::Capabilities::CONCIERGE+
+  # scoped to +residential_property+ only. No administrative capabilities are granted.
+  # Requires a linked +User+ because the role implies interactive system access.
   class AssignConcierge < BaseAssignment
-    # @return [Hash] { success: Boolean, assignment: StaffAssignment|nil, errors: Array<String> }
-    def call
-      raise NotImplementedError, "#{self.class}#call — implement in OperationalRoles section 8"
+    private
+
+    def target_staff_type
+      StaffTypes::CONCIERGE
+    end
+
+    def requires_system_access?
+      true
     end
   end
 end
