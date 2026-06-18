@@ -72,18 +72,36 @@
 - [x] 8.5 Validar `person.user_id` presente cuando la asignación requiere acceso al sistema
 - [x] 8.6 Tests de servicios de asignación
 
-## 9. Aislamiento y regresión
+## 9. Gestión visual de roles operativos
 
-- [ ] 9.1 Tests cross-organization denial en todas las políticas actualizadas
-- [ ] 9.2 Tests cross-property denial para property_admin y concierge
-- [ ] 9.3 Verificar que `tenant_admin` existentes conservan acceso org-wide
-- [ ] 9.4 Ejecutar suite de tests afectados (policies, resolver, people, units)
-- [ ] 9.5 Ejecutar `graphify update app` tras cambios en código
-- [ ] 9.6 Test explícito: usuario `property_admin` de Propiedad A no puede acceder ni modificar Propiedad B
-- [ ] 9.7 Test explícito: usuario `concierge` de Propiedad A no puede consultar datos de Propiedad B
+ - [ ] 9.1 Crear rutas admin para gestión de roles operativos
+ - [ ] 9.2 Crear controller admin para listar usuarios operativos, roles disponibles, matriz de permisos y asignaciones actuales
+ - [ ] 9.3 Conectar acciones de asignar/revocar roles con los servicios `OperationalRoles::*`
+ - [ ] 9.4 Crear serializers/props para `OperationalUserSummary`, roles disponibles, propiedades accesibles, staff assignments y capabilities efectivas
+ - [ ] 9.5 Crear vista de listado de roles/usuarios operativos basada en `mockups/roles_list.png`
+ - [ ] 9.6 Crear vista de detalle por rol basada en `mockups/details_per_rol.png`
+ - [ ] 9.7 Crear vista o componente de matriz de permisos basada en `mockups/matrix_of_permissions.png`
+ - [ ] 9.8 Crear vista o drawer de asignación de roles basada en `mockups/assign_roles_view.png`
+ - [ ] 9.9 Restringir propiedades seleccionables según el alcance del usuario actual
+ - [ ] 9.10 Ocultar o deshabilitar acciones según `capabilities` del usuario actual
+ - [ ] 9.11 Mantener todas las acciones de filas dentro de dropdowns
+ - [ ] 9.12 Agregar estados empty, loading, success y error para asignación/revocación de roles
+ - [ ] 9.13 Agregar tests de autorización para endpoints admin de gestión de roles operativos
+ - [ ] 9.14 Agregar tests frontend mínimos para renderizado condicional según capabilities
 
-## 10. Cierre
 
-- [ ] 10.1 Revisar navegación admin: ocultar ítems según `capabilities` en layout
-- [ ] 10.2 Documentar decisión Rolify-on-Person vs User (follow-up opcional)
-- [ ] 10.3 Archivar/sync specs delta al completar implementación
+## 10. Aislamiento y regresión
+
+- [ ] 10.1 Tests cross-organization denial en todas las políticas actualizadas
+- [ ] 10.2 Tests cross-property denial para property_admin y concierge
+- [ ] 10.3 Verificar que `tenant_admin` existentes conservan acceso org-wide
+- [ ] 10.4 Ejecutar suite de tests afectados (policies, resolver, people, units)
+- [ ] 10.5 Ejecutar `graphify update app` tras cambios en código
+- [ ] 10.6 Test explícito: usuario `property_admin` de Propiedad A no puede acceder ni modificar Propiedad B
+- [ ] 10.7 Test explícito: usuario `concierge` de Propiedad A no puede consultar datos de Propiedad B
+
+## 11. Cierre
+
+- [ ] 11.1 Revisar navegación admin: ocultar ítems según `capabilities` en layout
+- [ ] 11.2 Documentar decisión Rolify-on-Person vs User (follow-up opcional)
+- [ ] 11.3 Archivar/sync specs delta al completar implementación
