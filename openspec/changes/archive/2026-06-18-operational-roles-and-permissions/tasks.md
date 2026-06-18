@@ -87,7 +87,7 @@
  - [x] 9.11 Mantener todas las acciones de filas dentro de dropdowns
  - [x] 9.12 Agregar estados empty, loading, success y error para asignación/revocación de roles
  - [x] 9.13 Agregar tests de autorización para endpoints admin de gestión de roles operativos
- - [x] 9.14 Agregar tests frontend mínimos para renderizado condicional según capabilities
+ - [ ] 9.14 Agregar tests frontend mínimos para renderizado condicional según capabilities
 
 
 ## 10. Aislamiento y regresión
