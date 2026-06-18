@@ -6,17 +6,21 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
   def index
     authorize nil, :index?, policy_class: OperationalRolePolicy
 
-    assignments = scoped_assignments.includes(:person, :residential_property)
+    assignments = scoped_assignments.includes(:residential_property, person: :user)
     assignments = filter_assignments(assignments)
     assignments = assignments.order(created_at: :desc).page(@filters[:page]).per(@filters[:per_page])
 
     render inertia: "admin/operational_roles/assignments/index", props: {
       assignments: assignments.map { |a| Admin::OperationalAssignmentRowSerializer.new(a).as_json },
       pagination: pagination_info(assignments),
-      available_roles: OperationalRoles::RoleDefinitions.all.map { |r| r.slice(:key, :name) },
+      available_roles: OperationalRoles::RoleDefinitions.assignable.map { |r|
+        OperationalRoles::Presentation.role_json(r, users_count: 0).slice(:key, :name, :scope, :scope_label)
+      },
       accessible_properties: accessible_properties.map { |p| { id: p.id, name: p.name } },
+      assignable_people: assignable_people,
       permissions: {
-        create: operational_role_policy.create?
+        create: operational_role_policy.create?,
+        destroy: operational_role_policy.create?
       }
     }
   end
@@ -27,7 +31,7 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
     result = build_and_call_service
     if result.nil?
       redirect_to admin_operational_roles_assignments_path,
-        inertia: { errors: { base: ["Rol operativo no reconocido"] } }
+        inertia: { errors: { base: [I18n.t("operational_roles.errors.unknown_role")] } }
     elsif result[:success]
       redirect_to admin_operational_roles_assignments_path
     else
@@ -71,11 +75,14 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
   def filter_assignments(scope)
     if params[:q].present?
       query = "%#{params[:q].downcase}%"
-      scope = scope.joins(:person).where("LOWER(persons.display_name) LIKE ?", query)
+      scope = scope.joins(:person).left_joins(person: :user).where(
+        "LOWER(persons.display_name) LIKE :q OR LOWER(users.email) LIKE :q",
+        q: query
+      )
     end
     if params[:role].present?
       role_def = OperationalRoles::RoleDefinitions.find(params[:role])
-      scope = scope.where(staff_type: role_def[:staff_types]) if role_def
+      scope = scope.where(staff_type: role_def[:staff_types]) if role_def&.dig(:staff_types)&.present?
     end
     scope = scope.where(residential_property_id: params[:property_id]) if params[:property_id].present?
     scope
@@ -90,6 +97,20 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
     end
   end
 
+  def assignable_people
+    Person.where(organization_id: Current.organization.id)
+          .includes(:user)
+          .order(:display_name)
+          .map do |person|
+            {
+              id: person.id,
+              display_name: person.display_name,
+              user_email: person.user&.email,
+              has_user: person.user_id.present?
+            }
+          end
+  end
+
   def build_and_call_service
     person = Person.find_by(id: params[:person_id], organization_id: Current.organization.id)
     property = ResidentialProperty.find_by(id: params[:residential_property_id], organization_id: Current.organization.id)
@@ -99,7 +120,10 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
       actor: current_user,
       person: person,
       organization: Current.organization,
-      residential_property: property
+      residential_property: property,
+      starts_at: parse_date(params[:starts_at]),
+      ends_at: parse_date(params[:ends_at]),
+      status: params[:status].presence || StaffAssignment::STATUS_ACTIVE
     }
 
     case params[:role]
@@ -112,5 +136,13 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
     when "internal_staff"
       OperationalRoles::AssignInternalStaff.new(**base_args, staff_type: StaffTypes::MAINTENANCE).call
     end
+  end
+
+  def parse_date(value)
+    return nil if value.blank?
+
+    Date.parse(value.to_s)
+  rescue ArgumentError
+    nil
   end
 end

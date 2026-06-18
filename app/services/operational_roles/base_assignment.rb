@@ -15,11 +15,14 @@ module OperationalRoles
   # Subclasses implement +target_staff_type+ and +requires_system_access?+.
   # +call+ is final; override hooks instead.
   class BaseAssignment
-    def initialize(actor:, person:, organization:, residential_property:)
+    def initialize(actor:, person:, organization:, residential_property:, starts_at: nil, ends_at: nil, status: nil)
       @actor = actor
       @person = person
       @organization = organization
       @residential_property = residential_property
+      @starts_at = starts_at.presence || Date.current
+      @ends_at = ends_at.presence
+      @status = status.presence || StaffAssignment::STATUS_ACTIVE
     end
 
     def call
@@ -36,7 +39,7 @@ module OperationalRoles
           ).first
 
         if existing
-          existing.update!(status: StaffAssignment::STATUS_ACTIVE, ends_at: nil)
+          existing.update!(status: status, starts_at: starts_at, ends_at: ends_at)
           existing
         else
           StaffAssignment.create!(
@@ -44,8 +47,9 @@ module OperationalRoles
             person: person,
             residential_property: residential_property,
             staff_type: target_staff_type,
-            status: StaffAssignment::STATUS_ACTIVE,
-            starts_at: Date.current
+            status: status,
+            starts_at: starts_at,
+            ends_at: ends_at
           )
         end
       end
@@ -57,7 +61,7 @@ module OperationalRoles
 
     private
 
-    attr_reader :actor, :person, :organization, :residential_property
+    attr_reader :actor, :person, :organization, :residential_property, :starts_at, :ends_at, :status
 
     # Override in subclass to return the persisted staff_type string.
     def target_staff_type
