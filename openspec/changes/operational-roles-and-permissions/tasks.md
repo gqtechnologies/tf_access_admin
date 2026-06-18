@@ -58,10 +58,10 @@
 
 ## 7. Contratos de dominio para UI futura
 
-- [ ] 7.1 Documentar `OperationalUserSummary` (serializer o type stub)
-- [ ] 7.2 Definir contrato de entrada/salida para servicios `OperationalRoles::*` que serán implementados en sección 8
-- [ ] 7.3 Exponer `capabilities` en shared props Inertia del layout admin
-- [ ] 7.4 Tipos TypeScript `OperationalCapabilities` para frontend
+- [x] 7.1 Documentar `OperationalUserSummary` (serializer o type stub)
+- [x] 7.2 Definir contrato de entrada/salida para servicios `OperationalRoles::*` que serán implementados en sección 8
+- [x] 7.3 Exponer `capabilities` en shared props Inertia del layout admin
+- [x] 7.4 Tipos TypeScript `OperationalCapabilities` para frontend
 
 ## 8. Servicios de asignación (sin UI)
 
