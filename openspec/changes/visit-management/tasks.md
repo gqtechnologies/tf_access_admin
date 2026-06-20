@@ -56,14 +56,14 @@
 
 ## 6. Controllers y endpoints
 
-* [ ] 6.1 Crear rutas/controller para index, show, create, authorize, check-in, check-out y cancel
-* [ ] 6.2 Definir strong params y respuestas Inertia iniciales
-* [ ] 6.3 Añadir/update endpoint administrativo de edición cuando el estado sea editable
-* [ ] 6.4 Separar endpoints o modos de respuesta para listado administrativo y listado operativo
-* [ ] 6.5 Aceptar y validar payloads de metadata de check-in/check-out
-* [ ] 6.6 Devolver errores de policy, transición y validación consumibles por Inertia
-* [ ] 6.7 Refrescar listado, contadores y detalle tras acciones operativas
-* [ ] 6.8 Testear requests/controllers, incluyendo 403 cross-org/cross-property
+* [x] 6.1 Crear rutas/controller para index, show, create, authorize, check-in, check-out y cancel
+* [x] 6.2 Definir strong params y respuestas Inertia iniciales
+* [x] 6.3 Añadir/update endpoint administrativo de edición cuando el estado sea editable
+* [x] 6.4 Separar endpoints o modos de respuesta para listado administrativo y listado operativo
+* [x] 6.5 Aceptar y validar payloads de metadata de check-in/check-out
+* [x] 6.6 Devolver errores de policy, transición y validación consumibles por Inertia
+* [x] 6.7 Refrescar listado, contadores y detalle tras acciones operativas
+* [x] 6.8 Testear requests/controllers, incluyendo 403 cross-org/cross-property
 
 ## 7. Serializers y props Inertia
 

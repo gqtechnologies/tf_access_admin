@@ -827,6 +827,12 @@ pt:
         validations:
           invalid_access_type: "O tipo de acesso não é válido"
           invalid_incident_type: "O tipo de incidência não é válido"
+        errors:
+          not_found: "Visita não encontrada"
+          not_authorized: "Você não tem permissão para realizar esta ação"
+          not_editable: "A visita não pode ser editada no seu estado atual"
+          invalid_transition: "A transição de estado não é válida para esta visita"
+          unit_not_found: "A unidade indicada não existe ou não está disponível"
       residential_properties:
         title: "Propriedades"
         created_successfully: "Propriedade criada com sucesso"

@@ -838,6 +838,12 @@ en:
         validations:
           invalid_access_type: "Access type is not valid"
           invalid_incident_type: "Incident type is not valid"
+        errors:
+          not_found: "Visit not found"
+          not_authorized: "You are not authorized to perform this action"
+          not_editable: "Visit cannot be edited in its current state"
+          invalid_transition: "State transition is not valid for this visit"
+          unit_not_found: "The specified unit does not exist or is not available"
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"

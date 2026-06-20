@@ -71,7 +71,26 @@ Rails.application.routes.draw do
       resources :assignments, only: [:index, :create, :destroy]
     end
     resources :operational_roles, only: [:index, :show], param: :role
+
+    resources :visits, only: %i[index show new create edit update] do
+      member do
+        post :authorize_visit, as: :authorize
+        delete :cancel
+      end
+      resources :check_ins, only: %i[create], module: :visits
+      resources :check_outs, only: %i[create], module: :visits
+    end
+
     match "*path", to: "errors#not_found", via: :all
+  end
+
+  namespace :concierge do
+    resources :visits, only: %i[index show] do
+      member do
+        post :check_in
+        post :check_out
+      end
+    end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
