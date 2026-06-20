@@ -10,13 +10,13 @@
 
 ## 2. Estados AASM y auditoría técnica
 
-* [ ] 2.1 Integrar AASM con `pending`, `authorized`, `checked_in`, `checked_out`, `cancelled`
-* [ ] 2.2 Implementar eventos `authorize`, `check_in`, `check_out`, `cancel`
-* [ ] 2.3 Restringir check-in a `authorized`, check-out a `checked_in` y cancelación a `pending`/`authorized`
-* [ ] 2.4 Resolver estado inicial en backend según capability, sin confiar en el frontend
-* [ ] 2.5 Registrar actores `User` y timestamps de autorización, ingreso y salida
-* [ ] 2.6 Mantener `audited` como auditoría técnica
-* [ ] 2.7 Revalidar tests de transiciones inválidas: no cancelar `checked_in`/`checked_out`, no check-in fuera de `authorized`, no check-out fuera de `checked_in`
+* [x] 2.1 Integrar AASM con `pending`, `authorized`, `checked_in`, `checked_out`, `cancelled`
+* [x] 2.2 Implementar eventos `authorize`, `check_in`, `check_out`, `cancel`
+* [x] 2.3 Restringir check-in a `authorized`, check-out a `checked_in` y cancelación a `pending`/`authorized`
+* [x] 2.4 Resolver estado inicial en backend según capability, sin confiar en el frontend
+* [x] 2.5 Registrar actores `User` y timestamps de autorización, ingreso y salida
+* [x] 2.6 Mantener `audited` como auditoría técnica
+* [x] 2.7 Revalidar tests de transiciones inválidas: no cancelar `checked_in`/`checked_out`, no check-in fuera de `authorized`, no check-out fuera de `checked_in`
 
 ## 3. Historial funcional
 

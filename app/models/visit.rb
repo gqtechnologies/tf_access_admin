@@ -64,8 +64,16 @@ class Visit < ApplicationRecord
   include VisitStatuses
   include VisitTypes
   include Visit::OperationalMetadata
+  include Visit::StateMachine
 
   acts_as_tenant :organization
+
+  audited only: %i[
+    status visit_type scheduled_at valid_from valid_until notes
+    visitor_person_id host_person_id unit_id residential_property_id property_section_id
+    created_by_id authorized_by_id authorized_at
+    checked_in_by_id checked_in_at checked_out_by_id checked_out_at
+  ]
 
   belongs_to :organization
   belongs_to :residential_property
