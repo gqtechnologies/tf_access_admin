@@ -2,6 +2,8 @@
 
 module Visits
   class Cancel
+    include ServiceAuthorization
+
     def self.call(**kwargs)
       new(**kwargs).call
     end
@@ -13,6 +15,8 @@ module Visits
     end
 
     def call
+      authorize_visit_action!(@visit, :cancel?)
+
       ActiveRecord::Base.transaction do
         from_status = @visit.status
         @visit.cancel!

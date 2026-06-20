@@ -29,17 +29,17 @@
 
 ## 4. Servicios de dominio
 
-* [ ] 4.1 Implementar `Visits::Create` con denormalización, visitante `Person`, anfitrión elegible y actor
-* [ ] 4.2 Implementar `Visits::Authorize`
-* [ ] 4.3 Implementar `Visits::CheckIn`
-* [ ] 4.4 Implementar `Visits::CheckOut`
-* [ ] 4.5 Implementar `Visits::Cancel`
-* [ ] 4.6 Autorizar servicios vía Pundit y usar transacciones atómicas
-* [ ] 4.7 Eliminar cualquier permiso o rama que permita a conserjería crear visitas no planificadas
-* [ ] 4.8 Extender `Visits::CheckIn` con `access_point`, `access_type`, `vehicle_plate` y `notes`
-* [ ] 4.9 Extender `Visits::CheckOut` con `access_point`, `incident_type` y `notes`
-* [ ] 4.10 Validar/normalizar metadata operacional y preservar solo claves permitidas
-* [ ] 4.11 Testear servicios con metadata, historial funcional, estado inicial backend y denegación de creación por conserjería
+* [x] 4.1 Implementar `Visits::Create` con denormalización, visitante `Person`, anfitrión elegible y actor
+* [x] 4.2 Implementar `Visits::Authorize`
+* [x] 4.3 Implementar `Visits::CheckIn`
+* [x] 4.4 Implementar `Visits::CheckOut`
+* [x] 4.5 Implementar `Visits::Cancel`
+* [x] 4.6 Autorizar servicios vía Pundit y usar transacciones atómicas
+* [x] 4.7 Eliminar cualquier permiso o rama que permita a conserjería crear visitas no planificadas
+* [x] 4.8 Extender `Visits::CheckIn` con `access_point`, `access_type`, `vehicle_plate` y `notes`
+* [x] 4.9 Extender `Visits::CheckOut` con `access_point`, `incident_type` y `notes`
+* [x] 4.10 Validar/normalizar metadata operacional y preservar solo claves permitidas
+* [x] 4.11 Testear servicios con metadata, historial funcional, estado inicial backend y denegación de creación por conserjería
 
 ## 5. Policies y scopes
 

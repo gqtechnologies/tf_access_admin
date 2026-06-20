@@ -824,6 +824,9 @@ pt:
           cancelled: "Cancelada"
           rejected: "Rejeitada"
           expired: "Expirada"
+        validations:
+          invalid_access_type: "O tipo de acesso não é válido"
+          invalid_incident_type: "O tipo de incidência não é válido"
       residential_properties:
         title: "Propriedades"
         created_successfully: "Propriedade criada com sucesso"

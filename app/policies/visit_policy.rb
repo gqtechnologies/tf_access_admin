@@ -59,11 +59,11 @@ class VisitPolicy < ApplicationPolicy
     same_organization? && allowed?(:manage_visits)
   end
 
-  # Authorize: resident or owner with authorize_visits on the visit's unit
+  # Authorize: resident or owner with authorize_visits, or administrators with manage_visits
   def authorize?
     return false unless same_organization?
 
-    allowed?(:authorize_visits)
+    allowed?(:authorize_visits) || allowed?(:manage_visits)
   end
 
   # Check-in (register entry): concierge or property_admin on the visit's property
@@ -78,6 +78,14 @@ class VisitPolicy < ApplicationPolicy
     return false unless same_organization?
 
     allowed?(:register_visit_exit)
+  end
+
+  # Cancel: administrators or unit authorizers while visit is still cancellable
+  def cancel?
+    return false unless same_organization?
+    return false unless cancellable_visit?
+
+    allowed?(:manage_visits) || allowed?(:authorize_visits)
   end
 
   class Scope < ApplicationPolicy::Scope
@@ -112,5 +120,13 @@ class VisitPolicy < ApplicationPolicy
 
       relation
     end
+  end
+
+  private
+
+  def cancellable_visit?
+    return false unless record.respond_to?(:status)
+
+    record.status.in?([ VisitStatuses::PENDING, VisitStatuses::AUTHORIZED ])
   end
 end

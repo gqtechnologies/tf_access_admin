@@ -2,6 +2,8 @@
 
 module Visits
   class Create
+    include ServiceAuthorization
+
     VISIT_ASSIGNMENT_KEYS = %i[
       visitor_person_id host_person_id scheduled_at valid_from valid_until
       visit_type notes metadata
@@ -19,8 +21,10 @@ module Visits
     end
 
     def call
+      visit = build_visit
+      authorize_visit_action!(visit, :create?)
+
       ActiveRecord::Base.transaction do
-        visit = build_visit
         visit.assign_initial_status!(actor: @actor, requested_status: @requested_status)
         visit.save!
 
@@ -52,7 +56,7 @@ module Visits
         valid_until: @visit_params[:valid_until],
         visit_type: @visit_params[:visit_type],
         notes: @visit_params[:notes],
-        metadata: @visit_params[:metadata] || {}
+        metadata: Visit.sanitize_metadata(@visit_params[:metadata] || {})
       )
     end
   end

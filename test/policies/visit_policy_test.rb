@@ -166,6 +166,7 @@ class VisitPolicyTest < ActiveSupport::TestCase
     assert VisitPolicy.new(@tenant_admin, @visit_p).authorize?
     assert VisitPolicy.new(@tenant_admin, @visit_p).check_in?
     assert VisitPolicy.new(@tenant_admin, @visit_p).check_out?
+    assert VisitPolicy.new(@tenant_admin, @visit_p).cancel?
   end
 
   test "tenant_admin cannot access visits from another organization" do
@@ -215,6 +216,7 @@ class VisitPolicyTest < ActiveSupport::TestCase
     refute VisitPolicy.new(@concierge_p, @visit_p).create?
     refute VisitPolicy.new(@concierge_p, @visit_p).update?
     refute VisitPolicy.new(@concierge_p, @visit_p).authorize?
+    refute VisitPolicy.new(@concierge_p, @visit_p).cancel?
     refute VisitPolicy.new(@concierge_p, @visit_p).destroy?
   end
 

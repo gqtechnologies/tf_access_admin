@@ -835,6 +835,9 @@ en:
           cancelled: "Cancelled"
           rejected: "Rejected"
           expired: "Expired"
+        validations:
+          invalid_access_type: "Access type is not valid"
+          invalid_incident_type: "Incident type is not valid"
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"
