@@ -827,6 +827,11 @@ pt:
         validations:
           invalid_access_type: "O tipo de acesso não é válido"
           invalid_incident_type: "O tipo de incidência não é válido"
+        visit_types:
+          guest: "Visita"
+          delivery: "Entrega"
+          service: "Serviço"
+          other: "Outro"
         errors:
           not_found: "Visita não encontrada"
           not_authorized: "Você não tem permissão para realizar esta ação"

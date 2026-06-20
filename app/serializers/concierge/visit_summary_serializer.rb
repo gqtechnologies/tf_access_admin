@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-# Operational list serializer for Visit, used in Concierge::VisitsController#index (§7.2, §7.3).
-# Exposes only the fields needed for the concierge tabs (authorized/checked-in/recent checked-out):
-# visitor identity, unit, host, status labels, relevant timestamps, and backend-computed actions.
-# Administrative data (notes, metadata, full person profiles, actor stamps, history) are omitted.
-class Concierge::VisitSerializer < ActiveModel::Serializer
+# Operational summary serializer for Visit (§7.7).
+# Used in Concierge::VisitsController#show (restricted operational detail)
+# and as the confirmation payload before check-in or check-out.
+# Contains visitor, unit, host, current status, all relevant timestamps,
+# and the allowed actions so the confirmation surface can render correctly.
+class Concierge::VisitSummarySerializer < ActiveModel::Serializer
   attributes :id,
     :status,
     :status_label,
@@ -12,6 +13,7 @@ class Concierge::VisitSerializer < ActiveModel::Serializer
     :visit_type_label,
     :scheduled_at,
     :valid_from,
+    :valid_until,
     :authorized_at,
     :checked_in_at,
     :checked_out_at,

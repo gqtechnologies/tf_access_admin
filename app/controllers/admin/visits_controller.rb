@@ -33,10 +33,12 @@ class Admin::VisitsController < AdminController
                .page(@filters[:page])
                .per(@filters[:per_page])
 
+    scoped = policy_scope(Visit)
     render inertia: "admin/visits/index", props: {
       visits: serialize_visits(visits),
       pagination: pagination_info(visits),
-      filters: params[:q].to_h
+      filters: params[:q].to_h,
+      counters: visit_counters(scoped)
     }
   end
 
@@ -46,7 +48,7 @@ class Admin::VisitsController < AdminController
     authorize @visit
 
     render inertia: "admin/visits/show", props: {
-      visit: serialize_visit(@visit)
+      visit: serialize_visit_detail(@visit)
     }
   end
 
@@ -87,7 +89,7 @@ class Admin::VisitsController < AdminController
     authorize @visit
 
     render inertia: "admin/visits/edit", props: {
-      visit: serialize_visit(@visit)
+      visit: serialize_visit_detail(@visit)
     }
   end
 
@@ -162,11 +164,21 @@ class Admin::VisitsController < AdminController
     )
   end
 
-  def serialize_visit(visit)
-    Admin::VisitSerializer.new(visit, current_user: current_user).as_json
+  def serialize_visit_detail(visit)
+    policy = VisitPolicy.new(current_user, visit)
+    serializer_class = policy.full_detail? ? Admin::VisitDetailSerializer : Admin::VisitRestrictedSerializer
+    serializer_class.new(visit, current_user: current_user, policy: policy).as_json
   end
 
   def serialize_visits(visits)
     visits.map { |v| Admin::VisitSerializer.new(v, current_user: current_user).as_json }
+  end
+
+  def visit_counters(scoped)
+    {
+      authorized: scoped.where(status: VisitStatuses::AUTHORIZED).count,
+      checked_in: scoped.where(status: VisitStatuses::CHECKED_IN).count,
+      recent_checked_out: scoped.recently_checked_out.count
+    }
   end
 end

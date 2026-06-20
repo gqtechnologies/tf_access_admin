@@ -766,6 +766,11 @@ es:
         validations:
           invalid_access_type: "El tipo de acceso no es válido"
           invalid_incident_type: "El tipo de incidencia no es válido"
+        visit_types:
+          guest: "Visita"
+          delivery: "Entrega"
+          service: "Servicio"
+          other: "Otro"
         errors:
           not_found: "Visita no encontrada"
           not_authorized: "No tienes permiso para realizar esta acción"

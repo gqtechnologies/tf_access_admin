@@ -67,17 +67,17 @@
 
 ## 7. Serializers y props Inertia
 
-* [ ] 7.1 Crear serializer administrativo base con `permissions`
-* [ ] 7.2 Crear serializer mínimo base para conserjería
-* [ ] 7.3 Crear/ajustar serializer de listado operativo
-* [ ] 7.4 Crear/ajustar serializer de listado administrativo
-* [ ] 7.5 Crear serializer de detalle completo
-* [ ] 7.6 Crear serializer de detalle restringido
-* [ ] 7.7 Crear serializer resumen para check-in/check-out
-* [ ] 7.8 Integrar serializer de eventos/historial
-* [ ] 7.9 Exponer `permissions`/`actions` por visita calculadas en backend
-* [ ] 7.10 Exponer contadores `authorized`, `checked_in`, `recent_checked_out`, filtros y propiedad asignada
-* [ ] 7.11 Testear ausencia de datos administrativos en payload restringido y consistencia de acciones
+* [x] 7.1 Crear serializer administrativo base con `permissions`
+* [x] 7.2 Crear serializer mínimo base para conserjería
+* [x] 7.3 Crear/ajustar serializer de listado operativo
+* [x] 7.4 Crear/ajustar serializer de listado administrativo
+* [x] 7.5 Crear serializer de detalle completo
+* [x] 7.6 Crear serializer de detalle restringido
+* [x] 7.7 Crear serializer resumen para check-in/check-out
+* [x] 7.8 Integrar serializer de eventos/historial
+* [x] 7.9 Exponer `permissions`/`actions` por visita calculadas en backend
+* [x] 7.10 Exponer contadores `authorized`, `checked_in`, `recent_checked_out`, filtros y propiedad asignada
+* [x] 7.11 Testear ausencia de datos administrativos en payload restringido y consistencia de acciones
 
 ## 8. UI: Concierge Authorized Visits
 

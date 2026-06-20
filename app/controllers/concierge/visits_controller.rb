@@ -20,10 +20,13 @@ class Concierge::VisitsController < AdminController
                .page(@filters[:page])
                .per(@filters[:per_page])
 
+    scoped = policy_scope(Visit)
     render inertia: "concierge/visits/index", props: {
       visits: serialize_visits(visits),
       pagination: pagination_info(visits),
-      filters: params[:q].to_h
+      filters: params[:q].to_h,
+      counters: visit_counters(scoped),
+      assigned_property: assigned_property_summary
     }
   end
 
@@ -32,7 +35,7 @@ class Concierge::VisitsController < AdminController
     authorize @visit
 
     render inertia: "concierge/visits/show", props: {
-      visit: serialize_visit(@visit)
+      visit: serialize_summary(@visit)
     }
   end
 
@@ -100,11 +103,33 @@ class Concierge::VisitsController < AdminController
     p.permit(:access_point, :incident_type, :notes, metadata: {})
   end
 
-  def serialize_visit(visit)
-    Concierge::VisitSerializer.new(visit, current_user: current_user).as_json
+  def serialize_summary(visit)
+    Concierge::VisitSummarySerializer.new(visit, current_user: current_user).as_json
   end
 
   def serialize_visits(visits)
     visits.map { |v| Concierge::VisitSerializer.new(v, current_user: current_user).as_json }
+  end
+
+  def visit_counters(scoped)
+    {
+      authorized: scoped.where(status: VisitStatuses::AUTHORIZED).count,
+      checked_in: scoped.where(status: VisitStatuses::CHECKED_IN).count,
+      recent_checked_out: scoped.recently_checked_out.count
+    }
+  end
+
+  def assigned_property_summary
+    resolver = Authorization::Resolver.new(user: current_user, organization: Current.organization)
+    profile = resolver.profile
+    property_ids = profile.property_capabilities
+                          .select { |_, caps| caps.include?(Authorization::Capabilities::VIEW_AUTHORIZED_VISITS) }
+                          .keys
+    return nil if property_ids.empty?
+
+    property = ResidentialProperty.where(id: property_ids).first
+    return nil unless property
+
+    { id: property.id, name: property.name }
   end
 end
