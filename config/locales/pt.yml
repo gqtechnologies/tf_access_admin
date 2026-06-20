@@ -91,6 +91,52 @@ pt:
       need_help: "Precisa de ajuda?"
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
+    concierge:
+      visits:
+        actions:
+          open_menu: "Abrir ações da visita"
+          view: "Ver detalhe"
+          check_in: "Registrar entrada"
+          check_out: "Registrar saída"
+        index:
+          title: "Visitas autorizadas / operacionais"
+          description: "Visitas operacionais da propriedade atribuída. Registre entradas e saídas pelo menu de ações."
+          assigned_property: "Propriedade atribuída"
+          search:
+            placeholder: "Buscar visitante, unidade ou anfitrião..."
+          tabs:
+            authorized: "Autorizadas"
+            checked_in: "Entradas"
+            recent_checked_out: "Saídas recentes"
+          filters:
+            button: "Filtros"
+            title: "Filtros operacionais"
+            visit_type: "Tipo de visita"
+            all_types: "Todos os tipos"
+            clear: "Limpar"
+            apply: "Aplicar"
+          table:
+            headers:
+              visitor: "Visitante"
+              unit: "Unidade"
+              host: "Anfitrião"
+              status: "Estado"
+              authorized_time: "Horário autorizado"
+              last_movement: "Último movimento"
+          movements:
+            authorized: "Autorizada"
+            checked_in: "Entrada registrada"
+            checked_out: "Saída registrada"
+        show:
+          title: "Detalhe da visita"
+          back_to_list: "Voltar à lista"
+          fields:
+            unit: "Unidade"
+            host: "Anfitrião"
+            scheduled_at: "Agendada"
+            authorized_at: "Autorizada"
+            checked_in_at: "Entrada"
+            checked_out_at: "Saída"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Apenas letras, números e hífens são permitidos"
@@ -1275,6 +1321,8 @@ pt:
         organization_settings: "Configurações da Organização"
         settings: "Configurações"
         operational_roles: "Funções operacionais"
+        concierge: "Portaria"
+        authorized_visits: "Visitas autorizadas"
         categories: "Categorias"
         components: "Componentes"
         products: "Produtos"

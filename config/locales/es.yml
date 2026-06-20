@@ -96,6 +96,52 @@ es:
       need_help: "¿Necesitas ayuda?"
       contact_support: "Contactar soporte"
       go_to_home: "Ir a la página de inicio"
+    concierge:
+      visits:
+        actions:
+          open_menu: "Abrir acciones de visita"
+          view: "Ver detalle"
+          check_in: "Registrar ingreso"
+          check_out: "Registrar salida"
+        index:
+          title: "Visitas autorizadas / operativas"
+          description: "Visitas operativas de la propiedad asignada. Registre ingresos y salidas desde el menú de acciones."
+          assigned_property: "Propiedad asignada"
+          search:
+            placeholder: "Buscar visitante, unidad o anfitrión..."
+          tabs:
+            authorized: "Autorizadas"
+            checked_in: "Ingresadas"
+            recent_checked_out: "Salidas recientes"
+          filters:
+            button: "Filtros"
+            title: "Filtros operativos"
+            visit_type: "Tipo de visita"
+            all_types: "Todos los tipos"
+            clear: "Limpiar"
+            apply: "Aplicar"
+          table:
+            headers:
+              visitor: "Visitante"
+              unit: "Unidad"
+              host: "Anfitrión"
+              status: "Estado"
+              authorized_time: "Hora autorizada"
+              last_movement: "Último movimiento"
+          movements:
+            authorized: "Autorizada"
+            checked_in: "Ingreso registrado"
+            checked_out: "Salida registrada"
+        show:
+          title: "Detalle de visita"
+          back_to_list: "Volver al listado"
+          fields:
+            unit: "Unidad"
+            host: "Anfitrión"
+            scheduled_at: "Programada"
+            authorized_at: "Autorizada"
+            checked_in_at: "Ingreso"
+            checked_out_at: "Salida"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Solo se permiten letras, números y guiones medios"
@@ -1319,6 +1365,8 @@ es:
         organization_settings: "Configuración de Organización"
         settings: "Configuración"
         operational_roles: "Roles operativos"
+        concierge: "Conserjería"
+        authorized_visits: "Visitas autorizadas"
         footer:
           title: "Mi Cuenta"
           logout: "Cerrar Sesión"

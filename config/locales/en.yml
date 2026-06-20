@@ -100,6 +100,52 @@ en:
       need_help: "Need help?"
       contact_support: "Contact support"
       go_to_home: "Go to home"
+    concierge:
+      visits:
+        actions:
+          open_menu: "Open visit actions"
+          view: "View detail"
+          check_in: "Register entry"
+          check_out: "Register exit"
+        index:
+          title: "Authorized / operational visits"
+          description: "Operational visits for your assigned property. Register entries and exits from the actions menu."
+          assigned_property: "Assigned property"
+          search:
+            placeholder: "Search visitor, unit or host..."
+          tabs:
+            authorized: "Authorized"
+            checked_in: "Checked in"
+            recent_checked_out: "Recent check-outs"
+          filters:
+            button: "Filters"
+            title: "Operational filters"
+            visit_type: "Visit type"
+            all_types: "All types"
+            clear: "Clear"
+            apply: "Apply"
+          table:
+            headers:
+              visitor: "Visitor"
+              unit: "Unit"
+              host: "Host"
+              status: "Status"
+              authorized_time: "Authorized time"
+              last_movement: "Last movement"
+          movements:
+            authorized: "Authorized"
+            checked_in: "Entry registered"
+            checked_out: "Exit registered"
+        show:
+          title: "Visit detail"
+          back_to_list: "Back to list"
+          fields:
+            unit: "Unit"
+            host: "Host"
+            scheduled_at: "Scheduled at"
+            authorized_at: "Authorized at"
+            checked_in_at: "Checked in at"
+            checked_out_at: "Checked out at"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Only letters, numbers, and hyphens are allowed"
@@ -1324,6 +1370,8 @@ en:
         organization_settings: "Organization Settings"
         settings: "Settings"
         operational_roles: "Operational Roles"
+        concierge: "Concierge"
+        authorized_visits: "Authorized visits"
         categories: "Categories"
         components: "Components"
         products: "Products"

@@ -81,15 +81,15 @@
 
 ## 8. UI: Concierge Authorized Visits
 
-* [ ] 8.1 Crear página operativa basada en [`mockups/visits_lists_property.png`](mockups/visits_lists_property.png)
-* [ ] 8.2 Mostrar propiedad asignada y tabs Autorizadas, Ingresadas, Salidas recientes
-* [ ] 8.3 Implementar búsqueda por visitante, unidad o anfitrión y filtros operativos
-* [ ] 8.4 Crear tabla paginada con columnas operativas y badges de estado
-* [ ] 8.5 Crear `VisitActionsDropdown` y eliminar botones inline de acciones
-* [ ] 8.6 Mapear acciones backend: `authorized` view/check-in; `checked_in` view/check-out; `checked_out` reciente view
-* [ ] 8.7 Ocultar creación, edición, autorización y cancelación para conserjería
-* [ ] 8.8 Añadir navegación sidebar con `view_authorized_visits`
-* [ ] 8.9 Refrescar tabs, contadores y filas tras check-in/check-out
+* [x] 8.1 Crear página operativa basada en [`mockups/visits_lists_property.png`](mockups/visits_lists_property.png)
+* [x] 8.2 Mostrar propiedad asignada y tabs Autorizadas, Ingresadas, Salidas recientes
+* [x] 8.3 Implementar búsqueda por visitante, unidad o anfitrión y filtros operativos
+* [x] 8.4 Crear tabla paginada con columnas operativas y badges de estado
+* [x] 8.5 Crear `VisitActionsDropdown` y eliminar botones inline de acciones
+* [x] 8.6 Mapear acciones backend: `authorized` view/check-in; `checked_in` view/check-out; `checked_out` reciente view
+* [x] 8.7 Ocultar creación, edición, autorización y cancelación para conserjería
+* [x] 8.8 Añadir navegación sidebar con `view_authorized_visits`
+* [x] 8.9 Refrescar tabs, contadores y filas tras check-in/check-out
 
 ## 9. UI: Check-in y Check-out
 

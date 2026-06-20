@@ -132,6 +132,14 @@ class Visit < ApplicationRecord
     )
   }
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[status visit_type scheduled_at authorized_at checked_in_at checked_out_at]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[visitor_person host_person unit]
+  end
+
   def self.host_eligible?(person:, unit:, at: Time.zone.now)
     return false if person.blank? || unit.blank?
 

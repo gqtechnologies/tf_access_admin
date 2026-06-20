@@ -14,16 +14,18 @@ class Concierge::VisitsController < AdminController
   # Operational listing: authorized + checked_in + recent checked_out on assigned properties.
   def index
     authorize Visit
-    @q = policy_scope(Visit).ransack(params[:q])
+    scoped = policy_scope(Visit)
+    tab_scope = apply_operational_tab(scoped, params[:tab])
+    @q = tab_scope.ransack(params[:q])
     visits = @q.result(distinct: true)
                .order(scheduled_at: :asc)
                .page(@filters[:page])
                .per(@filters[:per_page])
 
-    scoped = policy_scope(Visit)
     render inertia: "concierge/visits/index", props: {
       visits: serialize_visits(visits),
       pagination: pagination_info(visits),
+      tab: operational_tab_param(params[:tab]),
       filters: params[:q].to_h,
       counters: visit_counters(scoped),
       assigned_property: assigned_property_summary
@@ -117,6 +119,24 @@ class Concierge::VisitsController < AdminController
       checked_in: scoped.where(status: VisitStatuses::CHECKED_IN).count,
       recent_checked_out: scoped.recently_checked_out.count
     }
+  end
+
+  OPERATIONAL_TABS = {
+    "authorized" => VisitStatuses::AUTHORIZED,
+    "checked_in" => VisitStatuses::CHECKED_IN,
+    "recent_checked_out" => "recent_checked_out"
+  }.freeze
+
+  def apply_operational_tab(scope, tab)
+    key = operational_tab_param(tab)
+    return scope.recently_checked_out if key == "recent_checked_out"
+
+    scope.where(status: OPERATIONAL_TABS.fetch(key))
+  end
+
+  def operational_tab_param(tab)
+    key = tab.to_s.presence || "authorized"
+    OPERATIONAL_TABS.key?(key) ? key : "authorized"
   end
 
   def assigned_property_summary

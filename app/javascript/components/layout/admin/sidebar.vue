@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2 } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -94,6 +94,23 @@ const getFeatureIcon = (key: string) => {
                   <Link href="/admin/operational_roles">
                     <Users class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.operational_roles') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Concierge operational visits — view_authorized_visits capability -->
+        <SidebarGroup v-if="capabilities?.view_authorized_visits">
+          <SidebarGroupLabel>{{ t('admin.sidebar.concierge') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/concierge/visits">
+                    <ClipboardList class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.authorized_visits') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
