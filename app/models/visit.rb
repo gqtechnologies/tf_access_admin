@@ -108,7 +108,29 @@ class Visit < ApplicationRecord
   before_validation :assign_validity_defaults
   before_validation :sanitize_metadata_assignment
 
+  # Window during which a checked-out visit is still surfaced in operational
+  # (concierge) listings as a "recent" check-out.
+  RECENT_CHECK_OUT_WINDOW = 24.hours
+
   scope :operational, -> { where(status: VisitStatuses::OPERATIONAL) }
+
+  # Recently checked-out visits, used to keep just-completed visits visible in
+  # operational listings without exposing the full historical backlog.
+  scope :recently_checked_out, ->(window: RECENT_CHECK_OUT_WINDOW) {
+    where(status: VisitStatuses::CHECKED_OUT).where(checked_out_at: window.ago..)
+  }
+
+  # Visits visible to concierge-style operational actors: currently authorized,
+  # currently checked-in, or recently checked-out. Pending and cancelled visits
+  # are intentionally excluded (OpenSpec visit-management §5.5).
+  scope :concierge_visible, -> {
+    where(
+      "visits.status IN (:operational_now) OR (visits.status = :checked_out AND visits.checked_out_at >= :since)",
+      operational_now: [ VisitStatuses::AUTHORIZED, VisitStatuses::CHECKED_IN ],
+      checked_out: VisitStatuses::CHECKED_OUT,
+      since: RECENT_CHECK_OUT_WINDOW.ago
+    )
+  }
 
   def self.host_eligible?(person:, unit:, at: Time.zone.now)
     return false if person.blank? || unit.blank?

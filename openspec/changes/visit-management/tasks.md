@@ -43,16 +43,16 @@
 
 ## 5. Policies y scopes
 
-* [ ] 5.1 Implementar `VisitPolicy#index?`, `show?`, `create?`, `update?`, `authorize?`, `cancel?`, `check_in?`, `check_out?`
-* [ ] 5.2 Alinear policy con `manage_visits`, `create_visits`, `authorize_visits`, `view_authorized_visits`, `register_visit_entry`, `register_visit_exit`
-* [ ] 5.3 Scope tenant_admin organization-wide y property_admin por propiedades asignadas
-* [ ] 5.4 Scope resident/owner por unidades y capabilities contextuales
-* [ ] 5.5 Ajustar scope concierge a propiedades asignadas y solo `authorized`, `checked_in`, `checked_out` recientes
-* [ ] 5.6 Denegar explícitamente a conserjería `create?`, `update?`, `authorize?` y `cancel?`
-* [ ] 5.7 Permitir `show?` completo con `manage_visits` y restringido con `view_authorized_visits`
-* [ ] 5.8 Limitar `cancel?` a estados `pending`/`authorized` y alcance administrativo/contextual permitido
-* [ ] 5.9 Mantener check-in/check-out fuera de administración salvo capability operativa explícita
-* [ ] 5.10 Testear scopes/actions por rol, estado, propiedad y organización
+* [x] 5.1 Implementar `VisitPolicy#index?`, `show?`, `create?`, `update?`, `authorize?`, `cancel?`, `check_in?`, `check_out?`
+* [x] 5.2 Alinear policy con `manage_visits`, `create_visits`, `authorize_visits`, `view_authorized_visits`, `register_visit_entry`, `register_visit_exit`
+* [x] 5.3 Scope tenant_admin organization-wide y property_admin por propiedades asignadas
+* [x] 5.4 Scope resident/owner por unidades y capabilities contextuales
+* [x] 5.5 Ajustar scope concierge a propiedades asignadas y solo `authorized`, `checked_in`, `checked_out` recientes
+* [x] 5.6 Denegar explícitamente a conserjería `create?`, `update?`, `authorize?` y `cancel?`
+* [x] 5.7 Permitir `show?` completo con `manage_visits` y restringido con `view_authorized_visits`
+* [x] 5.8 Limitar `cancel?` a estados `pending`/`authorized` y alcance administrativo/contextual permitido
+* [x] 5.9 Mantener check-in/check-out fuera de administración salvo capability operativa explícita
+* [x] 5.10 Testear scopes/actions por rol, estado, propiedad y organización
 
 ## 6. Controllers y endpoints
 
@@ -67,8 +67,8 @@
 
 ## 7. Serializers y props Inertia
 
-* [x] 7.1 Crear serializer administrativo base con `permissions`
-* [x] 7.2 Crear serializer mínimo base para conserjería
+* [ ] 7.1 Crear serializer administrativo base con `permissions`
+* [ ] 7.2 Crear serializer mínimo base para conserjería
 * [ ] 7.3 Crear/ajustar serializer de listado operativo
 * [ ] 7.4 Crear/ajustar serializer de listado administrativo
 * [ ] 7.5 Crear serializer de detalle completo
@@ -116,10 +116,10 @@
 
 ## 11. UI: Visit Create
 
-* [x] 11.1 Crear flujo administrativo multi-paso de propiedad, unidad, visitante, anfitrión, horario y confirmación
-* [x] 11.2 Filtrar unidades por propiedad y anfitriones por relación activa
-* [x] 11.3 Buscar/crear visitante `Person`
-* [x] 11.4 Manejar loading, empty, success y error con footer `justify-between`
+* [ ] 11.1 Crear flujo administrativo multi-paso de propiedad, unidad, visitante, anfitrión, horario y confirmación
+* [ ] 11.2 Filtrar unidades por propiedad y anfitriones por relación activa
+* [ ] 11.3 Buscar/crear visitante `Person`
+* [ ] 11.4 Manejar loading, empty, success y error con footer `justify-between`
 * [ ] 11.5 Alinear stepper a Información general, Visitante, Fecha/horario, Adicional, Notas/confirmación
 * [ ] 11.6 Añadir documento, teléfono, motivo, vehículo opcional y notas al contrato de formulario
 * [ ] 11.7 Implementar `VisitAuthorizationSummary` basado en [`mockups/visit_create.png`](mockups/visit_create.png)
@@ -138,15 +138,15 @@
 
 ## 13. UI contextual para residentes/propietarios
 
-* [x] 13.1 Añadir visitas en detalle de unidad/listado scoped
-* [x] 13.2 Listar y crear visitas para unidades relacionadas
-* [x] 13.3 Autorizar/cancelar según capabilities y estado
-* [x] 13.4 Ocultar acciones no permitidas según backend
+* [ ] 13.1 Añadir visitas en detalle de unidad/listado scoped
+* [ ] 13.2 Listar y crear visitas para unidades relacionadas
+* [ ] 13.3 Autorizar/cancelar según capabilities y estado
+* [ ] 13.4 Ocultar acciones no permitidas según backend
 * [ ] 13.5 Revalidar que el flujo contextual comparte estado inicial backend, dropdowns e historial funcional
 
 ## 14. i18n, tests integrales y QA
 
-* [x] 14.1 Añadir traducciones base de tipos, estados, acciones y labels en `es`, `en`, `pt`
+* [ ] 14.1 Añadir traducciones base de tipos, estados, acciones y labels en `es`, `en`, `pt`
 * [ ] 14.2 Completar traducciones para superficies, dropdowns, metadata, timeline, errores y estados vacíos/loading
 * [ ] 14.3 Tests integración `pending -> authorized -> checked_in -> checked_out`
 * [ ] 14.4 Tests cancelación permitida/denegada e historial funcional

@@ -2,22 +2,36 @@
 
 # Authorization policy for +Visit+ records.
 #
-# Capability-to-action contract (implementation of OpenSpec 4.1–4.3):
+# Capability-to-action contract (implementation of OpenSpec visit-management §5):
 #
-#   index?      → view_visits (org/property-wide) or view_authorized_visits (concierge, property-scoped)
-#   show?       → view_visits or view_authorized_visits, scoped to the visit's property
-#   create?     → create_visits, scoped to the visit's unit (resident/owner context)
-#   authorize?  → authorize_visits, scoped to the visit's unit
+#   index?      → manage_visits / view_visits (admin) or view_authorized_visits (concierge)
+#   show?       → manage_visits / view_visits (full) or view_authorized_visits (restricted)
+#   create?     → create_visits (resident/owner unit context) or manage_visits (admin)
+#   update?     → manage_visits (admin only)
+#   authorize?  → authorize_visits (resident/owner unit context) or manage_visits (admin)
+#   cancel?     → manage_visits or authorize_visits, only while pending/authorized
 #   check_in?   → register_visit_entry, scoped to the visit's residential_property
 #   check_out?  → register_visit_exit, scoped to the visit's residential_property
 #
-# Scope rules:
-#   - organization_admin/tenant_admin → all visits in the organization
-#   - property_admin                  → visits for accessible (assigned) properties
-#   - concierge                       → visits for assigned properties (minimal access)
-#   - resident/owner                  → visits linked to their active units only
-#   - client without assignment       → no visits
-#   - cross-organization              → always denied
+# Concierge (operational) actors MUST NOT create, update, authorize or cancel
+# visits in the MVP (§5.6); they only hold view_authorized_visits plus the
+# operational register_visit_entry/register_visit_exit capabilities. Check-in
+# and check-out stay out of administration unless the actor explicitly holds the
+# operational capability (§5.9); state validity is enforced by the AASM
+# transitions, not by the policy boolean.
+#
+# Detail granularity (§5.7):
+#   - full_detail?       → manage_visits / view_visits
+#   - restricted_detail? → view_authorized_visits without full access (concierge)
+#
+# Scope rules (§5.3–5.5):
+#   - tenant_admin / content_manager → all visits in the organization
+#   - property_admin                 → all visits on assigned (managed) properties
+#   - concierge                      → operational visits (authorized, checked_in,
+#                                       recently checked_out) on assigned properties only
+#   - resident/owner                 → visits linked to their active units only
+#   - client without assignment      → no visits
+#   - cross-organization             → always denied
 #
 class VisitPolicy < ApplicationPolicy
   # List: tenant_admin/property_admin (manage_visits), concierge (view_authorized_visits)
@@ -32,6 +46,25 @@ class VisitPolicy < ApplicationPolicy
 
     allowed?(:view_visits) || allowed?(:manage_visits) ||
       allowed?(:view_authorized_visits) || allowed?(:view_minimal_access_control_data)
+  end
+
+  # Full detail (administrative): exposes complete visit, person, actor, metadata
+  # and functional history data. Drives the full vs. restricted serializer choice.
+  # Tied to manage_visits (§5.7); concierge holds view_visits too but only ever
+  # receives the restricted payload.
+  def full_detail?
+    return false unless same_organization?
+
+    allowed?(:manage_visits)
+  end
+
+  # Restricted detail (concierge): only operational fields and minimal timeline.
+  # Mutually exclusive with full_detail? so a single actor never gets both.
+  def restricted_detail?
+    return false unless same_organization?
+    return false if full_detail?
+
+    allowed?(:view_authorized_visits) || allowed?(:view_minimal_access_control_data)
   end
 
   # Create: residents and owners via create_visits, property_admin/tenant_admin via manage_visits
@@ -100,25 +133,44 @@ class VisitPolicy < ApplicationPolicy
       resolver = authorization_resolver
       return scope.none unless resolver
 
-      # org-wide roles see all visits in the organization
+      # org-wide roles (tenant_admin, content_manager) see all visits in the organization
       return organization_scoped if resolver.allowed?(:view_visits) || resolver.allowed?(:manage_visits)
 
-      # property-scoped roles (concierge, property_admin) see visits on accessible properties
-      property_ids = accessible_property_ids
+      profile = resolver.profile
+
+      # Split property-scoped access by capability:
+      #   - manage_visits        → property_admin, sees every status (managed)
+      #   - view_authorized/visits without manage → concierge, operational only
+      managed_property_ids = []
+      operational_property_ids = []
+      profile.property_capabilities.each do |property_id, caps|
+        if caps.include?(Authorization::Capabilities::MANAGE_VISITS)
+          managed_property_ids << property_id
+        elsif caps.include?(Authorization::Capabilities::VIEW_AUTHORIZED_VISITS) ||
+              caps.include?(Authorization::Capabilities::VIEW_VISITS)
+          operational_property_ids << property_id
+        end
+      end
 
       # unit-scoped roles (owner/resident) see visits on their active units
-      unit_ids = resolver.profile.unit_capabilities
-                         .select { |_id, caps| caps.include?(:create_visits) || caps.include?(:authorize_visits) }
-                         .keys
-
-      return scope.none if property_ids.empty? && unit_ids.empty?
+      unit_ids = profile.unit_capabilities
+                        .select do |_id, caps|
+                          caps.include?(Authorization::Capabilities::CREATE_VISITS) ||
+                            caps.include?(Authorization::Capabilities::AUTHORIZE_VISITS)
+                        end
+                        .keys
 
       base = organization_scoped
-      relation = base.none
-      relation = relation.or(base.where(residential_property_id: property_ids)) if property_ids.any?
-      relation = relation.or(base.where(unit_id: unit_ids)) if unit_ids.any?
+      clauses = []
+      clauses << base.where(residential_property_id: managed_property_ids) if managed_property_ids.any?
+      if operational_property_ids.any?
+        clauses << base.where(residential_property_id: operational_property_ids).concierge_visible
+      end
+      clauses << base.where(unit_id: unit_ids) if unit_ids.any?
 
-      relation
+      return scope.none if clauses.empty?
+
+      clauses.reduce { |relation, clause| relation.or(clause) }
     end
   end
 

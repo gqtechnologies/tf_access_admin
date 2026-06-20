@@ -148,6 +148,30 @@ class VisitPolicyTest < ActiveSupport::TestCase
     Current.reset
   end
 
+  # Builds an additional visit on +unit+ (host is @owner, eligible on @unit_p)
+  # with an explicit status, for scope/state assertions.
+  def create_visit_on(unit, status:, checked_out_at: nil)
+    ActsAsTenant.with_tenant(@organization) do
+      visitor = Person.create!(
+        organization: @organization,
+        display_name: "Visitor #{SecureRandom.hex(4)}",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+
+      Visit.create!(
+        organization: @organization,
+        unit: unit,
+        visitor_person: visitor,
+        host_person: @owner.person_for(@organization),
+        scheduled_at: 1.day.from_now,
+        valid_from: 1.day.from_now,
+        status: status,
+        checked_out_at: checked_out_at
+      )
+    end
+  end
+
   # ─── tenant_admin (organization-wide) ───────────────────────────────────────
 
   test "tenant_admin can index and show visits organization-wide" do
@@ -281,12 +305,44 @@ class VisitPolicyTest < ActiveSupport::TestCase
     refute_includes resolved, @other_org_visit
   end
 
-  test "concierge scope returns only visits on assigned property" do
+  test "concierge scope returns only operational visits on assigned property" do
+    authorized = create_visit_on(@unit_p, status: VisitStatuses::AUTHORIZED)
+
     resolved = VisitPolicy::Scope.new(@concierge_p, Visit.all).resolve
 
-    assert_includes resolved, @visit_p
+    assert_includes resolved, authorized
+    refute_includes resolved, @visit_p # pending is excluded for concierge
     refute_includes resolved, @visit_q
     refute_includes resolved, @other_org_visit
+  end
+
+  test "concierge scope excludes pending and cancelled, includes operational and recent checked-out" do
+    authorized = create_visit_on(@unit_p, status: VisitStatuses::AUTHORIZED)
+    checked_in = create_visit_on(@unit_p, status: VisitStatuses::CHECKED_IN)
+    recent_out = create_visit_on(@unit_p, status: VisitStatuses::CHECKED_OUT, checked_out_at: 1.hour.ago)
+    old_out = create_visit_on(@unit_p, status: VisitStatuses::CHECKED_OUT, checked_out_at: 2.days.ago)
+    cancelled = create_visit_on(@unit_p, status: VisitStatuses::CANCELLED)
+
+    resolved = VisitPolicy::Scope.new(@concierge_p, Visit.all).resolve
+
+    assert_includes resolved, authorized
+    assert_includes resolved, checked_in
+    assert_includes resolved, recent_out
+    refute_includes resolved, old_out      # checked-out outside the recent window
+    refute_includes resolved, @visit_p     # pending
+    refute_includes resolved, cancelled    # cancelled
+  end
+
+  test "property_admin scope returns visits in every status on assigned property" do
+    authorized = create_visit_on(@unit_p, status: VisitStatuses::AUTHORIZED)
+    cancelled = create_visit_on(@unit_p, status: VisitStatuses::CANCELLED)
+
+    resolved = VisitPolicy::Scope.new(@property_admin_p, Visit.all).resolve
+
+    assert_includes resolved, @visit_p   # pending
+    assert_includes resolved, authorized
+    assert_includes resolved, cancelled
+    refute_includes resolved, @visit_q
   end
 
   test "owner scope returns only visits on their unit" do
@@ -299,6 +355,49 @@ class VisitPolicyTest < ActiveSupport::TestCase
 
   test "client scope returns no visits" do
     assert_empty VisitPolicy::Scope.new(@client, Visit.all).resolve
+  end
+
+  # ─── detail granularity (full vs restricted) ────────────────────────────────
+
+  test "manage_visits actors receive full detail and not restricted" do
+    assert VisitPolicy.new(@tenant_admin, @visit_p).full_detail?
+    refute VisitPolicy.new(@tenant_admin, @visit_p).restricted_detail?
+
+    assert VisitPolicy.new(@property_admin_p, @visit_p).full_detail?
+    refute VisitPolicy.new(@property_admin_p, @visit_p).restricted_detail?
+  end
+
+  test "concierge receives restricted detail and not full" do
+    refute VisitPolicy.new(@concierge_p, @visit_p).full_detail?
+    assert VisitPolicy.new(@concierge_p, @visit_p).restricted_detail?
+  end
+
+  test "cross-organization actor receives neither full nor restricted detail" do
+    refute VisitPolicy.new(@tenant_admin, @other_org_visit).full_detail?
+    refute VisitPolicy.new(@tenant_admin, @other_org_visit).restricted_detail?
+  end
+
+  # ─── cancel? state limits (§5.8) ─────────────────────────────────────────────
+
+  test "admin can cancel pending or authorized visits but not checked-in or later" do
+    authorized = create_visit_on(@unit_p, status: VisitStatuses::AUTHORIZED)
+    checked_in = create_visit_on(@unit_p, status: VisitStatuses::CHECKED_IN)
+    checked_out = create_visit_on(@unit_p, status: VisitStatuses::CHECKED_OUT, checked_out_at: 1.hour.ago)
+    cancelled = create_visit_on(@unit_p, status: VisitStatuses::CANCELLED)
+
+    assert VisitPolicy.new(@tenant_admin, @visit_p).cancel? # pending
+    assert VisitPolicy.new(@tenant_admin, authorized).cancel?
+    refute VisitPolicy.new(@tenant_admin, checked_in).cancel?
+    refute VisitPolicy.new(@tenant_admin, checked_out).cancel?
+    refute VisitPolicy.new(@tenant_admin, cancelled).cancel?
+  end
+
+  test "owner can cancel a cancellable visit on their unit via authorize_visits" do
+    authorized = create_visit_on(@unit_p, status: VisitStatuses::AUTHORIZED)
+    checked_in = create_visit_on(@unit_p, status: VisitStatuses::CHECKED_IN)
+
+    assert VisitPolicy.new(@owner, authorized).cancel?
+    refute VisitPolicy.new(@owner, checked_in).cancel?
   end
 
   # ─── capability contract assertions ─────────────────────────────────────────
