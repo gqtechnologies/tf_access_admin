@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_19_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -1069,11 +1069,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
     t.uuid "changed_by_id"
     t.uuid "changed_by_person_id"
     t.datetime "created_at", null: false
-    t.string "event_type"
+    t.string "event_type", null: false
     t.string "from_status"
     t.jsonb "metadata", default: {}, null: false
     t.text "notes"
-    t.datetime "occurred_at"
+    t.datetime "occurred_at", null: false
     t.uuid "organization_id", null: false
     t.text "reason"
     t.string "to_status", null: false
@@ -1082,6 +1082,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
     t.index ["changed_by_id"], name: "index_visit_status_histories_on_changed_by_id"
     t.index ["changed_by_person_id"], name: "index_visit_status_histories_on_changed_by_person_id"
     t.index ["metadata"], name: "index_visit_status_histories_on_metadata", using: :gin
+    t.index ["organization_id", "event_type"], name: "index_visit_status_histories_on_org_event_type"
     t.index ["organization_id", "to_status"], name: "index_visit_status_histories_on_organization_id_and_to_status"
     t.index ["organization_id", "visit_id", "created_at"], name: "index_visit_status_histories_on_org_visit_created_at"
     t.index ["organization_id", "visit_id", "occurred_at"], name: "index_visit_status_histories_on_org_visit_occurred_at"
@@ -1144,7 +1145,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
     t.index ["host_person_id"], name: "index_visits_on_host_person_id"
     t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
     t.index ["organization_id", "residential_property_id", "scheduled_at"], name: "index_visits_on_org_property_pending_scheduled_at", where: "((status)::text = 'pending'::text)"
-    t.index ["organization_id", "residential_property_id", "status", "checked_out_at"], name: "index_visits_on_org_property_operational_statuses", where: "((status)::text = ANY ((ARRAY['authorized'::character varying, 'checked_in'::character varying, 'checked_out'::character varying])::text[]))"
+    t.index ["organization_id", "residential_property_id", "status", "checked_out_at"], name: "index_visits_on_org_property_operational_statuses", where: "((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))"
     t.index ["organization_id", "residential_property_id", "status", "scheduled_at"], name: "index_visits_on_org_property_status_scheduled_at"
     t.index ["organization_id", "unit_id", "scheduled_at"], name: "index_visits_on_org_unit_scheduled_at"
     t.index ["organization_id"], name: "index_visits_on_organization_id"

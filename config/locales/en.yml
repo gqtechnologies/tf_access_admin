@@ -820,6 +820,21 @@ en:
           invalid_occupancy_type: "Occupancy type is not valid"
           invalid_status: "Status is not valid"
           existing_person_match: "A person with this document or email already exists (%{display_name}). Search and reuse them."
+      visits:
+        event_types:
+          created: "Created"
+          authorized: "Authorized"
+          checked_in: "Checked in"
+          checked_out: "Checked out"
+          cancelled: "Cancelled"
+        statuses:
+          pending: "Pending"
+          authorized: "Authorized"
+          checked_in: "Checked in"
+          checked_out: "Checked out"
+          cancelled: "Cancelled"
+          rejected: "Rejected"
+          expired: "Expired"
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"
@@ -1447,6 +1462,10 @@ en:
               incoherent_with_unit: "must match the unit section"
             valid_until:
               after_valid_from: "must be on or after valid from"
+        visit_status_history:
+          attributes:
+            organization:
+              incoherent_with_visit: "must match the visit organization"
         bulk_import:
           attributes:
             status:

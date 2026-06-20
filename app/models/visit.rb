@@ -87,7 +87,7 @@ class Visit < ApplicationRecord
   belongs_to :checked_out_by, class_name: "User", optional: true
   belongs_to :staff_shift, optional: true
 
-  has_many :visit_status_histories, dependent: :destroy
+  has_many :visit_status_histories, -> { chronological }, dependent: :destroy
   has_many :visit_participants
   has_one  :visit_recurrence, dependent: :destroy
 

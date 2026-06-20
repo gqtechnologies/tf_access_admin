@@ -20,12 +20,12 @@
 
 ## 3. Historial funcional
 
-* [ ] 3.1 Evolucionar `visit_status_histories` o crear `visit_events` con `visit_id`, `organization_id`, `event_type`, `from_status`, `to_status`, `actor_user_id`, `occurred_at`, `notes`, `metadata`
-* [ ] 3.2 Registrar evento `created` en `Visits::Create`
-* [ ] 3.3 Registrar eventos `authorized`, `checked_in`, `checked_out`, `cancelled` en la misma transacción de cada servicio
-* [ ] 3.4 Exponer asociaciones/scopes tenant-safe y orden cronológico
-* [ ] 3.5 Crear serializer de eventos/historial para timeline y panel de actores
-* [ ] 3.6 Testear contenido, actor, timestamps, metadata y rollback atómico del historial funcional
+* [x] 3.1 Evolucionar `visit_status_histories` o crear `visit_events` con `visit_id`, `organization_id`, `event_type`, `from_status`, `to_status`, `actor_user_id`, `occurred_at`, `notes`, `metadata`
+* [x] 3.2 Registrar evento `created` en `Visits::Create`
+* [x] 3.3 Registrar eventos `authorized`, `checked_in`, `checked_out`, `cancelled` en la misma transacción de cada servicio
+* [x] 3.4 Exponer asociaciones/scopes tenant-safe y orden cronológico
+* [x] 3.5 Crear serializer de eventos/historial para timeline y panel de actores
+* [x] 3.6 Testear contenido, actor, timestamps, metadata y rollback atómico del historial funcional
 
 ## 4. Servicios de dominio
 
