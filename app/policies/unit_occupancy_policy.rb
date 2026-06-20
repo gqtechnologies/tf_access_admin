@@ -10,15 +10,15 @@ class UnitOccupancyPolicy < ApplicationPolicy
   end
 
   def create?
-    same_organization? && unit_and_person_same_organization? && allowed?(:manage_occupancies)
+    manageable_occupancy?
   end
 
   def update?
-    same_organization? && unit_and_person_same_organization? && allowed?(:manage_occupancies)
+    manageable_occupancy?
   end
 
   def destroy?
-    same_organization? && unit_and_person_same_organization? && allowed?(:manage_occupancies)
+    manageable_occupancy?
   end
 
   class Scope < ApplicationPolicy::Scope
@@ -35,6 +35,16 @@ class UnitOccupancyPolicy < ApplicationPolicy
   end
 
   private
+
+  def manageable_occupancy?
+    return false unless same_organization?
+
+    if index_record?
+      allowed?(:manage_occupancies) || any_accessible_property?(:manage_occupancies)
+    else
+      unit_and_person_same_organization? && allowed?(:manage_occupancies)
+    end
+  end
 
   def unit_and_person_same_organization?
     return false unless record.respond_to?(:unit) && record.respond_to?(:person)

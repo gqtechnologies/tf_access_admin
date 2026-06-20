@@ -1428,6 +1428,16 @@ es:
   activerecord:
     errors:
       models:
+        visit:
+          attributes:
+            host_person:
+              inactive_on_unit: "debe tener una relación activa de propiedad u ocupación en la unidad seleccionada"
+            residential_property:
+              incoherent_with_unit: "debe coincidir con la propiedad de la unidad"
+            property_section:
+              incoherent_with_unit: "debe coincidir con la sección de la unidad"
+            valid_until:
+              after_valid_from: "debe ser igual o posterior al inicio de validez"
         bulk_import:
           attributes:
             status:

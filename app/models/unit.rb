@@ -56,6 +56,7 @@ class Unit < ApplicationRecord
   has_many :lease_contracts, dependent: :destroy
   has_many :unit_occupancies, dependent: :destroy
   has_many :authorized_residents, dependent: :destroy
+  has_many :visits, dependent: :destroy
 
   validates :unit_type, presence: true, inclusion: { in: UnitTypes::ALL }
   validates :identifier, presence: true

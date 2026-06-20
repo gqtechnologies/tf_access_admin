@@ -64,14 +64,16 @@ class VisitPolicyTest < ActiveSupport::TestCase
       person_type: PersonTypes::NATURAL,
       status: PersonStatuses::ACTIVE
     )
+    host_p = @owner.person_for(@organization)
 
     @visit_p = Visit.create!(
       organization: @organization,
-      residential_property: @property_p,
       unit: @unit_p,
-      scheduled_starts_at: 1.day.from_now,
-      responsible_person: person_p,
-      status: "pending"
+      visitor_person: person_p,
+      host_person: host_p,
+      scheduled_at: 1.day.from_now,
+      valid_from: 1.day.from_now,
+      status: VisitStatuses::PENDING
     )
 
     @visit_q = ActsAsTenant.with_tenant(@organization) do
@@ -81,13 +83,28 @@ class VisitPolicyTest < ActiveSupport::TestCase
         person_type: PersonTypes::NATURAL,
         status: PersonStatuses::ACTIVE
       )
+      host_q = Person.create!(
+        organization: @organization,
+        display_name: "Visit Host Q",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+      UnitOwnership.create!(
+        organization: @organization,
+        person: host_q,
+        unit: @unit_q,
+        ownership_percentage: 100,
+        starts_at: Date.current,
+        status: UnitOwnership::STATUS_ACTIVE
+      )
       Visit.create!(
         organization: @organization,
-        residential_property: @property_q,
         unit: @unit_q,
-        scheduled_starts_at: 1.day.from_now,
-        responsible_person: person_q,
-        status: "pending"
+        visitor_person: person_q,
+        host_person: host_q,
+        scheduled_at: 1.day.from_now,
+        valid_from: 1.day.from_now,
+        status: VisitStatuses::PENDING
       )
     end
 
@@ -100,13 +117,28 @@ class VisitPolicyTest < ActiveSupport::TestCase
         person_type: PersonTypes::NATURAL,
         status: PersonStatuses::ACTIVE
       )
+      other_host = Person.create!(
+        organization: @other_organization,
+        display_name: "Other Org Host",
+        person_type: PersonTypes::NATURAL,
+        status: PersonStatuses::ACTIVE
+      )
+      UnitOwnership.create!(
+        organization: @other_organization,
+        person: other_host,
+        unit: other_unit,
+        ownership_percentage: 100,
+        starts_at: Date.current,
+        status: UnitOwnership::STATUS_ACTIVE
+      )
       Visit.create!(
         organization: @other_organization,
-        residential_property: other_property,
         unit: other_unit,
-        scheduled_starts_at: 1.day.from_now,
-        responsible_person: other_person,
-        status: "pending"
+        visitor_person: other_person,
+        host_person: other_host,
+        scheduled_at: 1.day.from_now,
+        valid_from: 1.day.from_now,
+        status: VisitStatuses::PENDING
       )
     end
   end

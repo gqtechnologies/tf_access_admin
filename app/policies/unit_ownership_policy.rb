@@ -10,15 +10,15 @@ class UnitOwnershipPolicy < ApplicationPolicy
   end
 
   def create?
-    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
+    manageable_ownership?
   end
 
   def update?
-    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
+    manageable_ownership?
   end
 
   def destroy?
-    same_organization? && unit_and_person_same_organization? && allowed?(:manage_ownerships)
+    manageable_ownership?
   end
 
   class Scope < ApplicationPolicy::Scope
@@ -35,6 +35,16 @@ class UnitOwnershipPolicy < ApplicationPolicy
   end
 
   private
+
+  def manageable_ownership?
+    return false unless same_organization?
+
+    if index_record?
+      allowed?(:manage_ownerships) || any_accessible_property?(:manage_ownerships)
+    else
+      unit_and_person_same_organization? && allowed?(:manage_ownerships)
+    end
+  end
 
   def unit_and_person_same_organization?
     return false unless record.respond_to?(:unit) && record.respond_to?(:person)

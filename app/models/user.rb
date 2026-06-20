@@ -45,6 +45,10 @@ class User < ApplicationRecord
   has_many :people, dependent: :destroy
   has_many :organization_memberships, through: :people
   has_many :organizations, through: :people
+  has_many :created_visits, class_name: "Visit", foreign_key: :created_by_id, dependent: :nullify
+  has_many :authorized_visits, class_name: "Visit", foreign_key: :authorized_by_id, dependent: :nullify
+  has_many :checked_in_visits, class_name: "Visit", foreign_key: :checked_in_by_id, dependent: :nullify
+  has_many :checked_out_visits, class_name: "Visit", foreign_key: :checked_out_by_id, dependent: :nullify
   has_one_attached :avatar
 
   after_create :provision_tenant_identity

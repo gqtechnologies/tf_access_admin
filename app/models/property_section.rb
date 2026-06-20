@@ -48,6 +48,7 @@ class PropertySection < ApplicationRecord
   belongs_to :parent, class_name: "PropertySection", optional: true, inverse_of: :children
   has_many :children, class_name: "PropertySection", foreign_key: :parent_id, inverse_of: :parent, dependent: :destroy
   has_many :units, dependent: :destroy
+  has_many :visits, dependent: :destroy
 
   validates :section_type, presence: true, inclusion: { in: SectionTypes::ALL }
   validates :name, presence: true

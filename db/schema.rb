@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_19_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -1066,19 +1066,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_120000) do
   end
 
   create_table "visit_status_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "changed_by_id"
     t.uuid "changed_by_person_id"
     t.datetime "created_at", null: false
+    t.string "event_type"
     t.string "from_status"
     t.jsonb "metadata", default: {}, null: false
+    t.text "notes"
+    t.datetime "occurred_at"
     t.uuid "organization_id", null: false
     t.text "reason"
     t.string "to_status", null: false
     t.datetime "updated_at", null: false
     t.uuid "visit_id", null: false
+    t.index ["changed_by_id"], name: "index_visit_status_histories_on_changed_by_id"
     t.index ["changed_by_person_id"], name: "index_visit_status_histories_on_changed_by_person_id"
     t.index ["metadata"], name: "index_visit_status_histories_on_metadata", using: :gin
     t.index ["organization_id", "to_status"], name: "index_visit_status_histories_on_organization_id_and_to_status"
     t.index ["organization_id", "visit_id", "created_at"], name: "index_visit_status_histories_on_org_visit_created_at"
+    t.index ["organization_id", "visit_id", "occurred_at"], name: "index_visit_status_histories_on_org_visit_occurred_at"
     t.index ["organization_id"], name: "index_visit_status_histories_on_organization_id"
     t.index ["visit_id"], name: "index_visit_status_histories_on_visit_id"
   end
@@ -1109,43 +1115,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_120000) do
   end
 
   create_table "visits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.datetime "actual_ended_at"
-    t.datetime "actual_started_at"
-    t.datetime "approved_at"
-    t.uuid "approved_by_person_id"
-    t.string "authorization_method"
-    t.datetime "concierge_validated_at"
-    t.uuid "concierge_validated_by_person_id"
+    t.datetime "authorized_at"
+    t.uuid "authorized_by_id"
+    t.datetime "checked_in_at"
+    t.uuid "checked_in_by_id"
+    t.datetime "checked_out_at"
+    t.uuid "checked_out_by_id"
     t.datetime "created_at", null: false
-    t.uuid "created_by_person_id"
+    t.uuid "created_by_id"
+    t.uuid "host_person_id", null: false
     t.jsonb "metadata", default: {}, null: false
     t.text "notes"
     t.uuid "organization_id", null: false
-    t.datetime "rejected_at"
-    t.uuid "rejected_by_person_id"
-    t.text "rejection_reason"
+    t.uuid "property_section_id"
     t.uuid "residential_property_id", null: false
-    t.uuid "responsible_person_id"
-    t.datetime "scheduled_ends_at"
-    t.datetime "scheduled_starts_at", null: false
-    t.uuid "staff_shift_id"
+    t.datetime "scheduled_at", null: false
     t.string "status", default: "pending", null: false
     t.uuid "unit_id", null: false
     t.datetime "updated_at", null: false
-    t.index ["approved_by_person_id"], name: "index_visits_on_approved_by_person_id"
-    t.index ["concierge_validated_by_person_id"], name: "index_visits_on_concierge_validated_by_person_id"
-    t.index ["created_by_person_id"], name: "index_visits_on_created_by_person_id"
+    t.datetime "valid_from", null: false
+    t.datetime "valid_until"
+    t.string "visit_type"
+    t.uuid "visitor_person_id", null: false
+    t.index ["authorized_by_id"], name: "index_visits_on_authorized_by_id"
+    t.index ["checked_in_by_id"], name: "index_visits_on_checked_in_by_id"
+    t.index ["checked_out_by_id"], name: "index_visits_on_checked_out_by_id"
+    t.index ["created_by_id"], name: "index_visits_on_created_by_id"
+    t.index ["host_person_id"], name: "index_visits_on_host_person_id"
     t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
-    t.index ["organization_id", "residential_property_id", "scheduled_starts_at"], name: "index_visits_on_org_property_pending_statuses", where: "((status)::text = ANY (ARRAY[('pending'::character varying)::text, ('concierge_validation_pending'::character varying)::text, ('resident_notified'::character varying)::text]))"
-    t.index ["organization_id", "residential_property_id", "status", "scheduled_starts_at"], name: "index_visits_on_org_property_status_scheduled_starts"
-    t.index ["organization_id", "staff_shift_id"], name: "index_visits_on_organization_id_and_staff_shift_id"
-    t.index ["organization_id", "unit_id", "scheduled_starts_at"], name: "index_visits_on_org_unit_scheduled_starts"
+    t.index ["organization_id", "residential_property_id", "scheduled_at"], name: "index_visits_on_org_property_pending_scheduled_at", where: "((status)::text = 'pending'::text)"
+    t.index ["organization_id", "residential_property_id", "status", "checked_out_at"], name: "index_visits_on_org_property_operational_statuses", where: "((status)::text = ANY ((ARRAY['authorized'::character varying, 'checked_in'::character varying, 'checked_out'::character varying])::text[]))"
+    t.index ["organization_id", "residential_property_id", "status", "scheduled_at"], name: "index_visits_on_org_property_status_scheduled_at"
+    t.index ["organization_id", "unit_id", "scheduled_at"], name: "index_visits_on_org_unit_scheduled_at"
     t.index ["organization_id"], name: "index_visits_on_organization_id"
-    t.index ["rejected_by_person_id"], name: "index_visits_on_rejected_by_person_id"
+    t.index ["property_section_id"], name: "index_visits_on_property_section_id"
     t.index ["residential_property_id"], name: "index_visits_on_residential_property_id"
-    t.index ["responsible_person_id"], name: "index_visits_on_responsible_person_id"
     t.index ["unit_id"], name: "index_visits_on_unit_id"
-    t.check_constraint "scheduled_ends_at IS NULL OR scheduled_ends_at >= scheduled_starts_at", name: "visits_scheduled_range_valid"
+    t.index ["visitor_person_id"], name: "index_visits_on_visitor_person_id"
+    t.check_constraint "valid_until IS NULL OR valid_until >= valid_from", name: "visits_validity_range_valid"
   end
 
   add_foreign_key "access_events", "organizations"
@@ -1276,16 +1283,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_120000) do
   add_foreign_key "visit_recurrences", "visits"
   add_foreign_key "visit_status_histories", "organizations"
   add_foreign_key "visit_status_histories", "people", column: "changed_by_person_id"
+  add_foreign_key "visit_status_histories", "users", column: "changed_by_id"
   add_foreign_key "visit_status_histories", "visits"
   add_foreign_key "visitor_profiles", "organizations"
   add_foreign_key "visitor_profiles", "people"
   add_foreign_key "visits", "organizations"
-  add_foreign_key "visits", "people", column: "approved_by_person_id"
-  add_foreign_key "visits", "people", column: "concierge_validated_by_person_id"
-  add_foreign_key "visits", "people", column: "created_by_person_id"
-  add_foreign_key "visits", "people", column: "rejected_by_person_id"
-  add_foreign_key "visits", "people", column: "responsible_person_id"
+  add_foreign_key "visits", "people", column: "host_person_id"
+  add_foreign_key "visits", "people", column: "visitor_person_id"
+  add_foreign_key "visits", "property_sections"
   add_foreign_key "visits", "residential_properties"
-  add_foreign_key "visits", "staff_shifts"
   add_foreign_key "visits", "units"
+  add_foreign_key "visits", "users", column: "authorized_by_id"
+  add_foreign_key "visits", "users", column: "checked_in_by_id"
+  add_foreign_key "visits", "users", column: "checked_out_by_id"
+  add_foreign_key "visits", "users", column: "created_by_id"
 end

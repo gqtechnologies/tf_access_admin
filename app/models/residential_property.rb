@@ -43,6 +43,7 @@ class ResidentialProperty < ApplicationRecord
   belongs_to :organization
   has_many :property_sections, dependent: :destroy
   has_many :units, dependent: :destroy
+  has_many :visits, dependent: :destroy
   has_one :property_setting, dependent: :destroy
 
   validates :name, presence: true

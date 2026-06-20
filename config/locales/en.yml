@@ -1437,6 +1437,16 @@ en:
   activerecord:
     errors:
       models:
+        visit:
+          attributes:
+            host_person:
+              inactive_on_unit: "must have an active ownership or occupancy on the selected unit"
+            residential_property:
+              incoherent_with_unit: "must match the unit property"
+            property_section:
+              incoherent_with_unit: "must match the unit section"
+            valid_until:
+              after_valid_from: "must be on or after valid from"
         bulk_import:
           attributes:
             status:

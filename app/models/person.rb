@@ -40,11 +40,6 @@
 #  fk_rails_...  (organization_id => organizations.id)
 #  fk_rails_...  (user_id => users.id)
 #
-# Canonical identity for natural and legal persons within an organization.
-# All domain relationships (ownerships, occupancies, visitor profiles, staff
-# assignments, visits) reference +people+; do not introduce parallel identity
-# tables for owners, residents, visitors, or staff.
-#
 class Person < ApplicationRecord
   include PersonTypes
   include PersonStatuses
@@ -65,6 +60,8 @@ class Person < ApplicationRecord
   # Extended visitor profiles; see +VisitorProfile+ for the person_id contract.
   has_many :visitor_profiles, dependent: :destroy
   has_many :staff_assignments, dependent: :destroy
+  has_many :visits_as_visitor, class_name: "Visit", foreign_key: :visitor_person_id, dependent: :destroy
+  has_many :visits_as_host, class_name: "Visit", foreign_key: :host_person_id, dependent: :destroy
 
   validates :display_name, presence: true
   validates :person_type, presence: true, inclusion: { in: PersonTypes::ALL }
