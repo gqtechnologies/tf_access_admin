@@ -155,6 +155,7 @@ import { new_admin_visit_path } from '@/routes'
 import type { ColumnDef } from '@/types/table'
 import type {
   AdminVisitListItem,
+  AdminVisitShowItem,
   AdminVisitScope,
   PropertySummary,
   UnitFilterOption,
@@ -328,13 +329,13 @@ function onSearchClear(event: Event) {
   if (target?.value === '') triggerSearch()
 }
 
-function onCheckIn(visit: AdminVisitListItem) {
-  selectedVisit.value = visit
+function onCheckIn(visit: AdminVisitListItem | AdminVisitShowItem) {
+  selectedVisit.value = visit as AdminVisitListItem
   checkInOpen.value = true
 }
 
-function onCheckOut(visit: AdminVisitListItem) {
-  selectedVisit.value = visit
+function onCheckOut(visit: AdminVisitListItem | AdminVisitShowItem) {
+  selectedVisit.value = visit as AdminVisitListItem
   checkOutOpen.value = true
 }
 

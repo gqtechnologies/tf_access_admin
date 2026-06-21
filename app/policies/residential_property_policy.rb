@@ -2,7 +2,7 @@
 
 class ResidentialPropertyPolicy < ApplicationPolicy
   def index?
-    resolver.accessible_property_ids.any?
+    allowed?(:manage_properties) || resolver.accessible_property_ids.any?
   end
 
   def show?

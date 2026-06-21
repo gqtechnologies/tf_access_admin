@@ -237,7 +237,7 @@ class Admin::VisitsController < AdminController
   end
 
   def authorize_visit_management!
-    authorize Visit
+    authorize Visit, :index?
   end
 
   def unit_option_json(unit)

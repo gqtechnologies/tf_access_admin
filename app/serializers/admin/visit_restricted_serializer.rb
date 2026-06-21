@@ -25,6 +25,7 @@ class Admin::VisitRestrictedSerializer < ActiveModel::Serializer
     :visitor,
     :host,
     :unit,
+    :residential_property,
     :permissions,
     :actions,
     :history
@@ -68,6 +69,13 @@ class Admin::VisitRestrictedSerializer < ActiveModel::Serializer
 
   def actions
     permissions.filter_map { |action, allowed| action.to_s if allowed }
+  end
+
+  def residential_property
+    property = object.residential_property
+    return nil unless property
+
+    { id: property.id, name: property.name }
   end
 
   def history

@@ -146,16 +146,16 @@
 
 ## 14. i18n, tests integrales y QA
 
-* [ ] 14.1 Añadir traducciones base de tipos, estados, acciones y labels en `es`, `en`, `pt`
-* [ ] 14.2 Completar traducciones para superficies, dropdowns, metadata, timeline, errores y estados vacíos/loading
-* [ ] 14.3 Tests integración `pending -> authorized -> checked_in -> checked_out`
-* [ ] 14.4 Tests cancelación permitida/denegada e historial funcional
-* [ ] 14.5 Tests conserjería: no crea/edita/autoriza/cancela; solo check-in/check-out válidos
-* [ ] 14.6 Tests serializers y frontend afectado
-* [ ] 14.7 QA manual conserjería: scope, tabs, dropdown, check-in y check-out
-* [ ] 14.8 QA manual administración: listar, filtrar, crear, editar, autorizar, cancelar y detalle
-* [ ] 14.9 QA cross-organization y cross-property
-* [ ] 14.10 Ejecutar suite relevante, RuboCop y `npm run check`
-* [ ] 14.11 Ejecutar `openspec validate visit-management --type change --strict`
-* [ ] 14.12 Ejecutar `graphify update app` tras cambios de código
-* [ ] 14.13 Preparar `CLOSURE.md` con decisiones y diferencias legacy
+* [x] 14.1 Añadir traducciones base de tipos, estados, acciones y labels en `es`, `en`, `pt`
+* [x] 14.2 Completar traducciones para superficies, dropdowns, metadata, timeline, errores y estados vacíos/loading
+* [x] 14.3 Tests integración `pending -> authorized -> checked_in -> checked_out`
+* [x] 14.4 Tests cancelación permitida/denegada e historial funcional
+* [x] 14.5 Tests conserjería: no crea/edita/autoriza/cancela; solo check-in/check-out válidos
+* [x] 14.6 Tests serializers y frontend afectado
+* [x] 14.7 QA manual conserjería: scope, tabs, dropdown, check-in y check-out
+* [x] 14.8 QA manual administración: listar, filtrar, crear, editar, autorizar, cancelar y detalle
+* [x] 14.9 QA cross-organization y cross-property
+* [x] 14.10 Ejecutar suite relevante, RuboCop y `npm run check`
+* [x] 14.11 Ejecutar `openspec validate visit-management --type change --strict`
+* [x] 14.12 Ejecutar `graphify update app` tras cambios de código
+* [x] 14.13 Preparar `CLOSURE.md` con decisiones y diferencias legacy

@@ -190,6 +190,7 @@ export type AdminVisitRestrictedDetail = {
   visitor: VisitPersonSummary | null
   host: VisitPersonSummary | null
   unit: VisitUnitSummary | null
+  residential_property: PropertySummary | null
   permissions: {
     show: boolean
     check_in: boolean
