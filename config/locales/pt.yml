@@ -1725,6 +1725,12 @@ pt:
       unconfirmed_account: "Conta não confirmada"
       token_expired: "Token expirado"
       token_invalid: "Token inválido"
+    visits:
+      unit_not_found: "Unidade não encontrada ou inacessível"
+      no_active_relationship: "Você não tem uma relação ativa com esta unidade"
+      authorization_denied: "Você não está autorizado a registrar visitas autorizadas nesta unidade"
+      invalid_visitor: "Os dados do visitante são inválidos"
+      invalid_scheduled_at: "A data e hora da visita são inválidas"
   activerecord:
     errors:
       models:

@@ -4,10 +4,10 @@
 
 ## 1. API privada para residentes
 
-* [ ] 1.1 Definir el contrato versionado del endpoint privado autenticado para registrar una visita desde el contexto de una unidad
-* [ ] 1.2 Definir payload, respuesta, errores y semántica temporal sin aceptar organization, property, section, host, actores o status como valores confiables del cliente
-* [ ] 1.3 Mantener el endpoint separado de controllers, rutas y respuestas Inertia del administrador
-* [ ] 1.4 Documentar que el endpoint crea exclusivamente visitas autorizadas para residentes habilitados; un flujo `pending` requerirá otro contrato
+* [x] 1.1 Definir el contrato versionado del endpoint privado autenticado para registrar una visita desde el contexto de una unidad
+* [x] 1.2 Definir payload, respuesta, errores y semántica temporal sin aceptar organization, property, section, host, actores o status como valores confiables del cliente
+* [x] 1.3 Mantener el endpoint separado de controllers, rutas y respuestas Inertia del administrador
+* [x] 1.4 Documentar que el endpoint crea exclusivamente visitas autorizadas para residentes habilitados; un flujo `pending` requerirá otro contrato
 
 ## 2. Contexto y autorización del residente
 

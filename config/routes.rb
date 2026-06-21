@@ -35,6 +35,12 @@ Rails.application.routes.draw do
       # end
 
       namespace :private do
+        # Resident private API — unit-scoped, authenticated, separate from admin/Inertia flows.
+        # POST /api/v1/private/units/:unit_id/visits creates an authorized visit.
+        # A pending-visit flow requires a separate contract.
+        resources :units, only: [] do
+          resources :visits, only: [:create], module: :units
+        end
       end
     end
   end
