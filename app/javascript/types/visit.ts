@@ -32,6 +32,17 @@ export type ConciergeVisitListItem = {
   unit: VisitUnitSummary | null
   permissions: ConciergeVisitPermissions
   actions: string[]
+  operational_timeline?: VisitTimelineEntry[]
+  checked_in_by_name?: string | null
+}
+
+export type VisitTimelineEntry = {
+  id: string
+  event_type: string
+  event_type_label: string
+  occurred_at: string
+  actor_name: string | null
+  tone: 'success' | 'neutral' | 'warning'
 }
 
 export type ConciergeVisitSummary = ConciergeVisitListItem & {

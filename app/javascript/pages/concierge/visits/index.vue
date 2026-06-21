@@ -93,6 +93,19 @@
         />
       </template>
     </AdminDataTable>
+
+    <VisitCheckInDrawer
+      v-model:open="checkInOpen"
+      :visit="selectedVisit"
+      return-to="list"
+      @success="refreshList"
+    />
+    <VisitCheckOutDrawer
+      v-model:open="checkOutOpen"
+      :visit="selectedVisit"
+      return-to="list"
+      @success="refreshList"
+    />
   </div>
 </template>
 
@@ -105,6 +118,8 @@ import AdminDataTable from '@/components/admin/table/index.vue'
 import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
 import VisitStatusBadge from '@/components/concierge/visits/VisitStatusBadge.vue'
 import VisitActionsDropdown from '@/components/concierge/visits/VisitActionsDropdown.vue'
+import VisitCheckInDrawer from '@/components/concierge/visits/VisitCheckInDrawer.vue'
+import VisitCheckOutDrawer from '@/components/concierge/visits/VisitCheckOutDrawer.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -147,6 +162,9 @@ const props = defineProps<{
 const { t, locale } = useI18n()
 const filtersOpen = ref(false)
 const visitTypes = VISIT_TYPES
+const selectedVisit = ref<ConciergeVisitListItem | null>(null)
+const checkInOpen = ref(false)
+const checkOutOpen = ref(false)
 
 const initialTab = (props.tab ?? 'authorized') as ConciergeVisitTab
 const { activeTab, visitTypeFilter, fetchVisits, refreshList } = useConciergeVisitsList(initialTab)
@@ -272,12 +290,14 @@ function onSearchClear(event: Event) {
   if (target?.value === '') triggerSearch()
 }
 
-function onCheckIn() {
-  refreshList()
+function onCheckIn(visit: ConciergeVisitListItem) {
+  selectedVisit.value = visit
+  checkInOpen.value = true
 }
 
-function onCheckOut() {
-  refreshList()
+function onCheckOut(visit: ConciergeVisitListItem) {
+  selectedVisit.value = visit
+  checkOutOpen.value = true
 }
 
 const columns = computed<ColumnDef<ConciergeVisitListItem, unknown>[]>(() => [

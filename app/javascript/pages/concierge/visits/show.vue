@@ -6,8 +6,8 @@
       <VisitStatusBadge :status="visit.status" :label="visit.status_label" />
       <VisitActionsDropdown
         :visit="visit"
-        @check-in="onOperationalAction"
-        @check-out="onOperationalAction"
+        @check-in="openCheckIn"
+        @check-out="openCheckOut"
       />
     </div>
 
@@ -45,16 +45,31 @@
         <Button variant="outline">{{ t('concierge.visits.show.back_to_list') }}</Button>
       </Link>
     </div>
+
+    <VisitCheckInDrawer
+      v-model:open="checkInOpen"
+      :visit="visit"
+      return-to="detail"
+      @success="reloadVisit"
+    />
+    <VisitCheckOutDrawer
+      v-model:open="checkOutOpen"
+      :visit="visit"
+      return-to="detail"
+      @success="reloadVisit"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
 import Header from '@/components/admin/layout/Header.vue'
 import VisitStatusBadge from '@/components/concierge/visits/VisitStatusBadge.vue'
 import VisitActionsDropdown from '@/components/concierge/visits/VisitActionsDropdown.vue'
+import VisitCheckInDrawer from '@/components/concierge/visits/VisitCheckInDrawer.vue'
+import VisitCheckOutDrawer from '@/components/concierge/visits/VisitCheckOutDrawer.vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import type { ConciergeVisitSummary } from '@/types/visit'
@@ -65,6 +80,8 @@ const props = defineProps<{
 }>()
 
 const { t, locale } = useI18n()
+const checkInOpen = ref(false)
+const checkOutOpen = ref(false)
 
 const itemsBreadcrumb = computed<BreadcrumbItem[]>(() => [
   { label: t('admin.sidebar.home'), href: '/admin/home/index' },
@@ -83,7 +100,15 @@ function formatDateTime(value: string | null | undefined) {
   }).format(date)
 }
 
-function onOperationalAction() {
+function openCheckIn() {
+  checkInOpen.value = true
+}
+
+function openCheckOut() {
+  checkOutOpen.value = true
+}
+
+function reloadVisit() {
   router.reload({ only: ['visit'] })
 }
 </script>

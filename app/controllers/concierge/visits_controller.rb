@@ -18,6 +18,7 @@ class Concierge::VisitsController < AdminController
     tab_scope = apply_operational_tab(scoped, params[:tab])
     @q = tab_scope.ransack(params[:q])
     visits = @q.result(distinct: true)
+               .includes(:visitor_person, :host_person, :unit, :checked_in_by, :visit_status_histories)
                .order(scheduled_at: :asc)
                .page(@filters[:page])
                .per(@filters[:per_page])
@@ -52,16 +53,13 @@ class Concierge::VisitsController < AdminController
       notes: check_in_params[:notes],
       check_in_metadata: check_in_params[:metadata]&.to_h || {}
     )
-    redirect_to concierge_visit_path(@visit)
+    redirect_to operational_redirect_target
   rescue AASM::InvalidTransition
-    redirect_to concierge_visit_path(@visit),
-                inertia: { errors: { base: [ t("frontend.admin.visits.errors.invalid_transition") ] } }
+    operational_error_redirect(base: [ t("frontend.admin.visits.errors.invalid_transition") ])
   rescue Visits::OperationalMetadataParams::InvalidMetadataError => e
-    redirect_to concierge_visit_path(@visit),
-                inertia: { errors: { base: [ e.message ] } }
+    operational_error_redirect(base: [ e.message ])
   rescue Pundit::NotAuthorizedError
-    redirect_to concierge_visit_path(@visit),
-                inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
+    operational_error_redirect(base: [ t("frontend.admin.visits.errors.not_authorized") ])
   end
 
   # POST /concierge/visits/:id/check_out (6.1, 6.5, 6.6, 6.7)
@@ -74,22 +72,21 @@ class Concierge::VisitsController < AdminController
       notes: check_out_params[:notes],
       check_out_metadata: check_out_params[:metadata]&.to_h || {}
     )
-    redirect_to concierge_visit_path(@visit)
+    redirect_to operational_redirect_target
   rescue AASM::InvalidTransition
-    redirect_to concierge_visit_path(@visit),
-                inertia: { errors: { base: [ t("frontend.admin.visits.errors.invalid_transition") ] } }
+    operational_error_redirect(base: [ t("frontend.admin.visits.errors.invalid_transition") ])
   rescue Visits::OperationalMetadataParams::InvalidMetadataError => e
-    redirect_to concierge_visit_path(@visit),
-                inertia: { errors: { base: [ e.message ] } }
+    operational_error_redirect(base: [ e.message ])
   rescue Pundit::NotAuthorizedError
-    redirect_to concierge_visit_path(@visit),
-                inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
+    operational_error_redirect(base: [ t("frontend.admin.visits.errors.not_authorized") ])
   end
 
   private
 
   def set_visit
-    @visit = policy_scope(Visit).find(params[:id])
+    @visit = policy_scope(Visit)
+               .includes(:visitor_person, :host_person, :unit, :checked_in_by, :visit_status_histories)
+               .find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to concierge_visits_path,
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_found") ] } }
@@ -137,6 +134,16 @@ class Concierge::VisitsController < AdminController
   def operational_tab_param(tab)
     key = tab.to_s.presence || "authorized"
     OPERATIONAL_TABS.key?(key) ? key : "authorized"
+  end
+
+  def operational_redirect_target
+    return concierge_visits_path if params[:return_to] == "list"
+
+    concierge_visit_path(@visit)
+  end
+
+  def operational_error_redirect(errors)
+    redirect_to operational_redirect_target, inertia: { errors: errors }
   end
 
   def assigned_property_summary

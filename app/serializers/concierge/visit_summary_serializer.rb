@@ -25,7 +25,9 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
     :host,
     :unit,
     :permissions,
-    :actions
+    :actions,
+    :operational_timeline,
+    :checked_in_by_name
 
   def status_label
     I18n.t("frontend.admin.visits.statuses.#{object.status}", default: object.status.to_s.humanize)
@@ -66,6 +68,20 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
 
   def actions
     permissions.filter_map { |action, allowed| action.to_s if allowed }
+  end
+
+  def operational_timeline
+    object.visit_status_histories
+          .where(event_type: [
+            VisitEventTypes::AUTHORIZED,
+            VisitEventTypes::CHECKED_IN,
+            VisitEventTypes::CHECKED_OUT
+          ])
+          .map { |entry| Concierge::VisitTimelineEntrySerializer.new(entry).as_json }
+  end
+
+  def checked_in_by_name
+    object.checked_in_by&.name
   end
 
   private

@@ -136,6 +136,61 @@ en:
             authorized: "Authorized"
             checked_in: "Entry registered"
             checked_out: "Exit registered"
+        summary:
+          unit: "Unit"
+          host: "Host"
+          authorized_at: "Authorized visit"
+          authorized_visit: "Authorized visit"
+          checked_in_at: "Registered entry"
+          checked_in_by: "Registered by"
+        access_points:
+          main_entrance: "Main entrance"
+          side_entrance: "Side entrance"
+          garage: "Garage"
+        access_types:
+          pedestrian: "Pedestrian"
+          vehicle: "Vehicle"
+          delivery: "Delivery"
+          other: "Other"
+        incident_types:
+          none: "No incident"
+          noise: "Noise"
+          damage: "Damage"
+          security: "Security"
+          other: "Other"
+        timeline:
+          events:
+            authorized: "Visit authorized"
+            checked_in: "Entry registered"
+            checked_out: "Exit registered"
+        check_in:
+          title: "Register entry (Check-in)"
+          description: "Confirm visitor entry with operational metadata."
+          confirm: "Confirm entry"
+          info_banner: "The visit will be marked as checked in."
+          fields:
+            entry_time: "Entry date and time"
+            access_point: "Access / gatehouse"
+            select_access_point: "Select access point"
+            access_type: "Access type"
+            select_access_type: "Select access type"
+            vehicle_plate: "License plate or vehicle (optional)"
+            vehicle_plate_placeholder: "e.g. ABCD12"
+            notes: "Notes (optional)"
+        check_out:
+          title: "Register exit (Check-out)"
+          description: "Confirm visitor exit with operational metadata."
+          confirm: "Confirm exit"
+          fields:
+            exit_time: "Exit date and time"
+            access_point: "Access / gatehouse"
+            select_access_point: "Select access point"
+            notes: "Notes (optional)"
+            incident_type: "Incident (optional)"
+            no_incident: "No incident"
+          timeline:
+            title: "Timeline"
+            empty: "No operational events yet."
         show:
           title: "Visit detail"
           back_to_list: "Back to list"

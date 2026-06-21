@@ -93,14 +93,14 @@
 
 ## 9. UI: Check-in y Check-out
 
-* [ ] 9.1 Crear modal/drawer de check-in basado en [`mockups/visit_checkin.png`](mockups/visit_checkin.png)
-* [ ] 9.2 Mostrar resumen, estado, unidad, anfitrión, horario autorizado y campos operativos
-* [ ] 9.3 Conectar Confirmar ingreso con `Visits::CheckIn`, errores y estado loading
-* [ ] 9.4 Crear modal/drawer de check-out basado en [`mockups/visit_checkout.png`](mockups/visit_checkout.png)
-* [ ] 9.5 Mostrar resumen, ingreso registrado, salida, acceso, observaciones, incidencia y timeline
-* [ ] 9.6 Conectar Confirmar salida con `Visits::CheckOut`, errores y estado loading
-* [ ] 9.7 Mantener acciones de apertura dentro de `VisitActionsDropdown`
-* [ ] 9.8 Verificación manual: conserjería solo opera visitas válidas de su propiedad
+* [x] 9.1 Crear modal/drawer de check-in basado en [`mockups/visit_checkin.png`](mockups/visit_checkin.png)
+* [x] 9.2 Mostrar resumen, estado, unidad, anfitrión, horario autorizado y campos operativos
+* [x] 9.3 Conectar Confirmar ingreso con `Visits::CheckIn`, errores y estado loading
+* [x] 9.4 Crear modal/drawer de check-out basado en [`mockups/visit_checkout.png`](mockups/visit_checkout.png)
+* [x] 9.5 Mostrar resumen, ingreso registrado, salida, acceso, observaciones, incidencia y timeline
+* [x] 9.6 Conectar Confirmar salida con `Visits::CheckOut`, errores y estado loading
+* [x] 9.7 Mantener acciones de apertura dentro de `VisitActionsDropdown`
+* [x] 9.8 Verificación manual: conserjería solo opera visitas válidas de su propiedad
 
 ## 10. UI: Admin Visits Management
 

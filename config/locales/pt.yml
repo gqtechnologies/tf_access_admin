@@ -127,6 +127,61 @@ pt:
             authorized: "Autorizada"
             checked_in: "Entrada registrada"
             checked_out: "Saída registrada"
+        summary:
+          unit: "Unidade"
+          host: "Anfitrião"
+          authorized_at: "Visita autorizada"
+          authorized_visit: "Visita autorizada"
+          checked_in_at: "Entrada registrada"
+          checked_in_by: "Registrado por"
+        access_points:
+          main_entrance: "Portaria principal"
+          side_entrance: "Portaria secundária"
+          garage: "Garagem"
+        access_types:
+          pedestrian: "Pedestre"
+          vehicle: "Veicular"
+          delivery: "Entrega"
+          other: "Outro"
+        incident_types:
+          none: "Sem ocorrência"
+          noise: "Ruído"
+          damage: "Dano"
+          security: "Segurança"
+          other: "Outra"
+        timeline:
+          events:
+            authorized: "Visita autorizada"
+            checked_in: "Entrada registrada"
+            checked_out: "Saída registrada"
+        check_in:
+          title: "Registrar entrada (Check-in)"
+          description: "Confirme a entrada do visitante com metadados operacionais."
+          confirm: "Confirmar entrada"
+          info_banner: "A visita será marcada como registrada."
+          fields:
+            entry_time: "Data e hora de entrada"
+            access_point: "Acesso / Portaria"
+            select_access_point: "Selecione o acesso"
+            access_type: "Tipo de acesso"
+            select_access_type: "Selecione o tipo de acesso"
+            vehicle_plate: "Placa ou veículo (opcional)"
+            vehicle_plate_placeholder: "Ex. ABCD12"
+            notes: "Observações (opcional)"
+        check_out:
+          title: "Registrar saída (Check-out)"
+          description: "Confirme a saída do visitante com metadados operacionais."
+          confirm: "Confirmar saída"
+          fields:
+            exit_time: "Data e hora de saída"
+            access_point: "Acesso / Portaria"
+            select_access_point: "Selecione o acesso"
+            notes: "Observações (opcional)"
+            incident_type: "Ocorrência (opcional)"
+            no_incident: "Sem ocorrência"
+          timeline:
+            title: "Linha do tempo"
+            empty: "Ainda não há eventos operacionais."
         show:
           title: "Detalhe da visita"
           back_to_list: "Voltar à lista"
