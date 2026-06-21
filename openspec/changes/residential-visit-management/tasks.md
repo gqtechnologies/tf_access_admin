@@ -21,11 +21,11 @@
 
 ## 3. Visitante como Person
 
-* [ ] 3.1 Resolver al visitante dentro de la organización por documento normalizado/digest usando el resolver canónico existente
-* [ ] 3.2 Reutilizar la `Person` existente cuando corresponde
-* [ ] 3.3 Crear una `Person` de visitante cuando no existe, con nombre, documento y teléfono válidos
-* [ ] 3.4 Evitar duplicados y cualquier reutilización cross-organization
-* [ ] 3.5 No introducir ni usar `visitor_profiles` como identidad primaria
+* [x] 3.1 Resolver al visitante dentro de la organización por documento normalizado/digest usando el resolver canónico existente
+* [x] 3.2 Reutilizar la `Person` existente cuando corresponde
+* [x] 3.3 Crear una `Person` de visitante cuando no existe, con nombre, documento y teléfono válidos
+* [x] 3.4 Evitar duplicados y cualquier reutilización cross-organization
+* [x] 3.5 No introducir ni usar `visitor_profiles` como identidad primaria
 
 ## 4. Creación autorizada y trazabilidad
 
