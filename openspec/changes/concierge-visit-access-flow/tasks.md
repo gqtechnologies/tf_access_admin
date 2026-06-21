@@ -4,13 +4,13 @@
 
 ## 1. Backend y scopes operativos de portería
 
-* [ ] 1.1 Definir contexto de una propiedad activa por sesión/pantalla de portería
-* [ ] 1.2 Reutilizar `VisitPolicy::Scope` y `Authorization::Resolver` con aislamiento por organización y propiedad
-* [ ] 1.3 Exigir `StaffAssignment` de conserjería activo y vigente
-* [ ] 1.4 Separar capabilities de visualización, ingreso y salida
-* [ ] 1.5 Definir scope `expected_today` para visitas `authorized` cuya programación/validez intersecta el día local
-* [ ] 1.6 Definir scope `currently_inside` para visitas `checked_in` sin salida
-* [ ] 1.7 Definir estado operacional efectivo para autorización vencida por `valid_until`, sin forzar transición persistida a `expired`
+* [x] 1.1 Definir contexto de una propiedad activa por sesión/pantalla de portería
+* [x] 1.2 Reutilizar `VisitPolicy::Scope` y `Authorization::Resolver` con aislamiento por organización y propiedad
+* [x] 1.3 Exigir `StaffAssignment` de conserjería activo y vigente
+* [x] 1.4 Separar capabilities de visualización, ingreso y salida
+* [x] 1.5 Definir scope `expected_today` para visitas `authorized` cuya programación/validez intersecta el día local
+* [x] 1.6 Definir scope `currently_inside` para visitas `checked_in` sin salida
+* [x] 1.7 Definir estado operacional efectivo para autorización vencida por `valid_until`, sin forzar transición persistida a `expired`
 
 ## 2. Búsqueda y listados de portería
 

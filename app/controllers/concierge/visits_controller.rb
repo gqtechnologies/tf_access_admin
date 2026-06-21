@@ -11,10 +11,13 @@ class Concierge::VisitsController < AdminController
   before_action :set_visit, only: %i[show check_in check_out]
 
   # GET /concierge/visits (6.1, 6.4)
-  # Operational listing: authorized + checked_in + recent checked_out on assigned properties.
+  # Operational listing: authorized + checked_in + recent checked_out on the active property.
+  # When the concierge is assigned to multiple properties the caller must supply
+  # ?property_id=<uuid> to pin the context; without it the first authorized property
+  # is used. All queries are scoped to a single property (1.1 / 1.2).
   def index
     authorize Visit
-    scoped = policy_scope(Visit)
+    scoped = property_scoped_visits
     tab_scope = apply_operational_tab(scoped, params[:tab])
     @q = tab_scope.ransack(params[:q])
     visits = @q.result(distinct: true)
@@ -112,6 +115,8 @@ class Concierge::VisitsController < AdminController
 
   def visit_counters(scoped)
     {
+      expected_today: scoped.expected_today.count,
+      currently_inside: scoped.currently_inside.count,
       authorized: scoped.where(status: VisitStatuses::AUTHORIZED).count,
       checked_in: scoped.where(status: VisitStatuses::CHECKED_IN).count,
       recent_checked_out: scoped.recently_checked_out.count
@@ -119,21 +124,25 @@ class Concierge::VisitsController < AdminController
   end
 
   OPERATIONAL_TABS = {
-    "authorized" => VisitStatuses::AUTHORIZED,
-    "checked_in" => VisitStatuses::CHECKED_IN,
+    "expected_today"     => :expected_today,
+    "currently_inside"   => :currently_inside,
+    "authorized"         => VisitStatuses::AUTHORIZED,
+    "checked_in"         => VisitStatuses::CHECKED_IN,
     "recent_checked_out" => "recent_checked_out"
   }.freeze
 
   def apply_operational_tab(scope, tab)
     key = operational_tab_param(tab)
     return scope.recently_checked_out if key == "recent_checked_out"
+    return scope.expected_today       if key == "expected_today"
+    return scope.currently_inside     if key == "currently_inside"
 
     scope.where(status: OPERATIONAL_TABS.fetch(key))
   end
 
   def operational_tab_param(tab)
-    key = tab.to_s.presence || "authorized"
-    OPERATIONAL_TABS.key?(key) ? key : "authorized"
+    key = tab.to_s.presence || "expected_today"
+    OPERATIONAL_TABS.key?(key) ? key : "expected_today"
   end
 
   def operational_redirect_target
@@ -146,17 +155,43 @@ class Concierge::VisitsController < AdminController
     redirect_to operational_redirect_target, inertia: { errors: errors }
   end
 
+  # 1.1 — Resolve the single authorized property for this concierge session/screen.
+  # When ?property_id is supplied it is validated against the concierge's authorized
+  # property set; if absent the sole authorized property is used, or nil when
+  # multiple properties require an explicit selection.
+  def active_property
+    @active_property ||= begin
+      resolver     = Authorization::Resolver.new(user: current_user, organization: Current.organization)
+      property_ids = resolver.profile
+                             .property_capabilities
+                             .select { |_, caps| caps.include?(Authorization::Capabilities::VIEW_AUTHORIZED_VISITS) }
+                             .keys
+      return nil if property_ids.empty?
+
+      if params[:property_id].present?
+        ResidentialProperty.find_by(id: params[:property_id]) if property_ids.include?(params[:property_id])
+      elsif property_ids.one?
+        ResidentialProperty.find_by(id: property_ids.first)
+      else
+        # Multiple authorized properties — caller must supply property_id.
+        nil
+      end
+    end
+  end
+
   def assigned_property_summary
-    resolver = Authorization::Resolver.new(user: current_user, organization: Current.organization)
-    profile = resolver.profile
-    property_ids = profile.property_capabilities
-                          .select { |_, caps| caps.include?(Authorization::Capabilities::VIEW_AUTHORIZED_VISITS) }
-                          .keys
-    return nil if property_ids.empty?
+    return nil unless active_property
 
-    property = ResidentialProperty.where(id: property_ids).first
-    return nil unless property
+    { id: active_property.id, name: active_property.name }
+  end
 
-    { id: property.id, name: property.name }
+  # 1.2 — All visit queries are scoped first by VisitPolicy::Scope (organization +
+  # concierge_visible), then narrowed to the single active property so lists,
+  # counters and mutations never leak data across properties.
+  def property_scoped_visits
+    base = policy_scope(Visit)
+    return base.where(residential_property_id: active_property.id) if active_property
+
+    base
   end
 end

@@ -132,6 +132,34 @@ class Visit < ApplicationRecord
     )
   }
 
+  # 1.5 — Authorized visits whose scheduling or validity window intersects the
+  # local calendar day. Uses the application time zone when none is supplied.
+  # A visit with no valid_until is treated as valid for the full day.
+  scope :expected_today, ->(time_zone: Time.zone) {
+    tz        = time_zone.is_a?(String) ? ActiveSupport::TimeZone[time_zone] : (time_zone || Time.zone)
+    day_start = tz.now.beginning_of_day
+    day_end   = tz.now.end_of_day
+    where(status: VisitStatuses::AUTHORIZED)
+      .where(
+        "(visits.scheduled_at BETWEEN :start AND :finish) OR " \
+        "(visits.valid_from <= :finish AND (visits.valid_until IS NULL OR visits.valid_until >= :start))",
+        start: day_start,
+        finish: day_end
+      )
+  }
+
+  # 1.6 — Visits currently inside the property: checked-in with no recorded exit.
+  scope :currently_inside, -> {
+    where(status: VisitStatuses::CHECKED_IN, checked_out_at: nil)
+  }
+
+  # 1.7 — True when the visit is authorized but its valid_until has lapsed,
+  # making it operationally expired without a persisted state transition.
+  # Use this for display logic; never mutate status based solely on this predicate.
+  def authorization_expired?
+    status == VisitStatuses::AUTHORIZED && valid_until.present? && valid_until < Time.zone.now
+  end
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[status visit_type scheduled_at authorized_at checked_in_at checked_out_at]
   end
