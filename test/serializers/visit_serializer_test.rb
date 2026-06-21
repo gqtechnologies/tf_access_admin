@@ -116,14 +116,15 @@ class VisitSerializerTest < ActiveSupport::TestCase
 
   # ─── Admin::VisitRestrictedSerializer (restricted detail) ────────────────────
 
-  test "restricted serializer omits notes, metadata, actors, and history" do
+  test "restricted serializer omits notes, metadata, and actors but includes history" do
     data = Admin::VisitRestrictedSerializer.new(@visit, current_user: @concierge).as_json
 
     assert_nil data[:notes]
     assert_nil data[:metadata]
-    assert_nil data[:history]
     assert_nil data[:authorized_by_actor]
     assert_nil data[:visitor_detail]
+    assert_equal 1, data[:history].length
+    assert_equal VisitEventTypes::AUTHORIZED, data[:history].first[:event_type]
   end
 
   test "restricted serializer still includes visitor/host/unit and status" do

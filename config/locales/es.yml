@@ -1024,6 +1024,61 @@ es:
           authorize_confirm_description: "La visita pasará a estado autorizada."
           cancel_confirm_title: "Cancelar visita"
           cancel_confirm_description: "La visita será cancelada y dejará de estar disponible operativamente."
+          more_actions: "Más acciones"
+        show:
+          title: "Detalle de visita"
+          header:
+            document: "Documento"
+          tabs:
+            aria_label: "Secciones del detalle de visita"
+            info: "Información"
+            documents: "Documentos"
+            history: "Historial"
+          sections:
+            visit:
+              title: "Información de la visita"
+            visitor:
+              title: "Visitante"
+            host:
+              title: "Anfitrión"
+            location:
+              title: "Ubicación"
+            vehicle:
+              title: "Vehículo"
+            notes:
+              title: "Notas"
+            actors:
+              title: "Actores"
+          fields:
+            status: "Estado"
+            reason: "Motivo"
+            scheduled_at: "Fecha programada"
+            valid_from: "Válida desde"
+            valid_until: "Válida hasta"
+            authorized_at: "Autorizada el"
+            checked_in_at: "Ingreso el"
+            checked_out_at: "Salida el"
+            name: "Nombre"
+            document: "Documento"
+            phone: "Teléfono"
+            email: "Email"
+            property: "Propiedad"
+            unit: "Unidad"
+            host: "Anfitrión"
+            vehicle_plate: "Patente"
+            vehicle_model: "Marca / modelo"
+            vehicle_color: "Color"
+            created_by: "Creada por"
+            authorized_by: "Autorizada por"
+            checked_in_by: "Ingreso registrado por"
+            checked_out_by: "Salida registrada por"
+          documents:
+            title: "Documentos"
+            description: "La gestión documental estará disponible en una versión futura."
+          history:
+            title: "Historial funcional"
+            description: "Registro cronológico de eventos del ciclo de vida de la visita."
+            empty: "Aún no hay eventos en el historial."
       residential_properties:
         title: "Propiedades"
         created_successfully: "Propiedad creada correctamente"

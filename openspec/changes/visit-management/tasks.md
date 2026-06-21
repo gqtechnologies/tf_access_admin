@@ -128,13 +128,13 @@
 
 ## 12. UI: Visit Detail
 
-* [ ] 12.1 Crear header con visitante, documento, estado y dropdown Más acciones
-* [ ] 12.2 Crear tabs Información, Documentos e Historial basado en [`mockups/visit_details.png.png`](mockups/visit_details.png.png)
-* [ ] 12.3 Implementar detalle completo con datos, actores, vehículo/metadata, notas e historial funcional
-* [ ] 12.4 Dejar Documentos como placeholder sin backend documental
-* [ ] 12.5 Implementar detalle restringido con datos mínimos y acciones operativas
-* [ ] 12.6 Renderizar timeline desde serializer de eventos
-* [ ] 12.7 Mantener todas las acciones en dropdown y ocultar las ausentes en `permissions`
+* [x] 12.1 Crear header con visitante, documento, estado y dropdown Más acciones
+* [x] 12.2 Crear tabs Información, Documentos e Historial basado en [`mockups/visit_details.png.png`](mockups/visit_details.png.png)
+* [x] 12.3 Implementar detalle completo con datos, actores, vehículo/metadata, notas e historial funcional
+* [x] 12.4 Dejar Documentos como placeholder sin backend documental
+* [x] 12.5 Implementar detalle restringido con datos mínimos y acciones operativas
+* [x] 12.6 Renderizar timeline desde serializer de eventos
+* [x] 12.7 Mantener todas las acciones en dropdown y ocultar las ausentes en `permissions`
 
 ## 13. UI contextual para residentes/propietarios
 

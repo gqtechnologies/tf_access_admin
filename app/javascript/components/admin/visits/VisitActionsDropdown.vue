@@ -1,19 +1,28 @@
 <template>
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
-      <Button variant="ghost" size="icon" class="h-8 w-8 p-0">
+      <Button
+        v-if="variant === 'detail'"
+        type="button"
+        variant="outline"
+        class="gap-2"
+      >
+        <EllipsisVertical class="size-4" />
+        {{ t('admin.visits.actions.more_actions') }}
+      </Button>
+      <Button v-else variant="ghost" size="icon" class="h-8 w-8 p-0">
         <EllipsisVertical class="size-4" />
         <span class="sr-only">{{ t('admin.visits.actions.open_menu') }}</span>
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" class="w-52">
-      <DropdownMenuItem v-if="visit.permissions.show" as-child>
+      <DropdownMenuItem v-if="visit.permissions.show && !hideView" as-child>
         <Link :href="admin_visit_path(visit.id)" class="flex w-full cursor-pointer items-center gap-2">
           <Eye class="size-4" />
           {{ t('admin.visits.actions.view') }}
         </Link>
       </DropdownMenuItem>
-      <DropdownMenuItem v-if="visit.permissions.authorize" @select.prevent>
+      <DropdownMenuItem v-if="'authorize' in visit.permissions && visit.permissions.authorize" @select.prevent>
         <ConfirmDialog
           :title="t('admin.visits.actions.authorize_confirm_title')"
           :description="t('admin.visits.actions.authorize_confirm_description')"
@@ -25,7 +34,7 @@
           </div>
         </ConfirmDialog>
       </DropdownMenuItem>
-      <DropdownMenuItem v-if="visit.permissions.update" as-child>
+      <DropdownMenuItem v-if="'update' in visit.permissions && visit.permissions.update" as-child>
         <Link :href="edit_admin_visit_path(visit.id)" class="flex w-full cursor-pointer items-center gap-2">
           <Pencil class="size-4" />
           {{ t('admin.visits.actions.edit') }}
@@ -39,7 +48,7 @@
         <LogOut class="size-4" />
         {{ t('admin.visits.actions.check_out') }}
       </DropdownMenuItem>
-      <DropdownMenuItem v-if="visit.permissions.cancel" @select.prevent>
+      <DropdownMenuItem v-if="'cancel' in visit.permissions && visit.permissions.cancel" @select.prevent>
         <ConfirmDialog
           :title="t('admin.visits.actions.cancel_confirm_title')"
           :description="t('admin.visits.actions.cancel_confirm_description')"
@@ -68,15 +77,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { admin_visit_path, authorize_admin_visit_path, cancel_admin_visit_path, edit_admin_visit_path } from '@/routes'
-import type { AdminVisitListItem } from '@/types/visit'
+import type { AdminVisitListItem, AdminVisitShowItem } from '@/types/visit'
 
-const props = defineProps<{
-  visit: AdminVisitListItem
-}>()
+const props = withDefaults(
+  defineProps<{
+    visit: AdminVisitListItem | AdminVisitShowItem
+    variant?: 'table' | 'detail'
+    hideView?: boolean
+  }>(),
+  {
+    variant: 'table',
+    hideView: false,
+  },
+)
 
 const emit = defineEmits<{
-  checkIn: [visit: AdminVisitListItem]
-  checkOut: [visit: AdminVisitListItem]
+  checkIn: [visit: AdminVisitListItem | AdminVisitShowItem]
+  checkOut: [visit: AdminVisitListItem | AdminVisitShowItem]
   success: []
 }>()
 

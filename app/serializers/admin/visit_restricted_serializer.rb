@@ -26,7 +26,8 @@ class Admin::VisitRestrictedSerializer < ActiveModel::Serializer
     :host,
     :unit,
     :permissions,
-    :actions
+    :actions,
+    :history
 
   def status_label
     I18n.t("frontend.admin.visits.statuses.#{object.status}", default: object.status.to_s.humanize)
@@ -67,6 +68,12 @@ class Admin::VisitRestrictedSerializer < ActiveModel::Serializer
 
   def actions
     permissions.filter_map { |action, allowed| action.to_s if allowed }
+  end
+
+  def history
+    object.visit_status_histories.map do |event|
+      Admin::VisitStatusHistorySerializer.new(event).as_json
+    end
   end
 
   private

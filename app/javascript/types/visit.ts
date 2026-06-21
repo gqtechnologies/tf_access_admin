@@ -109,3 +109,94 @@ export type AdminVisitListItem = {
 }
 
 export type AdminVisitScope = 'organization' | 'assigned'
+
+export type VisitPersonDetail = {
+  id: string
+  display_name: string
+  first_name?: string | null
+  last_name?: string | null
+  person_type?: string
+  document_type?: string | null
+  document_number?: string | null
+  email?: string | null
+  phone?: string | null
+}
+
+export type VisitActor = {
+  id: string
+  name: string
+  email: string
+}
+
+export type VisitHistoryEntry = {
+  id: string
+  event_type: string
+  event_type_label: string
+  from_status?: string | null
+  from_status_label?: string | null
+  to_status?: string | null
+  to_status_label?: string | null
+  occurred_at: string
+  notes?: string | null
+  metadata?: Record<string, unknown>
+  actor_user_id?: string | null
+  actor_name?: string | null
+  actor_email?: string | null
+}
+
+export type VisitMetadata = {
+  vehicle?: {
+    plate?: string
+    brand_model?: string
+    color?: string
+  }
+  check_in?: Record<string, string>
+  check_out?: Record<string, string>
+}
+
+export type AdminVisitDetail = AdminVisitListItem & {
+  notes?: string | null
+  metadata?: VisitMetadata
+  visitor_detail?: VisitPersonDetail | null
+  host_detail?: VisitPersonDetail | null
+  unit_detail?: (VisitUnitSummary & {
+    residential_property_id?: string
+    property_section_id?: string | null
+  }) | null
+  created_by_actor?: VisitActor | null
+  authorized_by_actor?: VisitActor | null
+  checked_in_by_actor?: VisitActor | null
+  checked_out_by_actor?: VisitActor | null
+  history?: VisitHistoryEntry[]
+}
+
+export type AdminVisitRestrictedDetail = {
+  id: string
+  status: string
+  status_label: string
+  visit_type: string | null
+  visit_type_label: string | null
+  scheduled_at: string
+  valid_from: string
+  valid_until: string | null
+  authorized_at: string | null
+  checked_in_at: string | null
+  checked_out_at: string | null
+  residential_property_id?: string
+  unit_id?: string
+  visitor_person_id?: string
+  host_person_id?: string
+  visitor: VisitPersonSummary | null
+  host: VisitPersonSummary | null
+  unit: VisitUnitSummary | null
+  permissions: {
+    show: boolean
+    check_in: boolean
+    check_out: boolean
+    restricted_detail: boolean
+  }
+  actions: string[]
+  history?: VisitHistoryEntry[]
+}
+
+export type AdminVisitShowItem = AdminVisitDetail | AdminVisitRestrictedDetail

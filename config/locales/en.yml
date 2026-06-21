@@ -1096,6 +1096,61 @@ en:
           authorize_confirm_description: "The visit will move to authorized status."
           cancel_confirm_title: "Cancel visit"
           cancel_confirm_description: "The visit will be cancelled and removed from operational flows."
+          more_actions: "More actions"
+        show:
+          title: "Visit detail"
+          header:
+            document: "Document"
+          tabs:
+            aria_label: "Visit detail sections"
+            info: "Information"
+            documents: "Documents"
+            history: "History"
+          sections:
+            visit:
+              title: "Visit information"
+            visitor:
+              title: "Visitor"
+            host:
+              title: "Host"
+            location:
+              title: "Location"
+            vehicle:
+              title: "Vehicle"
+            notes:
+              title: "Notes"
+            actors:
+              title: "Actors"
+          fields:
+            status: "Status"
+            reason: "Reason"
+            scheduled_at: "Scheduled date"
+            valid_from: "Valid from"
+            valid_until: "Valid until"
+            authorized_at: "Authorized at"
+            checked_in_at: "Checked in at"
+            checked_out_at: "Checked out at"
+            name: "Name"
+            document: "Document"
+            phone: "Phone"
+            email: "Email"
+            property: "Property"
+            unit: "Unit"
+            host: "Host"
+            vehicle_plate: "License plate"
+            vehicle_model: "Brand / model"
+            vehicle_color: "Color"
+            created_by: "Created by"
+            authorized_by: "Authorized by"
+            checked_in_by: "Checked in by"
+            checked_out_by: "Checked out by"
+          documents:
+            title: "Documents"
+            description: "Document management will be available in a future release."
+          history:
+            title: "Functional history"
+            description: "Chronological record of visit lifecycle events."
+            empty: "No history events recorded yet."
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"

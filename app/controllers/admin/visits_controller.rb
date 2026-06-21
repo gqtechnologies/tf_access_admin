@@ -178,7 +178,13 @@ class Admin::VisitsController < AdminController
   private
 
   def set_visit
-    @visit = policy_scope(Visit).find(params[:id])
+    @visit = policy_scope(Visit)
+               .includes(
+                 :visitor_person, :host_person, :unit, :residential_property,
+                 :created_by, :authorized_by, :checked_in_by, :checked_out_by,
+                 visit_status_histories: :actor_user
+               )
+               .find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to admin_visits_path,
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_found") ] } }
