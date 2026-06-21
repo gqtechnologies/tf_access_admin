@@ -39,11 +39,11 @@
 
 ## 5. Visibilidad posterior para conserjería
 
-* [ ] 5.1 Confirmar que la visita `authorized` entra al scope operativo existente de conserjería
-* [ ] 5.2 Exigir `StaffAssignment` activo y vigente en la propiedad de la visita
-* [ ] 5.3 Exigir `view_authorized_visits` para esa propiedad
-* [ ] 5.4 Excluir conserjes asignados únicamente a otras propiedades
-* [ ] 5.5 Mantener a conserjería sin permisos de creación, edición o autorización por este flujo
+* [x] 5.1 Confirmar que la visita `authorized` entra al scope operativo existente de conserjería
+* [x] 5.2 Exigir `StaffAssignment` activo y vigente en la propiedad de la visita
+* [x] 5.3 Exigir `view_authorized_visits` para esa propiedad
+* [x] 5.4 Excluir conserjes asignados únicamente a otras propiedades
+* [x] 5.5 Mantener a conserjería sin permisos de creación, edición o autorización por este flujo
 
 ## 6. Tests de autorización y aislamiento
 
