@@ -116,15 +116,15 @@
 
 ## 11. UI: Visit Create
 
-* [ ] 11.1 Crear flujo administrativo multi-paso de propiedad, unidad, visitante, anfitrión, horario y confirmación
-* [ ] 11.2 Filtrar unidades por propiedad y anfitriones por relación activa
-* [ ] 11.3 Buscar/crear visitante `Person`
-* [ ] 11.4 Manejar loading, empty, success y error con footer `justify-between`
-* [ ] 11.5 Alinear stepper a Información general, Visitante, Fecha/horario, Adicional, Notas/confirmación
-* [ ] 11.6 Añadir documento, teléfono, motivo, vehículo opcional y notas al contrato de formulario
-* [ ] 11.7 Implementar `VisitAuthorizationSummary` basado en [`mockups/visit_create.png`](mockups/visit_create.png)
-* [ ] 11.8 Asegurar que el resumen no persiste ni decide estado; mostrar resultado informativo backend
-* [ ] 11.9 Submit, errores y redirección/refresco tras creación
+* [x] 11.1 Crear flujo administrativo multi-paso de propiedad, unidad, visitante, anfitrión, horario y confirmación
+* [x] 11.2 Filtrar unidades por propiedad y anfitriones por relación activa
+* [x] 11.3 Buscar/crear visitante `Person`
+* [x] 11.4 Manejar loading, empty, success y error con footer `justify-between`
+* [x] 11.5 Alinear stepper a Información general, Visitante, Fecha/horario, Adicional, Notas/confirmación
+* [x] 11.6 Añadir documento, teléfono, motivo, vehículo opcional y notas al contrato de formulario
+* [x] 11.7 Implementar `VisitAuthorizationSummary` basado en [`mockups/visit_create.png`](mockups/visit_create.png)
+* [x] 11.8 Asegurar que el resumen no persiste ni decide estado; mostrar resultado informativo backend
+* [x] 11.9 Submit, errores y redirección/refresco tras creación
 
 ## 12. UI: Visit Detail
 

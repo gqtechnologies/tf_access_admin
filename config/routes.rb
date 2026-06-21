@@ -73,6 +73,11 @@ Rails.application.routes.draw do
     resources :operational_roles, only: [:index, :show], param: :role
 
     resources :visits, only: %i[index show new create edit update] do
+      collection do
+        get :form_units
+        get :form_hosts
+        get :initial_status_preview
+      end
       member do
         post :authorize_visit, as: :authorize
         delete :cancel

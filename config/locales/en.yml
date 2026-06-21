@@ -980,6 +980,110 @@ en:
               check_out: "Check-out"
           actions:
             create: "New visit"
+        new:
+          title: "New visit"
+          description: "Register a visit using the guided form. Property, unit and host fields are linked; the final status is resolved by the backend."
+          steps_nav: "Visit creation steps"
+          steps:
+            general: "General info"
+            visitor: "Visitor"
+            schedule: "Date & time"
+            additional: "Additional"
+            confirm: "Notes & confirm"
+          actions:
+            cancel: "Cancel"
+            continue: "Continue"
+            submit: "Create visit"
+          errors:
+            visitor_required: "Select or create a visitor"
+          validations:
+            property_required: "Select a property"
+            unit_required: "Select a unit"
+            host_required: "Select a host"
+            visitor_required: "Select or create a visitor"
+            document_required: "Document is required"
+            first_name_required: "First name is required"
+            last_name_required: "Last name is required"
+            date_required: "Date is required"
+            start_time_required: "Start time is required"
+            end_time_before_start: "End time must be after start time"
+            visit_type_required: "Select a visit reason"
+          general:
+            title: "General information"
+            description: "Select the property, unit and host for this visit."
+            fields:
+              property: "Property"
+              unit: "Unit"
+              host: "Host"
+            placeholders:
+              property: "Select a property"
+              unit: "Select a unit"
+              host: "Select a host"
+            loading:
+              units: "Loading units..."
+              hosts: "Loading hosts..."
+            empty:
+              units: "No units available for this property."
+              hosts: "No active owners or residents on this unit."
+          visitor:
+            title: "Visitor details"
+            description: "Search for an existing person or create a new visitor."
+            modes:
+              search: "Search person"
+              create: "Create visitor"
+            search:
+              placeholder: "Search by document, name or email..."
+              loading: "Searching..."
+              empty: "No people found."
+            create:
+              fields:
+                document: "Document"
+                phone: "Phone"
+          schedule:
+            title: "Date and time"
+            description: "Define when the visit is scheduled and its optional validity window."
+            fields:
+              date: "Date"
+              start_time: "Start time"
+              end_time: "End time (optional)"
+            end_time_hint: "If provided, the visit validity ends at this time."
+          additional:
+            title: "Additional information"
+            description: "Specify the visit reason and optional vehicle details."
+            fields:
+              reason: "Reason"
+              vehicle_plate: "License plate"
+              vehicle_model: "Brand / model"
+              vehicle_color: "Color"
+            placeholders:
+              reason: "Select a reason"
+              vehicle_plate: "e.g. ABCD12"
+              vehicle_model: "e.g. Honda Civic"
+              vehicle_color: "e.g. Gray"
+          confirm:
+            title: "Notes and confirmation"
+            description: "Add optional notes and review the summary before creating the visit."
+            fields:
+              notes: "Notes"
+            placeholders:
+              notes: "Additional information for staff..."
+          summary:
+            title: "Authorization summary"
+            description: "Live preview of the visit data. Does not persist or decide the final status."
+            empty: "—"
+            estimated_status: "Estimated initial status"
+            status_loading: "Calculating estimated status..."
+            fields:
+              property: "Property"
+              unit: "Unit"
+              host: "Host"
+              visitor: "Visitor"
+              reason: "Reason"
+              schedule: "Schedule"
+              vehicle: "Vehicle"
+            initial_status:
+              pending: "The visit will be created as pending and will require authorization."
+              authorized: "The visit will be created as authorized because you can authorize directly."
         actions:
           open_menu: "Open visit actions"
           view: "View detail"

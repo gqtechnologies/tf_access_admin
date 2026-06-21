@@ -22,6 +22,7 @@ class Admin::VisitsController < AdminController
 
   before_action :set_visit, only: %i[show edit update authorize_visit cancel]
   before_action :require_editable_status!, only: %i[edit update]
+  before_action :authorize_visit_management!, only: %i[form_units form_hosts initial_status_preview]
 
   # GET /admin/visits
   # Administrative listing — all org or property-scoped visits (6.1, 6.4).
@@ -62,9 +63,40 @@ class Admin::VisitsController < AdminController
   def new
     authorize Visit
 
-    render inertia: "admin/visits/new", props: {
-      visit: Admin::VisitSerializer.new(Visit.new, current_user: current_user).as_json
+    render inertia: "admin/visits/new", props: new_form_props
+  end
+
+  # GET /admin/visits/form_units
+  def form_units
+    units = policy_scope(Unit).order(:identifier)
+    property_id = params[:residential_property_id].presence
+    units = units.where(residential_property_id: property_id) if property_id.present?
+
+    render json: {
+      units: units.limit(500).map { |unit| unit_option_json(unit) }
     }
+  end
+
+  # GET /admin/visits/form_hosts
+  def form_hosts
+    unit = policy_scope(Unit).find(params.require(:unit_id))
+    hosts = Visits::EligibleHosts.call(unit: unit)
+
+    render json: {
+      hosts: hosts.map { |person| host_option_json(person) }
+    }
+  rescue ActiveRecord::RecordNotFound
+    render json: { hosts: [] }, status: :not_found
+  end
+
+  # GET /admin/visits/initial_status_preview
+  def initial_status_preview
+    unit = policy_scope(Unit).find(params.require(:unit_id))
+    status = Visit::InitialStatus.resolve(actor: current_user, unit: unit)
+
+    render json: initial_status_preview_json(status)
+  rescue ActiveRecord::RecordNotFound
+    render json: { initial_status: VisitStatuses::PENDING }, status: :not_found
   end
 
   # POST /admin/visits (6.1, 6.2, 6.5, 6.6)
@@ -72,9 +104,14 @@ class Admin::VisitsController < AdminController
     authorize Visit
 
     unit = policy_scope(Unit).find(visit_params[:unit_id])
+    visitor = Visits::ResolveVisitorPerson.call(
+      organization: unit.organization,
+      person_id: visit_params[:visitor_person_id].presence,
+      person_params: visitor_person_params
+    )
     visit = Visits::Create.call(
       unit: unit,
-      visit_params: visit_params.except(:unit_id),
+      visit_params: visit_params.except(:unit_id).merge(visitor_person_id: visitor.id),
       actor: current_user
     )
     redirect_to admin_visit_path(visit)
@@ -84,6 +121,9 @@ class Admin::VisitsController < AdminController
   rescue ActiveRecord::RecordInvalid => e
     redirect_to new_admin_visit_path,
                 inertia: { errors: e.record.errors.to_h }
+  rescue ArgumentError
+    redirect_to new_admin_visit_path,
+                inertia: { errors: { visitor_person_id: [ t("frontend.admin.visits.new.errors.visitor_required") ] } }
   rescue Pundit::NotAuthorizedError
     redirect_to new_admin_visit_path,
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
@@ -157,8 +197,61 @@ class Admin::VisitsController < AdminController
       :unit_id, :visitor_person_id, :host_person_id,
       :scheduled_at, :valid_from, :valid_until,
       :visit_type, :notes,
-      metadata: {}
+      metadata: { vehicle: %i[plate brand_model color] }
     )
+  end
+
+  def visitor_person_params
+    return nil unless params[:person].present?
+
+    params.require(:person).permit(
+      :first_name, :last_name, :display_name,
+      :document_number, :phone, :email, :person_type
+    )
+  end
+
+  def new_form_props
+    {
+      visit: Admin::VisitSerializer.new(Visit.new, current_user: current_user).as_json,
+      properties: accessible_properties_for_filters,
+      visit_types: VisitTypes::ALL.map { |type| visit_type_option(type) }
+    }
+  end
+
+  def authorize_visit_management!
+    authorize Visit
+  end
+
+  def unit_option_json(unit)
+    {
+      id: unit.id,
+      identifier: unit.identifier,
+      display_name: unit.display_name,
+      residential_property_id: unit.residential_property_id
+    }
+  end
+
+  def host_option_json(person)
+    {
+      id: person.id,
+      display_name: person.display_name,
+      document_number: person.document_number
+    }
+  end
+
+  def visit_type_option(type)
+    {
+      value: type,
+      label: I18n.t("frontend.admin.visits.visit_types.#{type}", default: type.to_s.humanize)
+    }
+  end
+
+  def initial_status_preview_json(status)
+    {
+      initial_status: status,
+      initial_status_label: I18n.t("frontend.admin.visits.statuses.#{status}", default: status.to_s.humanize),
+      message: I18n.t("frontend.admin.visits.new.summary.initial_status.#{status}")
+    }
   end
 
   def update_params

@@ -908,6 +908,110 @@ es:
               check_out: "Salida"
           actions:
             create: "Nueva visita"
+        new:
+          title: "Nueva visita"
+          description: "Registra una visita con el formulario guiado. Propiedad, unidad y anfitrión están vinculados; el estado final lo resuelve el backend."
+          steps_nav: "Pasos para crear visita"
+          steps:
+            general: "Información general"
+            visitor: "Visitante"
+            schedule: "Fecha y horario"
+            additional: "Adicional"
+            confirm: "Notas y confirmación"
+          actions:
+            cancel: "Cancelar"
+            continue: "Continuar"
+            submit: "Crear visita"
+          errors:
+            visitor_required: "Selecciona o crea un visitante"
+          validations:
+            property_required: "Selecciona una propiedad"
+            unit_required: "Selecciona una unidad"
+            host_required: "Selecciona un anfitrión"
+            visitor_required: "Selecciona o crea un visitante"
+            document_required: "El documento es obligatorio"
+            first_name_required: "El nombre es obligatorio"
+            last_name_required: "El apellido es obligatorio"
+            date_required: "La fecha es obligatoria"
+            start_time_required: "La hora de inicio es obligatoria"
+            end_time_before_start: "La hora de fin debe ser posterior a la de inicio"
+            visit_type_required: "Selecciona un motivo de visita"
+          general:
+            title: "Información general"
+            description: "Selecciona la propiedad, unidad y anfitrión de la visita."
+            fields:
+              property: "Propiedad"
+              unit: "Unidad"
+              host: "Anfitrión"
+            placeholders:
+              property: "Selecciona una propiedad"
+              unit: "Selecciona una unidad"
+              host: "Selecciona un anfitrión"
+            loading:
+              units: "Cargando unidades..."
+              hosts: "Cargando anfitriones..."
+            empty:
+              units: "No hay unidades disponibles para esta propiedad."
+              hosts: "No hay propietarios o residentes activos en esta unidad."
+          visitor:
+            title: "Detalles del visitante"
+            description: "Busca una persona existente o crea un nuevo visitante."
+            modes:
+              search: "Buscar persona"
+              create: "Crear visitante"
+            search:
+              placeholder: "Buscar por documento, nombre o email..."
+              loading: "Buscando..."
+              empty: "No se encontraron personas."
+            create:
+              fields:
+                document: "Documento"
+                phone: "Teléfono"
+          schedule:
+            title: "Fecha y horario"
+            description: "Define cuándo está programada la visita y la ventana de validez opcional."
+            fields:
+              date: "Fecha"
+              start_time: "Hora inicio"
+              end_time: "Hora fin (opcional)"
+            end_time_hint: "Si se indica, la validez de la visita termina a esa hora."
+          additional:
+            title: "Información adicional"
+            description: "Indica el motivo de la visita y datos opcionales del vehículo."
+            fields:
+              reason: "Motivo"
+              vehicle_plate: "Patente"
+              vehicle_model: "Marca / modelo"
+              vehicle_color: "Color"
+            placeholders:
+              reason: "Selecciona un motivo"
+              vehicle_plate: "Ej. ABCD12"
+              vehicle_model: "Ej. Honda Civic"
+              vehicle_color: "Ej. Gris"
+          confirm:
+            title: "Notas y confirmación"
+            description: "Agrega notas opcionales y revisa el resumen antes de crear la visita."
+            fields:
+              notes: "Notas"
+            placeholders:
+              notes: "Información adicional para el personal..."
+          summary:
+            title: "Resumen de autorización"
+            description: "Vista previa en tiempo real. No persiste datos ni decide el estado final."
+            empty: "—"
+            estimated_status: "Estado inicial estimado"
+            status_loading: "Calculando estado estimado..."
+            fields:
+              property: "Propiedad"
+              unit: "Unidad"
+              host: "Anfitrión"
+              visitor: "Visitante"
+              reason: "Motivo"
+              schedule: "Horario"
+              vehicle: "Vehículo"
+            initial_status:
+              pending: "La visita se creará como pendiente y requerirá autorización."
+              authorized: "La visita se creará como autorizada porque puedes autorizar directamente."
         actions:
           open_menu: "Abrir acciones de visita"
           view: "Ver detalle"
