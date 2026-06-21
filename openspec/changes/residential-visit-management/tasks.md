@@ -11,13 +11,13 @@
 
 ## 2. Contexto y autorización del residente
 
-* [ ] 2.1 Resolver la organización activa, el `User` autenticado y su `Person` asociada
-* [ ] 2.2 Cargar `unit_id` mediante scopes tenant-safe
-* [ ] 2.3 Validar que la `Person` tenga `UnitOccupancy` o `UnitOwnership` activa y vigente en esa unidad
-* [ ] 2.4 Denegar relaciones inactivas, futuras, vencidas o eliminadas
-* [ ] 2.5 Exigir `create_visits` y `authorize_visits` en el contexto de la misma unidad
-* [ ] 2.6 Respetar `can_authorize_visits = true` cuando la autorización se deriva de `UnitOccupancy`
-* [ ] 2.7 Evitar escalamiento cross-unit, cross-property y cross-organization
+* [x] 2.1 Resolver la organización activa, el `User` autenticado y su `Person` asociada
+* [x] 2.2 Cargar `unit_id` mediante scopes tenant-safe
+* [x] 2.3 Validar que la `Person` tenga `UnitOccupancy` o `UnitOwnership` activa y vigente en esa unidad
+* [x] 2.4 Denegar relaciones inactivas, futuras, vencidas o eliminadas
+* [x] 2.5 Exigir `create_visits` y `authorize_visits` en el contexto de la misma unidad
+* [x] 2.6 Respetar `can_authorize_visits = true` cuando la autorización se deriva de `UnitOccupancy`
+* [x] 2.7 Evitar escalamiento cross-unit, cross-property y cross-organization
 
 ## 3. Visitante como Person
 

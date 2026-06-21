@@ -20,14 +20,39 @@
 #   organization_id, residential_property_id, property_section_id,
 #   host_person_id, created_by_id, authorized_by_id, status
 class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseController
+  before_action :load_unit
+  before_action :authorize_resident!
+
   def create
-    # Authorization, visitor resolution and visit persistence are implemented
-    # in subsequent sections (2.x – 4.x). This action raises NotImplementedError
-    # until those tasks are complete so callers receive a clear signal.
-    raise NotImplementedError, "Resident visit creation not yet implemented"
+    # Visitor resolution (3.x) and visit persistence (4.x) are implemented
+    # in subsequent sections. This placeholder renders 501 until complete.
+    render json: { error: "Not implemented" }, status: :not_implemented
   end
 
   private
+
+  # 2.2 — Unit is loaded through ActsAsTenant scope: any unit_id outside the
+  # current organization raises RecordNotFound (rescued as 404 in BaseController).
+  def load_unit
+    @unit = Unit.find(params[:unit_id])
+  end
+
+  # 2.1 / 2.3–2.7 — Resolves User → Person → unit capabilities and enforces
+  # that the resident has both create_visits and authorize_visits on @unit.
+  # Inactive, expired, future-dated, or soft-deleted relationships produce 403,
+  # as does UnitOccupancy with can_authorize_visits = false.
+  def authorize_resident!
+    @visit_context = Residents::VisitContext.new(
+      user: current_user,
+      organization: ActsAsTenant.current_tenant,
+      unit: @unit
+    )
+
+    return if @visit_context.authorized?
+
+    render json: { error: I18n.t("api.visits.#{@visit_context.denial_reason}") },
+           status: :forbidden
+  end
 
   def visit_params
     params.require(:visit).permit(
