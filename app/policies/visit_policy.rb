@@ -45,7 +45,16 @@ class VisitPolicy < ApplicationPolicy
     return false unless same_organization?
 
     allowed?(:view_visits) || allowed?(:manage_visits) ||
-      allowed?(:view_authorized_visits) || allowed?(:view_minimal_access_control_data)
+      allowed?(:view_authorized_visits) || allowed?(:view_minimal_access_control_data) ||
+      unit_context_visit_access?
+  end
+
+  # Contextual detail for owners/residents on their active units.
+  def contextual_detail?
+    return false unless same_organization?
+    return false if full_detail? || restricted_detail?
+
+    unit_context_visit_access?
   end
 
   # Full detail (administrative): exposes complete visit, person, actor, metadata
@@ -180,5 +189,9 @@ class VisitPolicy < ApplicationPolicy
     return false unless record.respond_to?(:status)
 
     record.status.in?([ VisitStatuses::PENDING, VisitStatuses::AUTHORIZED ])
+  end
+
+  def unit_context_visit_access?
+    allowed?(:create_visits) || allowed?(:authorize_visits)
   end
 end

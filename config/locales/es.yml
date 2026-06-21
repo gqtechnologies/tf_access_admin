@@ -777,6 +777,18 @@ es:
               finished: "Finalizado"
               pending: "Pendiente"
               inactive: "Inactivo"
+          visits:
+            title: "Visitas"
+            description: "Consulta y administra las visitas programadas para esta unidad."
+            actions:
+              create: "Crear visita"
+            table:
+              visitor: "Visitante"
+              host: "Anfitrión"
+              reason: "Motivo"
+              scheduled_at: "Programada"
+              status: "Estado"
+              empty: "No hay visitas registradas para esta unidad."
           change_history:
             title: "Historial de cambios"
             empty_title: "Sin cambios registrados"

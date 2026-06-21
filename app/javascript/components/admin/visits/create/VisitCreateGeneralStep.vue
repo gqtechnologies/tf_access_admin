@@ -12,6 +12,7 @@
           id="visit-property"
           v-model="form.residential_property_id"
           class="w-full"
+          :disabled="lockPropertyUnit"
           :aria-invalid="!!fieldErrors.residential_property_id"
         >
           <NativeSelectOption value="">
@@ -33,7 +34,7 @@
           id="visit-unit"
           v-model="form.unit_id"
           class="w-full"
-          :disabled="!form.residential_property_id || unitsLoading"
+          :disabled="lockPropertyUnit || !form.residential_property_id || unitsLoading"
           :aria-invalid="!!fieldErrors.unit_id"
         >
           <NativeSelectOption value="">
@@ -110,6 +111,7 @@ const props = defineProps<{
   unitsLoading?: boolean
   hostsLoading?: boolean
   fieldErrors?: Record<string, string | undefined>
+  lockPropertyUnit?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -120,10 +122,12 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 const fieldErrors = computed(() => props.fieldErrors ?? {})
+const lockPropertyUnit = computed(() => props.lockPropertyUnit ?? false)
 
 watch(
   () => form.value.residential_property_id,
   (propertyId, previousPropertyId) => {
+    if (lockPropertyUnit.value) return
     if (propertyId === previousPropertyId) return
     form.value.unit_id = ''
     form.value.host_person_id = ''
@@ -134,6 +138,7 @@ watch(
 watch(
   () => form.value.unit_id,
   (unitId, previousUnitId) => {
+    if (lockPropertyUnit.value) return
     if (unitId === previousUnitId) return
     form.value.host_person_id = ''
     emit('unit-change', String(unitId ?? ''))

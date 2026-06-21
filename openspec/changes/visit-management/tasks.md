@@ -138,11 +138,11 @@
 
 ## 13. UI contextual para residentes/propietarios
 
-* [ ] 13.1 Añadir visitas en detalle de unidad/listado scoped
-* [ ] 13.2 Listar y crear visitas para unidades relacionadas
-* [ ] 13.3 Autorizar/cancelar según capabilities y estado
-* [ ] 13.4 Ocultar acciones no permitidas según backend
-* [ ] 13.5 Revalidar que el flujo contextual comparte estado inicial backend, dropdowns e historial funcional
+* [x] 13.1 Añadir visitas en detalle de unidad/listado scoped
+* [x] 13.2 Listar y crear visitas para unidades relacionadas
+* [x] 13.3 Autorizar/cancelar según capabilities y estado
+* [x] 13.4 Ocultar acciones no permitidas según backend
+* [x] 13.5 Revalidar que el flujo contextual comparte estado inicial backend, dropdowns e historial funcional
 
 ## 14. i18n, tests integrales y QA
 

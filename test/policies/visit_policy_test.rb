@@ -256,6 +256,19 @@ class VisitPolicyTest < ActiveSupport::TestCase
     assert VisitPolicy.new(@owner, @visit_p).create?
   end
 
+  test "owner can show and receive contextual detail for visits on their unit" do
+    policy = VisitPolicy.new(@owner, @visit_p)
+
+    assert policy.show?
+    assert policy.contextual_detail?
+    refute policy.full_detail?
+    refute policy.restricted_detail?
+  end
+
+  test "owner cannot show visits on other units" do
+    refute VisitPolicy.new(@owner, @visit_q).show?
+  end
+
   test "owner cannot update or destroy visits" do
     refute VisitPolicy.new(@owner, @visit_p).update?
     refute VisitPolicy.new(@owner, @visit_p).destroy?

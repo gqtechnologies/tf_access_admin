@@ -27,7 +27,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import VisitActionsDropdown from '@/components/admin/visits/VisitActionsDropdown.vue'
 import VisitStatusBadge from '@/components/concierge/visits/VisitStatusBadge.vue'
-import { isFullVisitDetail } from '@/lib/utils/visit_detail'
+import { isContextualVisitDetail, isFullVisitDetail } from '@/lib/utils/visit_detail'
 import type { AdminVisitShowItem } from '@/types/visit'
 
 const props = defineProps<{
@@ -45,14 +45,17 @@ const { t } = useI18n()
 const visitorName = computed(() => props.visit.visitor?.display_name ?? '—')
 
 const documentNumber = computed(() => {
-  if (!isFullVisitDetail(props.visit)) return null
-  return props.visit.visitor_detail?.document_number ?? null
+  if (isFullVisitDetail(props.visit) || isContextualVisitDetail(props.visit)) {
+    return props.visit.visitor_detail?.document_number ?? null
+  }
+  return null
 })
 
 const hasActions = computed(() => {
   const permissions = props.visit.permissions as Record<string, boolean>
+  const ignoredKeys = new Set(['show', 'full_detail', 'restricted_detail', 'contextual_detail'])
   return Object.entries(permissions).some(
-    ([key, allowed]) => allowed && key !== 'show' && key !== 'full_detail' && key !== 'restricted_detail',
+    ([key, allowed]) => allowed && !ignoredKeys.has(key),
   )
 })
 </script>

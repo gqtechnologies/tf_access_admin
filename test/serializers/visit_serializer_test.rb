@@ -143,6 +143,43 @@ class VisitSerializerTest < ActiveSupport::TestCase
     refute data[:permissions].key?(:cancel)
   end
 
+  # ─── Admin::VisitContextualDetailSerializer (contextual detail) ─────────────
+
+  test "contextual detail serializer includes limited person detail, notes, metadata, and history" do
+    data = Admin::VisitContextualDetailSerializer.new(@visit, current_user: @owner).as_json
+
+    assert_equal "Some admin note", data[:notes]
+    assert data.key?(:metadata)
+    assert_equal @visit.visitor_person.display_name, data[:visitor_detail][:display_name]
+    assert_nil data[:authorized_by_actor]
+    assert_equal 1, data[:history].length
+    assert data[:contextual_detail]
+  end
+
+  test "contextual permissions include create, authorize, and cancel without full detail" do
+    pending_visit = ActsAsTenant.with_tenant(@organization) do
+      Visit.create!(
+        organization: @organization,
+        unit: @unit,
+        visitor_person: @visit.visitor_person,
+        host_person: @visit.host_person,
+        scheduled_at: 1.day.from_now,
+        valid_from: 1.day.from_now,
+        status: VisitStatuses::PENDING
+      )
+    end
+
+    data = Admin::VisitContextualDetailSerializer.new(pending_visit, current_user: @owner).as_json
+
+    assert data[:permissions][:show]
+    assert data[:permissions][:create]
+    assert data[:permissions][:authorize]
+    assert data[:permissions][:cancel]
+    refute data[:permissions][:full_detail]
+    refute data[:permissions][:restricted_detail]
+    assert data[:permissions][:contextual_detail]
+  end
+
   # ─── Concierge::VisitSummarySerializer ───────────────────────────────────────
 
   test "concierge summary omits notes, metadata, history, and actor stamps" do

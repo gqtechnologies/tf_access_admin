@@ -30,6 +30,12 @@
         />
       </template>
 
+      <VisitDetailContextualPanel
+        v-else-if="isContextualDetailView"
+        :visit="visit as AdminVisitContextualDetail"
+        :locale="locale"
+      />
+
       <VisitDetailRestrictedPanel
         v-else
         :visit="visit as AdminVisitRestrictedDetail"
@@ -61,6 +67,7 @@ import { useI18n } from 'vue-i18n'
 import { FileText, History, Info } from 'lucide-vue-next'
 import Header from '@/components/admin/layout/Header.vue'
 import TabNav, { type TabNavItem } from '@/components/admin/shared/TabNav.vue'
+import VisitDetailContextualPanel from '@/components/admin/visits/detail/VisitDetailContextualPanel.vue'
 import VisitDetailDocumentsTab from '@/components/admin/visits/detail/VisitDetailDocumentsTab.vue'
 import VisitDetailHeader from '@/components/admin/visits/detail/VisitDetailHeader.vue'
 import VisitDetailHistoryTab from '@/components/admin/visits/detail/VisitDetailHistoryTab.vue'
@@ -68,9 +75,10 @@ import VisitDetailInfoTab from '@/components/admin/visits/detail/VisitDetailInfo
 import VisitDetailRestrictedPanel from '@/components/admin/visits/detail/VisitDetailRestrictedPanel.vue'
 import VisitCheckInDrawer from '@/components/concierge/visits/VisitCheckInDrawer.vue'
 import VisitCheckOutDrawer from '@/components/concierge/visits/VisitCheckOutDrawer.vue'
-import { isFullVisitDetail } from '@/lib/utils/visit_detail'
-import { admin_visits_path } from '@/routes'
+import { isContextualVisitDetail, isFullVisitDetail } from '@/lib/utils/visit_detail'
+import { admin_residential_property_unit_path, admin_visits_path } from '@/routes'
 import type {
+  AdminVisitContextualDetail,
   AdminVisitDetail,
   AdminVisitListItem,
   AdminVisitRestrictedDetail,
@@ -89,15 +97,33 @@ const checkOutOpen = ref(false)
 const selectedVisit = ref<AdminVisitListItem | null>(null)
 
 const isFullDetail = computed(() => isFullVisitDetail(props.visit))
+const isContextualDetailView = computed(() => isContextualVisitDetail(props.visit))
 
 const pageTitle = computed(
   () => props.visit.visitor?.display_name ?? t('admin.visits.show.title'),
 )
 
-const itemsBreadcrumb = computed<BreadcrumbItem[]>(() => [
-  { label: t('admin.sidebar.manage_visits'), href: admin_visits_path() },
-  { label: pageTitle.value },
-])
+const itemsBreadcrumb = computed<BreadcrumbItem[]>(() => {
+  if (isContextualVisitDetail(props.visit)) {
+    const visit = props.visit
+    const propertyId = visit.residential_property?.id ?? ''
+    const unitId = visit.unit?.id ?? ''
+    const unitLabel = visit.unit?.display_name ?? visit.unit?.identifier ?? ''
+
+    return [
+      {
+        label: unitLabel,
+        href: admin_residential_property_unit_path(propertyId, unitId, { tab: 'visits' }),
+      },
+      { label: pageTitle.value },
+    ]
+  }
+
+  return [
+    { label: t('admin.sidebar.manage_visits'), href: admin_visits_path() },
+    { label: pageTitle.value },
+  ]
+})
 
 const tabs = computed<TabNavItem[]>(() => [
   { id: 'info', label: t('admin.visits.show.tabs.info'), icon: Info },

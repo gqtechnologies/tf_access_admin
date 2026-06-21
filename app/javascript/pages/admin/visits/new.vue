@@ -22,6 +22,7 @@
             :units-loading="unitsLoading"
             :hosts-loading="hostsLoading"
             :field-errors="fieldErrors"
+            :lock-property-unit="isContextualCreate"
             @property-change="handlePropertyChange"
             @unit-change="handleUnitChange"
           />
@@ -90,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { router } from '@inertiajs/vue3'
 import Header from '@/components/admin/layout/Header.vue'
@@ -112,12 +113,13 @@ import { useAdminVisitFormData } from '@/lib/composables/admin/useAdminVisitForm
 import { mapServerErrorsToForm } from '@/lib/forms/map_server_errors'
 import { buildDisplayName } from '@/lib/schemas/unit_ownership'
 import type { VisitTypeOption } from '@/lib/schemas/visit_create'
-import { admin_visits_path } from '@/routes'
-import type { PropertySummary } from '@/types/visit'
+import { admin_residential_property_unit_path, admin_visits_path } from '@/routes'
+import type { PropertySummary, VisitContextualCreateContext } from '@/types/visit'
 
 const props = defineProps<{
   properties: PropertySummary[]
   visit_types: VisitTypeOption[]
+  contextual?: VisitContextualCreateContext
   errors?: Record<string, string[]>
 }>()
 
@@ -153,10 +155,27 @@ const {
   refreshLocationData,
 } = useAdminVisitFormData()
 
-const itemsBreadcrumb = computed(() => [
-  { label: t('admin.sidebar.manage_visits'), href: admin_visits_path() },
-  { label: t('admin.visits.new.title') },
-])
+const isContextualCreate = computed(() => Boolean(props.contextual?.unit))
+
+const itemsBreadcrumb = computed(() => {
+  if (isContextualCreate.value && props.contextual?.unit) {
+    const unit = props.contextual.unit
+    return [
+      {
+        label: unit.display_name ?? unit.identifier,
+        href: admin_residential_property_unit_path(unit.residential_property_id, unit.id, {
+          tab: 'visits',
+        }),
+      },
+      { label: t('admin.visits.new.title') },
+    ]
+  }
+
+  return [
+    { label: t('admin.sidebar.manage_visits'), href: admin_visits_path() },
+    { label: t('admin.visits.new.title') },
+  ]
+})
 
 const visitTypes = computed(() => props.visit_types)
 const properties = computed(() => props.properties)
@@ -201,6 +220,14 @@ function handleBack() {
 }
 
 function handleCancel() {
+  if (isContextualCreate.value && props.contextual?.unit) {
+    const unit = props.contextual.unit
+    router.visit(
+      admin_residential_property_unit_path(unit.residential_property_id, unit.id, { tab: 'visits' }),
+    )
+    return
+  }
+
   router.visit(admin_visits_path())
 }
 
@@ -224,7 +251,16 @@ function submit() {
   submitting.value = true
   saveVisitCreateState(snapshot())
 
-  router.post('/admin/visits', buildSubmitPayload(), {
+  const payload = buildSubmitPayload()
+  if (isContextualCreate.value && props.contextual?.unit) {
+    payload.return_to = 'unit'
+    payload.context = {
+      unit_id: props.contextual.unit.id,
+      return_to: 'unit',
+    }
+  }
+
+  router.post('/admin/visits', payload, {
     preserveScroll: true,
     onFinish: () => {
       submitting.value = false
@@ -264,4 +300,18 @@ watch(
   },
   { immediate: true },
 )
+
+async function initializeContextualCreate() {
+  if (!props.contextual?.unit) return
+
+  const unit = props.contextual.unit
+  form.value.residential_property_id = unit.residential_property_id
+  form.value.unit_id = unit.id
+  await fetchUnits(unit.residential_property_id)
+  await Promise.all([fetchHosts(unit.id), fetchInitialStatusPreview(unit.id)])
+}
+
+onMounted(() => {
+  void initializeContextualCreate()
+})
 </script>

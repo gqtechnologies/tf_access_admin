@@ -838,6 +838,18 @@ pt:
               finished: "Finalizado"
               pending: "Pendente"
               inactive: "Inativo"
+          visits:
+            title: "Visitas"
+            description: "Consulte e gerencie as visitas agendadas para esta unidade."
+            actions:
+              create: "Criar visita"
+            table:
+              visitor: "Visitante"
+              host: "Anfitrião"
+              reason: "Motivo"
+              scheduled_at: "Agendada"
+              status: "Estado"
+              empty: "Não há visitas registradas para esta unidade."
           change_history:
             title: "Histórico de alterações"
             empty_title: "Sem alterações registradas"

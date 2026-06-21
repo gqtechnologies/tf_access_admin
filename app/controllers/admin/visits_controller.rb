@@ -114,18 +114,18 @@ class Admin::VisitsController < AdminController
       visit_params: visit_params.except(:unit_id).merge(visitor_person_id: visitor.id),
       actor: current_user
     )
-    redirect_to admin_visit_path(visit)
+    redirect_to after_create_path(visit, unit: unit)
   rescue ActiveRecord::RecordNotFound
-    redirect_to new_admin_visit_path,
+    redirect_to contextual_new_visit_path(unit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.unit_not_found") ] } }
   rescue ActiveRecord::RecordInvalid => e
-    redirect_to new_admin_visit_path,
+    redirect_to contextual_new_visit_path(unit),
                 inertia: { errors: e.record.errors.to_h }
   rescue ArgumentError
-    redirect_to new_admin_visit_path,
+    redirect_to contextual_new_visit_path(unit),
                 inertia: { errors: { visitor_person_id: [ t("frontend.admin.visits.new.errors.visitor_required") ] } }
   rescue Pundit::NotAuthorizedError
-    redirect_to new_admin_visit_path,
+    redirect_to contextual_new_visit_path(unit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
   end
 
@@ -166,7 +166,7 @@ class Admin::VisitsController < AdminController
   # DELETE /admin/visits/:id/cancel (6.1, 6.6)
   def cancel
     Visits::Cancel.call(visit: @visit, actor: current_user, notes: params[:notes])
-    redirect_to admin_visits_path
+    redirect_to after_cancel_path(@visit)
   rescue AASM::InvalidTransition
     redirect_to admin_visit_path(@visit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.invalid_transition") ] } }
@@ -217,11 +217,23 @@ class Admin::VisitsController < AdminController
   end
 
   def new_form_props
-    {
+    props = {
       visit: Admin::VisitSerializer.new(Visit.new, current_user: current_user).as_json,
       properties: accessible_properties_for_filters,
       visit_types: VisitTypes::ALL.map { |type| visit_type_option(type) }
     }
+
+    unit = contextual_unit
+    if unit
+      props[:contextual] = {
+        unit: unit_option_json(unit).merge(
+          property_name: unit.residential_property.name
+        ),
+        return_to: contextual_return_to
+      }
+    end
+
+    props
   end
 
   def authorize_visit_management!
@@ -271,8 +283,62 @@ class Admin::VisitsController < AdminController
 
   def serialize_visit_detail(visit)
     policy = VisitPolicy.new(current_user, visit)
-    serializer_class = policy.full_detail? ? Admin::VisitDetailSerializer : Admin::VisitRestrictedSerializer
+    serializer_class = if policy.full_detail?
+      Admin::VisitDetailSerializer
+    elsif policy.contextual_detail?
+      Admin::VisitContextualDetailSerializer
+    else
+      Admin::VisitRestrictedSerializer
+    end
     serializer_class.new(visit, current_user: current_user, policy: policy).as_json
+  end
+
+  def contextual_unit
+    return @contextual_unit if defined?(@contextual_unit)
+
+    unit_id = params[:unit_id].presence || params.dig(:context, :unit_id)
+    @contextual_unit = unit_id.present? ? policy_scope(Unit).find_by(id: unit_id) : nil
+  end
+
+  def contextual_return_to
+    type = params[:return_to].to_s.presence || params.dig(:context, :return_to).to_s.presence
+    return nil unless type == "unit"
+
+    unit = contextual_unit || policy_scope(Unit).find_by(id: visit_params[:unit_id])
+    return nil unless unit
+
+    {
+      type: "unit",
+      residential_property_id: unit.residential_property_id,
+      unit_id: unit.id
+    }
+  rescue ActionController::ParameterMissing
+    nil
+  end
+
+  def contextual_new_visit_path(unit = contextual_unit)
+    return new_admin_visit_path if unit.blank?
+
+    new_admin_visit_path(
+      unit_id: unit.id,
+      return_to: params[:return_to].presence || params.dig(:context, :return_to)
+    )
+  end
+
+  def after_create_path(visit, unit:)
+    return contextual_unit_show_path(unit) if contextual_return_to.present?
+
+    admin_visit_path(visit)
+  end
+
+  def after_cancel_path(visit)
+    return contextual_unit_show_path(visit.unit) if VisitPolicy.new(current_user, visit).contextual_detail?
+
+    admin_visits_path
+  end
+
+  def contextual_unit_show_path(unit)
+    admin_residential_property_unit_path(unit.residential_property_id, unit.id, tab: "visits")
   end
 
   def serialize_visits(visits)

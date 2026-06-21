@@ -84,6 +84,7 @@ export type AdminVisitPermissions = {
   check_out: boolean
   full_detail: boolean
   restricted_detail: boolean
+  contextual_detail?: boolean
 }
 
 export type AdminVisitListItem = {
@@ -199,4 +200,54 @@ export type AdminVisitRestrictedDetail = {
   history?: VisitHistoryEntry[]
 }
 
-export type AdminVisitShowItem = AdminVisitDetail | AdminVisitRestrictedDetail
+export type AdminVisitContextualPermissions = {
+  show: boolean
+  create: boolean
+  authorize: boolean
+  cancel: boolean
+  check_in: boolean
+  check_out: boolean
+  full_detail: false
+  restricted_detail: false
+  contextual_detail: true
+}
+
+export type AdminVisitContextualDetail = AdminVisitListItem & {
+  notes?: string | null
+  metadata?: VisitMetadata
+  visitor_detail?: Pick<VisitPersonDetail, 'id' | 'display_name' | 'document_number' | 'phone'> | null
+  host_detail?: Pick<VisitPersonDetail, 'id' | 'display_name' | 'document_number' | 'phone'> | null
+  history?: VisitHistoryEntry[]
+  contextual_detail: true
+  permissions: AdminVisitContextualPermissions
+}
+
+export type AdminVisitShowItem = AdminVisitDetail | AdminVisitRestrictedDetail | AdminVisitContextualDetail
+
+export type UnitVisitPermissions = {
+  create: boolean
+}
+
+export type UnitVisitsPagination = {
+  current_page: number
+  per_page: number
+  total_pages: number
+  total_count: number
+}
+
+export type VisitContextualCreateUnit = {
+  id: string
+  identifier: string
+  display_name: string | null
+  residential_property_id: string
+  property_name: string
+}
+
+export type VisitContextualCreateContext = {
+  unit: VisitContextualCreateUnit
+  return_to: {
+    type: 'unit'
+    residential_property_id: string
+    unit_id: string
+  } | null
+}

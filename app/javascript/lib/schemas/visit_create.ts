@@ -131,4 +131,9 @@ export type VisitCreateSubmitPayload = {
     phone?: string
     person_type: string
   }
+  return_to?: string
+  context?: {
+    unit_id: string
+    return_to: string
+  }
 }

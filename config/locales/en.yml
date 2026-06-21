@@ -849,6 +849,18 @@ en:
               finished: "Ended"
               pending: "Pending"
               inactive: "Inactive"
+          visits:
+            title: "Visits"
+            description: "View and manage visits scheduled for this unit."
+            actions:
+              create: "Create visit"
+            table:
+              visitor: "Visitor"
+              host: "Host"
+              reason: "Reason"
+              scheduled_at: "Scheduled"
+              status: "Status"
+              empty: "No visits registered for this unit."
           change_history:
             title: "Change history"
             empty_title: "No changes recorded"

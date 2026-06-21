@@ -38,6 +38,13 @@ class Admin::ResidentialProperties::UnitsController < AdminController
 
     occupancy_stats = Unit::OccupancyStats.for(@unit)
 
+    visits = policy_scope(Visit)
+      .where(unit: @unit)
+      .includes(:visitor_person, :host_person, :unit, :residential_property)
+      .order(scheduled_at: :desc)
+      .page(visits_filters[:page])
+      .per(visits_filters[:per_page])
+
     render inertia: "admin/units/show", props: {
       unit: Admin::UnitSerializer.new(
         @unit,
@@ -53,6 +60,9 @@ class Admin::ResidentialProperties::UnitsController < AdminController
       occupancy_types: occupancy_type_options,
       occupancy_permissions: occupancy_permissions,
       occupancies_include_inactive: occupancies_filters[:include_inactive],
+      visits: visits.map { |visit| Admin::VisitSerializer.new(visit, current_user: current_user).as_json },
+      visits_pagination: pagination_info(visits, per_page: visits_filters[:per_page]),
+      visit_permissions: visit_permissions,
       change_history: Unit::ChangeHistory.for(@unit)
     }, status: :ok
   end
@@ -65,6 +75,24 @@ class Admin::ResidentialProperties::UnitsController < AdminController
       per_page: params[:occupancies_per_page] || params[:per_page] || 10,
       include_inactive: ActiveModel::Type::Boolean.new.cast(params[:occupancies_include_inactive]) == true
     }
+  end
+
+  def visits_filters
+    @visits_filters ||= {
+      page: params[:visits_page] || 1,
+      per_page: params[:visits_per_page] || 10
+    }
+  end
+
+  def visit_permissions
+    {
+      create: can_create_visit_for_unit?
+    }
+  end
+
+  def can_create_visit_for_unit?
+    draft = Visit.new(unit: @unit, organization: @unit.organization)
+    VisitPolicy.new(current_user, draft).create?
   end
 
   def occupancy_type_options

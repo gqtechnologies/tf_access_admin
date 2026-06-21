@@ -1,5 +1,5 @@
 import type { TimelineEntry } from '@/components/admin/shared/Timeline.vue'
-import type { AdminVisitDetail, AdminVisitShowItem, VisitHistoryEntry } from '@/types/visit'
+import type { AdminVisitDetail, AdminVisitContextualDetail, AdminVisitShowItem, VisitHistoryEntry } from '@/types/visit'
 
 export function historyEventTone(eventType: string): TimelineEntry['tone'] {
   switch (eventType) {
@@ -30,4 +30,8 @@ export function historyToTimelineEntries(
 
 export function isFullVisitDetail(visit: AdminVisitShowItem): visit is AdminVisitDetail {
   return 'full_detail' in visit.permissions && visit.permissions.full_detail === true
+}
+
+export function isContextualVisitDetail(visit: AdminVisitShowItem): visit is AdminVisitContextualDetail {
+  return 'contextual_detail' in visit.permissions && visit.permissions.contextual_detail === true
 }
