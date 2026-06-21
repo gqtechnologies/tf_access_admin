@@ -47,23 +47,23 @@
 
 ## 6. Tests de autorización y aislamiento
 
-* [ ] 6.1 Testear creación exitosa por residente con ocupación activa y `can_authorize_visits = true`
-* [ ] 6.2 Testear creación exitosa por propietario activo cuando la regla vigente le concede `authorize_visits`
-* [ ] 6.3 Testear rechazo cuando el usuario no tiene relación con la unidad
-* [ ] 6.4 Testear rechazo de ocupación inactiva, futura, vencida o eliminada
-* [ ] 6.5 Testear rechazo de ocupante con `can_authorize_visits = false`
-* [ ] 6.6 Testear rechazo cross-organization
-* [ ] 6.7 Testear rechazo cross-property y cross-unit aunque el usuario tenga relación activa en otra unidad
-* [ ] 6.8 Testear creación y reutilización tenant-safe del visitante `Person`
-* [ ] 6.9 Testear `created_by_id`, `authorized_by_id`, `visitor_person_id` y `host_person_id`
-* [ ] 6.10 Testear derivación de propiedad y sección desde la unidad
-* [ ] 6.11 Testear visibilidad para conserjería asignada con `view_authorized_visits`
-* [ ] 6.12 Testear invisibilidad para conserjería de otra propiedad, con assignment inactivo o sin capability
-* [ ] 6.13 Testear rollback total ante errores de identidad, autorización o persistencia
+* [x] 6.1 Testear creación exitosa por residente con ocupación activa y `can_authorize_visits = true`
+* [x] 6.2 Testear creación exitosa por propietario activo cuando la regla vigente le concede `authorize_visits`
+* [x] 6.3 Testear rechazo cuando el usuario no tiene relación con la unidad
+* [x] 6.4 Testear rechazo de ocupación inactiva, futura, vencida o eliminada
+* [x] 6.5 Testear rechazo de ocupante con `can_authorize_visits = false`
+* [x] 6.6 Testear rechazo cross-organization
+* [x] 6.7 Testear rechazo cross-property y cross-unit aunque el usuario tenga relación activa en otra unidad
+* [x] 6.8 Testear creación y reutilización tenant-safe del visitante `Person`
+* [x] 6.9 Testear `created_by_id`, `authorized_by_id`, `visitor_person_id` y `host_person_id`
+* [x] 6.10 Testear derivación de propiedad y sección desde la unidad
+* [x] 6.11 Testear visibilidad para conserjería asignada con `view_authorized_visits`
+* [x] 6.12 Testear invisibilidad para conserjería de otra propiedad, con assignment inactivo o sin capability
+* [x] 6.13 Testear rollback total ante errores de identidad, autorización o persistencia
 
 ## 7. QA de contrato
 
-* [ ] 7.1 Verificar que no se agregan vistas ni componentes Vue admin para residentes
-* [ ] 7.2 Verificar que no se implementa un portal móvil completo
-* [ ] 7.3 Verificar que `property_admin` y `concierge` siguen siendo roles por propiedad derivados de `StaffAssignment`
-* [ ] 7.4 Validar el change con `openspec validate residential-visit-management --type change --strict`
+* [x] 7.1 Verificar que no se agregan vistas ni componentes Vue admin para residentes
+* [x] 7.2 Verificar que no se implementa un portal móvil completo
+* [x] 7.3 Verificar que `property_admin` y `concierge` siguen siendo roles por propiedad derivados de `StaffAssignment`
+* [x] 7.4 Validar el change con `openspec validate residential-visit-management --type change --strict`
