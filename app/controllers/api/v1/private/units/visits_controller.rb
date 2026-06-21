@@ -24,9 +24,17 @@ class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseControll
   before_action :authorize_resident!
 
   def create
-    # Visitor resolution (3.x) and visit persistence (4.x) are implemented
-    # in subsequent sections. This placeholder renders 501 until complete.
-    render json: { error: "Not implemented" }, status: :not_implemented
+    visit = Residents::CreateAuthorizedVisit.call(
+      unit:           @unit,
+      host_person:    @visit_context.host_person,
+      visitor_params: visit_params[:visitor],
+      scheduled_at:   visit_params[:scheduled_at],
+      actor:          current_user
+    )
+
+    render json: { data: { id: visit.id, status: visit.status } }, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
   end
 
   private

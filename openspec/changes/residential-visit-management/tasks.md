@@ -29,13 +29,13 @@
 
 ## 4. Creación autorizada y trazabilidad
 
-* [ ] 4.1 Crear la visita asociada a la unidad validada y al visitante resuelto
-* [ ] 4.2 Asignar `host_person_id` desde la `Person` del `User` residente autenticado
-* [ ] 4.3 Derivar `residential_property_id` y `property_section_id` desde `unit_id`
-* [ ] 4.4 Crear la visita en estado `authorized` solo después de validar autorización efectiva
-* [ ] 4.5 Asegurar `created_by_id` y `authorized_by_id` como referencias al `User` autenticado
-* [ ] 4.6 Registrar `authorized_at` e historial funcional según el contrato vigente de `visit-management`
-* [ ] 4.7 Ejecutar resolución/creación de visitante, visita e historial en una transacción atómica
+* [x] 4.1 Crear la visita asociada a la unidad validada y al visitante resuelto
+* [x] 4.2 Asignar `host_person_id` desde la `Person` del `User` residente autenticado
+* [x] 4.3 Derivar `residential_property_id` y `property_section_id` desde `unit_id`
+* [x] 4.4 Crear la visita en estado `authorized` solo después de validar autorización efectiva
+* [x] 4.5 Asegurar `created_by_id` y `authorized_by_id` como referencias al `User` autenticado
+* [x] 4.6 Registrar `authorized_at` e historial funcional según el contrato vigente de `visit-management`
+* [x] 4.7 Ejecutar resolución/creación de visitante, visita e historial en una transacción atómica
 
 ## 5. Visibilidad posterior para conserjería
 
