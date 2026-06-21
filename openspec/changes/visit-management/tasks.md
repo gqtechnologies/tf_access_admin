@@ -104,15 +104,15 @@
 
 ## 10. UI: Admin Visits Management
 
-* [ ] 10.1 Crear listado administrativo basado en [`mockups/visits_organization.png`](mockups/visits_organization.png)
-* [ ] 10.2 Implementar alcance organización completa / propiedad asignada cuando aplique
-* [ ] 10.3 Añadir filtros de propiedad, unidad, estado, fechas y búsqueda
-* [ ] 10.4 Crear tabla paginada con columnas administrativas
-* [ ] 10.5 Mostrar Nueva visita solo con permission backend
-* [ ] 10.6 Usar `VisitActionsDropdown` para todas las acciones de fila
-* [ ] 10.7 Mapear acciones administrativas por estado y `permissions`
-* [ ] 10.8 Mostrar check-in/check-out solo con capability operativa explícita
-* [ ] 10.9 Verificación manual tenant_admin organization-wide y property_admin solo asignadas
+* [x] 10.1 Crear listado administrativo basado en [`mockups/visits_organization.png`](mockups/visits_organization.png)
+* [x] 10.2 Implementar alcance organización completa / propiedad asignada cuando aplique
+* [x] 10.3 Añadir filtros de propiedad, unidad, estado, fechas y búsqueda
+* [x] 10.4 Crear tabla paginada con columnas administrativas
+* [x] 10.5 Mostrar Nueva visita solo con permission backend
+* [x] 10.6 Usar `VisitActionsDropdown` para todas las acciones de fila
+* [x] 10.7 Mapear acciones administrativas por estado y `permissions`
+* [x] 10.8 Mostrar check-in/check-out solo con capability operativa explícita
+* [x] 10.9 Verificación manual tenant_admin organization-wide y property_admin solo asignadas
 
 ## 11. UI: Visit Create
 

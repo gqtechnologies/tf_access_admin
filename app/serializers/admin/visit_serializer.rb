@@ -26,6 +26,7 @@ class Admin::VisitSerializer < ActiveModel::Serializer
     :visitor,
     :host,
     :unit,
+    :residential_property,
     :permissions,
     :actions
 
@@ -52,6 +53,13 @@ class Admin::VisitSerializer < ActiveModel::Serializer
     return nil unless u
 
     { id: u.id, identifier: u.identifier, display_name: u.display_name }
+  end
+
+  def residential_property
+    property = object.residential_property
+    return nil unless property
+
+    { id: property.id, name: property.name }
   end
 
   def permissions

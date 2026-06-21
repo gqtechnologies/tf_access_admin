@@ -1,9 +1,15 @@
 import { ref, watch } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
-import { check_in_concierge_visit_path, check_out_concierge_visit_path } from '@/routes'
+import {
+  admin_visit_check_ins_path,
+  admin_visit_check_outs_path,
+  check_in_concierge_visit_path,
+  check_out_concierge_visit_path,
+} from '@/routes'
 import type { ConciergeVisitListItem } from '@/types/visit'
 
 type ReturnTarget = 'list' | 'detail'
+type VisitNamespace = 'admin' | 'concierge'
 
 type CheckInPayload = {
   access_point: string
@@ -18,7 +24,12 @@ type CheckOutPayload = {
   notes?: string
 }
 
-export function useVisitOperationalSubmit(returnTo: ReturnTarget) {
+type Options = {
+  returnTo: ReturnTarget
+  namespace?: VisitNamespace
+}
+
+export function useVisitOperationalSubmit({ returnTo, namespace = 'concierge' }: Options) {
   const submitting = ref(false)
   const errors = ref<string[]>([])
   const page = usePage()
@@ -36,8 +47,13 @@ export function useVisitOperationalSubmit(returnTo: ReturnTarget) {
     submitting.value = true
     errors.value = []
 
+    const url =
+      namespace === 'admin'
+        ? admin_visit_check_ins_path(visit.id)
+        : check_in_concierge_visit_path(visit.id)
+
     router.post(
-      check_in_concierge_visit_path(visit.id),
+      url,
       {
         return_to: returnTo === 'list' ? 'list' : undefined,
         check_in: payload,
@@ -58,8 +74,13 @@ export function useVisitOperationalSubmit(returnTo: ReturnTarget) {
     submitting.value = true
     errors.value = []
 
+    const url =
+      namespace === 'admin'
+        ? admin_visit_check_outs_path(visit.id)
+        : check_out_concierge_visit_path(visit.id)
+
     router.post(
-      check_out_concierge_visit_path(visit.id),
+      url,
       {
         return_to: returnTo === 'list' ? 'list' : undefined,
         check_out: payload,

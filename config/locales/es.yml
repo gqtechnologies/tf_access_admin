@@ -878,6 +878,48 @@ es:
           not_editable: "La visita no puede editarse en su estado actual"
           invalid_transition: "La transición de estado no es válida para esta visita"
           unit_not_found: "La unidad indicada no existe o no está disponible"
+        index:
+          title: "Gestión de visitas"
+          description: "Consulta y administra todas las visitas registradas en la organización. Usa los filtros para encontrar visitas específicas o crear una nueva visita."
+          search:
+            placeholder: "Buscar visitante, anfitrión o unidad..."
+          scope:
+            organization: "Organización completa"
+            assigned: "Propiedad asignada"
+          filters:
+            property: "Propiedad"
+            unit: "Unidad"
+            status: "Estado"
+            date_range: "Rango de fechas"
+            all_properties: "Todas las propiedades"
+            all_units: "Todas las unidades"
+            all_statuses: "Todos los estados"
+            clear: "Limpiar"
+            apply: "Aplicar filtros"
+          table:
+            headers:
+              visitor: "Visitante"
+              unit: "Unidad"
+              property: "Propiedad"
+              host: "Anfitrión"
+              status: "Estado"
+              date: "Fecha"
+              check_in: "Ingreso"
+              check_out: "Salida"
+          actions:
+            create: "Nueva visita"
+        actions:
+          open_menu: "Abrir acciones de visita"
+          view: "Ver detalle"
+          edit: "Editar"
+          authorize: "Autorizar"
+          cancel: "Cancelar"
+          check_in: "Registrar ingreso"
+          check_out: "Registrar salida"
+          authorize_confirm_title: "Autorizar visita"
+          authorize_confirm_description: "La visita pasará a estado autorizada."
+          cancel_confirm_title: "Cancelar visita"
+          cancel_confirm_description: "La visita será cancelada y dejará de estar disponible operativamente."
       residential_properties:
         title: "Propiedades"
         created_successfully: "Propiedad creada correctamente"
@@ -1422,6 +1464,8 @@ es:
         operational_roles: "Roles operativos"
         concierge: "Conserjería"
         authorized_visits: "Visitas autorizadas"
+        visits: "Visitas"
+        manage_visits: "Gestión de visitas"
         footer:
           title: "Mi Cuenta"
           logout: "Cerrar Sesión"

@@ -950,6 +950,48 @@ en:
           not_editable: "Visit cannot be edited in its current state"
           invalid_transition: "State transition is not valid for this visit"
           unit_not_found: "The specified unit does not exist or is not available"
+        index:
+          title: "Visit management"
+          description: "Review and manage all visits registered in the organization. Use filters to find specific visits or create a new one."
+          search:
+            placeholder: "Search visitor, host or unit..."
+          scope:
+            organization: "Full organization"
+            assigned: "Assigned properties"
+          filters:
+            property: "Property"
+            unit: "Unit"
+            status: "Status"
+            date_range: "Date range"
+            all_properties: "All properties"
+            all_units: "All units"
+            all_statuses: "All statuses"
+            clear: "Clear"
+            apply: "Apply filters"
+          table:
+            headers:
+              visitor: "Visitor"
+              unit: "Unit"
+              property: "Property"
+              host: "Host"
+              status: "Status"
+              date: "Date"
+              check_in: "Check-in"
+              check_out: "Check-out"
+          actions:
+            create: "New visit"
+        actions:
+          open_menu: "Open visit actions"
+          view: "View detail"
+          edit: "Edit"
+          authorize: "Authorize"
+          cancel: "Cancel"
+          check_in: "Register entry"
+          check_out: "Register exit"
+          authorize_confirm_title: "Authorize visit"
+          authorize_confirm_description: "The visit will move to authorized status."
+          cancel_confirm_title: "Cancel visit"
+          cancel_confirm_description: "The visit will be cancelled and removed from operational flows."
       residential_properties:
         title: "Properties"
         created_successfully: "Property created successfully"
@@ -1427,6 +1469,8 @@ en:
         operational_roles: "Operational Roles"
         concierge: "Concierge"
         authorized_visits: "Authorized visits"
+        visits: "Visits"
+        manage_visits: "Visit management"
         categories: "Categories"
         components: "Components"
         products: "Products"

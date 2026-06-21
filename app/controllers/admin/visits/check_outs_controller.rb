@@ -16,22 +16,28 @@ class Admin::Visits::CheckOutsController < AdminController
       notes: check_out_params[:notes],
       check_out_metadata: check_out_params[:metadata]&.to_h || {}
     )
-    redirect_to admin_visit_path(visit)
+    redirect_to operational_redirect_target(visit)
   rescue ActiveRecord::RecordNotFound
     redirect_to admin_visits_path,
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_found") ] } }
   rescue AASM::InvalidTransition
-    redirect_to admin_visit_path(params[:visit_id]),
+    redirect_to operational_redirect_target(visit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.invalid_transition") ] } }
   rescue Visits::OperationalMetadataParams::InvalidMetadataError => e
-    redirect_to admin_visit_path(params[:visit_id]),
+    redirect_to operational_redirect_target(visit),
                 inertia: { errors: { base: [ e.message ] } }
   rescue Pundit::NotAuthorizedError
-    redirect_to admin_visit_path(params[:visit_id]),
+    redirect_to operational_redirect_target(visit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
   end
 
   private
+
+  def operational_redirect_target(visit)
+    return admin_visits_path if params[:return_to] == "list"
+
+    admin_visit_path(visit)
+  end
 
   def check_out_params
     p = params[:check_out] ? params.require(:check_out) : ActionController::Parameters.new

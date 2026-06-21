@@ -61,3 +61,51 @@ export type AssignedPropertySummary = {
   id: string
   name: string
 }
+
+export type PropertySummary = {
+  id: string
+  name: string
+}
+
+export type UnitFilterOption = {
+  id: string
+  identifier: string
+  display_name: string | null
+  residential_property_id: string
+}
+
+export type AdminVisitPermissions = {
+  show: boolean
+  create: boolean
+  update: boolean
+  authorize: boolean
+  cancel: boolean
+  check_in: boolean
+  check_out: boolean
+  full_detail: boolean
+  restricted_detail: boolean
+}
+
+export type AdminVisitListItem = {
+  id: string
+  status: string
+  status_label: string
+  visit_type: string | null
+  visit_type_label: string | null
+  scheduled_at: string
+  valid_from: string
+  valid_until: string | null
+  authorized_at: string | null
+  checked_in_at: string | null
+  checked_out_at: string | null
+  visitor: VisitPersonSummary | null
+  host: VisitPersonSummary | null
+  unit: VisitUnitSummary | null
+  residential_property: PropertySummary | null
+  permissions: AdminVisitPermissions
+  actions: string[]
+  operational_timeline?: VisitTimelineEntry[]
+  checked_in_by_name?: string | null
+}
+
+export type AdminVisitScope = 'organization' | 'assigned'

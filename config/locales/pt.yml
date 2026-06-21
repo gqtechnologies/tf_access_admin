@@ -939,6 +939,48 @@ pt:
           not_editable: "A visita não pode ser editada no seu estado atual"
           invalid_transition: "A transição de estado não é válida para esta visita"
           unit_not_found: "A unidade indicada não existe ou não está disponível"
+        index:
+          title: "Gestão de visitas"
+          description: "Consulte e gerencie todas as visitas registradas na organização. Use os filtros para encontrar visitas específicas ou criar uma nova visita."
+          search:
+            placeholder: "Buscar visitante, anfitrião ou unidade..."
+          scope:
+            organization: "Organização completa"
+            assigned: "Propriedade atribuída"
+          filters:
+            property: "Propriedade"
+            unit: "Unidade"
+            status: "Estado"
+            date_range: "Intervalo de datas"
+            all_properties: "Todas as propriedades"
+            all_units: "Todas as unidades"
+            all_statuses: "Todos os estados"
+            clear: "Limpar"
+            apply: "Aplicar filtros"
+          table:
+            headers:
+              visitor: "Visitante"
+              unit: "Unidade"
+              property: "Propriedade"
+              host: "Anfitrião"
+              status: "Estado"
+              date: "Data"
+              check_in: "Entrada"
+              check_out: "Saída"
+          actions:
+            create: "Nova visita"
+        actions:
+          open_menu: "Abrir ações da visita"
+          view: "Ver detalhe"
+          edit: "Editar"
+          authorize: "Autorizar"
+          cancel: "Cancelar"
+          check_in: "Registrar entrada"
+          check_out: "Registrar saída"
+          authorize_confirm_title: "Autorizar visita"
+          authorize_confirm_description: "A visita passará para o estado autorizada."
+          cancel_confirm_title: "Cancelar visita"
+          cancel_confirm_description: "A visita será cancelada e deixará de estar disponível operacionalmente."
       residential_properties:
         title: "Propriedades"
         created_successfully: "Propriedade criada com sucesso"
@@ -1378,6 +1420,8 @@ pt:
         operational_roles: "Funções operacionais"
         concierge: "Portaria"
         authorized_visits: "Visitas autorizadas"
+        visits: "Visitas"
+        manage_visits: "Gestão de visitas"
         categories: "Categorias"
         components: "Componentes"
         products: "Produtos"

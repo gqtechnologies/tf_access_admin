@@ -27,18 +27,24 @@ class Admin::VisitsController < AdminController
   # Administrative listing — all org or property-scoped visits (6.1, 6.4).
   def index
     authorize Visit
-    @q = policy_scope(Visit).ransack(params[:q])
+    scoped = apply_admin_scope(policy_scope(Visit))
+    @q = scoped.ransack(params[:q])
     visits = @q.result(distinct: true)
+               .includes(:visitor_person, :host_person, :unit, :residential_property, :checked_in_by, :visit_status_histories)
                .order(scheduled_at: :desc)
                .page(@filters[:page])
                .per(@filters[:per_page])
 
-    scoped = policy_scope(Visit)
     render inertia: "admin/visits/index", props: {
       visits: serialize_visits(visits),
       pagination: pagination_info(visits),
       filters: params[:q].to_h,
-      counters: visit_counters(scoped)
+      scope: admin_scope_param,
+      show_scope_selector: show_admin_scope_selector?,
+      can_create: policy(Visit).create?,
+      properties: accessible_properties_for_filters,
+      units: filter_units,
+      statuses: VisitStatuses::MVP
     }
   end
 
@@ -180,5 +186,52 @@ class Admin::VisitsController < AdminController
       checked_in: scoped.where(status: VisitStatuses::CHECKED_IN).count,
       recent_checked_out: scoped.recently_checked_out.count
     }
+  end
+
+  ADMIN_SCOPES = %w[organization assigned].freeze
+
+  def admin_scope_param
+    return "organization" unless show_admin_scope_selector?
+
+    scope = params[:scope].to_s.presence || "organization"
+    ADMIN_SCOPES.include?(scope) ? scope : "organization"
+  end
+
+  def show_admin_scope_selector?
+    resolver = Authorization::Resolver.new(user: current_user, organization: Current.organization)
+    org_wide = resolver.allowed?(:manage_visits) || resolver.allowed?(:view_visits)
+    org_wide && managed_property_ids.any?
+  end
+
+  def apply_admin_scope(scope)
+    return scope unless show_admin_scope_selector?
+    return scope unless admin_scope_param == "assigned"
+
+    ids = managed_property_ids
+    return scope.none if ids.empty?
+
+    scope.where(residential_property_id: ids)
+  end
+
+  def managed_property_ids
+    profile = Authorization::GrantProfile.build(current_user, Current.organization)
+    profile.property_capabilities
+           .select { |_, caps| caps.include?(Authorization::Capabilities::MANAGE_VISITS) }
+           .keys
+  end
+
+  def accessible_properties_for_filters
+    ids = policy_scope(ResidentialProperty).pluck(:id, :name)
+    ids.map { |id, name| { id: id, name: name } }
+  end
+
+  def filter_units
+    units_scope = policy_scope(Unit).order(:identifier)
+    property_id = params.dig(:q, :residential_property_id_eq).presence
+    units_scope = units_scope.where(residential_property_id: property_id) if property_id.present?
+
+    units_scope.limit(500).map do |unit|
+      { id: unit.id, identifier: unit.identifier, display_name: unit.display_name, residential_property_id: unit.residential_property_id }
+    end
   end
 end

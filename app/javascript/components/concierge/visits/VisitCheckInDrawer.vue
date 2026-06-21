@@ -133,6 +133,7 @@ import type { ConciergeVisitListItem } from '@/types/visit'
 const props = defineProps<{
   visit: ConciergeVisitListItem | null
   returnTo?: 'list' | 'detail'
+  namespace?: 'admin' | 'concierge'
 }>()
 
 const open = defineModel<boolean>('open', { default: false })
@@ -153,7 +154,10 @@ const form = reactive({
   notes: '',
 })
 
-const { submitting, errors, submitCheckIn } = useVisitOperationalSubmit(props.returnTo ?? 'list')
+const { submitting, errors, submitCheckIn } = useVisitOperationalSubmit({
+  returnTo: props.returnTo ?? 'list',
+  namespace: props.namespace ?? 'concierge',
+})
 
 const currentDateTime = computed(() =>
   new Intl.DateTimeFormat(locale.value, {

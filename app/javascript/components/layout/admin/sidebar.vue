@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -111,6 +111,23 @@ const getFeatureIcon = (key: string) => {
                   <Link href="/concierge/visits">
                     <ClipboardList class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.authorized_visits') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Admin visit management — manage_visits / view_visits capability -->
+        <SidebarGroup v-if="capabilities?.manage_visits || capabilities?.view_visits">
+          <SidebarGroupLabel>{{ t('admin.sidebar.visits') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/visits">
+                    <CalendarDays class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.manage_visits') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
