@@ -24,7 +24,7 @@
 #  index_visit_status_histories_on_changed_by_id                  (changed_by_id)
 #  index_visit_status_histories_on_changed_by_person_id           (changed_by_person_id)
 #  index_visit_status_histories_on_metadata                       (metadata) USING gin
-#  index_visit_status_histories_on_org_event_type                   (organization_id,event_type)
+#  index_visit_status_histories_on_org_event_type                 (organization_id,event_type)
 #  index_visit_status_histories_on_org_visit_created_at           (organization_id,visit_id,created_at)
 #  index_visit_status_histories_on_org_visit_occurred_at          (organization_id,visit_id,occurred_at)
 #  index_visit_status_histories_on_organization_id                (organization_id)

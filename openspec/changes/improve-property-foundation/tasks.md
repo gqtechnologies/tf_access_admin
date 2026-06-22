@@ -4,14 +4,14 @@
 
 ## 1. Modelo y migraciones
 
-* [ ] 1.1 Auditar datos existentes: nombres duplicados, nombres vacíos y estados no canónicos
-* [ ] 1.2 Definir constantes/enums para `active`, `inactive` y `archived`
-* [ ] 1.3 Añadir constraint de estado permitido
-* [ ] 1.4 Definir columna o expresión normalizada para unicidad case-insensitive del nombre
-* [ ] 1.5 Añadir índice único por organización para nombres normalizados no eliminados
-* [ ] 1.6 Verificar FK y `NOT NULL` de `organization_id`, `name`, `property_type` y `status`
-* [ ] 1.7 Revisar asociaciones `dependent: :destroy` para evitar cascadas durante lifecycle de propiedad
-* [ ] 1.8 Definir auditoría mínima de cambios de estado y lifecycle
+* [x] 1.1 Auditar datos existentes: nombres duplicados, nombres vacíos y estados no canónicos
+* [x] 1.2 Definir constantes/enums para `active`, `inactive` y `archived`
+* [x] 1.3 Añadir constraint de estado permitido
+* [x] 1.4 Definir columna o expresión normalizada para unicidad case-insensitive del nombre
+* [x] 1.5 Añadir índice único por organización para nombres normalizados no eliminados
+* [x] 1.6 Verificar FK y `NOT NULL` de `organization_id`, `name`, `property_type` y `status`
+* [x] 1.7 Revisar asociaciones `dependent: :destroy` para evitar cascadas durante lifecycle de propiedad
+* [x] 1.8 Definir auditoría mínima de cambios de estado y lifecycle
 
 ## 2. Validaciones y normalización
 

@@ -1,5 +1,43 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: visit_status_histories
+#
+#  id                   :uuid             not null, primary key
+#  event_type           :string           not null
+#  from_status          :string
+#  metadata             :jsonb            not null
+#  notes                :text
+#  occurred_at          :datetime         not null
+#  reason               :text
+#  to_status            :string           not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  changed_by_id        :uuid
+#  changed_by_person_id :uuid
+#  organization_id      :uuid             not null
+#  visit_id             :uuid             not null
+#
+# Indexes
+#
+#  index_visit_status_histories_on_changed_by_id                  (changed_by_id)
+#  index_visit_status_histories_on_changed_by_person_id           (changed_by_person_id)
+#  index_visit_status_histories_on_metadata                       (metadata) USING gin
+#  index_visit_status_histories_on_org_event_type                 (organization_id,event_type)
+#  index_visit_status_histories_on_org_visit_created_at           (organization_id,visit_id,created_at)
+#  index_visit_status_histories_on_org_visit_occurred_at          (organization_id,visit_id,occurred_at)
+#  index_visit_status_histories_on_organization_id                (organization_id)
+#  index_visit_status_histories_on_organization_id_and_to_status  (organization_id,to_status)
+#  index_visit_status_histories_on_visit_id                       (visit_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (changed_by_id => users.id)
+#  fk_rails_...  (changed_by_person_id => people.id)
+#  fk_rails_...  (organization_id => organizations.id)
+#  fk_rails_...  (visit_id => visits.id)
+#
 require "test_helper"
 
 class VisitStatusHistoryTest < ActiveSupport::TestCase

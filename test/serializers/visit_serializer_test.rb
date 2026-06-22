@@ -1,5 +1,64 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: visits
+#
+#  id                      :uuid             not null, primary key
+#  authorized_at           :datetime
+#  checked_in_at           :datetime
+#  checked_out_at          :datetime
+#  metadata                :jsonb            not null
+#  notes                   :text
+#  scheduled_at            :datetime         not null
+#  status                  :string           default("pending"), not null
+#  valid_from              :datetime         not null
+#  valid_until             :datetime
+#  visit_type              :string
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  authorized_by_id        :uuid
+#  checked_in_by_id        :uuid
+#  checked_out_by_id       :uuid
+#  created_by_id           :uuid
+#  host_person_id          :uuid             not null
+#  organization_id         :uuid             not null
+#  property_section_id     :uuid
+#  residential_property_id :uuid             not null
+#  unit_id                 :uuid             not null
+#  visitor_person_id       :uuid             not null
+#
+# Indexes
+#
+#  index_visits_on_authorized_by_id                   (authorized_by_id)
+#  index_visits_on_checked_in_by_id                   (checked_in_by_id)
+#  index_visits_on_checked_out_by_id                  (checked_out_by_id)
+#  index_visits_on_created_by_id                      (created_by_id)
+#  index_visits_on_host_person_id                     (host_person_id)
+#  index_visits_on_metadata                           (metadata) USING gin
+#  index_visits_on_org_property_operational_statuses  (organization_id,residential_property_id,status,checked_out_at) WHERE ((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))
+#  index_visits_on_org_property_pending_scheduled_at  (organization_id,residential_property_id,scheduled_at) WHERE ((status)::text = 'pending'::text)
+#  index_visits_on_org_property_status_scheduled_at   (organization_id,residential_property_id,status,scheduled_at)
+#  index_visits_on_org_unit_scheduled_at              (organization_id,unit_id,scheduled_at)
+#  index_visits_on_organization_id                    (organization_id)
+#  index_visits_on_property_section_id                (property_section_id)
+#  index_visits_on_residential_property_id            (residential_property_id)
+#  index_visits_on_unit_id                            (unit_id)
+#  index_visits_on_visitor_person_id                  (visitor_person_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (authorized_by_id => users.id)
+#  fk_rails_...  (checked_in_by_id => users.id)
+#  fk_rails_...  (checked_out_by_id => users.id)
+#  fk_rails_...  (created_by_id => users.id)
+#  fk_rails_...  (host_person_id => people.id)
+#  fk_rails_...  (organization_id => organizations.id)
+#  fk_rails_...  (property_section_id => property_sections.id)
+#  fk_rails_...  (residential_property_id => residential_properties.id)
+#  fk_rails_...  (unit_id => units.id)
+#  fk_rails_...  (visitor_person_id => people.id)
+#
 require "test_helper"
 
 # §7.11 — Verifies that:

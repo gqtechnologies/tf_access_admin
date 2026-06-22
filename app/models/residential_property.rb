@@ -12,6 +12,7 @@
 #  deleted_at      :datetime
 #  metadata        :jsonb            not null
 #  name            :string           not null
+#  normalized_name :string           not null
 #  property_type   :string           not null
 #  region          :string
 #  status          :string           default("active"), not null
@@ -24,6 +25,7 @@
 #
 #  idx_on_organization_id_property_type_d2e2ee8ca6             (organization_id,property_type)
 #  idx_residential_properties_unique_code_per_org              (organization_id,code) UNIQUE WHERE ((code IS NOT NULL) AND (deleted_at IS NULL))
+#  idx_residential_properties_unique_normalized_name_per_org   (organization_id,normalized_name) UNIQUE WHERE (deleted_at IS NULL)
 #  index_residential_properties_on_deleted_at                  (deleted_at)
 #  index_residential_properties_on_metadata                    (metadata) USING gin
 #  index_residential_properties_on_organization_id             (organization_id)
@@ -35,12 +37,21 @@
 #
 class ResidentialProperty < ApplicationRecord
   include PropertyTypes
+  include PropertyStatuses
   include NormalizableAttributes
 
   acts_as_tenant :organization
   acts_as_paranoid
 
+  # Lifecycle/state changes are audited (improve-property-foundation §1.8).
+  audited only: %i[name status property_type]
+
   belongs_to :organization
+  # NOTE (improve-property-foundation §1.7): these associations still use
+  # +dependent: :destroy+. The lifecycle contract replaces destructive deletion
+  # with archiving, so the cascade must not be relied on as a lifecycle mechanism.
+  # Removing/guarding the cascade is handled by the archive service work (§3),
+  # not by this model/migration section.
   has_many :property_sections, dependent: :destroy
   has_many :units, dependent: :destroy
   has_many :visits, dependent: :destroy
@@ -51,6 +62,7 @@ class ResidentialProperty < ApplicationRecord
   validates :status, presence: true
 
   before_validation :normalize_optional_strings
+  before_validation :assign_normalized_name
   trims_attributes :name, :code, :address_line, :city, :region, :country, :timezone
 
   def self.ransackable_attributes(_auth_object = nil)
@@ -68,5 +80,12 @@ class ResidentialProperty < ApplicationRecord
     self.address_line = address_line.presence
     self.city = city.presence
     self.region = region.presence
+  end
+
+  # Mirrors the SQL backfill expression: trim, collapse whitespace, downcase.
+  # Populates the NOT NULL +normalized_name+ column used by the tenant-scoped
+  # case-insensitive uniqueness index (improve-property-foundation §1.4).
+  def assign_normalized_name
+    self.normalized_name = name.to_s.strip.gsub(/\s+/, " ").downcase.presence
   end
 end

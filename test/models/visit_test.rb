@@ -36,7 +36,7 @@
 #  index_visits_on_created_by_id                      (created_by_id)
 #  index_visits_on_host_person_id                     (host_person_id)
 #  index_visits_on_metadata                           (metadata) USING gin
-#  index_visits_on_org_property_operational_statuses  (organization_id,residential_property_id,status,checked_out_at) WHERE ((status)::text = ANY ((ARRAY['authorized'::character varying, 'checked_in'::character varying, 'checked_out'::character varying])::text[]))
+#  index_visits_on_org_property_operational_statuses  (organization_id,residential_property_id,status,checked_out_at) WHERE ((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))
 #  index_visits_on_org_property_pending_scheduled_at  (organization_id,residential_property_id,scheduled_at) WHERE ((status)::text = 'pending'::text)
 #  index_visits_on_org_property_status_scheduled_at   (organization_id,residential_property_id,status,scheduled_at)
 #  index_visits_on_org_unit_scheduled_at              (organization_id,unit_id,scheduled_at)
