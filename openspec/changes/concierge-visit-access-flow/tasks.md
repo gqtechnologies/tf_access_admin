@@ -48,13 +48,13 @@
 
 ## 5. Serializers y props mínimos para conserjería
 
-* [ ] 5.1 Definir serializer de fila para esperadas hoy
-* [ ] 5.2 Definir serializer de fila para actualmente dentro
-* [ ] 5.3 Definir serializer de resultado mínimo de búsqueda no operable
-* [ ] 5.4 Reutilizar resumen restringido para confirmaciones de check-in/check-out
-* [ ] 5.5 Exponer `permissions`/`actions` calculadas en backend
-* [ ] 5.6 Exponer timestamps, actores resumidos, duración y timeline mínimo
-* [ ] 5.7 Verificar ausencia de perfil administrativo, roles, memberships y notas sensibles
+* [x] 5.1 Definir serializer de fila para esperadas hoy
+* [x] 5.2 Definir serializer de fila para actualmente dentro
+* [x] 5.3 Definir serializer de resultado mínimo de búsqueda no operable
+* [x] 5.4 Reutilizar resumen restringido para confirmaciones de check-in/check-out
+* [x] 5.5 Exponer `permissions`/`actions` calculadas en backend
+* [x] 5.6 Exponer timestamps, actores resumidos, duración y timeline mínimo
+* [x] 5.7 Verificar ausencia de perfil administrativo, roles, memberships y notas sensibles
 
 ## 6. UI de portería basada en mockups
 

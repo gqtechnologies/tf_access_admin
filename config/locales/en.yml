@@ -107,6 +107,10 @@ en:
           view: "View detail"
           check_in: "Register entry"
           check_out: "Register exit"
+        denial:
+          cancelled: "Visit cancelled. Entry cannot be registered."
+          expired: "Authorization expired. Request a new authorization."
+          not_operable: "Visit not operable. Entry cannot be registered."
         index:
           title: "Authorized / operational visits"
           description: "Operational visits for your assigned property. Register entries and exits from the actions menu."

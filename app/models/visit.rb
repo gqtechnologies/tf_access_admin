@@ -175,6 +175,24 @@ class Visit < ApplicationRecord
     status == VisitStatuses::AUTHORIZED && valid_until.present? && valid_until < Time.zone.now
   end
 
+  # Effective operational status for display: maps a lapsed authorization to the
+  # calculated `expired` label without persisting a transition (1.7). Concierge
+  # serializers expose this alongside the persisted `status`.
+  def effective_operational_status
+    return VisitStatuses::EXPIRED if authorization_expired?
+
+    status
+  end
+
+  # Elapsed time inside the property, in seconds. For an active stay it runs to
+  # now; for a completed visit it spans entry to exit. Nil until checked in.
+  # No persisted column is needed (computed from timestamps).
+  def duration_seconds
+    return nil if checked_in_at.blank?
+
+    (checked_out_at || Time.zone.now).to_i - checked_in_at.to_i
+  end
+
   def self.ransackable_attributes(_auth_object = nil)
     %w[status visit_type scheduled_at authorized_at checked_in_at checked_out_at]
   end

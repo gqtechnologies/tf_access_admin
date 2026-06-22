@@ -103,6 +103,10 @@ es:
           view: "Ver detalle"
           check_in: "Registrar ingreso"
           check_out: "Registrar salida"
+        denial:
+          cancelled: "Visita cancelada. No es posible registrar el ingreso."
+          expired: "Autorización expirada. Solicite una nueva autorización."
+          not_operable: "Visita no operable. No es posible registrar el ingreso."
         index:
           title: "Visitas autorizadas / operativas"
           description: "Visitas operativas de la propiedad asignada. Registre ingresos y salidas desde el menú de acciones."

@@ -110,7 +110,10 @@ class Concierge::VisitsController < AdminController
   end
 
   def serialize_visits(visits)
-    visits.map { |v| Concierge::VisitSerializer.new(v, current_user: current_user).as_json }
+    # 5.3 — denied-result search surfaces non-operable visits (cancelled/expired)
+    # with the minimal explanatory serializer; normal lists use the row serializer.
+    serializer = params[:include_denied].present? ? Concierge::VisitSearchResultSerializer : Concierge::VisitSerializer
+    visits.map { |v| serializer.new(v, current_user: current_user).as_json }
   end
 
   def visit_counters(scoped)

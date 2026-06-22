@@ -9,6 +9,8 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
   attributes :id,
     :status,
     :status_label,
+    :effective_status,
+    :effective_status_label,
     :visit_type,
     :visit_type_label,
     :scheduled_at,
@@ -17,6 +19,7 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
     :authorized_at,
     :checked_in_at,
     :checked_out_at,
+    :duration_seconds,
     :residential_property_id,
     :unit_id,
     :visitor_person_id,
@@ -27,10 +30,22 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
     :permissions,
     :actions,
     :operational_timeline,
-    :checked_in_by_name
+    :authorized_by_name,
+    :checked_in_by_name,
+    :checked_out_by_name
 
   def status_label
     I18n.t("frontend.admin.visits.statuses.#{object.status}", default: object.status.to_s.humanize)
+  end
+
+  # Effective operational status (1.7): a lapsed authorization surfaces as
+  # `expired` for the badge without changing the persisted status.
+  def effective_status
+    object.effective_operational_status
+  end
+
+  def effective_status_label
+    I18n.t("frontend.admin.visits.statuses.#{effective_status}", default: effective_status.to_s.humanize)
   end
 
   def visit_type_label
@@ -80,8 +95,20 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
           .map { |entry| Concierge::VisitTimelineEntrySerializer.new(entry).as_json }
   end
 
+  def authorized_by_name
+    object.authorized_by&.name
+  end
+
   def checked_in_by_name
     object.checked_in_by&.name
+  end
+
+  def checked_out_by_name
+    object.checked_out_by&.name
+  end
+
+  def duration_seconds
+    object.duration_seconds
   end
 
   private
