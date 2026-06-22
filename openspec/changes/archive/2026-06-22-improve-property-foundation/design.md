@@ -300,3 +300,14 @@ El backend y la base de datos siguen siendo fuente de verdad.
 4. ¿Existe un caso legítimo para eliminar una propiedad completamente vacía desde UI, o toda eliminación debe convertirse en archive?
 5. ¿`property_admin` puede activar/desactivar la propiedad asignada o solo editar datos descriptivos? El diseño conserva `manage_property`, pero recomienda separar esas acciones en policy.
 6. ¿Qué dependencias adicionales deben bloquear una eliminación excepcional además de las conocidas actualmente?
+
+## Closure decisions (§8.7)
+
+Decisiones tomadas durante la implementación frente a las Open Questions:
+
+1. **Ubicación mínima** — *Diferida.* La validación mínima quedó en `country` + `timezone` (presencia + timezone válido). `address_line` permanece opcional y `metadata` sigue disponible. No se exige dirección postal estructurada; revisar con casos rurales/condominios en un change posterior.
+2. **Restaurar `archived`** — *Resuelta: terminal.* No existe restauración; `archived` es estado final dentro de este change. Una restauración requerirá un contrato separado.
+3. **Reutilización de nombre archivado** — *Resuelta: reservado.* El índice único es `WHERE deleted_at IS NULL` y `archived` **no** usa `deleted_at` (sigue presente). Por tanto una propiedad archivada conserva su slot de nombre normalizado y el nombre **no** es reutilizable mientras exista, evitando ambigüedad histórica.
+4. **Eliminación desde UI** — *Resuelta: solo archive.* `destroy` ordinario fue reemplazado por la acción explícita `archive` (no destructiva). No se expone hard delete/purge en el flujo administrativo.
+5. **`property_admin` activate/deactivate** — *Resuelta: unificada.* Quien tiene `manage_property` sobre la propiedad asignada puede actualizar datos descriptivos y transicionar `active`/`inactive` (vía `Properties::Update`). `create`/`archive` siguen siendo organizacionales (`manage_properties`) y se le deniegan. No se introdujo una capability separada para activate/deactivate.
+6. **Dependencias adicionales para eliminación excepcional** — *Diferida.* Al no exponerse hard delete (todo es archive no destructivo), no se definió una lista de bloqueo de borrado físico; queda fuera de alcance hasta que exista (si existe) una eliminación excepcional.

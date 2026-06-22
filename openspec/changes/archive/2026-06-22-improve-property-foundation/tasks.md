@@ -71,32 +71,32 @@
 
 ## 7. Tests
 
-* [ ] 7.1 Testear creación válida
-* [ ] 7.2 Testear rechazo sin organización
-* [ ] 7.3 Testear rechazo sin nombre
-* [ ] 7.4 Testear nombre duplicado normalizado dentro de la misma organización
-* [ ] 7.5 Testear mismo nombre en organizaciones distintas
-* [ ] 7.6 Testear valores válidos e inválidos de status
-* [ ] 7.7 Testear defaults y normalización
-* [ ] 7.8 Testear que propiedades con secciones o unidades no se eliminan físicamente
-* [ ] 7.9 Testear dependencias indirectas de personas y staff assignments
-* [ ] 7.10 Testear visitas activas/futuras como dependencia
-* [ ] 7.11 Testear archivado controlado y preservación de dependencias
-* [ ] 7.12 Testear tenant admin dentro y fuera de su organización
-* [ ] 7.13 Testear property admin asignado y no asignado
-* [ ] 7.14 Testear assignment inactivo, futuro y vencido
-* [ ] 7.15 Testear usuario sin permisos
-* [ ] 7.16 Testear aislamiento cross-organization y cross-property
-* [ ] 7.17 Testear delegación de controllers a servicios
-* [ ] 7.18 Testear conflicto concurrente de unicidad
-* [ ] 7.19 Testear contrato mínimo de serializer/props y acciones backend-driven
+* [x] 7.1 Testear creación válida
+* [x] 7.2 Testear rechazo sin organización
+* [x] 7.3 Testear rechazo sin nombre
+* [x] 7.4 Testear nombre duplicado normalizado dentro de la misma organización
+* [x] 7.5 Testear mismo nombre en organizaciones distintas
+* [x] 7.6 Testear valores válidos e inválidos de status
+* [x] 7.7 Testear defaults y normalización
+* [x] 7.8 Testear que propiedades con secciones o unidades no se eliminan físicamente
+* [x] 7.9 Testear dependencias indirectas de personas y staff assignments
+* [x] 7.10 Testear visitas activas/futuras como dependencia
+* [x] 7.11 Testear archivado controlado y preservación de dependencias
+* [x] 7.12 Testear tenant admin dentro y fuera de su organización
+* [x] 7.13 Testear property admin asignado y no asignado
+* [x] 7.14 Testear assignment inactivo, futuro y vencido
+* [x] 7.15 Testear usuario sin permisos
+* [x] 7.16 Testear aislamiento cross-organization y cross-property
+* [x] 7.17 Testear delegación de controllers a servicios
+* [x] 7.18 Testear conflicto concurrente de unicidad
+* [x] 7.19 Testear contrato mínimo de serializer/props y acciones backend-driven
 
 ## 8. Cierre
 
-* [ ] 8.1 Ejecutar suite de modelos, servicios, policies, requests y frontend
-* [ ] 8.2 Ejecutar RuboCop y chequeos TypeScript/Vue
-* [ ] 8.3 Verificar manualmente create, update, deactivate, activate y archive
-* [ ] 8.4 Verificar que archive no altera dependencias
-* [ ] 8.5 Ejecutar `openspec validate improve-property-foundation --type change --strict`
-* [ ] 8.6 Ejecutar Graphify después de la implementación futura, no durante este change documental
-* [ ] 8.7 Preparar cierre y registrar decisiones de Open Questions resueltas
+* [x] 8.1 Ejecutar suite de modelos, servicios, policies, requests y frontend
+* [x] 8.2 Ejecutar RuboCop y chequeos TypeScript/Vue
+* [x] 8.3 Verificar manualmente create, update, deactivate, activate y archive
+* [x] 8.4 Verificar que archive no altera dependencias
+* [x] 8.5 Ejecutar `openspec validate improve-property-foundation --type change --strict`
+* [x] 8.6 Ejecutar Graphify después de la implementación futura, no durante este change documental
+* [x] 8.7 Preparar cierre y registrar decisiones de Open Questions resueltas
