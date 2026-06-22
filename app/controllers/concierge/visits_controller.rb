@@ -17,20 +17,20 @@ class Concierge::VisitsController < AdminController
   # is used. All queries are scoped to a single property (1.1 / 1.2).
   def index
     authorize Visit
-    scoped = property_scoped_visits
+    # 2.4 — org+property scope is applied first; search filters are applied after.
+    scoped    = property_scoped_visits
     tab_scope = apply_operational_tab(scoped, params[:tab])
-    @q = tab_scope.ransack(params[:q])
-    visits = @q.result(distinct: true)
-               .includes(:visitor_person, :host_person, :unit, :checked_in_by, :visit_status_histories)
-               .order(scheduled_at: :asc)
-               .page(@filters[:page])
-               .per(@filters[:per_page])
+    visits    = apply_concierge_search(tab_scope)
+                  .includes(:visitor_person, :host_person, :unit, :checked_in_by, :visit_status_histories)
+                  .page(@filters[:page])
+                  .per(@filters[:per_page])
 
     render inertia: "concierge/visits/index", props: {
       visits: serialize_visits(visits),
       pagination: pagination_info(visits),
       tab: operational_tab_param(params[:tab]),
-      filters: params[:q].to_h,
+      query: search_query,
+      # 2.8 — counters for both operational lists; empty lists return count = 0
       counters: visit_counters(scoped),
       assigned_property: assigned_property_summary
     }
@@ -153,6 +153,24 @@ class Concierge::VisitsController < AdminController
 
   def operational_error_redirect(errors)
     redirect_to operational_redirect_target, inertia: { errors: errors }
+  end
+
+  # 2.4 — Apply Visits::ConciergeSearch when a text query is present.
+  # The scope is already org+property scoped; the service only refines it further.
+  # include_denied surfaces cancelled/expired results to explain entry denial (2.5).
+  def apply_concierge_search(scope)
+    return scope if search_query.blank?
+
+    Visits::ConciergeSearch.call(
+      scope:          scope,
+      query:          search_query,
+      organization:   Current.organization,
+      include_denied: params[:include_denied].present?
+    )
+  end
+
+  def search_query
+    params.dig(:q, :query).to_s.strip.presence
   end
 
   # 1.1 — Resolve the single authorized property for this concierge session/screen.

@@ -14,14 +14,14 @@
 
 ## 2. Búsqueda y listados de portería
 
-* [ ] 2.1 Definir búsqueda tenant-safe por documento del visitante
-* [ ] 2.2 Definir búsqueda por nombre normalizado del visitante
-* [ ] 2.3 Definir búsqueda por identificador/nombre visible de unidad
-* [ ] 2.4 Aplicar siempre scope de organización y propiedad antes de filtros de búsqueda
-* [ ] 2.5 Permitir resultado mínimo `cancelled` o vencido solo para explicar denegación de ingreso
-* [ ] 2.6 Excluir `cancelled` y `expired` de listas operativas normales
-* [ ] 2.7 Ordenar esperadas por horario y actualmente dentro por ingreso más antiguo
-* [ ] 2.8 Exponer contadores y estados vacíos de ambas listas
+* [x] 2.1 Definir búsqueda tenant-safe por documento del visitante
+* [x] 2.2 Definir búsqueda por nombre normalizado del visitante
+* [x] 2.3 Definir búsqueda por identificador/nombre visible de unidad
+* [x] 2.4 Aplicar siempre scope de organización y propiedad antes de filtros de búsqueda
+* [x] 2.5 Permitir resultado mínimo `cancelled` o vencido solo para explicar denegación de ingreso
+* [x] 2.6 Excluir `cancelled` y `expired` de listas operativas normales
+* [x] 2.7 Ordenar esperadas por horario y actualmente dentro por ingreso más antiguo
+* [x] 2.8 Exponer contadores y estados vacíos de ambas listas
 
 ## 3. Check-in
 

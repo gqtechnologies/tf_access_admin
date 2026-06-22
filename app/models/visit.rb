@@ -135,6 +135,7 @@ class Visit < ApplicationRecord
   # 1.5 — Authorized visits whose scheduling or validity window intersects the
   # local calendar day. Uses the application time zone when none is supplied.
   # A visit with no valid_until is treated as valid for the full day.
+  # Ordered by scheduled_at asc so the closest upcoming visits appear first (2.7).
   scope :expected_today, ->(time_zone: Time.zone) {
     tz        = time_zone.is_a?(String) ? ActiveSupport::TimeZone[time_zone] : (time_zone || Time.zone)
     day_start = tz.now.beginning_of_day
@@ -146,11 +147,25 @@ class Visit < ApplicationRecord
         start: day_start,
         finish: day_end
       )
+      .order(scheduled_at: :asc)
   }
 
   # 1.6 — Visits currently inside the property: checked-in with no recorded exit.
+  # Ordered by checked_in_at asc so prolonged stays are visible first (2.7).
   scope :currently_inside, -> {
     where(status: VisitStatuses::CHECKED_IN, checked_out_at: nil)
+      .order(checked_in_at: :asc)
+  }
+
+  # 2.1 — Exact document search via blind-index digest, scoped to the organization.
+  # Joining visitor_person ensures cross-org isolation regardless of base scope.
+  scope :by_visitor_document, ->(raw_doc, organization:) {
+    return none if raw_doc.blank?
+    digest = Person.document_digest(raw_doc.to_s.strip)
+    return none if digest.blank?
+    joins(:visitor_person).where(
+      people: { organization_id: organization.id, document_number_digest: digest }
+    )
   }
 
   # 1.7 — True when the visit is authorized but its valid_until has lapsed,
