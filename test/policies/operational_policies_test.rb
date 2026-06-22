@@ -124,6 +124,40 @@ class OperationalPoliciesTest < ActiveSupport::TestCase
     refute PersonPolicy.new(@tenant_admin, @other_org_person).show?
   end
 
+  test "tenant admin can create update and archive properties in own organization" do
+    policy_p = ResidentialPropertyPolicy.new(@tenant_admin, @property_p)
+
+    assert policy_p.update?
+    assert policy_p.archive?
+    assert policy_p.destroy?
+    assert ResidentialPropertyPolicy.new(@tenant_admin, ResidentialProperty).create?
+  end
+
+  test "tenant admin cannot create update or archive another organization property" do
+    policy = ResidentialPropertyPolicy.new(@tenant_admin, @other_org_property)
+
+    refute policy.show?
+    refute policy.update?
+    refute policy.archive?
+    refute policy.destroy?
+  end
+
+  test "property admin of P can view and update assigned property only" do
+    policy_p = ResidentialPropertyPolicy.new(@property_admin_p, @property_p)
+    policy_q = ResidentialPropertyPolicy.new(@property_admin_p, @property_q)
+
+    assert policy_p.show?
+    assert policy_p.update?
+    refute policy_p.create?
+    refute policy_p.archive?
+    refute policy_p.destroy?
+
+    refute policy_q.show?
+    refute policy_q.update?
+    refute policy_q.create?
+    refute policy_q.archive?
+  end
+
   test "property admin of P can manage allowed resources on P" do
     assert ResidentialPropertyPolicy.new(@property_admin_p, @property_p).show?
     assert UnitPolicy.new(@property_admin_p, @unit_p).show?
@@ -238,6 +272,65 @@ class OperationalPoliciesTest < ActiveSupport::TestCase
     assert_includes resolved, @property_p
     refute_includes resolved, @property_q
     refute_includes resolved, @other_org_property
+  end
+
+  test "inactive property admin assignment grants no residential property access" do
+    inactive_admin = create_user_for_organization(
+      organization: @organization,
+      email: "op-policies-inactive-admin@example.test",
+      role: AvailableRoles::CLIENT
+    )
+    StaffAssignment.create!(
+      organization: @organization,
+      person: inactive_admin.person_for(@organization),
+      residential_property: @property_p,
+      staff_type: StaffTypes::MANAGER,
+      status: StaffAssignment::STATUS_INACTIVE,
+      starts_at: Date.current
+    )
+
+    policy = ResidentialPropertyPolicy.new(inactive_admin, @property_p)
+
+    refute policy.show?
+    refute policy.update?
+    assert_empty ResidentialPropertyPolicy::Scope.new(inactive_admin, ResidentialProperty.all).resolve
+  end
+
+  test "expired property admin assignment grants no residential property access" do
+    expired_admin = create_user_for_organization(
+      organization: @organization,
+      email: "op-policies-expired-admin@example.test",
+      role: AvailableRoles::CLIENT
+    )
+    StaffAssignment.create!(
+      organization: @organization,
+      person: expired_admin.person_for(@organization),
+      residential_property: @property_p,
+      staff_type: StaffTypes::MANAGER,
+      status: StaffAssignment::STATUS_ACTIVE,
+      starts_at: 30.days.ago.to_date,
+      ends_at: Date.current - 1.day
+    )
+
+    policy = ResidentialPropertyPolicy.new(expired_admin, @property_p)
+
+    refute policy.show?
+    refute policy.update?
+  end
+
+  test "global manager role without staff assignment does not grant property admin access" do
+    global_manager = create_user_for_organization(
+      organization: @organization,
+      email: "op-policies-global-manager@example.test",
+      role: AvailableRoles::MANAGER
+    )
+
+    policy = ResidentialPropertyPolicy.new(global_manager, @property_p)
+
+    refute policy.show?
+    refute policy.update?
+    refute policy.create?
+    refute policy.archive?
   end
 
   test "bulk import scope respects property access" do

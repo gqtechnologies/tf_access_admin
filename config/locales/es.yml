@@ -1797,6 +1797,7 @@ es:
               taken: "Ya existe una propiedad con este código en la organización"
             status:
               inclusion: "no es un estado válido"
+              archive_requires_service: "el archivado debe realizarse mediante la acción de archivar, no en una edición ordinaria"
             timezone:
               invalid_timezone: "no es una zona horaria válida"
             organization_id:

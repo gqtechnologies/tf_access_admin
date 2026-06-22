@@ -1806,6 +1806,7 @@ en:
               taken: "A property with this code already exists in the organization"
             status:
               inclusion: "is not a valid status"
+              archive_requires_service: "archiving must use the archive action, not an ordinary edit"
             timezone:
               invalid_timezone: "is not a valid time zone"
             organization_id:

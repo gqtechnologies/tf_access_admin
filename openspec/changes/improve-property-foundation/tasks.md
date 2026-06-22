@@ -26,27 +26,27 @@
 
 ## 3. Servicios de dominio
 
-* [ ] 3.1 Implementar `Properties::Create`
-* [ ] 3.2 Implementar `Properties::Update`
-* [ ] 3.3 Implementar `Properties::Archive`
-* [ ] 3.4 Derivar organización desde contexto confiable en create
-* [ ] 3.5 Centralizar normalización y validaciones de lifecycle
-* [ ] 3.6 Separar activate/deactivate de cambios descriptivos cuando corresponda
-* [ ] 3.7 Hacer archive no destructivo, atómico e idempotente
-* [ ] 3.8 Preservar secciones, unidades, personas relacionadas, assignments, visitas y datos operativos al archivar
-* [ ] 3.9 Definir errores/resultados estructurados para controller y UI
+* [x] 3.1 Implementar `Properties::Create`
+* [x] 3.2 Implementar `Properties::Update`
+* [x] 3.3 Implementar `Properties::Archive`
+* [x] 3.4 Derivar organización desde contexto confiable en create
+* [x] 3.5 Centralizar normalización y validaciones de lifecycle
+* [x] 3.6 Separar activate/deactivate de cambios descriptivos cuando corresponda
+* [x] 3.7 Hacer archive no destructivo, atómico e idempotente
+* [x] 3.8 Preservar secciones, unidades, personas relacionadas, assignments, visitas y datos operativos al archivar
+* [x] 3.9 Definir errores/resultados estructurados para controller y UI
 
 ## 4. Policy y scopes
 
-* [ ] 4.1 Alinear `ResidentialPropertyPolicy` con acciones index/show/create/update/archive
-* [ ] 4.2 Mantener `manage_properties` como capability organizacional
-* [ ] 4.3 Mantener `manage_property` acotada a propiedades con assignment activo
-* [ ] 4.4 Permitir create/archive a tenant admin dentro de su organización
-* [ ] 4.5 Permitir view/update a property admin solo en propiedades asignadas
-* [ ] 4.6 Denegar create/archive a property admin por defecto
-* [ ] 4.7 Denegar assignments inactivos, futuros o vencidos
-* [ ] 4.8 Garantizar scopes tenant-safe y cross-property
-* [ ] 4.9 No introducir roles globales de `property_admin`
+* [x] 4.1 Alinear `ResidentialPropertyPolicy` con acciones index/show/create/update/archive
+* [x] 4.2 Mantener `manage_properties` como capability organizacional
+* [x] 4.3 Mantener `manage_property` acotada a propiedades con assignment activo
+* [x] 4.4 Permitir create/archive a tenant admin dentro de su organización
+* [x] 4.5 Permitir view/update a property admin solo en propiedades asignadas
+* [x] 4.6 Denegar create/archive a property admin por defecto
+* [x] 4.7 Denegar assignments inactivos, futuros o vencidos
+* [x] 4.8 Garantizar scopes tenant-safe y cross-property
+* [x] 4.9 No introducir roles globales de `property_admin`
 
 ## 5. Controllers y props
 

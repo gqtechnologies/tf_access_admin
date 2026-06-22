@@ -1750,6 +1750,7 @@ pt:
               taken: "Já existe uma propriedade com este código na organização"
             status:
               inclusion: "não é um estado válido"
+              archive_requires_service: "o arquivamento deve ser feito pela ação de arquivar, não em uma edição comum"
             timezone:
               invalid_timezone: "não é um fuso horário válido"
             organization_id:
