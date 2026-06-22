@@ -1,5 +1,18 @@
 import type { ConciergeVisitListItem } from '@/types/visit'
 
+type VisitStatusCarrier = Pick<
+  ConciergeVisitListItem,
+  'status' | 'status_label' | 'effective_status' | 'effective_status_label'
+>
+
+export function visitEffectiveStatus(visit: VisitStatusCarrier): string {
+  return visit.effective_status ?? visit.status
+}
+
+export function visitEffectiveStatusLabel(visit: VisitStatusCarrier): string {
+  return visit.effective_status_label ?? visit.status_label
+}
+
 export function visitInitials(name: string | undefined | null): string {
   if (!name?.trim()) return '?'
 
@@ -13,9 +26,23 @@ export function visitStatusTone(status: string): 'success' | 'warning' | 'muted'
       return 'success'
     case 'authorized':
       return 'warning'
+    case 'expired':
+    case 'cancelled':
+      return 'muted'
     default:
       return 'muted'
   }
+}
+
+export function formatVisitDuration(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`
+  }
+
+  return `${minutes}m`
 }
 
 export function visitAuthorizedTime(visit: ConciergeVisitListItem): string | null {

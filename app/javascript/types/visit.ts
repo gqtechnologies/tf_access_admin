@@ -20,6 +20,8 @@ export type ConciergeVisitListItem = {
   id: string
   status: string
   status_label: string
+  effective_status?: string
+  effective_status_label?: string
   visit_type: string | null
   visit_type_label: string | null
   scheduled_at: string
@@ -27,13 +29,18 @@ export type ConciergeVisitListItem = {
   authorized_at: string | null
   checked_in_at: string | null
   checked_out_at: string | null
+  duration_seconds?: number | null
   visitor: VisitPersonSummary | null
   host: VisitPersonSummary | null
   unit: VisitUnitSummary | null
   permissions: ConciergeVisitPermissions
   actions: string[]
   operational_timeline?: VisitTimelineEntry[]
+  authorized_by_name?: string | null
   checked_in_by_name?: string | null
+  checked_out_by_name?: string | null
+  denial_reason?: string | null
+  denial_explanation?: string | null
 }
 
 export type VisitTimelineEntry = {
@@ -49,9 +56,11 @@ export type ConciergeVisitSummary = ConciergeVisitListItem & {
   valid_until: string | null
 }
 
-export type ConciergeVisitTab = 'authorized' | 'checked_in' | 'recent_checked_out'
+export type ConciergeVisitTab = 'expected_today' | 'currently_inside'
 
 export type ConciergeVisitCounters = {
+  expected_today: number
+  currently_inside: number
   authorized: number
   checked_in: number
   recent_checked_out: number

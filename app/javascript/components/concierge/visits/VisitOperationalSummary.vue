@@ -11,7 +11,7 @@
           <p class="font-medium">{{ visit.visitor?.display_name ?? '—' }}</p>
         </div>
       </div>
-      <VisitStatusBadge :status="visit.status" :label="visit.status_label" />
+      <VisitStatusBadge :visit="visit" :status="visit.status" :label="visit.status_label" />
     </div>
 
     <div class="grid gap-3 sm:grid-cols-3">

@@ -33,10 +33,10 @@
       </Button>
     </div>
 
-    <AdminDataTable :columns="columns" :data="visits">
+    <AdminDataTable :columns="columns" :data="visits" :empty-message="emptyStateMessage">
       <template #actions-table>
-        <div class="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div class="flex w-full flex-col gap-2 md:w-2/3 md:flex-row">
+        <div class="flex w-full flex-col gap-3 md:flex-row md:items-center">
+          <div class="flex w-full flex-col gap-2 md:flex-row">
             <Input
               type="search"
               v-model="search"
@@ -48,39 +48,8 @@
               {{ t('common.actions.search') }}
             </Button>
           </div>
-          <Popover v-model:open="filtersOpen">
-            <PopoverTrigger as-child>
-              <Button variant="outline">
-                <SlidersHorizontal class="size-4" />
-                {{ t('concierge.visits.index.filters.button') }}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-72 space-y-3" align="end">
-              <p class="text-sm font-medium">{{ t('concierge.visits.index.filters.title') }}</p>
-              <div class="space-y-2">
-                <Label for="visit-type-filter">{{ t('concierge.visits.index.filters.visit_type') }}</Label>
-                <NativeSelect id="visit-type-filter" v-model="visitTypeFilter" class="w-full">
-                  <NativeSelectOption value="">
-                    {{ t('concierge.visits.index.filters.all_types') }}
-                  </NativeSelectOption>
-                  <NativeSelectOption v-for="type in visitTypes" :key="type" :value="type">
-                    {{ t(`admin.visits.visit_types.${type}`) }}
-                  </NativeSelectOption>
-                </NativeSelect>
-              </div>
-              <div class="flex justify-end gap-2">
-                <Button variant="ghost" size="sm" @click="clearFilters">
-                  {{ t('concierge.visits.index.filters.clear') }}
-                </Button>
-                <Button size="sm" @click="applyFilters">
-                  {{ t('concierge.visits.index.filters.apply') }}
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
       </template>
-
       <template v-if="paginationMeta" #footer>
         <DataTablePagination
           :current-page="currentPage"
@@ -112,27 +81,25 @@
 <script setup lang="ts">
 import { computed, h, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Building2, Search, SlidersHorizontal } from 'lucide-vue-next'
+import { Building2, Search } from 'lucide-vue-next'
 import Header from '@/components/admin/layout/Header.vue'
 import AdminDataTable from '@/components/admin/table/index.vue'
 import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
+import VisitDenialNotice from '@/components/concierge/visits/VisitDenialNotice.vue'
+import VisitRowActions from '@/components/concierge/visits/VisitRowActions.vue'
 import VisitStatusBadge from '@/components/concierge/visits/VisitStatusBadge.vue'
-import VisitActionsDropdown from '@/components/concierge/visits/VisitActionsDropdown.vue'
 import VisitCheckInDrawer from '@/components/concierge/visits/VisitCheckInDrawer.vue'
 import VisitCheckOutDrawer from '@/components/concierge/visits/VisitCheckOutDrawer.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
 import { useTable } from '@/lib/composables/useTable'
 import { useConciergeVisitsList } from '@/lib/composables/concierge/useConciergeVisitsList'
 import {
+  formatVisitDuration,
   visitAuthorizedTime,
   visitInitials,
-  visitLastMovement,
 } from '@/lib/utils/visit'
 import type { ColumnDef } from '@/types/table'
 import type {
@@ -143,8 +110,6 @@ import type {
 } from '@/types/visit'
 import type { BreadcrumbItem } from '@/types/layout'
 
-const VISIT_TYPES = ['guest', 'delivery', 'service', 'other'] as const
-
 const props = defineProps<{
   visits: ConciergeVisitListItem[]
   pagination?: {
@@ -154,24 +119,18 @@ const props = defineProps<{
     total_count: number
   }
   tab?: ConciergeVisitTab
-  filters?: Record<string, string>
+  query?: string | null
   counters: ConciergeVisitCounters
   assigned_property?: AssignedPropertySummary | null
 }>()
 
 const { t, locale } = useI18n()
-const filtersOpen = ref(false)
-const visitTypes = VISIT_TYPES
 const selectedVisit = ref<ConciergeVisitListItem | null>(null)
 const checkInOpen = ref(false)
 const checkOutOpen = ref(false)
 
-const initialTab = (props.tab ?? 'authorized') as ConciergeVisitTab
-const { activeTab, visitTypeFilter, fetchVisits, refreshList } = useConciergeVisitsList(initialTab)
-
-if (props.filters?.visit_type_eq) {
-  visitTypeFilter.value = props.filters.visit_type_eq
-}
+const initialTab = (props.tab ?? 'expected_today') as ConciergeVisitTab
+const { activeTab, fetchVisits, refreshList } = useConciergeVisitsList(initialTab)
 
 const itemsBreadcrumb = computed<BreadcrumbItem[]>(() => [
   { label: t('admin.sidebar.home'), href: '/admin/home/index' },
@@ -180,23 +139,29 @@ const itemsBreadcrumb = computed<BreadcrumbItem[]>(() => [
 
 const tabs = computed(() => [
   {
-    key: 'authorized' as const,
-    label: t('concierge.visits.index.tabs.authorized'),
-    count: props.counters.authorized,
+    key: 'expected_today' as const,
+    label: t('concierge.visits.index.tabs.expected_today'),
+    count: props.counters.expected_today,
   },
   {
-    key: 'checked_in' as const,
-    label: t('concierge.visits.index.tabs.checked_in'),
-    count: props.counters.checked_in,
-  },
-  {
-    key: 'recent_checked_out' as const,
-    label: t('concierge.visits.index.tabs.recent_checked_out'),
-    count: props.counters.recent_checked_out,
+    key: 'currently_inside' as const,
+    label: t('concierge.visits.index.tabs.currently_inside'),
+    count: props.counters.currently_inside,
   },
 ])
 
 const assignedProperty = computed(() => props.assigned_property ?? null)
+const isSearching = computed(() => Boolean(props.query?.trim()))
+
+const emptyStateMessage = computed(() => {
+  if (isSearching.value) {
+    return t('concierge.visits.index.empty.search')
+  }
+
+  return activeTab.value === 'currently_inside'
+    ? t('concierge.visits.index.empty.currently_inside')
+    : t('concierge.visits.index.empty.expected_today')
+})
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return '—'
@@ -209,13 +174,27 @@ function formatDateTime(value: string | null | undefined) {
   }).format(date)
 }
 
+function currentDuration(visit: ConciergeVisitListItem) {
+  if (visit.duration_seconds != null && visit.duration_seconds >= 0) {
+    return formatVisitDuration(visit.duration_seconds)
+  }
+
+  if (!visit.checked_in_at) return '—'
+
+  const checkedInAt = new Date(visit.checked_in_at).getTime()
+  if (Number.isNaN(checkedInAt)) return '—'
+
+  const seconds = Math.max(0, Math.floor((Date.now() - checkedInAt) / 1000))
+  return formatVisitDuration(seconds)
+}
+
 function loadList(page: number, itemsPerPage: number) {
   fetchVisits({
     search: search.value,
     page,
     itemsPerPage,
     tab: activeTab.value,
-    visitType: visitTypeFilter.value,
+    propertyId: assignedProperty.value?.id,
   })
 }
 
@@ -225,7 +204,7 @@ const fetchData = (searchValue: string, page: number, itemsPerPage: number) => {
     page,
     itemsPerPage,
     tab: activeTab.value,
-    visitType: visitTypeFilter.value,
+    propertyId: assignedProperty.value?.id,
   })
 }
 
@@ -263,25 +242,13 @@ watch(
 )
 
 onMounted(() => {
-  const searchKey = 'visitor_person_display_name_or_host_person_display_name_or_unit_identifier_cont'
-  if (props.filters?.[searchKey]) {
-    search.value = props.filters[searchKey]
+  if (props.query) {
+    search.value = props.query
   }
 })
 
 function changeTab(tab: ConciergeVisitTab) {
   activeTab.value = tab
-  loadList(1, itemsPerPage.value)
-}
-
-function applyFilters() {
-  filtersOpen.value = false
-  loadList(1, itemsPerPage.value)
-}
-
-function clearFilters() {
-  visitTypeFilter.value = ''
-  filtersOpen.value = false
   loadList(1, itemsPerPage.value)
 }
 
@@ -300,79 +267,106 @@ function onCheckOut(visit: ConciergeVisitListItem) {
   checkOutOpen.value = true
 }
 
-const columns = computed<ColumnDef<ConciergeVisitListItem, unknown>[]>(() => [
-  {
-    id: 'visitor',
-    header: () => t('concierge.visits.index.table.headers.visitor'),
-    cell: ({ row }) => {
-      const visitor = row.original.visitor
-      const name = visitor?.display_name ?? '—'
-      return h('div', { class: 'flex items-center gap-3' }, [
-        h(
-          'div',
-          {
-            class:
-              'bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
-          },
-          visitInitials(name),
-        ),
-        h('span', { class: 'font-medium' }, name),
-      ])
-    },
-  },
-  {
-    id: 'unit',
-    header: () => t('concierge.visits.index.table.headers.unit'),
-    cell: ({ row }) => {
-      const unit = row.original.unit
-      return h('span', unit?.display_name ?? unit?.identifier ?? '—')
-    },
-  },
-  {
-    id: 'host',
-    header: () => t('concierge.visits.index.table.headers.host'),
-    cell: ({ row }) => h('span', row.original.host?.display_name ?? '—'),
-  },
-  {
-    id: 'status',
-    header: () => t('concierge.visits.index.table.headers.status'),
-    cell: ({ row }) =>
-      h(VisitStatusBadge, {
-        status: row.original.status,
-        label: row.original.status_label,
-      }),
-  },
-  {
-    id: 'authorized_time',
-    header: () => t('concierge.visits.index.table.headers.authorized_time'),
-    cell: ({ row }) => h('span', formatDateTime(visitAuthorizedTime(row.original))),
-  },
-  {
-    id: 'last_movement',
-    header: () => t('concierge.visits.index.table.headers.last_movement'),
-    cell: ({ row }) => {
-      const movement = visitLastMovement(row.original)
-      if (!movement.at || !movement.kind) return h('span', '—')
+const columns = computed<ColumnDef<ConciergeVisitListItem, unknown>[]>(() => {
+  const timeHeader =
+    activeTab.value === 'currently_inside'
+      ? t('concierge.visits.index.table.headers.checked_in_at')
+      : t('concierge.visits.index.table.headers.scheduled_at')
 
-      return h('div', { class: 'flex flex-col gap-0.5' }, [
-        h('span', { class: 'text-sm' }, formatDateTime(movement.at)),
-        h(
-          'span',
-          { class: 'text-muted-foreground text-xs' },
-          t(`concierge.visits.index.movements.${movement.kind}`),
-        ),
-      ])
+  const baseColumns: ColumnDef<ConciergeVisitListItem, unknown>[] = [
+    {
+      id: 'visitor',
+      header: () => t('concierge.visits.index.table.headers.visitor'),
+      cell: ({ row }) => {
+        const visit = row.original
+
+        if (visit.denial_explanation) {
+          return h(VisitDenialNotice, { visit })
+        }
+
+        const visitor = visit.visitor
+        const name = visitor?.display_name ?? '—'
+        return h('div', { class: 'flex items-center gap-3' }, [
+          h(
+            'div',
+            {
+              class:
+                'bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+            },
+            visitInitials(name),
+          ),
+          h('span', { class: 'font-medium' }, name),
+        ])
+      },
     },
-  },
-  {
+    {
+      id: 'unit',
+      header: () => t('concierge.visits.index.table.headers.unit'),
+      cell: ({ row }) => {
+        if (row.original.denial_explanation) return h('span', '—')
+        const unit = row.original.unit
+        return h('span', unit?.display_name ?? unit?.identifier ?? '—')
+      },
+    },
+    {
+      id: 'host',
+      header: () => t('concierge.visits.index.table.headers.host'),
+      cell: ({ row }) => {
+        if (row.original.denial_explanation) return h('span', '—')
+        return h('span', row.original.host?.display_name ?? '—')
+      },
+    },
+    {
+      id: 'status',
+      header: () => t('concierge.visits.index.table.headers.status'),
+      cell: ({ row }) =>
+        h(VisitStatusBadge, {
+          visit: row.original,
+          status: row.original.status,
+          label: row.original.status_label,
+        }),
+    },
+    {
+      id: 'time',
+      header: () => timeHeader,
+      cell: ({ row }) => {
+        const visit = row.original
+        if (visit.denial_explanation) return h('span', '—')
+
+        if (activeTab.value === 'currently_inside') {
+          return h('span', formatDateTime(visit.checked_in_at))
+        }
+
+        return h('span', formatDateTime(visit.scheduled_at ?? visitAuthorizedTime(visit)))
+      },
+    },
+  ]
+
+  if (activeTab.value === 'currently_inside') {
+    baseColumns.push({
+      id: 'duration',
+      header: () => t('concierge.visits.index.table.headers.duration'),
+      cell: ({ row }) => {
+        if (row.original.denial_explanation) return h('span', '—')
+        return h('span', { class: 'tabular-nums' }, currentDuration(row.original))
+      },
+    })
+  }
+
+  baseColumns.push({
     id: 'actions',
     header: () => t('common.table.actions'),
-    cell: ({ row }) =>
-      h(VisitActionsDropdown, {
+    cell: ({ row }) => {
+      if (row.original.denial_explanation) return h('span', '—')
+
+      return h(VisitRowActions, {
         visit: row.original,
         onCheckIn: onCheckIn,
         onCheckOut: onCheckOut,
-      }),
-  },
-])
+      })
+    },
+  })
+
+  return baseColumns
+})
 </script>

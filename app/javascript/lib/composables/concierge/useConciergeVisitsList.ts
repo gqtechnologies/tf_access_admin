@@ -7,51 +7,50 @@ type ListQuery = {
   page: number
   itemsPerPage: number
   tab: ConciergeVisitTab
-  visitType: string
+  propertyId?: string | null
 }
 
-export function useConciergeVisitsList(initialTab: ConciergeVisitTab = 'authorized') {
+export function useConciergeVisitsList(initialTab: ConciergeVisitTab = 'expected_today') {
   const activeTab = ref<ConciergeVisitTab>(initialTab)
-  const visitTypeFilter = ref('')
 
-  function buildQueryParams({ search, page, itemsPerPage, tab, visitType }: ListQuery) {
-    const q: Record<string, string> = {}
-
-    if (search.trim()) {
-      q.visitor_person_display_name_or_host_person_display_name_or_unit_identifier_cont = search.trim()
-    }
-    if (visitType) {
-      q.visit_type_eq = visitType
-    }
-
-    return {
+  function buildQueryParams({ search, page, itemsPerPage, tab, propertyId }: ListQuery) {
+    const params: Record<string, string | number | Record<string, string>> = {
       page,
       per_page: itemsPerPage,
       tab,
-      q,
     }
+
+    const trimmedSearch = search.trim()
+    if (trimmedSearch) {
+      params.q = { query: trimmedSearch }
+      params.include_denied = '1'
+    }
+
+    if (propertyId) {
+      params.property_id = propertyId
+    }
+
+    return params
   }
 
   function fetchVisits(query: ListQuery) {
     activeTab.value = query.tab
-    visitTypeFilter.value = query.visitType
 
     router.get('/concierge/visits', buildQueryParams(query), {
       preserveState: true,
       preserveScroll: true,
-      only: ['visits', 'pagination', 'counters', 'tab', 'filters'],
+      only: ['visits', 'pagination', 'counters', 'tab', 'query', 'assigned_property'],
     })
   }
 
   function refreshList() {
     router.reload({
-      only: ['visits', 'pagination', 'counters', 'tab', 'filters'],
+      only: ['visits', 'pagination', 'counters', 'tab', 'query', 'assigned_property'],
     })
   }
 
   return {
     activeTab,
-    visitTypeFilter,
     fetchVisits,
     refreshList,
   }

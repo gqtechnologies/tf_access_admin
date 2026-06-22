@@ -58,17 +58,17 @@
 
 ## 6. UI de portería basada en mockups
 
-* [ ] 6.1 Diseñar pantalla de portería con contexto visible de propiedad
-* [ ] 6.2 Implementar búsqueda por documento, nombre y unidad
-* [ ] 6.3 Implementar listas Esperadas hoy y Actualmente dentro
-* [ ] 6.4 Mostrar badges de estado operacional efectivo
-* [ ] 6.5 Mostrar `Registrar ingreso` solo cuando backend entregue `check_in`
-* [ ] 6.6 Mostrar `Registrar salida` solo cuando backend entregue `check_out`
-* [ ] 6.7 Adaptar confirmación de ingreso desde `visit_checkin.png`
-* [ ] 6.8 Adaptar confirmación de salida desde `visit_checkout.png`
-* [ ] 6.9 Adaptar detalle mínimo/timeline desde `visit_details.png.png`
-* [ ] 6.10 Refrescar listas y contadores después de cada transición
-* [ ] 6.11 Mostrar “Solicitar nueva autorización” como instrucción, no como acción de autorización del conserje
+* [x] 6.1 Diseñar pantalla de portería con contexto visible de propiedad
+* [x] 6.2 Implementar búsqueda por documento, nombre y unidad
+* [x] 6.3 Implementar listas Esperadas hoy y Actualmente dentro
+* [x] 6.4 Mostrar badges de estado operacional efectivo
+* [x] 6.5 Mostrar `Registrar ingreso` solo cuando backend entregue `check_in`
+* [x] 6.6 Mostrar `Registrar salida` solo cuando backend entregue `check_out`
+* [x] 6.7 Adaptar confirmación de ingreso desde `visit_checkin.png`
+* [x] 6.8 Adaptar confirmación de salida desde `visit_checkout.png`
+* [x] 6.9 Adaptar detalle mínimo/timeline desde `visit_details.png.png`
+* [x] 6.10 Refrescar listas y contadores después de cada transición
+* [x] 6.11 Mostrar “Solicitar nueva autorización” como instrucción, no como acción de autorización del conserje
 
 ## 7. Auditoría, historial y reportabilidad
 

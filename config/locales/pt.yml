@@ -102,35 +102,30 @@ pt:
           cancelled: "Visita cancelada. Não é possível registrar a entrada."
           expired: "Autorização expirada. Solicite uma nova autorização."
           not_operable: "Visita não operável. Não é possível registrar a entrada."
+        instructions:
+          request_new_authorization: "Solicitar nova autorização"
         index:
-          title: "Visitas autorizadas / operacionais"
-          description: "Visitas operacionais da propriedade atribuída. Registre entradas e saídas pelo menu de ações."
+          title: "Portaria de visitas"
+          description: "Visitas operacionais da propriedade atribuída. Busque por documento, nome do visitante ou unidade."
           assigned_property: "Propriedade atribuída"
           search:
-            placeholder: "Buscar visitante, unidade ou anfitrião..."
+            placeholder: "Buscar por documento, nome ou unidade..."
           tabs:
-            authorized: "Autorizadas"
-            checked_in: "Entradas"
-            recent_checked_out: "Saídas recentes"
-          filters:
-            button: "Filtros"
-            title: "Filtros operacionais"
-            visit_type: "Tipo de visita"
-            all_types: "Todos os tipos"
-            clear: "Limpar"
-            apply: "Aplicar"
+            expected_today: "Esperadas hoje"
+            currently_inside: "Atualmente dentro"
+          empty:
+            expected_today: "Não há visitas esperadas para hoje."
+            currently_inside: "Não há visitantes atualmente dentro."
+            search: "Nenhuma visita corresponde à busca."
           table:
             headers:
               visitor: "Visitante"
               unit: "Unidade"
               host: "Anfitrião"
               status: "Estado"
-              authorized_time: "Horário autorizado"
-              last_movement: "Último movimento"
-          movements:
-            authorized: "Autorizada"
-            checked_in: "Entrada registrada"
-            checked_out: "Saída registrada"
+              scheduled_at: "Horário agendado"
+              checked_in_at: "Horário de entrada"
+              duration: "Duração"
         summary:
           unit: "Unidade"
           host: "Anfitrião"
@@ -189,13 +184,22 @@ pt:
         show:
           title: "Detalhe da visita"
           back_to_list: "Voltar à lista"
+          sections:
+            details: "Detalhes da visita"
+            timeline: "Linha do tempo"
           fields:
             unit: "Unidade"
             host: "Anfitrião"
             scheduled_at: "Agendada"
+            valid_until: "Válida até"
             authorized_at: "Autorizada"
+            authorized_by: "Autorizada por"
             checked_in_at: "Entrada"
+            checked_in_by: "Entrada registrada por"
             checked_out_at: "Saída"
+            checked_out_by: "Saída registrada por"
+            duration: "Tempo dentro"
+            current_duration: "Duração atual"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Apenas letras, números e hífens são permitidos"

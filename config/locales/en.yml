@@ -111,35 +111,30 @@ en:
           cancelled: "Visit cancelled. Entry cannot be registered."
           expired: "Authorization expired. Request a new authorization."
           not_operable: "Visit not operable. Entry cannot be registered."
+        instructions:
+          request_new_authorization: "Request a new authorization"
         index:
-          title: "Authorized / operational visits"
-          description: "Operational visits for your assigned property. Register entries and exits from the actions menu."
+          title: "Gatehouse visits"
+          description: "Operational visits for your assigned property. Search by document, visitor name or unit."
           assigned_property: "Assigned property"
           search:
-            placeholder: "Search visitor, unit or host..."
+            placeholder: "Search by document, visitor name or unit..."
           tabs:
-            authorized: "Authorized"
-            checked_in: "Checked in"
-            recent_checked_out: "Recent check-outs"
-          filters:
-            button: "Filters"
-            title: "Operational filters"
-            visit_type: "Visit type"
-            all_types: "All types"
-            clear: "Clear"
-            apply: "Apply"
+            expected_today: "Expected today"
+            currently_inside: "Currently inside"
+          empty:
+            expected_today: "No visits expected today."
+            currently_inside: "No visitors currently inside."
+            search: "No visits match your search."
           table:
             headers:
               visitor: "Visitor"
               unit: "Unit"
               host: "Host"
               status: "Status"
-              authorized_time: "Authorized time"
-              last_movement: "Last movement"
-          movements:
-            authorized: "Authorized"
-            checked_in: "Entry registered"
-            checked_out: "Exit registered"
+              scheduled_at: "Scheduled time"
+              checked_in_at: "Entry time"
+              duration: "Duration"
         summary:
           unit: "Unit"
           host: "Host"
@@ -198,13 +193,22 @@ en:
         show:
           title: "Visit detail"
           back_to_list: "Back to list"
+          sections:
+            details: "Visit details"
+            timeline: "Timeline"
           fields:
             unit: "Unit"
             host: "Host"
             scheduled_at: "Scheduled at"
+            valid_until: "Valid until"
             authorized_at: "Authorized at"
+            authorized_by: "Authorized by"
             checked_in_at: "Checked in at"
+            checked_in_by: "Entry registered by"
             checked_out_at: "Checked out at"
+            checked_out_by: "Exit registered by"
+            duration: "Time inside"
+            current_duration: "Current duration"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Only letters, numbers, and hyphens are allowed"
