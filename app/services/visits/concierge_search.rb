@@ -40,23 +40,24 @@ module Visits
       # 2.6 — operational base strips cancelled/expired unless denied-result path (2.5)
       base = @include_denied ? @scope : @scope.concierge_visible
 
-      # 2.1 — exact document digest (cross-org isolation enforced by scope)
-      by_document = base.by_visitor_document(@query, organization: @organization)
+      like = "%#{sanitize_like(@query)}%"
+      digest = Person.document_digest(@query)
 
-      # 2.2 — partial name match (ILIKE for accent-tolerant case-insensitivity)
-      by_name = base
-        .joins(:visitor_person)
-        .where("people.display_name ILIKE ?", "%#{sanitize_like(@query)}%")
-
-      # 2.3 — unit identifier or visible name
-      by_unit = base
-        .joins(:unit)
+      # Single query joining visitor (people) and unit so all three criteria can
+      # be OR'd in one WHERE. Combining them as separate `.or` relations fails
+      # because each carries a different join and is structurally incompatible.
+      #   2.1 — exact document digest, scoped to the organization
+      #   2.2 — partial visitor name (ILIKE, accent-tolerant case-insensitivity)
+      #   2.3 — unit identifier, normalized identifier or visible name
+      base
+        .joins(:visitor_person, :unit)
         .where(
-          "units.identifier ILIKE :q OR units.normalized_identifier ILIKE :q OR units.display_name ILIKE :q",
-          q: "%#{sanitize_like(@query)}%"
+          "(people.organization_id = :org AND people.document_number_digest = :digest) " \
+          "OR people.display_name ILIKE :like " \
+          "OR units.identifier ILIKE :like OR units.normalized_identifier ILIKE :like " \
+          "OR units.display_name ILIKE :like",
+          org: @organization.id, digest: digest, like: like
         )
-
-      by_document.or(by_name).or(by_unit)
     end
 
     private

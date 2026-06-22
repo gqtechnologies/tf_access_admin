@@ -72,35 +72,26 @@
 
 ## 7. Auditoría, historial y reportabilidad
 
-* [ ] 7.1 Verificar auditoría técnica de estado, timestamps y actores
-* [ ] 7.2 Registrar evento funcional `checked_in` con actor, from/to, momento y metadata
-* [ ] 7.3 Registrar evento funcional `checked_out` con actor, from/to, momento y metadata
-* [ ] 7.4 Garantizar rollback atómico entre visita e historial
-* [ ] 7.5 Exponer datos trazables para visitante, unidad, autorizador, actores de ingreso/salida y duración
-* [ ] 7.6 Definir consulta de visitas aún dentro sin construir reportes completos
+* [x] 7.1 Verificar auditoría técnica de estado, timestamps y actores
+* [x] 7.2 Registrar evento funcional `checked_in` con actor, from/to, momento y metadata
+* [x] 7.3 Registrar evento funcional `checked_out` con actor, from/to, momento y metadata
+* [x] 7.4 Garantizar rollback atómico entre visita e historial
+* [x] 7.5 Exponer datos trazables para visitante, unidad, autorizador, actores de ingreso/salida y duración
+* [x] 7.6 Definir consulta de visitas aún dentro sin construir reportes completos
 
 ## 8. Tests de autorización, estados y aislamiento
 
-* [ ] 8.1 Testear conserje con assignment activo en propiedad asignada
-* [ ] 8.2 Testear assignment inactivo, futuro y vencido
-* [ ] 8.3 Testear ausencia independiente de `view_authorized_visits`, `register_visit_entry` y `register_visit_exit`
-* [ ] 8.4 Testear búsqueda por documento, nombre y unidad
-* [ ] 8.5 Testear listas esperadas hoy y actualmente dentro
-* [ ] 8.6 Testear check-in exitoso y actor `User`
-* [ ] 8.7 Testear rechazo de visita cancelada, expirada, temporalmente vencida y no autorizada
-* [ ] 8.8 Testear doble check-in secuencial y concurrente
-* [ ] 8.9 Testear check-out exitoso y actor `User`
-* [ ] 8.10 Testear check-out desde estado inválido y salida duplicada
-* [ ] 8.11 Testear aislamiento cross-organization y cross-property en listas, búsqueda y mutaciones
-* [ ] 8.12 Testear payload mínimo y ausencia de datos administrativos
-* [ ] 8.13 Testear auditoría, historial y rollback
-* [ ] 8.14 Testear que visitas de `residential-visit-management` aparecen igual que otras visitas autorizadas
-
-## 9. Cierre
-
-* [ ] 9.1 Ejecutar suite relevante de models, services, policies, requests, serializers y frontend
-* [ ] 9.2 Verificar manualmente búsqueda, esperadas hoy, actualmente dentro, ingreso y salida
-* [ ] 9.3 Verificar referencias visuales y accesibilidad de estados/acciones
-* [ ] 9.4 Ejecutar `openspec validate concierge-visit-access-flow --type change --strict`
-* [ ] 9.5 Ejecutar Graphify después de una implementación futura; no corresponde actualizar el grafo por cambios solo documentales
-* [ ] 9.6 Preparar cierre indicando dependencias y cualquier delta futuro de `visit-management`
+* [x] 8.1 Testear conserje con assignment activo en propiedad asignada
+* [x] 8.2 Testear assignment inactivo, futuro y vencido
+* [x] 8.3 Testear ausencia independiente de `view_authorized_visits`, `register_visit_entry` y `register_visit_exit`
+* [x] 8.4 Testear búsqueda por documento, nombre y unidad
+* [x] 8.5 Testear listas esperadas hoy y actualmente dentro
+* [x] 8.6 Testear check-in exitoso y actor `User`
+* [x] 8.7 Testear rechazo de visita cancelada, expirada, temporalmente vencida y no autorizada
+* [x] 8.8 Testear doble check-in secuencial y concurrente
+* [x] 8.9 Testear check-out exitoso y actor `User`
+* [x] 8.10 Testear check-out desde estado inválido y salida duplicada
+* [x] 8.11 Testear aislamiento cross-organization y cross-property en listas, búsqueda y mutaciones
+* [x] 8.12 Testear payload mínimo y ausencia de datos administrativos
+* [x] 8.13 Testear auditoría, historial y rollback
+* [x] 8.14 Testear que visitas de `residential-visit-management` aparecen igual que otras visitas autorizadas

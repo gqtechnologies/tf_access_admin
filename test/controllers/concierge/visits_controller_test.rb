@@ -162,7 +162,82 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
     assert_equal VisitStatuses::CHECKED_OUT, @authorized_visit.reload.status
   end
 
+  # ─── 8.11 cross-organization isolation in mutations ──────────────────────────
+
+  test "concierge cannot check in a visit from another organization" do
+    other_visit = build_other_org_authorized_visit!
+    sign_in_as(@concierge)
+    post check_in_concierge_visit_path(other_visit), params: { check_in: {} }
+    assert_response :redirect
+    assert_equal VisitStatuses::AUTHORIZED, other_visit.reload.status
+  end
+
+  # ─── 8.14 residential-visit-management visits appear like other authorized ───
+
+  test "a visit created via the resident flow appears in the concierge list" do
+    resident_visit = build_resident_flow_visit!
+
+    sign_in_as(@concierge)
+    inertia_get concierge_visits_path
+    assert_response :success
+
+    visit_ids = inertia_props["visits"].map { |v| v["id"] }
+    assert_includes visit_ids, resident_visit.id
+  end
+
   private
+
+  # Authorized visit created through the resident private API service, used to
+  # assert it is indistinguishable from admin-created authorized visits (8.14).
+  def build_resident_flow_visit!
+    ActsAsTenant.with_tenant(@organization) do
+      resident = create_user_for_organization(
+        organization: @organization,
+        email: "conc-ctrl-resident-flow@example.test",
+        role: AvailableRoles::CLIENT
+      )
+      UnitOccupancy.create!(
+        organization: @organization,
+        person: resident.person_for(@organization),
+        unit: @unit,
+        occupancy_type: OccupancyTypes::TENANT,
+        starts_at: 7.days.ago,
+        status: OccupancyStatuses::ACTIVE,
+        can_authorize_visits: true
+      )
+      Residents::CreateAuthorizedVisit.call(
+        unit: @unit,
+        host_person: resident.person_for(@organization),
+        visitor_params: { name: "Resident Flow Visitor", document: "RF-DOC-1", phone: "+56911112222" },
+        scheduled_at: 1.hour.from_now,
+        actor: resident
+      )
+    end
+  end
+
+  def build_other_org_authorized_visit!
+    ActsAsTenant.with_tenant(@other_organization) do
+      property = create_property(@other_organization, "Other Org Ctrl Property")
+      unit = create_unit(property, "OO-CTRL-101")
+      host = Person.create!(
+        organization: @other_organization, display_name: "Other Org Host",
+        person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
+      )
+      UnitOwnership.create!(
+        organization: @other_organization, person: host, unit: unit,
+        ownership_percentage: 100, starts_at: Date.current, status: UnitOwnership::STATUS_ACTIVE
+      )
+      visitor = Person.create!(
+        organization: @other_organization, display_name: "Other Org Visitor",
+        person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
+      )
+      Visit.create!(
+        organization: @other_organization, unit: unit, visitor_person: visitor, host_person: host,
+        scheduled_at: 1.hour.from_now, valid_from: 30.minutes.ago, status: VisitStatuses::AUTHORIZED,
+        authorized_at: 10.minutes.ago
+      )
+    end
+  end
 
   def sign_in_as(user)
     host! "#{@organization.subdomain}.example.com"
