@@ -1185,6 +1185,7 @@ pt:
         statuses:
           active: "Ativa"
           inactive: "Inativa"
+          archived: "Arquivada"
         index:
           title: "Propriedades residenciais"
           input:
@@ -1200,10 +1201,10 @@ pt:
           actions:
             create: "Nova propriedade"
             structure: "Gerenciar estrutura"
-            delete: "Excluir propriedade"
-            delete_description: "Excluir a propriedade {name}?"
-            delete_success: "Propriedade excluída com sucesso"
-            delete_error: "Não foi possível excluir a propriedade"
+            archive: "Arquivar propriedade"
+            archive_description: "Arquivar a propriedade {name}? Ela será preservada para histórico e consulta."
+            archive_success: "Propriedade arquivada com sucesso"
+            archive_error: "Não foi possível arquivar a propriedade"
         new:
           title: "Nova propriedade residencial"
           description: "Registre uma propriedade na sua organização"
@@ -1212,6 +1213,15 @@ pt:
           title: "Editar propriedade residencial"
           description: "Atualize os dados da propriedade"
           submit: "Salvar alterações"
+          archived_banner: "Esta propriedade está arquivada. Os dados são somente leitura e não podem ser alterados."
+          archive_section:
+            title: "Arquivar propriedade"
+            description: "O arquivamento preserva o histórico e as dependências. A propriedade deixará de aceitar nova atividade operacional."
+        form:
+          saving: "Salvando…"
+        states:
+          forbidden: "Você não tem permissão para editar esta propriedade."
+          read_only: "Esta propriedade é somente leitura."
         input:
           name:
             label: "Nome"

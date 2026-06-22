@@ -2,6 +2,7 @@
 
 class AdminController < InertiaController
   include PaginationProps
+  include InertiaErrorsSerializable
 
   before_action :authenticate_user!
   before_action :set_locale

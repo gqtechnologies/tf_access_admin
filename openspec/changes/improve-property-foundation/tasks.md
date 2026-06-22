@@ -50,24 +50,24 @@
 
 ## 5. Controllers y props
 
-* [ ] 5.1 Delegar create a `Properties::Create`
-* [ ] 5.2 Delegar update a `Properties::Update`
-* [ ] 5.3 Reemplazar destroy ordinario por una acción explícita de archive
-* [ ] 5.4 Delegar archive a `Properties::Archive`
-* [ ] 5.5 Mantener carga de registros mediante policy scope
-* [ ] 5.6 Unificar contrato de errores Inertia
-* [ ] 5.7 Exponer permisos backend-driven para editar, activar/desactivar y archivar
-* [ ] 5.8 Evitar aceptar `organization_id` desde parámetros del cliente
+* [x] 5.1 Delegar create a `Properties::Create`
+* [x] 5.2 Delegar update a `Properties::Update`
+* [x] 5.3 Reemplazar destroy ordinario por una acción explícita de archive
+* [x] 5.4 Delegar archive a `Properties::Archive`
+* [x] 5.5 Mantener carga de registros mediante policy scope
+* [x] 5.6 Unificar contrato de errores Inertia
+* [x] 5.7 Exponer permisos backend-driven para editar, activar/desactivar y archivar
+* [x] 5.8 Evitar aceptar `organization_id` desde parámetros del cliente
 
 ## 6. UI mínima
 
-* [ ] 6.1 Alinear schema frontend con estados canónicos
-* [ ] 6.2 Mantener `archived` fuera del selector ordinario de creación/edición
-* [ ] 6.3 Añadir acción separada de archive con confirmación explícita
-* [ ] 6.4 Mostrar errores de nombre duplicado en el campo correspondiente
-* [ ] 6.5 Mostrar estado archivado y limitar acciones según props backend
-* [ ] 6.6 Definir estados loading, success, error y forbidden
-* [ ] 6.7 Mantener el formulario como superficie de datos y no como fuente de reglas de lifecycle
+* [x] 6.1 Alinear schema frontend con estados canónicos
+* [x] 6.2 Mantener `archived` fuera del selector ordinario de creación/edición
+* [x] 6.3 Añadir acción separada de archive con confirmación explícita
+* [x] 6.4 Mostrar errores de nombre duplicado en el campo correspondiente
+* [x] 6.5 Mostrar estado archivado y limitar acciones según props backend
+* [x] 6.6 Definir estados loading, success, error y forbidden
+* [x] 6.7 Mantener el formulario como superficie de datos y no como fuente de reglas de lifecycle
 
 ## 7. Tests
 

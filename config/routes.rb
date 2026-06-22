@@ -51,7 +51,10 @@ Rails.application.routes.draw do
     resources :people, only: [:index, :show, :new, :create, :edit, :update, :destroy]
     resources :profile, only: [:edit, :update]
     resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
-    resources :residential_properties, only: [:index, :new, :create, :edit, :update, :destroy] do
+    resources :residential_properties, only: [:index, :new, :create, :edit, :update] do
+      member do
+        post :archive
+      end
       resource :structure, only: [:show], module: :residential_properties
       resources :units, only: [:show], module: :residential_properties do
         resources :ownerships, only: [:create, :update, :destroy], controller: "unit_ownerships"

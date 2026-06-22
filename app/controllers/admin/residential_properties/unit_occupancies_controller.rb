@@ -109,10 +109,6 @@ class Admin::ResidentialProperties::UnitOccupanciesController < AdminController
     admin_residential_property_unit_path(@residential_property, @unit, tab: "occupants")
   end
 
-  def serialize_inertia_errors(record)
-    record.errors.to_hash.transform_values { |messages| Array(messages) }
-  end
-
   def set_residential_property
     @residential_property = policy_scope(ResidentialProperty).find(params[:residential_property_id])
   rescue ActiveRecord::RecordNotFound

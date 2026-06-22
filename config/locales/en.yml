@@ -1196,6 +1196,7 @@ en:
         statuses:
           active: "Active"
           inactive: "Inactive"
+          archived: "Archived"
         index:
           title: "Residential properties"
           input:
@@ -1211,10 +1212,10 @@ en:
           actions:
             create: "New property"
             structure: "Manage structure"
-            delete: "Delete property"
-            delete_description: "Delete property {name}?"
-            delete_success: "Property deleted successfully"
-            delete_error: "Could not delete property"
+            archive: "Archive property"
+            archive_description: "Archive property {name}? It will be preserved for history and consultation."
+            archive_success: "Property archived successfully"
+            archive_error: "Could not archive property"
         new:
           title: "New residential property"
           description: "Register a property for your organization"
@@ -1223,6 +1224,15 @@ en:
           title: "Edit residential property"
           description: "Update property details"
           submit: "Save changes"
+          archived_banner: "This property is archived. Details are read-only and cannot be changed."
+          archive_section:
+            title: "Archive property"
+            description: "Archiving preserves history and dependencies. The property will no longer accept new operational activity."
+        form:
+          saving: "Saving…"
+        states:
+          forbidden: "You do not have permission to edit this property."
+          read_only: "This property is read-only."
         input:
           name:
             label: "Name"
