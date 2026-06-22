@@ -1789,6 +1789,18 @@ es:
   activerecord:
     errors:
       models:
+        residential_property:
+          attributes:
+            name:
+              taken: "Ya existe una propiedad con este nombre en la organización"
+            code:
+              taken: "Ya existe una propiedad con este código en la organización"
+            status:
+              inclusion: "no es un estado válido"
+            timezone:
+              invalid_timezone: "no es una zona horaria válida"
+            organization_id:
+              immutable: "no puede modificarse"
         visit:
           attributes:
             host_person:

@@ -15,14 +15,14 @@
 
 ## 2. Validaciones y normalización
 
-* [ ] 2.1 Normalizar nombre mediante trim, colapso de whitespace y comparación case-insensitive
-* [ ] 2.2 Validar nombre único dentro de la organización con error de campo
-* [ ] 2.3 Mantener código opcional y único por organización cuando está presente
-* [ ] 2.4 Validar inclusión de `property_type`
-* [ ] 2.5 Validar inclusión de `status`
-* [ ] 2.6 Definir validación de ubicación mínima y timezone
-* [ ] 2.7 Impedir cambio de `organization_id`
-* [ ] 2.8 Manejar `RecordNotUnique` concurrente como error de dominio
+* [x] 2.1 Normalizar nombre mediante trim, colapso de whitespace y comparación case-insensitive
+* [x] 2.2 Validar nombre único dentro de la organización con error de campo
+* [x] 2.3 Mantener código opcional y único por organización cuando está presente
+* [x] 2.4 Validar inclusión de `property_type`
+* [x] 2.5 Validar inclusión de `status`
+* [x] 2.6 Definir validación de ubicación mínima y timezone
+* [x] 2.7 Impedir cambio de `organization_id`
+* [x] 2.8 Manejar `RecordNotUnique` concurrente como error de dominio
 
 ## 3. Servicios de dominio
 
