@@ -32,7 +32,8 @@ module Visit::StateMachine
       end
 
       event :check_out do
-        transitions from: :checked_in, to: :checked_out, after: :stamp_check_out
+        transitions from: :checked_in, to: :checked_out,
+                    guard: :exit_not_before_entry?, after: :stamp_check_out
       end
 
       event :cancel do
@@ -47,6 +48,15 @@ module Visit::StateMachine
     return false if valid_until.present? && now > valid_until
 
     true
+  end
+
+  # 4.6 — A check-out can only happen after a recorded entry. Requires
+  # checked_in_at to be present and the effective exit time (now) to not
+  # precede it, guarding against clock skew or out-of-order confirmations.
+  def exit_not_before_entry?(*)
+    return false if checked_in_at.blank?
+
+    Time.zone.now >= checked_in_at
   end
 
   def assign_initial_status!(actor:, requested_status: nil)

@@ -37,14 +37,14 @@
 
 ## 4. Check-out
 
-* [ ] 4.1 Reutilizar/extender el contrato `Visits::CheckOut`
-* [ ] 4.2 Exigir estado `checked_in` y `register_visit_exit`
-* [ ] 4.3 Validar propiedad asignada mediante `VisitPolicy`
-* [ ] 4.4 Persistir `checked_out_at` y `checked_out_by_id` como `User`
-* [ ] 4.5 Transicionar atómicamente a `checked_out`
-* [ ] 4.6 Validar que salida no preceda al ingreso
-* [ ] 4.7 Persistir metadata permitida de acceso, observaciones e incidencia
-* [ ] 4.8 Impedir salida duplicada
+* [x] 4.1 Reutilizar/extender el contrato `Visits::CheckOut`
+* [x] 4.2 Exigir estado `checked_in` y `register_visit_exit`
+* [x] 4.3 Validar propiedad asignada mediante `VisitPolicy`
+* [x] 4.4 Persistir `checked_out_at` y `checked_out_by_id` como `User`
+* [x] 4.5 Transicionar atómicamente a `checked_out`
+* [x] 4.6 Validar que salida no preceda al ingreso
+* [x] 4.7 Persistir metadata permitida de acceso, observaciones e incidencia
+* [x] 4.8 Impedir salida duplicada
 
 ## 5. Serializers y props mínimos para conserjería
 

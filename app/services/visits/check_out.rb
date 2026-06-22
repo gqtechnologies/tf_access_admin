@@ -22,7 +22,11 @@ module Visits
     def call
       authorize_visit_action!(@visit, :check_out?)
 
-      ActiveRecord::Base.transaction do
+      # 4.8 — with_lock issues SELECT FOR UPDATE and wraps the block in a
+      # transaction. Two concurrent check-out requests on the same visit queue
+      # on the row lock; the second reloads status = checked_out and AASM raises
+      # InvalidTransition, preventing a duplicate exit.
+      @visit.with_lock do
         from_status = @visit.status
         @visit.merge_check_out_metadata!(@check_out_metadata) if @check_out_metadata.present?
         @visit.check_out!(@actor)
@@ -37,9 +41,9 @@ module Visits
           notes: @notes,
           metadata: { "check_out" => @visit.check_out_metadata }.compact_blank
         )
-
-        @visit
       end
+
+      @visit
     end
   end
 end
