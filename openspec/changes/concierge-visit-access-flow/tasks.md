@@ -25,15 +25,15 @@
 
 ## 3. Check-in
 
-* [ ] 3.1 Reutilizar/extender el contrato `Visits::CheckIn`
-* [ ] 3.2 Exigir estado `authorized`, ventana temporal vigente y `register_visit_entry`
-* [ ] 3.3 Validar propiedad asignada mediante `VisitPolicy`
-* [ ] 3.4 Persistir `checked_in_at` y `checked_in_by_id` como `User`
-* [ ] 3.5 Transicionar atómicamente a `checked_in`
-* [ ] 3.6 Persistir metadata permitida de acceso, tipo, patente y observaciones
-* [ ] 3.7 Impedir doble check-in activo, incluyendo confirmaciones concurrentes
-* [ ] 3.8 Rechazar visitas `cancelled`, `expired`, vencidas o en cualquier estado distinto de `authorized`
-* [ ] 3.9 Definir evento opcional post-commit para notificación futura, sin implementar entrega
+* [x] 3.1 Reutilizar/extender el contrato `Visits::CheckIn`
+* [x] 3.2 Exigir estado `authorized`, ventana temporal vigente y `register_visit_entry`
+* [x] 3.3 Validar propiedad asignada mediante `VisitPolicy`
+* [x] 3.4 Persistir `checked_in_at` y `checked_in_by_id` como `User`
+* [x] 3.5 Transicionar atómicamente a `checked_in`
+* [x] 3.6 Persistir metadata permitida de acceso, tipo, patente y observaciones
+* [x] 3.7 Impedir doble check-in activo, incluyendo confirmaciones concurrentes
+* [x] 3.8 Rechazar visitas `cancelled`, `expired`, vencidas o en cualquier estado distinto de `authorized`
+* [x] 3.9 Definir evento opcional post-commit para notificación futura, sin implementar entrega
 
 ## 4. Check-out
 
