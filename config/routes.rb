@@ -64,7 +64,12 @@ Rails.application.routes.draw do
           end
         end
       end
-      resources :property_sections, only: [:create, :update, :destroy], module: :residential_properties
+      resources :property_sections, only: [:create, :update], module: :residential_properties do
+        member do
+          post :move
+          post :archive
+        end
+      end
       resources :bulk_imports, only: %i[create update], module: :residential_properties do
         member do
           post :validate
@@ -75,7 +80,7 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :property_sections, only: [:index, :edit, :update, :destroy]
+    resources :property_sections, only: [:index, :edit]
     namespace :operational_roles do
       resources :assignments, only: [:index, :create, :destroy]
     end

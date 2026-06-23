@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_21_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -717,19 +717,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_21_120000) do
     t.datetime "deleted_at"
     t.jsonb "metadata", default: {}, null: false
     t.string "name", null: false
+    t.string "normalized_name", null: false
     t.uuid "organization_id", null: false
     t.uuid "parent_id"
     t.integer "position"
     t.uuid "residential_property_id", null: false
     t.string "section_type", null: false
+    t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_property_sections_on_deleted_at"
     t.index ["metadata"], name: "index_property_sections_on_metadata", using: :gin
+    t.index ["organization_id", "residential_property_id", "normalized_name"], name: "idx_property_sections_unique_root_name", unique: true, where: "((parent_id IS NULL) AND (deleted_at IS NULL))"
+    t.index ["organization_id", "residential_property_id", "parent_id", "normalized_name"], name: "idx_property_sections_unique_child_name", unique: true, where: "((parent_id IS NOT NULL) AND (deleted_at IS NULL))"
     t.index ["organization_id", "residential_property_id", "parent_id", "section_type", "code"], name: "idx_property_sections_unique_code_in_context", unique: true, where: "((code IS NOT NULL) AND (deleted_at IS NULL))"
     t.index ["organization_id", "residential_property_id", "parent_id"], name: "idx_property_sections_on_org_property_parent"
     t.index ["organization_id"], name: "index_property_sections_on_organization_id"
     t.index ["parent_id"], name: "index_property_sections_on_parent_id"
+    t.index ["residential_property_id", "parent_id", "position"], name: "idx_property_sections_property_parent_position"
     t.index ["residential_property_id"], name: "index_property_sections_on_residential_property_id"
+    t.check_constraint "section_type::text = ANY (ARRAY['building'::character varying, 'tower'::character varying, 'floor'::character varying, 'block'::character varying, 'stage'::character varying, 'sector'::character varying, 'parking_area'::character varying, 'storage_area'::character varying, 'other'::character varying, 'parking'::character varying, 'storage'::character varying, 'commercial'::character varying, 'amenities'::character varying, 'entrance'::character varying, 'garden'::character varying]::text[])", name: "property_sections_section_type_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "property_sections_status_allowed"
   end
 
   create_table "property_setting_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

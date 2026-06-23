@@ -1440,6 +1440,30 @@ es:
             expand: "Expandir sección"
             collapse: "Contraer sección"
             manage_unit: "Gestionar unidad"
+            persisted_status: "almacenado como {status}"
+          move:
+            action: "Mover sección"
+            title: "Mover sección"
+            description: "Elige una nueva ubicación para {name} dentro de esta propiedad."
+            parent_label: "Nuevo padre"
+            root_option: "Nivel raíz (sin padre)"
+            nested_root_hint: "Las secciones con subsecciones no pueden anidarse bajo otra sección."
+            submit: "Mover sección"
+            success: "Sección movida correctamente"
+            error: "No se pudo mover la sección"
+          archive:
+            action: "Archivar sección"
+            title: "Archivar sección"
+            description: "¿Archivar la sección {name}? Las subsecciones, unidades e historial se conservarán."
+            success: "Sección archivada correctamente"
+            error: "No se pudo archivar la sección"
+          states:
+            forbidden: "No tienes permiso para gestionar secciones en esta propiedad."
+            read_only: "La estructura de esta propiedad es de solo lectura."
+            property_archived: "Esta propiedad está archivada. No se pueden modificar las secciones."
+            section_archived: "Esta sección está archivada y es de solo lectura."
+            section_not_operative: "Esta sección no es operativa por su estado o un ancestro."
+            empty_read_only: "Aún no se han creado secciones para esta propiedad."
           form:
             new_title: "Nueva sección"
             new_description: "Crea una nueva sección dentro de la estructura actual"
@@ -1457,6 +1481,7 @@ es:
             preview_title: "Vista previa"
             submit_create: "Crear sección"
             submit_edit: "Guardar cambios"
+            saving: "Guardando…"
       bulk_imports:
         property_section_required: "La sección es obligatoria para iniciar la importación"
         not_found: "Importación no encontrada"
@@ -1505,6 +1530,8 @@ es:
           parent_required: "La sección padre es obligatoria"
           parent_invalid: "La sección padre no es válida"
           parent_same_property: "La sección padre debe pertenecer a la misma propiedad"
+          parent_same_organization: "La sección padre debe pertenecer a la misma organización"
+          parent_not_operative: "No se pueden agregar ni mover secciones bajo una sección o propiedad no operativa"
           parent_circular: "La sección padre no puede ser descendiente de esta sección"
           parent_must_be_root: "Solo una sección raíz puede ser padre (máximo un nivel de anidación)"
           child_cannot_have_children: "Una sección hija no puede contener otras secciones, solo unidades"
@@ -1513,10 +1540,20 @@ es:
           container_cannot_have_units: "Una sección con subsecciones no puede tener unidades; asígnalas a las secciones hijas"
           section_cannot_accept_units: "Las unidades solo pueden asignarse a secciones hijas o a secciones sin subsecciones"
           position_min: "La posición debe ser al menos 1"
+          status_required: "El estado es obligatorio"
+        statuses:
+          active: "Activa"
+          inactive: "Inactiva"
+          archived: "Archivada"
         section_types:
+          building: "Edificio"
           block: "Bloque"
           tower: "Torre"
           floor: "Piso"
+          stage: "Etapa"
+          sector: "Sector"
+          parking_area: "Zona de estacionamiento"
+          storage_area: "Zona de bodegas"
           parking: "Estacionamiento"
           storage: "Bodega"
           commercial: "Comercial"
@@ -1562,6 +1599,8 @@ es:
             placeholder: "Código interno (opcional)"
           section_type:
             label: "Tipo de sección"
+          status:
+            label: "Estado"
           residential_property_id:
             label: "Propiedad residencial"
             placeholder: "Selecciona una propiedad"
@@ -1812,6 +1851,25 @@ es:
               invalid_timezone: "no es una zona horaria válida"
             organization_id:
               immutable: "no puede modificarse"
+        property_section:
+          attributes:
+            name:
+              taken: "Ya existe una sección con este nombre en el mismo nivel"
+            code:
+              taken: "Ya existe una sección con este código en el mismo contexto"
+            status:
+              inclusion: "no es un estado válido"
+              archive_requires_service: "el archivado debe realizarse mediante la acción de archivar, no en una edición ordinaria"
+            section_type:
+              inclusion: "no es un tipo de sección válido"
+            organization_id:
+              mismatch_property: "debe coincidir con la organización de la propiedad"
+            residential_property_id:
+              immutable: "no puede modificarse"
+            parent_id:
+              move_requires_service: "los cambios de padre deben realizarse mediante la acción de mover, no en una edición ordinaria"
+            base:
+              property_not_operative: "no se pueden modificar secciones mientras la propiedad no esté activa"
         visit:
           attributes:
             host_person:

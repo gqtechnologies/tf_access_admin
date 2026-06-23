@@ -1513,6 +1513,30 @@ en:
             expand: "Expand section"
             collapse: "Collapse section"
             manage_unit: "Manage unit"
+            persisted_status: "stored as {status}"
+          move:
+            action: "Move section"
+            title: "Move section"
+            description: "Choose a new location for {name} within this property."
+            parent_label: "New parent"
+            root_option: "Root level (no parent)"
+            nested_root_hint: "Sections with subsections cannot be nested under another section."
+            submit: "Move section"
+            success: "Section moved successfully"
+            error: "Could not move section"
+          archive:
+            action: "Archive section"
+            title: "Archive section"
+            description: "Archive section {name}? The subsections, units and history will be preserved."
+            success: "Section archived successfully"
+            error: "Could not archive section"
+          states:
+            forbidden: "You do not have permission to manage sections for this property."
+            read_only: "This property structure is read-only."
+            property_archived: "This property is archived. Sections cannot be modified."
+            section_archived: "This section is archived and read-only."
+            section_not_operative: "This section is not operational due to its status or an ancestor."
+            empty_read_only: "No sections have been created for this property yet."
           form:
             new_title: "New section"
             new_description: "Create a new section within the current structure"
@@ -1530,6 +1554,7 @@ en:
             preview_title: "Preview"
             submit_create: "Create section"
             submit_edit: "Save changes"
+            saving: "Saving…"
       bulk_imports:
         property_section_required: "Section is required to start the import"
         not_found: "Import not found"
@@ -1578,6 +1603,8 @@ en:
           parent_required: "Parent section is required"
           parent_invalid: "Parent section is invalid"
           parent_same_property: "Parent section must belong to the same property"
+          parent_same_organization: "Parent section must belong to the same organization"
+          parent_not_operative: "Sections cannot be added or moved under a non-operational section or property"
           parent_circular: "Parent section cannot be a descendant of this section"
           parent_must_be_root: "Only a root section can be selected as parent (maximum one nesting level)"
           child_cannot_have_children: "A child section cannot contain other sections, only units"
@@ -1586,10 +1613,20 @@ en:
           container_cannot_have_units: "A section with subsections cannot have units; assign units to child sections"
           section_cannot_accept_units: "Units can only be assigned to child sections or sections without subsections"
           position_min: "Position must be at least 1"
+          status_required: "Status is required"
+        statuses:
+          active: "Active"
+          inactive: "Inactive"
+          archived: "Archived"
         section_types:
+          building: "Building"
           block: "Block"
           tower: "Tower"
           floor: "Floor"
+          stage: "Stage"
+          sector: "Sector"
+          parking_area: "Parking area"
+          storage_area: "Storage area"
           parking: "Parking"
           storage: "Storage"
           commercial: "Commercial"
@@ -1635,6 +1672,8 @@ en:
             placeholder: "Internal code (optional)"
           section_type:
             label: "Section type"
+          status:
+            label: "Status"
           residential_property_id:
             label: "Residential property"
             placeholder: "Select a property"
@@ -1821,6 +1860,25 @@ en:
               invalid_timezone: "is not a valid time zone"
             organization_id:
               immutable: "cannot be changed"
+        property_section:
+          attributes:
+            name:
+              taken: "A section with this name already exists at the same level"
+            code:
+              taken: "A section with this code already exists in the same context"
+            status:
+              inclusion: "is not a valid status"
+              archive_requires_service: "archiving must use the archive action, not an ordinary edit"
+            section_type:
+              inclusion: "is not a valid section type"
+            organization_id:
+              mismatch_property: "must match the property's organization"
+            residential_property_id:
+              immutable: "cannot be changed"
+            parent_id:
+              move_requires_service: "parent changes must use the move action, not an ordinary edit"
+            base:
+              property_not_operative: "cannot modify sections while the property is not active"
         visit:
           attributes:
             host_person:

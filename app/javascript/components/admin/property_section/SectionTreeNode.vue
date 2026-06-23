@@ -1,20 +1,23 @@
 <template>
   <li class="relative list-none">
-    <Collapsible v-model:open="isOpen" class="w-full">
+    <Collapsible
+      :open="isOpen"
+      class="w-full"
+      @update:open="(value) => emit('toggle-expand', node.id, value)"
+    >
       <div
         class="group relative z-10 flex min-h-10 items-center gap-1 rounded-lg pr-1 transition-colors"
-        :class="isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'"
+        :class="[
+          isSelected ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50',
+          node.disabled ? 'opacity-70' : '',
+        ]"
       >
-        <CollapsibleTrigger
-          v-if="hasChildren"
-          as-child
-          @click.stop
-        >
+        <CollapsibleTrigger v-if="hasChildren" as-child @click.stop>
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            class="size-7 shrink-0 text-muted-foreground hover:text-foreground hover:bg-transparent"
+            class="size-7 shrink-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
             :aria-expanded="isOpen"
             :aria-label="
               isOpen
@@ -29,13 +32,7 @@
           </Button>
         </CollapsibleTrigger>
 
-        <span
-          v-else
-          class="flex size-7 shrink-0 items-center justify-center"
-          aria-hidden="true"
-        >
-         
-        </span>
+        <span v-else class="flex size-7 shrink-0 items-center justify-center" aria-hidden="true" />
 
         <button
           type="button"
@@ -53,15 +50,30 @@
             />
           </div>
 
-          <span
-            class="min-w-0 flex-1 truncate text-sm font-medium"
-            :class="isSelected ? 'text-primary' : ''"
-          >
-            {{ node.name }}
+          <span class="min-w-0 flex-1">
+            <span
+              class="block truncate text-sm font-medium"
+              :class="isSelected ? 'text-primary' : ''"
+            >
+              {{ node.name }}
+            </span>
+            <span class="mt-0.5 flex flex-wrap items-center gap-1.5">
+              <SectionStatusBadge :status="node.effective_status" />
+              <span
+                v-if="node.status !== node.effective_status"
+                class="text-muted-foreground text-xs"
+              >
+                ({{
+                  t('admin.residential_properties.structure.tree.persisted_status', {
+                    status: t(`admin.property_sections.statuses.${node.status}`),
+                  })
+                }})
+              </span>
+            </span>
           </span>
         </button>
 
-        <DropdownMenu>
+        <DropdownMenu v-if="showActionsMenu">
           <DropdownMenuTrigger as-child>
             <Button
               variant="ghost"
@@ -74,27 +86,33 @@
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            v-if="canAddSubsection"
-            @click="emit('add-subsection', node.id)"
-          >
-            <Plus class="size-4" />
-            {{ t('admin.residential_properties.structure.tree.add_subsection') }}
-          </DropdownMenuItem>
+            <DropdownMenuItem
+              v-if="node.permissions.add_child && !node.disabled"
+              @click="emit('add-subsection', node.id)"
+            >
+              <Plus class="size-4" />
+              {{ t('admin.residential_properties.structure.tree.add_subsection') }}
+            </DropdownMenuItem>
 
-            <DropdownMenuItem @click="emit('edit', node)">
+            <DropdownMenuItem v-if="node.permissions.edit && !node.disabled" @click="emit('edit', node)">
               <Pencil class="size-4" />
               {{ t('common.actions.edit') }}
             </DropdownMenuItem>
 
-            <DropdownMenuSeparator />
+            <DropdownMenuItem v-if="node.permissions.move && !node.disabled" @click="emit('move', node)">
+              <ArrowRightLeft class="size-4" />
+              {{ t('admin.residential_properties.structure.move.action') }}
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator v-if="node.permissions.archive" />
 
             <DropdownMenuItem
+              v-if="node.permissions.archive"
               class="text-destructive focus:text-destructive"
-              @click="emit('delete', node)"
+              @click="emit('archive', node)"
             >
-              <Trash2 class="size-4" />
-              {{ t('common.actions.delete') }}
+              <ArchiveIcon class="size-4" />
+              {{ t('admin.residential_properties.structure.archive.action') }}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -105,18 +123,21 @@
           class="relative m-0 ml-3.5 mt-0.5 list-none space-y-0.5 border-l border-border/80 py-0.5 pl-3"
         >
           <SectionTreeNode
-            v-for="(child, index) in node.children"
+            v-for="(child, index) in visibleChildren"
             :key="child.id"
             :node="child"
             :depth="depth + 1"
-            :is-last="index === node.children.length - 1 && (node.units?.length ?? 0) === 0"
+            :is-last="index === visibleChildren.length - 1 && (node.units?.length ?? 0) === 0"
             :selected-id="selectedId"
+            :is-expanded="isChildExpanded"
             :force-expanded="forceExpanded"
             :residential-property-id="residentialPropertyId"
             @select="emit('select', $event)"
             @add-subsection="emit('add-subsection', $event)"
             @edit="emit('edit', $event)"
-            @delete="emit('delete', $event)"
+            @move="emit('move', $event)"
+            @archive="emit('archive', $event)"
+            @toggle-expand="(nodeId, open) => emit('toggle-expand', nodeId, open)"
           />
           <SectionTreeUnit
             v-for="unit in node.units ?? []"
@@ -132,11 +153,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ChevronRight, MoreVertical, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import {
+  ArchiveIcon,
+  ArrowRightLeft,
+  ChevronRight,
+  MoreVertical,
+  Pencil,
+  Plus,
+} from 'lucide-vue-next'
+import SectionStatusBadge from '@/components/admin/property_section/SectionStatusBadge.vue'
 import SectionTreeUnit from '@/components/admin/property_section/SectionTreeUnit.vue'
-
 import { Button } from '@/components/ui/button'
 import {
   Collapsible,
@@ -150,7 +178,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
+import { PROPERTY_SECTION_MAX_DEPTH } from '@/lib/composables/property_section/usePropertySectionTree'
 import { useSectionTypeIcon } from '@/lib/composables/property_section/useSectionTypeIcon'
 import type { PropertySectionTreeNode } from '@/types/property_section'
 
@@ -162,12 +190,14 @@ const props = withDefaults(
     depth: number
     isLast?: boolean
     selectedId?: string | null
+    isExpanded?: (nodeId: string) => boolean
     forceExpanded?: boolean
     residentialPropertyId: string
   }>(),
   {
     isLast: false,
     selectedId: null,
+    isExpanded: () => true,
     forceExpanded: false,
     residentialPropertyId: '',
   },
@@ -177,43 +207,26 @@ const emit = defineEmits<{
   (e: 'select', node: PropertySectionTreeNode): void
   (e: 'add-subsection', parentId: string): void
   (e: 'edit', node: PropertySectionTreeNode): void
-  (e: 'delete', node: PropertySectionTreeNode): void
+  (e: 'move', node: PropertySectionTreeNode): void
+  (e: 'archive', node: PropertySectionTreeNode): void
+  (e: 'toggle-expand', nodeId: string, open: boolean): void
 }>()
 
 const { t } = useI18n()
 const { iconFor } = useSectionTypeIcon()
 
+const visibleChildren = computed(() =>
+  props.depth >= PROPERTY_SECTION_MAX_DEPTH - 1 ? [] : props.node.children,
+)
+
 const hasChildren = computed(
-  () => props.node.children.length > 0 || (props.node.units?.length ?? 0) > 0,
+  () => visibleChildren.value.length > 0 || (props.node.units?.length ?? 0) > 0,
 )
 const isSelected = computed(() => props.selectedId === props.node.id)
-const canAddSubsection = computed(() => !props.node.parent_id)
-const isOpen = ref(true)
-
-function nodeContainsId(nodes: PropertySectionTreeNode[], id: string): boolean {
-  for (const item of nodes) {
-    if (item.id === id) return true
-    if (nodeContainsId(item.children, id)) return true
-  }
-  return false
-}
-
-watch(
-  () => props.selectedId,
-  (id) => {
-    if (id && hasChildren.value && nodeContainsId(props.node.children, id)) {
-      isOpen.value = true
-    }
-  },
-  { immediate: true },
-)
-
-watch(
-  () => props.forceExpanded,
-  (expanded) => {
-    if (expanded && hasChildren.value) {
-      isOpen.value = true
-    }
-  },
-)
+const isOpen = computed(() => props.forceExpanded || props.isExpanded(props.node.id))
+const isChildExpanded = props.isExpanded
+const showActionsMenu = computed(() => {
+  const p = props.node.permissions
+  return p.add_child || p.edit || p.move || p.archive
+})
 </script>

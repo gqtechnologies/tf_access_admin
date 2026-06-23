@@ -1461,6 +1461,30 @@ pt:
             expand: "Expandir seção"
             collapse: "Recolher seção"
             manage_unit: "Gerenciar unidade"
+            persisted_status: "armazenado como {status}"
+          move:
+            action: "Mover seção"
+            title: "Mover seção"
+            description: "Escolha um novo local para {name} dentro desta propriedade."
+            parent_label: "Novo pai"
+            root_option: "Nível raiz (sem pai)"
+            nested_root_hint: "Seções com subseções não podem ser aninhadas sob outra seção."
+            submit: "Mover seção"
+            success: "Seção movida com sucesso"
+            error: "Não foi possível mover a seção"
+          archive:
+            action: "Arquivar seção"
+            title: "Arquivar seção"
+            description: "Arquivar a seção {name}? Subseções, unidades e histórico serão preservados."
+            success: "Seção arquivada com sucesso"
+            error: "Não foi possível arquivar a seção"
+          states:
+            forbidden: "Você não tem permissão para gerenciar seções nesta propriedade."
+            read_only: "A estrutura desta propriedade é somente leitura."
+            property_archived: "Esta propriedade está arquivada. As seções não podem ser modificadas."
+            section_archived: "Esta seção está arquivada e é somente leitura."
+            section_not_operative: "Esta seção não está operacional devido ao seu status ou a um ancestral."
+            empty_read_only: "Nenhuma seção foi criada para esta propriedade ainda."
           form:
             new_title: "Nova seção"
             new_description: "Crie uma nova seção dentro da estrutura atual"
@@ -1478,6 +1502,7 @@ pt:
             preview_title: "Pré-visualização"
             submit_create: "Criar seção"
             submit_edit: "Salvar alterações"
+            saving: "Salvando…"
       bulk_imports:
         property_section_required: "A seção é obrigatória para iniciar a importação"
         not_found: "Importação não encontrada"
@@ -1526,6 +1551,8 @@ pt:
           parent_required: "A seção pai é obrigatória"
           parent_invalid: "A seção pai é inválida"
           parent_same_property: "A seção pai deve pertencer à mesma propriedade"
+          parent_same_organization: "A seção pai deve pertencer à mesma organização"
+          parent_not_operative: "Não é possível adicionar ou mover seções sob uma seção ou propriedade não operacional"
           parent_circular: "A seção pai não pode ser descendente desta seção"
           parent_must_be_root: "Apenas uma seção raiz pode ser pai (máximo um nível de aninhamento)"
           child_cannot_have_children: "Uma seção filha não pode conter outras seções, apenas unidades"
@@ -1534,10 +1561,20 @@ pt:
           container_cannot_have_units: "Uma seção com subseções não pode ter unidades; atribua unidades às seções filhas"
           section_cannot_accept_units: "Unidades só podem ser atribuídas a seções filhas ou a seções sem subseções"
           position_min: "A posição deve ser pelo menos 1"
+          status_required: "O status é obrigatório"
+        statuses:
+          active: "Ativa"
+          inactive: "Inativa"
+          archived: "Arquivada"
         section_types:
+          building: "Edifício"
           block: "Bloco"
           tower: "Torre"
           floor: "Andar"
+          stage: "Etapa"
+          sector: "Setor"
+          parking_area: "Área de estacionamento"
+          storage_area: "Área de depósitos"
           parking: "Estacionamento"
           storage: "Depósito"
           commercial: "Comercial"
@@ -1583,6 +1620,8 @@ pt:
             placeholder: "Código interno (opcional)"
           section_type:
             label: "Tipo de seção"
+          status:
+            label: "Status"
           residential_property_id:
             label: "Propriedade residencial"
             placeholder: "Selecione uma propriedade"
@@ -1765,6 +1804,25 @@ pt:
               invalid_timezone: "não é um fuso horário válido"
             organization_id:
               immutable: "não pode ser alterado"
+        property_section:
+          attributes:
+            name:
+              taken: "Já existe uma seção com este nome no mesmo nível"
+            code:
+              taken: "Já existe uma seção com este código no mesmo contexto"
+            status:
+              inclusion: "não é um estado válido"
+              archive_requires_service: "o arquivamento deve ser feito pela ação de arquivar, não em uma edição comum"
+            section_type:
+              inclusion: "não é um tipo de seção válido"
+            organization_id:
+              mismatch_property: "deve coincidir com a organização da propriedade"
+            residential_property_id:
+              immutable: "não pode ser alterado"
+            parent_id:
+              move_requires_service: "alterações de pai devem ser feitas pela ação de mover, não em uma edição comum"
+            base:
+              property_not_operative: "não é possível modificar seções enquanto a propriedade não estiver ativa"
         visit:
           attributes:
             host_person:
