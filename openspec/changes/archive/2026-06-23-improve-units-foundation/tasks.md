@@ -1,6 +1,21 @@
 # Improve Units Foundation Tasks
 
-> Estas tareas definen la implementación incremental del change. Ninguna está completada.
+## Status: ARCHIVED ✅
+
+**Completed:** 2026-06-23
+
+All implementation tasks completed and tested. Key deliverables:
+- Unit domain model with organization/property/section validation
+- Canonical service layer (Create, Update, MoveToSection, Archive, Restore, SoftDelete)
+- Migration with normalized-identifier backfill, partial unique indexes, and FK constraints
+- Policy-based authorization with property-scoped create requirement
+- Bulk import integration with canonical service boundary
+- 72+ integration tests + 19 migration constraint tests
+- OpenSpec alignment verified
+
+### Note on Deferred Items
+
+- **Task 4.8 (type/status checks)**: Deferred pending legacy type audit and catalog mapping. Constraint infrastructure in place; validation enforcement blocked until legacy data reconciliation completes.
 
 ## 1. Modelo y catálogos
 
