@@ -4,9 +4,7 @@
 
 Define the tenant-safe identity, placement, uniqueness, lifecycle, service and
 authorization contract for units within a residential property.
-
 ## Requirements
-
 ### Requirement: Unit belongs to organization and residential property
 
 The system SHALL require every `Unit` to belong to exactly one organization and
@@ -94,12 +92,17 @@ eligible to contain units according to the `property-section` contract.
 - **WHEN** section S is not eligible to contain units according to the `property-section` contract
 - **THEN** unit assignment is rejected with a `property_section_id` error
 
-#### Scenario: Current eligible section types are delegated to property-section
+#### Scenario: Unit delegates section eligibility to property-section
 
-- **GIVEN** the current `property-section` contract marks `block`, `tower`, and `floor` as eligible for units
+- **GIVEN** the `property-section` contract marks section S as eligible for units
 - **WHEN** Unit validates section eligibility
-- **THEN** Unit relies on the `property-section` eligibility contract
-- **AND** Unit does not hardcode an independent section-type list
+- **THEN** S may be assigned to the unit
+
+#### Scenario: Unit rejects section not eligible by property-section
+
+- **GIVEN** the `property-section` contract marks section S as not eligible for units
+- **WHEN** Unit validates section eligibility
+- **THEN** unit assignment is rejected with a `property_section_id` error
 
 #### Scenario: Inactive or archived section rejects incoming unit
 
@@ -277,29 +280,29 @@ services.
 
 #### Scenario: Update cannot change property or organization
 
-* **GIVEN** unit U belongs to property P and organization O
-* **WHEN** descriptive update submits another property or organization
-* **THEN** the mutation is rejected or the untrusted values are ignored
-* **AND** U remains in P and O
+- **GIVEN** unit U belongs to property P and organization O
+- **WHEN** descriptive update submits another property or organization
+- **THEN** the mutation is rejected or the untrusted values are ignored
+- **AND** U remains in P and O
 
 #### Scenario: Update cannot change section placement
 
-* **GIVEN** unit U belongs to section A
-* **WHEN** descriptive update submits section B
-* **THEN** the update does not move U
-* **AND** placement changes require `Units::MoveToSection`
+- **GIVEN** unit U belongs to section A
+- **WHEN** descriptive update submits section B
+- **THEN** the update does not move U
+- **AND** placement changes require `Units::MoveToSection`
 
 #### Scenario: Update cannot archive unit
 
-* **GIVEN** unit U is not archived
-* **WHEN** descriptive update submits `status = archived`
-* **THEN** the update is rejected
-* **AND** archive requires `Units::Archive`
+- **GIVEN** unit U is not archived
+- **WHEN** descriptive update submits `status = archived`
+- **THEN** the update is rejected
+- **AND** archive requires `Units::Archive`
 
 #### Scenario: Update can change operational status
 
-* **WHEN** an authorized actor updates U from `available` to `inactive` or `maintenance`
-* **THEN** the status change may be persisted according to the allowed status contract
+- **WHEN** an authorized actor updates U from `available` to `occupied`, `inactive` or `maintenance`
+- **THEN** the status change may be persisted according to the allowed status contract
 
 ### Requirement: Unit area must be positive when present
 
@@ -466,6 +469,18 @@ services.
 - **THEN** the unit is not moved
 - **AND** the row is rejected, skipped or warned according to the configured import mode
 
+#### Scenario: Bulk import updates when mode allows it
+
+- **WHEN** a spreadsheet row matches an existing unit
+- **AND** the import mode allows updates
+- **THEN** bulk import delegates descriptive changes to `Units::Update`
+
+#### Scenario: Bulk import moves placement when mode allows it
+
+- **WHEN** a spreadsheet row changes a unit's section placement
+- **AND** the import mode allows placement changes
+- **THEN** bulk import delegates placement changes to `Units::MoveToSection`
+
 ### Requirement: Unit authorization is property-scoped
 
 The system SHALL evaluate `view_units` and `manage_units` against the concrete
@@ -473,19 +488,19 @@ residential property and SHALL deny cross-property or cross-organization access.
 
 #### Scenario: Actor with view units can read unit catalog
 
-* **GIVEN** actor A has `view_units` for property P
-* **WHEN** A opens the unit catalog for P
-* **THEN** units from P are visible according to the authorized scope
+- **GIVEN** actor A has `view_units` for property P
+- **WHEN** A opens the unit catalog for P
+- **THEN** units from P are visible according to the authorized scope
 
 #### Scenario: Actor with view units but without manage units cannot mutate
 
-* **GIVEN** actor A has `view_units` for property P
-* **AND** A lacks `manage_units` for P
-* **WHEN** A attempts to create, update, move, archive or restore a unit in P
-* **THEN** authorization is denied
-* **AND** no mutation occurs
+- **GIVEN** actor A has `view_units` for property P
+- **AND** A lacks `manage_units` for P
+- **WHEN** A attempts to create, update, move, archive or restore a unit in P
+- **THEN** authorization is denied
+- **AND** no mutation occurs
 
-#### Scenario: Tenant admin manages unit in own organization
+#### Scenario: Tenant admin accesses unit in own organization
 
 - **GIVEN** A is tenant admin of O
 - **AND** property P belongs to O
@@ -498,6 +513,13 @@ residential property and SHALL deny cross-property or cross-organization access.
 - **AND** the assignment grants `manage_units`
 - **WHEN** A creates, updates, moves, archives or restores a unit in P
 - **THEN** authorization succeeds
+
+#### Scenario: Assigned property admin reads unit catalog
+
+- **GIVEN** A has an active and valid StaffAssignment to P
+- **AND** the assignment grants `view_units`
+- **WHEN** A opens the unit catalog for P
+- **THEN** authorization succeeds for read scope
 
 #### Scenario: Inactive assignment grants no access
 
@@ -518,12 +540,12 @@ residential property and SHALL deny cross-property or cross-organization access.
 - **AND** the assignment grants `view_units`
 - **WHEN** A opens the unit catalog for P
 - **THEN** authorization succeeds for read scope
-- **AND** mutation actions remain denied unless a future explicit capability grants them
+- **AND** mutation actions remain denied without `manage_units`
 
-#### Scenario: User without manage units cannot mutate
+#### Scenario: User without unit mutation capability cannot mutate
 
 - **GIVEN** A lacks `manage_units` for P
-- **WHEN** A attempts create, update, move, archive or restore
+- **WHEN** A attempts to create, update, move, archive or restore a unit in P
 - **THEN** authorization is denied
 - **AND** no mutation occurs
 
@@ -546,6 +568,12 @@ The system SHALL support tenant- and property-scoped lookup by identifier,
 canonical normalized identifier, display name, section, type and status. Search
 input is normalized by the system before matching against
 `normalized_identifier`.
+
+#### Scenario: Search input is normalized before lookup
+
+- **WHEN** actor A searches for an identifier using different case, whitespace or Unicode representation
+- **THEN** the system normalizes the input before matching `normalized_identifier`
+- **AND** matching units are returned only within A's authorized scope
 
 #### Scenario: Search returns only accessible property units
 
@@ -573,14 +601,14 @@ identifier, uniqueness, lifecycle or authorization.
 
 #### Scenario: Metadata cannot override structural fields
 
-* **WHEN** metadata contains property, section, identifier, type or status values
-* **THEN** those values do not override the dedicated Unit columns
+- **WHEN** metadata contains property, section, identifier, type, status or lifecycle values
+- **THEN** those values do not override the dedicated Unit columns
 
 #### Scenario: Metadata cannot grant authorization
 
-* **WHEN** metadata contains role, capability or access information
-* **THEN** authorization ignores metadata
-* **AND** access is resolved through the authorization contract
+- **WHEN** metadata contains role, capability or access information
+- **THEN** authorization ignores metadata
+- **AND** access is resolved through the authorization contract
 
 ### Requirement: Unit mutations respect property lifecycle
 
@@ -590,5 +618,6 @@ lifecycle does not allow catalog changes.
 #### Scenario: Archived property rejects ordinary unit mutation
 
 - **GIVEN** property P is archived
-- **WHEN** create, update, move or archive is attempted for a unit in P
+- **WHEN** create, update, move, archive or restore is attempted for a unit in P
 - **THEN** the mutation is denied according to property lifecycle rules
+

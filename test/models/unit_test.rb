@@ -247,4 +247,36 @@ class UnitTest < ActiveSupport::TestCase
     assert_equal @organization.id, unit.organization_id
     assert_equal UnitStatuses::AVAILABLE, unit.status
   end
+
+  # 3.2 — the same identifier may coexist in another organization
+  test "allows the same identifier in another organization" do
+    build_unit(identifier: "101", property_section: @tower).save!
+
+    ActsAsTenant.with_tenant(@other_organization) do
+      other_property = create_property(@other_organization, "Other Org Property")
+      other_unit = Unit.new(
+        residential_property: other_property,
+        identifier: "101",
+        unit_type: UnitTypes::APARTMENT
+      )
+
+      assert other_unit.valid?, other_unit.errors.full_messages.to_sentence
+    end
+  end
+
+  # 8.2 — metadata cannot grant authorization
+  test "strips authorization keys from metadata so it cannot grant access" do
+    unit = build_unit(metadata: {
+      "role" => "tenant_admin",
+      "roles" => [ "property_admin" ],
+      "capabilities" => [ "manage_units" ],
+      "permission" => "all",
+      "authorization" => "granted",
+      "access" => "granted",
+      "note" => "ok"
+    })
+    unit.save!
+
+    assert_equal({ "note" => "ok" }, unit.metadata)
+  end
 end
