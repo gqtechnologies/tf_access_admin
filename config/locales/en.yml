@@ -598,6 +598,14 @@ en:
             label: "Role"
       units:
         not_found: "Unit not found"
+        validations:
+          identifier_taken: "A unit with this identifier already exists in this context"
+          section_invalid: "The selected section is not valid"
+          section_same_property: "The section must belong to the same property"
+          section_not_operative: "Units cannot be assigned to a non-operative section or property"
+          section_not_eligible: "The section is not eligible to contain units"
+          unit_type_invalid: "The unit type is not valid"
+          residential_property_immutable: "The unit's property cannot be changed"
         show:
           unit_title: "Unit %{identifier}"
           actions:
@@ -1581,12 +1589,14 @@ en:
           duplicate_in_file: "Duplicate row in file"
           duplicate_in_database: "Unit already exists and will be skipped"
           unit_not_found_for_update: "Unit does not exist in this section and cannot be updated"
+          unit_ambiguous_for_update: "Multiple units match this identifier and cannot be updated"
           owner_document_email_conflict: "The same owner document appears with different emails in the file"
           owner_email_document_conflict: "The same owner email appears with different documents in the file"
         import:
           logs:
             unit_created: "Unit %{identifier} created"
             duplicate_skipped: "Skipped as duplicate"
+            not_authorized: "Import not authorized"
             skipped: "Row skipped"
             failed: "Import failed"
       property_sections:
@@ -1879,6 +1889,17 @@ en:
               move_requires_service: "parent changes must use the move action, not an ordinary edit"
             base:
               property_not_operative: "cannot modify sections while the property is not active"
+        unit:
+          attributes:
+            status:
+              archive_requires_service: "archiving must use the archive action, not an ordinary edit"
+              transition_not_allowed: "is not an allowed operational status transition"
+              reactivate_requires_archived: "reactivation requires an archived unit"
+            base:
+              property_not_operative: "cannot modify units while the property is not active"
+              not_deleted: "the unit is not soft-deleted"
+              already_deleted: "the unit is already soft-deleted"
+              destroy_requires_service: "soft delete must use the soft-delete action, not destroy directly"
         visit:
           attributes:
             host_person:

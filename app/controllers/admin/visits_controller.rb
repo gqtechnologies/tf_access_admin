@@ -68,9 +68,11 @@ class Admin::VisitsController < AdminController
 
   # GET /admin/visits/form_units
   def form_units
-    units = policy_scope(Unit).order(:identifier)
-    property_id = params[:residential_property_id].presence
-    units = units.where(residential_property_id: property_id) if property_id.present?
+    units = Units::Search.apply(
+      policy_scope(Unit).includes(:residential_property),
+      term: params[:search],
+      residential_property_id: params[:residential_property_id].presence
+    ).order(:identifier)
 
     render json: {
       units: units.limit(500).map { |unit| unit_option_json(unit) }

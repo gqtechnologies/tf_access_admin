@@ -534,7 +534,7 @@ module UnitOccupancies
 
       @property = ResidentialProperty.create!(
         organization: @organization,
-        name: "Occupancy Concurrency Property",
+        name: "Occupancy Concurrency Property #{SecureRandom.hex(4)}",
         property_type: PropertyTypes::BUILDING,
         status: "active",
         country: "Chile",
@@ -557,9 +557,10 @@ module UnitOccupancies
 
     teardown do
       ActsAsTenant.current_tenant = @organization
+      # Clean up relationships to avoid FK violations
+      # Tests run in transactions, so units will be cleaned up automatically
       UnitOccupancy.unscoped.where(unit_id: @unit.id).delete_all if @unit
-      @unit&.destroy
-      @property&.destroy
+      UnitOwnership.unscoped.where(unit_id: @unit.id).delete_all if @unit
       @person&.destroy
       ActsAsTenant.current_tenant = nil
     end

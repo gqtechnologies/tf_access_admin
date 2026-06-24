@@ -1,9 +1,30 @@
 # frozen_string_literal: true
 
+# Canonical channel for unit mutations (improve-units-foundation §6.1).
+# Every action loads tenant-safe records through policy scopes (§6.3), authorizes
+# with property context, and delegates to a domain service (§6.2). Organization
+# and property come from the nested route, never from client params (§6.4).
 class Admin::ResidentialProperties::UnitsController < AdminController
+  include RespondsToUnitResult
+
   before_action :set_residential_property
-  before_action :set_unit
-  before_action :set_filters, only: [ :show ]
+  before_action :set_unit, only: %i[show update move archive]
+  before_action :set_restorable_unit, only: [ :restore ]
+  before_action :set_filters, only: %i[index show]
+
+  def index
+    authorize Unit
+
+    units = searchable_units
+      .order(:identifier)
+      .page(@filters[:page])
+      .per(@filters[:per_page])
+
+    render json: {
+      units: units.map { |unit| serialize_unit_summary(unit) },
+      pagination: pagination_info(units)
+    }
+  end
 
   def show
     authorize @unit
@@ -51,7 +72,8 @@ class Admin::ResidentialProperties::UnitsController < AdminController
         residential_property_name: @residential_property.name,
         location_path: location_path,
         ownership_stats: ownership_stats,
-        occupancy_stats: occupancy_stats
+        occupancy_stats: occupancy_stats,
+        current_user: current_user
       ).as_json,
       ownerships: ownerships.map { |ownership| Admin::UnitOwnershipSerializer.new(ownership).as_json },
       ownerships_pagination: pagination_info(ownerships),
@@ -67,7 +89,98 @@ class Admin::ResidentialProperties::UnitsController < AdminController
     }, status: :ok
   end
 
+  def create
+    draft = @residential_property.units.new
+    authorize draft, :create?
+
+    result = Units::Create.call(
+      actor: current_user,
+      property: @residential_property,
+      section_id: unit_params[:property_section_id],
+      attributes: unit_params
+    )
+    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
+  end
+
+  def update
+    authorize @unit, :update?
+
+    result = Units::Update.call(
+      actor: current_user,
+      unit: @unit,
+      attributes: unit_params
+    )
+    respond_to_unit_result(
+      result,
+      success_path: admin_residential_property_unit_path(@residential_property, @unit),
+      error_path: admin_residential_property_unit_path(@residential_property, @unit)
+    )
+  end
+
+  def move
+    authorize @unit, :move?
+
+    result = Units::MoveToSection.call(
+      actor: current_user,
+      unit: @unit,
+      section_id: move_section_id
+    )
+    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
+  end
+
+  def archive
+    authorize @unit, :archive?
+
+    result = Units::Archive.call(actor: current_user, unit: @unit)
+    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
+  end
+
+  def restore
+    authorize @unit, :restore?
+
+    result = Units::Restore.call(actor: current_user, unit: @unit)
+    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
+  end
+
   private
+
+  def searchable_units
+    Units::Search.apply(
+      policy_scope(Unit).where(residential_property: @residential_property).includes(:property_section),
+      term: search_term,
+      property_section_id: params.dig(:q, :property_section_id),
+      status: params.dig(:q, :status)
+    )
+  end
+
+  def search_term
+    params.dig(:q, :search).presence || params[:search].presence
+  end
+
+  def unit_params
+    params.require(:unit).permit(
+      :identifier, :display_name, :unit_type, :status, :area_m2, :property_section_id,
+      metadata: {}
+    )
+  end
+
+  def move_section_id
+    return Units::MoveToSection::SECTION_UNCHANGED unless params[:unit].is_a?(ActionController::Parameters)
+
+    if params[:unit].key?(:property_section_id)
+      params.require(:unit).permit(:property_section_id)[:property_section_id]
+    else
+      Units::MoveToSection::SECTION_UNCHANGED
+    end
+  end
+
+  def serialize_unit_summary(unit)
+    Admin::UnitSummarySerializer.new(unit, current_user: current_user).as_json
+  end
+
+  def structure_path
+    admin_residential_property_structure_path(@residential_property)
+  end
 
   def occupancies_filters
     @occupancies_filters ||= {
@@ -91,6 +204,8 @@ class Admin::ResidentialProperties::UnitsController < AdminController
   end
 
   def can_create_visit_for_unit?
+    return false unless @unit
+
     draft = Visit.new(unit: @unit, organization: @unit.organization)
     VisitPolicy.new(current_user, draft).create?
   end
@@ -116,7 +231,7 @@ class Admin::ResidentialProperties::UnitsController < AdminController
     @residential_property = policy_scope(ResidentialProperty).find(params[:residential_property_id])
   rescue ActiveRecord::RecordNotFound
     redirect_to admin_residential_properties_path,
-                inertia: { errors: [ I18n.t("frontend.admin.residential_properties.not_found") ] }
+                inertia: { errors: { base: [ I18n.t("frontend.admin.residential_properties.not_found") ] } }
   end
 
   def set_unit
@@ -124,7 +239,17 @@ class Admin::ResidentialProperties::UnitsController < AdminController
       .where(residential_property: @residential_property)
       .find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to admin_residential_property_structure_path(@residential_property),
-                inertia: { errors: [ I18n.t("frontend.admin.units.not_found") ] }
+    redirect_to structure_path,
+                inertia: { errors: { base: [ I18n.t("frontend.admin.units.not_found") ] } }
+  end
+
+  def set_restorable_unit
+    @unit = policy_scope(Unit)
+      .with_deleted
+      .where(residential_property: @residential_property)
+      .find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to structure_path,
+                inertia: { errors: { base: [ I18n.t("frontend.admin.units.not_found") ] } }
   end
 end

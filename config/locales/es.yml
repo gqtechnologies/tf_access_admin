@@ -526,6 +526,14 @@ es:
             label: "Rol"
       units:
         not_found: "Unidad no encontrada"
+        validations:
+          identifier_taken: "Ya existe una unidad con este identificador en este contexto"
+          section_invalid: "La sección indicada no es válida"
+          section_same_property: "La sección debe pertenecer a la misma propiedad"
+          section_not_operative: "No se pueden asignar unidades a una sección o propiedad no operativa"
+          section_not_eligible: "La sección no es elegible para contener unidades"
+          unit_type_invalid: "El tipo de unidad no es válido"
+          residential_property_immutable: "La propiedad de la unidad no puede cambiarse"
         show:
           unit_title: "Unidad %{identifier}"
           actions:
@@ -1508,12 +1516,14 @@ es:
           duplicate_in_file: "Fila duplicada en el archivo"
           duplicate_in_database: "La unidad ya existe y será omitida"
           unit_not_found_for_update: "La unidad no existe en esta sección y no puede actualizarse"
+          unit_ambiguous_for_update: "Varias unidades coinciden con este identificador y no pueden actualizarse"
           owner_document_email_conflict: "El mismo documento de propietario aparece con correos distintos en el archivo"
           owner_email_document_conflict: "El mismo correo de propietario aparece con documentos distintos en el archivo"
         import:
           logs:
             unit_created: "Unidad %{identifier} creada"
             duplicate_skipped: "Omitida por duplicado"
+            not_authorized: "Importación no autorizada"
             skipped: "Fila omitida"
             failed: "Error al importar"
       property_sections:
@@ -1870,6 +1880,17 @@ es:
               move_requires_service: "los cambios de padre deben realizarse mediante la acción de mover, no en una edición ordinaria"
             base:
               property_not_operative: "no se pueden modificar secciones mientras la propiedad no esté activa"
+        unit:
+          attributes:
+            status:
+              archive_requires_service: "el archivado debe realizarse mediante la acción de archivar, no en una edición ordinaria"
+              transition_not_allowed: "no es una transición de estado operativa permitida"
+              reactivate_requires_archived: "la reactivación requiere una unidad archivada"
+            base:
+              property_not_operative: "no se pueden modificar unidades mientras la propiedad no esté activa"
+              not_deleted: "la unidad no está eliminada de forma reversible"
+              already_deleted: "la unidad ya está eliminada de forma reversible"
+              destroy_requires_service: "la eliminación reversible debe realizarse mediante la acción de soft delete, no con destroy directo"
         visit:
           attributes:
             host_person:

@@ -587,6 +587,14 @@ pt:
             label: "Cargo"
       units:
         not_found: "Unidade não encontrada"
+        validations:
+          identifier_taken: "Já existe uma unidade com este identificador neste contexto"
+          section_invalid: "A seção indicada não é válida"
+          section_same_property: "A seção deve pertencer à mesma propriedade"
+          section_not_operative: "Não é possível atribuir unidades a uma seção ou propriedade não operativa"
+          section_not_eligible: "A seção não é elegível para conter unidades"
+          unit_type_invalid: "O tipo de unidade não é válido"
+          residential_property_immutable: "A propriedade da unidade não pode ser alterada"
         show:
           unit_title: "Unidade %{identifier}"
           actions:
@@ -1529,12 +1537,14 @@ pt:
           duplicate_in_file: "Linha duplicada no arquivo"
           duplicate_in_database: "A unidade já existe e será omitida"
           unit_not_found_for_update: "A unidade não existe nesta seção e não pode ser atualizada"
+          unit_ambiguous_for_update: "Várias unidades correspondem a este identificador e não podem ser atualizadas"
           owner_document_email_conflict: "O mesmo documento do proprietário aparece com e-mails diferentes no arquivo"
           owner_email_document_conflict: "O mesmo e-mail do proprietário aparece com documentos diferentes no arquivo"
         import:
           logs:
             unit_created: "Unidade %{identifier} criada"
             duplicate_skipped: "Omitida por duplicado"
+            not_authorized: "Importação não autorizada"
             skipped: "Linha omitida"
             failed: "Falha na importação"
       property_sections:
@@ -1823,6 +1833,17 @@ pt:
               move_requires_service: "alterações de pai devem ser feitas pela ação de mover, não em uma edição comum"
             base:
               property_not_operative: "não é possível modificar seções enquanto a propriedade não estiver ativa"
+        unit:
+          attributes:
+            status:
+              archive_requires_service: "o arquivamento deve ser feito pela ação de arquivar, não em uma edição comum"
+              transition_not_allowed: "não é uma transição de status operacional permitida"
+              reactivate_requires_archived: "a reativação requer uma unidade arquivada"
+            base:
+              property_not_operative: "não é possível modificar unidades enquanto a propriedade não estiver ativa"
+              not_deleted: "a unidade não está excluída de forma reversível"
+              already_deleted: "a unidade já está excluída de forma reversível"
+              destroy_requires_service: "a exclusão reversível deve ser feita pela ação de soft delete, não por destroy direto"
         visit:
           attributes:
             host_person:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_23_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -735,8 +735,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
     t.index ["parent_id"], name: "index_property_sections_on_parent_id"
     t.index ["residential_property_id", "parent_id", "position"], name: "idx_property_sections_property_parent_position"
     t.index ["residential_property_id"], name: "index_property_sections_on_residential_property_id"
-    t.check_constraint "section_type::text = ANY (ARRAY['building'::character varying, 'tower'::character varying, 'floor'::character varying, 'block'::character varying, 'stage'::character varying, 'sector'::character varying, 'parking_area'::character varying, 'storage_area'::character varying, 'other'::character varying, 'parking'::character varying, 'storage'::character varying, 'commercial'::character varying, 'amenities'::character varying, 'entrance'::character varying, 'garden'::character varying]::text[])", name: "property_sections_section_type_allowed"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "property_sections_status_allowed"
+    t.check_constraint "section_type::text = ANY (ARRAY['building'::character varying::text, 'tower'::character varying::text, 'floor'::character varying::text, 'block'::character varying::text, 'stage'::character varying::text, 'sector'::character varying::text, 'parking_area'::character varying::text, 'storage_area'::character varying::text, 'other'::character varying::text, 'parking'::character varying::text, 'storage'::character varying::text, 'commercial'::character varying::text, 'amenities'::character varying::text, 'entrance'::character varying::text, 'garden'::character varying::text])", name: "property_sections_section_type_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "property_sections_status_allowed"
   end
 
   create_table "property_setting_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -804,11 +804,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
     t.index ["deleted_at"], name: "index_residential_properties_on_deleted_at"
     t.index ["metadata"], name: "index_residential_properties_on_metadata", using: :gin
     t.index ["organization_id", "code"], name: "idx_residential_properties_unique_code_per_org", unique: true, where: "((code IS NOT NULL) AND (deleted_at IS NULL))"
+    t.index ["organization_id", "id"], name: "idx_residential_properties_organization_id_id", unique: true
     t.index ["organization_id", "normalized_name"], name: "idx_residential_properties_unique_normalized_name_per_org", unique: true, where: "(deleted_at IS NULL)"
     t.index ["organization_id", "property_type"], name: "idx_on_organization_id_property_type_d2e2ee8ca6"
     t.index ["organization_id", "status"], name: "index_residential_properties_on_organization_id_and_status"
     t.index ["organization_id"], name: "index_residential_properties_on_organization_id"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "residential_properties_status_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "residential_properties_status_allowed"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -948,11 +949,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
     t.index ["deleted_at"], name: "index_units_on_deleted_at"
     t.index ["metadata"], name: "index_units_on_metadata", using: :gin
     t.index ["organization_id", "property_section_id"], name: "index_units_on_organization_id_and_property_section_id"
-    t.index ["organization_id", "residential_property_id", "property_section_id", "normalized_identifier"], name: "idx_units_unique_normalized_id_per_context", unique: true, where: "(deleted_at IS NULL)"
+    t.index ["organization_id", "residential_property_id", "normalized_identifier"], name: "idx_units_on_org_property_normalized_identifier_lookup", where: "(deleted_at IS NULL)"
+    t.index ["organization_id", "residential_property_id", "normalized_identifier"], name: "index_units_on_org_property_normalized_when_no_section", unique: true, where: "((property_section_id IS NULL) AND (deleted_at IS NULL))"
+    t.index ["organization_id", "residential_property_id", "property_section_id", "normalized_identifier"], name: "index_units_on_org_property_section_normalized_when_section", unique: true, where: "((property_section_id IS NOT NULL) AND (deleted_at IS NULL))"
     t.index ["organization_id", "residential_property_id", "status"], name: "idx_on_organization_id_residential_property_id_stat_47cefd6e3a"
     t.index ["organization_id"], name: "index_units_on_organization_id"
     t.index ["property_section_id"], name: "index_units_on_property_section_id"
     t.index ["residential_property_id"], name: "index_units_on_residential_property_id"
+    t.check_constraint "area_m2 IS NULL OR area_m2 > 0::numeric", name: "units_area_m2_positive"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1282,6 +1286,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
   add_foreign_key "units", "organizations"
   add_foreign_key "units", "property_sections"
   add_foreign_key "units", "residential_properties"
+  add_foreign_key "units", "residential_properties", column: ["organization_id", "residential_property_id"], primary_key: ["organization_id", "id"], name: "fk_units_organization_residential_property_coherent"
   add_foreign_key "vehicles", "organizations"
   add_foreign_key "vehicles", "people"
   add_foreign_key "vehicles", "units"

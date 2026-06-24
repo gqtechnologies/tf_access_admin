@@ -22,6 +22,11 @@ module OperationalPolicyTestHelper
     )
   end
 
+  def soft_delete_unit(unit)
+    unit.authorize_soft_delete!
+    unit.destroy
+  end
+
   def create_staff_user(organization:, email:, staff_type:, property:, role: AvailableRoles::CLIENT)
     user = create_user_for_organization(
       organization: organization,

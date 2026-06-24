@@ -106,6 +106,16 @@ class PropertySection < ApplicationRecord
     SectionTypes.eligible_for_units?(section_type)
   end
 
+  # Canonical structural eligibility contract consumed by the Unit domain
+  # (improve-units-foundation §1.6): a section can directly hold units only when
+  # its type is unit-eligible and it currently has no subsections. Effective
+  # activity is evaluated separately by callers (via +effectively_active?+), so
+  # this method stays a pure structural predicate. Unit code must rely on this
+  # method instead of duplicating the section-type list.
+  def can_contain_units?
+    eligible_for_units? && accepts_units?
+  end
+
   # Translates a concurrent unique-violation into a field-level domain error
   # instead of letting +ActiveRecord::RecordNotUnique+ surface as a 500. The
   # lifecycle services (§4) rescue the exception and delegate here so the

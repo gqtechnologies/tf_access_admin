@@ -56,7 +56,12 @@ Rails.application.routes.draw do
         post :archive
       end
       resource :structure, only: [:show], module: :residential_properties
-      resources :units, only: [:show], module: :residential_properties do
+    resources :units, only: [:index, :show, :create, :update], module: :residential_properties do
+        member do
+          post :move
+          post :archive
+          post :restore
+        end
         resources :ownerships, only: [:create, :update, :destroy], controller: "unit_ownerships"
         resources :occupancies, only: [:create, :update, :destroy], controller: "unit_occupancies" do
           collection do
@@ -81,6 +86,7 @@ Rails.application.routes.draw do
       end
     end
     resources :property_sections, only: [:index, :edit]
+    resources :units, only: [:index]
     namespace :operational_roles do
       resources :assignments, only: [:index, :create, :destroy]
     end

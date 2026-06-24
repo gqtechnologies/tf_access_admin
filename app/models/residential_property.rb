@@ -24,6 +24,7 @@
 # Indexes
 #
 #  idx_on_organization_id_property_type_d2e2ee8ca6             (organization_id,property_type)
+#  idx_residential_properties_organization_id_id               (organization_id,id) UNIQUE
 #  idx_residential_properties_unique_code_per_org              (organization_id,code) UNIQUE WHERE ((code IS NOT NULL) AND (deleted_at IS NULL))
 #  idx_residential_properties_unique_normalized_name_per_org   (organization_id,normalized_name) UNIQUE WHERE (deleted_at IS NULL)
 #  index_residential_properties_on_deleted_at                  (deleted_at)

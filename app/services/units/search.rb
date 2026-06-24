@@ -1,0 +1,66 @@
+# frozen_string_literal: true
+
+module Units
+  # Tenant-safe unit lookup (improve-units-foundation §6.7–§6.9).
+  #
+  # Applies to an already policy-scoped relation. Normalizes search input through
+  # +Units::NormalizeIdentifier+ before matching +normalized_identifier+.
+  class Search
+    def self.apply(scope, term: nil, residential_property_id: nil, property_section_id: nil, status: nil)
+      new(
+        scope,
+        term: term,
+        residential_property_id: residential_property_id,
+        property_section_id: property_section_id,
+        status: status
+      ).apply
+    end
+
+    def initialize(scope, term: nil, residential_property_id: nil, property_section_id: nil, status: nil)
+      @scope = scope
+      @term = term.to_s.strip.presence
+      @residential_property_id = residential_property_id.presence
+      @property_section_id = property_section_id
+      @status = status.to_s.strip.presence
+    end
+
+    def apply
+      relation = @scope
+      relation = relation.where(residential_property_id: @residential_property_id) if @residential_property_id
+      relation = apply_section_filter(relation)
+      relation = relation.where(status: @status) if @status
+      relation = apply_term(relation) if @term
+      relation
+    end
+
+    private
+
+    def apply_section_filter(relation)
+      return relation if @property_section_id.nil?
+
+      if @property_section_id.to_s == "none"
+        relation.where(property_section_id: nil)
+      else
+        relation.where(property_section_id: @property_section_id)
+      end
+    end
+
+    def apply_term(relation)
+      like = "%#{ActiveRecord::Base.sanitize_sql_like(@term)}%"
+      normalized = Units::NormalizeIdentifier.call(@term)&.normalized_identifier
+
+      if normalized.present?
+        relation.where(
+          "units.normalized_identifier = :normalized OR units.identifier ILIKE :like OR units.display_name ILIKE :like",
+          normalized: normalized,
+          like: like
+        )
+      else
+        relation.where(
+          "units.identifier ILIKE :like OR units.display_name ILIKE :like",
+          like: like
+        )
+      end
+    end
+  end
+end

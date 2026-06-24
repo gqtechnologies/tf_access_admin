@@ -1,5 +1,43 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: property_sections
+#
+#  id                      :uuid             not null, primary key
+#  code                    :string
+#  deleted_at              :datetime
+#  metadata                :jsonb            not null
+#  name                    :string           not null
+#  normalized_name         :string           not null
+#  position                :integer
+#  section_type            :string           not null
+#  status                  :string           default("active"), not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  organization_id         :uuid             not null
+#  parent_id               :uuid
+#  residential_property_id :uuid             not null
+#
+# Indexes
+#
+#  idx_property_sections_on_org_property_parent        (organization_id,residential_property_id,parent_id)
+#  idx_property_sections_property_parent_position      (residential_property_id,parent_id,position)
+#  idx_property_sections_unique_child_name             (organization_id,residential_property_id,parent_id,normalized_name) UNIQUE WHERE ((parent_id IS NOT NULL) AND (deleted_at IS NULL))
+#  idx_property_sections_unique_code_in_context        (organization_id,residential_property_id,parent_id,section_type,code) UNIQUE WHERE ((code IS NOT NULL) AND (deleted_at IS NULL))
+#  idx_property_sections_unique_root_name              (organization_id,residential_property_id,normalized_name) UNIQUE WHERE ((parent_id IS NULL) AND (deleted_at IS NULL))
+#  index_property_sections_on_deleted_at               (deleted_at)
+#  index_property_sections_on_metadata                 (metadata) USING gin
+#  index_property_sections_on_organization_id          (organization_id)
+#  index_property_sections_on_parent_id                (parent_id)
+#  index_property_sections_on_residential_property_id  (residential_property_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organization_id => organizations.id)
+#  fk_rails_...  (parent_id => property_sections.id)
+#  fk_rails_...  (residential_property_id => residential_properties.id)
+#
 require "test_helper"
 
 # Model-level rules for PropertySection (improve-property-sections §9, model items
