@@ -1,0 +1,64 @@
+<template>
+  <li class="list-none">
+    <Collapsible v-model:open="open" class="w-full">
+      <CollapsibleTrigger
+        v-if="hasChildren"
+        class="hover:bg-muted/50 flex w-full items-center gap-2 rounded-md px-1 py-1.5 text-left"
+      >
+        <ChevronRight
+          class="text-muted-foreground size-4 shrink-0 transition-transform duration-200"
+          :class="{ 'rotate-90': open }"
+        />
+        <Building2 class="text-muted-foreground size-4 shrink-0" />
+        <span class="text-sm font-medium">{{ node.name }}</span>
+      </CollapsibleTrigger>
+
+      <div v-else class="flex items-center gap-2 px-1 py-1.5">
+        <span class="size-4 shrink-0" aria-hidden="true" />
+        <Building2 class="text-muted-foreground size-4 shrink-0" />
+        <span class="text-sm font-medium">{{ node.name }}</span>
+      </div>
+
+      <CollapsibleContent v-if="hasChildren">
+        <ul class="text-muted-foreground mt-1 ml-3 space-y-1 border-l border-dashed pl-4">
+          <li
+            v-for="item in visibleChildren"
+            :key="item.kind === 'ellipsis' ? `${node.id}-ellipsis` : item.node.id"
+            class="relative flex items-center gap-2 py-0.5"
+          >
+            <span
+              class="bg-border absolute top-1/2 -left-4 h-px w-3 -translate-y-1/2"
+              aria-hidden="true"
+            />
+            <Layers class="size-3.5 shrink-0" />
+            <span class="text-sm">
+              {{ item.kind === 'ellipsis' ? '...' : item.node.name }}
+            </span>
+          </li>
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
+  </li>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { Building2, ChevronRight, Layers } from 'lucide-vue-next'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
+  displayTreeChildren,
+  type StructureTreeNode,
+} from '@/lib/property_setup/structurePreview'
+
+const props = defineProps<{
+  node: StructureTreeNode
+}>()
+
+const open = ref(true)
+const hasChildren = computed(() => (props.node.children?.length ?? 0) > 0)
+const visibleChildren = computed(() => displayTreeChildren(props.node.children))
+</script>

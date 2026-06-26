@@ -595,6 +595,22 @@ pt:
           section_not_eligible: "A seção não é elegível para conter unidades"
           unit_type_invalid: "O tipo de unidade não é válido"
           residential_property_immutable: "A propriedade da unidade não pode ser alterada"
+        unit_types:
+          apartment: "Apartamento"
+          house: "Casa"
+          office: "Escritório"
+          commercial_unit: "Unidade comercial"
+          parking_space: "Vaga de estacionamento"
+          storage_room: "Depósito"
+          common_area: "Área comum"
+          other: "Outro"
+          studio: "Estúdio"
+          duplex: "Duplex"
+          penthouse: "Penthouse"
+          parking: "Estacionamento"
+          storage: "Depósito"
+          commercial: "Comercial"
+          warehouse: "Armazém"
         show:
           unit_title: "Unidade %{identifier}"
           actions:
@@ -1191,6 +1207,8 @@ pt:
           sector: "Setor"
           other: "Outro"
         statuses:
+          draft: "Rascunho"
+          configured: "Configurado"
           active: "Ativa"
           inactive: "Inativa"
           archived: "Arquivada"
@@ -1511,6 +1529,273 @@ pt:
             submit_create: "Criar seção"
             submit_edit: "Salvar alterações"
             saving: "Salvando…"
+      property_setup:
+        wizard:
+          title: "Configurar imóvel"
+          description: "Complete as etapas para configurar seu novo imóvel residencial."
+          breadcrumb: "Configurar imóvel"
+          steps:
+            1: "Dados do imóvel"
+            2: "Estrutura"
+            3: "Unidades"
+            4: "Resumo"
+            5: "Confirmar"
+          actions:
+            back: "Voltar"
+            cancel: "Cancelar"
+            continue: "Continuar"
+            continue_to_confirm: "Continuar para confirmação"
+            confirm: "Confirmar configuração"
+          cancel:
+            draft_confirm: "Excluir o rascunho do imóvel? Todos os dados inseridos serão perdidos. Você também pode mantê-lo e retomar depois."
+        errors:
+          invalid_step: "Etapa inválida"
+        step1:
+          title: "Dados do imóvel"
+          fields:
+            name: "Nome"
+            property_type: "Tipo de imóvel"
+            address: "Endereço"
+            city: "Cidade"
+            estimated_units: "Estimativa de unidades"
+          validations:
+            name_required: "O nome é obrigatório"
+            property_type_required: "O tipo de imóvel é obrigatório"
+            address_required: "O endereço é obrigatório"
+            estimated_units_required: "A estimativa de unidades é obrigatória"
+            estimated_units_min: "A estimativa deve ser maior que 0"
+          summary:
+            title: "Resumo inicial"
+            type: "Tipo"
+            location: "Localização"
+            estimation: "Estimativa"
+            estimation_units: "{count} unidades"
+            flow_status: "Status do fluxo"
+            flow_status_pending: "Pendente de estrutura"
+        step2:
+          title: "Estrutura / seções"
+          description: "Defina como o imóvel é organizado internamente."
+          modes:
+            none:
+              title: "Sem seções"
+              description: "As unidades ficam diretamente sob o imóvel."
+            manual:
+              title: "Manual"
+              description: "Adicione torres, andares e seções um a um."
+            quick:
+              title: "Rápida"
+              description: "Gere a hierarquia automaticamente com parâmetros."
+          manual:
+            add: "Adicionar seção"
+            empty: "Nenhuma seção adicionada ainda."
+            name: "Nome"
+            parent: "Seção pai"
+            root: "Raiz"
+            type: "Tipo"
+          quick:
+            title: "Configuração de estrutura rápida"
+            towers: "Torres"
+            floors_per_tower: "Andares por torre"
+            units_per_floor: "Unidades por andar (estimativa)"
+            tower_prefix: "Prefixo da torre (opcional)"
+            floor_prefix: "Prefixo do andar (opcional)"
+            info: "A estrutura será gerada automaticamente com base nos valores definidos. Você poderá editá-la antes de continuar."
+          errors:
+            manual_empty: "Adicione pelo menos uma seção para continuar com estrutura manual."
+            quick_not_confirmed: "Confirme a pré-visualização da estrutura rápida antes de continuar."
+            mode_required: "Selecione um modo de estrutura."
+          validations:
+            towers_min: "Deve haver pelo menos 1 torre"
+            floors_per_tower_min: "Deve haver pelo menos 1 andar por torre"
+            units_per_floor_min: "Deve haver pelo menos 1 unidade por andar"
+            tower_prefix_required: "O prefixo da torre é obrigatório"
+            floor_prefix_required: "O prefixo do andar é obrigatório"
+          preview:
+            title: "Pré-visualização de estrutura"
+            subtitle: "Assim será gerado o seu imóvel"
+            towers: "Torres"
+            floors: "Andares"
+            sections: "Seções"
+            estimated_units: "unidades estimadas"
+            placeholder: "Configure os parâmetros para ver a pré-visualização."
+            none: "Nenhuma seção será criada para este imóvel."
+            stats:
+              towers: "torres"
+              floors: "andares"
+              sections: "seções"
+              estimated_units: "unidades estimadas"
+        step3:
+          title: "Unidades"
+          description: "Escolha o método para criar unidades."
+          errors:
+            mode_required: "Selecione um modo para criar unidades."
+            no_units: "Crie pelo menos uma unidade antes de continuar."
+          validations:
+            unit_type_required: "O tipo de unidade é obrigatório"
+            identifier_format_required: "O formato do identificador é obrigatório"
+            quantity_per_floor_min: "Deve haver pelo menos 1 unidade por andar"
+          context:
+            towers: "{count} torres"
+            floors: "{count} andares"
+            structure_count: "{count} seções"
+          automatic:
+            title: "Configuração de geração automática"
+            unit_type: "Tipo de unidade"
+            identifier_format: "Formato do identificador"
+            example: "Exemplo"
+            quantity_per_floor: "Quantidade por andar"
+            formats:
+              floor_sequential: "Andar + sequencial"
+              sequential: "Sequencial simples"
+            parking:
+              title: "Criar também vagas de estacionamento"
+              hint: "Esta opção será habilitada em uma etapa posterior."
+          modes:
+            individual:
+              title: "Individual"
+              description: "Crie unidades uma a uma."
+            automatic:
+              title: "Gerar automaticamente a partir da estrutura"
+              description: "Crie unidades por andar e torre conforme a configuração."
+            import:
+              title: "Importação em massa"
+              description: "Importe unidades de um arquivo Excel ou CSV."
+          individual:
+            add: "Adicionar unidade"
+            identifier: "Identificador"
+            type: "Tipo"
+          import:
+            open: "Abrir importador"
+            description: "Envie um arquivo Excel para criar unidades em lote. Você poderá revisar e corrigir antes de importar."
+          preview:
+            title: "Pré-visualização de unidades"
+            total_will_create: "{count} unidades serão criadas"
+            explanation_with_structure: "Serão criadas {count} unidades em {towers} torres com {floors} andares e {per_floor} unidades por andar."
+            explanation_flat: "Serão criadas {count} unidades com base na configuração atual."
+            loading: "Carregando pré-visualização…"
+            empty: "Configure os parâmetros para ver a pré-visualização."
+            table:
+              tower_floor: "Torre - Andar"
+              units: "Unidades"
+            pagination: "Mostrando {shown} de {total} combinações"
+            prev: "Anterior"
+            next: "Próximo"
+            import_mode: "A pré-visualização de unidades está disponível no modo automático."
+        step4:
+          title: "Resumo"
+          cards:
+            property: "Imóvel"
+            address: "Endereço"
+            structure: "Estrutura"
+            units: "Unidades"
+            structure_value: "{towers} torres / {floors} andares"
+            sections_value: "{count} seções"
+            units_value: "{count} {type}"
+          sections:
+            property: "Dados do imóvel"
+            structure: "Estrutura"
+            units: "Unidades"
+          structure:
+            tower_with_floors: "{name} ({count} andares)"
+            floors_list: "Andares {floors}"
+          table:
+            code: "Código"
+            tower: "Torre"
+            floor: "Andar"
+            unit: "Unidade"
+            type: "Tipo"
+            orientation: "Orientação"
+            area: "Área"
+            bedrooms: "Dormitórios"
+            area_value: "{value} m²"
+            empty: "Não há unidades para exibir."
+          units_total: "... {count} unidades no total"
+          notice: "Você poderá ajustar seções e unidades após confirmar."
+        step5:
+          title: "Confirmação"
+          acknowledge: "Confirmo que as informações estão corretas"
+          ready:
+            title: "Tudo pronto para criar o imóvel"
+            description: "Ao confirmar, o imóvel ficará configurado com a estrutura e unidades definidas."
+          success:
+            title: "Imóvel configurado!"
+            description: "O imóvel foi configurado com sucesso. Você pode continuar com as próximas ações."
+          checklist:
+            property: "Imóvel configurado"
+            structure: "Estrutura pronta"
+            units: "{count} unidades preparadas"
+          final_summary:
+            title: "Resumo final"
+            property: "imóvel"
+            towers: "torres"
+            floors: "andares"
+            units: "unidades"
+          consequences:
+            title: "O que acontecerá ao confirmar"
+            create_property: "O imóvel será configurado"
+            create_structure: "A estrutura definida será mantida"
+            create_units: "{count} unidades serão mantidas"
+            edit_after: "Você poderá editar a configuração depois"
+            duration_note: "O processo pode levar alguns segundos."
+          actions:
+            property_detail: "Ver detalhes do imóvel"
+            manage_units: "Gerenciar unidades"
+            import_owners: "Importar proprietários"
+            configure_residents: "Configurar residentes"
+          completed:
+            subtitle: "A configuração do imóvel foi concluída com sucesso."
+            success:
+              title: "Imóvel configurado com sucesso!"
+              description: "O imóvel, sua estrutura e as unidades foram criados com sucesso."
+            summary:
+              property: "Imóvel"
+              structure: "Estrutura"
+              units: "Unidades"
+              status: "Status"
+              status_value: "Configuração concluída"
+              structure_value: "{towers} torres / {floors} andares"
+              units_value: "{count} unidades"
+            next_steps:
+              title: "Próximos passos recomendados"
+              recommended_badge: "Recomendado"
+              property_detail:
+                title: "Ver detalhe do imóvel"
+                description: "Revise a ficha completa do imóvel recém-configurado."
+                action: "Ver detalhe"
+              manage_units:
+                title: "Administrar unidades"
+                description: "Edite identificadores, tipos e seções das unidades criadas."
+                action: "Administrar unidades"
+              import_owners:
+                title: "Importar proprietários"
+                description: "Carregue proprietários em lote para atribuí-los às unidades."
+                action: "Importar proprietários"
+              configure_residents:
+                title: "Configurar residentes"
+                description: "Atribua ocupantes e residentes às unidades do imóvel."
+                action: "Configurar residentes"
+            whats_next:
+              title: "O que vem a seguir"
+              review_structure:
+                title: "Revise a estrutura criada"
+                description: "Verifique torres, andares e seções conforme definido no assistente."
+              manage_units:
+                title: "Gerencie as unidades"
+                description: "Ajuste identificadores e tipos antes de operar."
+              load_owners:
+                title: "Carregue os proprietários"
+                description: "Importe ou registre proprietários para cada unidade."
+              configure_residents:
+                title: "Configure os residentes"
+                description: "Defina ocupantes e residentes quando o imóvel estiver operacional."
+            checklist:
+              property_created: "Imóvel criado"
+              structure_created: "Estrutura criada"
+              units_generated: "Unidades geradas"
+            footer:
+              back_to_summary: "Voltar ao resumo"
+              close: "Fechar"
+              go_to_property: "Ir ao detalhe do imóvel"
       bulk_imports:
         property_section_required: "A seção é obrigatória para iniciar a importação"
         not_found: "Importação não encontrada"

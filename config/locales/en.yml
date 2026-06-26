@@ -606,6 +606,22 @@ en:
           section_not_eligible: "The section is not eligible to contain units"
           unit_type_invalid: "The unit type is not valid"
           residential_property_immutable: "The unit's property cannot be changed"
+        unit_types:
+          apartment: "Apartment"
+          house: "House"
+          office: "Office"
+          commercial_unit: "Commercial unit"
+          parking_space: "Parking space"
+          storage_room: "Storage room"
+          common_area: "Common area"
+          other: "Other"
+          studio: "Studio"
+          duplex: "Duplex"
+          penthouse: "Penthouse"
+          parking: "Parking"
+          storage: "Storage"
+          commercial: "Commercial"
+          warehouse: "Warehouse"
         show:
           unit_title: "Unit %{identifier}"
           actions:
@@ -1202,6 +1218,8 @@ en:
           sector: "Sector"
           other: "Other"
         statuses:
+          draft: "Draft"
+          configured: "Configured"
           active: "Active"
           inactive: "Inactive"
           archived: "Archived"
@@ -1563,6 +1581,273 @@ en:
             submit_create: "Create section"
             submit_edit: "Save changes"
             saving: "Saving…"
+      property_setup:
+        wizard:
+          title: "Configure property"
+          description: "Complete the steps to set up your new residential property."
+          breadcrumb: "Configure property"
+          steps:
+            1: "Property data"
+            2: "Structure"
+            3: "Units"
+            4: "Summary"
+            5: "Confirm"
+          actions:
+            back: "Back"
+            cancel: "Cancel"
+            continue: "Continue"
+            continue_to_confirm: "Continue to confirmation"
+            confirm: "Confirm setup"
+          cancel:
+            draft_confirm: "Delete the property draft? All entered data will be lost. You can also keep it and come back later."
+        errors:
+          invalid_step: "Invalid step"
+        step1:
+          title: "Property data"
+          fields:
+            name: "Name"
+            property_type: "Property type"
+            address: "Address"
+            city: "City"
+            estimated_units: "Estimated units"
+          validations:
+            name_required: "Name is required"
+            property_type_required: "Property type is required"
+            address_required: "Address is required"
+            estimated_units_required: "Estimated units is required"
+            estimated_units_min: "Estimated units must be greater than 0"
+          summary:
+            title: "Initial summary"
+            type: "Type"
+            location: "Location"
+            estimation: "Estimation"
+            estimation_units: "{count} units"
+            flow_status: "Flow status"
+            flow_status_pending: "Pending structure"
+        step2:
+          title: "Structure / sections"
+          description: "Define how the property is internally organized."
+          modes:
+            none:
+              title: "No sections"
+              description: "Units are placed directly under the property."
+            manual:
+              title: "Manual"
+              description: "Add towers, floors, and sections one by one."
+            quick:
+              title: "Quick"
+              description: "Generate the hierarchy automatically with parameters."
+          manual:
+            add: "Add section"
+            empty: "No sections added yet."
+            name: "Name"
+            parent: "Parent section"
+            root: "Root"
+            type: "Type"
+          quick:
+            title: "Quick structure configuration"
+            towers: "Towers"
+            floors_per_tower: "Floors per tower"
+            units_per_floor: "Units per floor (estimate)"
+            tower_prefix: "Tower prefix (optional)"
+            floor_prefix: "Floor prefix (optional)"
+            info: "The structure will be generated automatically from the values you define. You can edit it before continuing."
+          errors:
+            manual_empty: "Add at least one section to continue with manual structure."
+            quick_not_confirmed: "Confirm the quick structure preview before continuing."
+            mode_required: "Select a structure mode."
+          validations:
+            towers_min: "There must be at least 1 tower"
+            floors_per_tower_min: "There must be at least 1 floor per tower"
+            units_per_floor_min: "There must be at least 1 unit per floor"
+            tower_prefix_required: "Tower prefix is required"
+            floor_prefix_required: "Floor prefix is required"
+          preview:
+            title: "Structure preview"
+            subtitle: "This is how your property will be generated"
+            towers: "Towers"
+            floors: "Floors"
+            sections: "Sections"
+            estimated_units: "estimated units"
+            placeholder: "Configure the parameters to see the preview."
+            none: "No sections will be created for this property."
+            stats:
+              towers: "towers"
+              floors: "floors"
+              sections: "sections"
+              estimated_units: "estimated units"
+        step3:
+          title: "Units"
+          description: "Choose how to create units."
+          errors:
+            mode_required: "Select a units creation mode."
+            no_units: "Create at least one unit before continuing."
+          validations:
+            unit_type_required: "Unit type is required"
+            identifier_format_required: "Identifier format is required"
+            quantity_per_floor_min: "There must be at least 1 unit per floor"
+          context:
+            towers: "{count} towers"
+            floors: "{count} floors"
+            structure_count: "{count} sections"
+          automatic:
+            title: "Automatic generation settings"
+            unit_type: "Unit type"
+            identifier_format: "Identifier format"
+            example: "Example"
+            quantity_per_floor: "Quantity per floor"
+            formats:
+              floor_sequential: "Floor + sequential"
+              sequential: "Simple sequential"
+            parking:
+              title: "Also create parking spaces"
+              hint: "This option will be enabled in a later step."
+          modes:
+            individual:
+              title: "Individual"
+              description: "Create units one by one."
+            automatic:
+              title: "Generate automatically from structure"
+              description: "Create units per floor and tower based on your configuration."
+            import:
+              title: "Bulk import"
+              description: "Import units from an Excel or CSV file."
+          individual:
+            add: "Add unit"
+            identifier: "Identifier"
+            type: "Type"
+          import:
+            open: "Open importer"
+            description: "Upload an Excel file to create units in bulk. You can review and fix rows before importing."
+          preview:
+            title: "Units preview"
+            total_will_create: "{count} units will be created"
+            explanation_with_structure: "{count} units will be created across {towers} towers with {floors} floors and {per_floor} units per floor."
+            explanation_flat: "{count} units will be created based on the current configuration."
+            loading: "Loading preview…"
+            empty: "Configure the parameters to see the preview."
+            table:
+              tower_floor: "Tower - Floor"
+              units: "Units"
+            pagination: "Showing {shown} of {total} combinations"
+            prev: "Previous"
+            next: "Next"
+            import_mode: "Units preview is available in automatic mode."
+        step4:
+          title: "Summary"
+          cards:
+            property: "Property"
+            address: "Address"
+            structure: "Structure"
+            units: "Units"
+            structure_value: "{towers} towers / {floors} floors"
+            sections_value: "{count} sections"
+            units_value: "{count} {type}"
+          sections:
+            property: "Property data"
+            structure: "Structure"
+            units: "Units"
+          structure:
+            tower_with_floors: "{name} ({count} floors)"
+            floors_list: "Floors {floors}"
+          table:
+            code: "Code"
+            tower: "Tower"
+            floor: "Floor"
+            unit: "Unit"
+            type: "Type"
+            orientation: "Orientation"
+            area: "Area"
+            bedrooms: "Bedrooms"
+            area_value: "{value} m²"
+            empty: "No units to display."
+          units_total: "... {count} units in total"
+          notice: "You will be able to adjust sections and units after confirming."
+        step5:
+          title: "Confirmation"
+          acknowledge: "I confirm the information is correct"
+          ready:
+            title: "Everything is ready to create the property"
+            description: "When you confirm, the property will be configured with the defined structure and units."
+          success:
+            title: "Property configured!"
+            description: "The property was configured successfully. You can continue with the next actions."
+          checklist:
+            property: "Property configured"
+            structure: "Structure ready"
+            units: "{count} units prepared"
+          final_summary:
+            title: "Final summary"
+            property: "property"
+            towers: "towers"
+            floors: "floors"
+            units: "units"
+          consequences:
+            title: "What will happen when you confirm"
+            create_property: "The property will be configured"
+            create_structure: "The defined structure will be kept"
+            create_units: "{count} units will be kept"
+            edit_after: "You can edit the configuration afterwards"
+            duration_note: "The process may take a few seconds."
+          actions:
+            property_detail: "View property detail"
+            manage_units: "Manage units"
+            import_owners: "Import owners"
+            configure_residents: "Configure residents"
+          completed:
+            subtitle: "The property setup was completed successfully."
+            success:
+              title: "Property configured successfully!"
+              description: "The property, its structure, and units were created successfully."
+            summary:
+              property: "Property"
+              structure: "Structure"
+              units: "Units"
+              status: "Status"
+              status_value: "Setup completed"
+              structure_value: "{towers} towers / {floors} floors"
+              units_value: "{count} units"
+            next_steps:
+              title: "Recommended next steps"
+              recommended_badge: "Recommended"
+              property_detail:
+                title: "View property detail"
+                description: "Review the full profile of the newly configured property."
+                action: "View detail"
+              manage_units:
+                title: "Manage units"
+                description: "Edit identifiers, types, and sections for the created units."
+                action: "Manage units"
+              import_owners:
+                title: "Import owners"
+                description: "Bulk-load owners and assign them to units."
+                action: "Import owners"
+              configure_residents:
+                title: "Configure residents"
+                description: "Assign occupants and residents to property units."
+                action: "Configure residents"
+            whats_next:
+              title: "What happens next"
+              review_structure:
+                title: "Review the created structure"
+                description: "Verify towers, floors, and sections as defined in the wizard."
+              manage_units:
+                title: "Manage units"
+                description: "Adjust identifiers and types before going operational."
+              load_owners:
+                title: "Load owners"
+                description: "Import or register owners for each unit."
+              configure_residents:
+                title: "Configure residents"
+                description: "Define occupants and residents when the property is operational."
+            checklist:
+              property_created: "Property created"
+              structure_created: "Structure created"
+              units_generated: "Units generated"
+            footer:
+              back_to_summary: "Back to summary"
+              close: "Close"
+              go_to_property: "Go to property detail"
       bulk_imports:
         property_section_required: "Section is required to start the import"
         not_found: "Import not found"

@@ -38,31 +38,24 @@ class Admin::ResidentialPropertiesControllerTest < ActionDispatch::IntegrationTe
     Current.reset
   end
 
-  test "tenant_admin create delegates to Properties::Create" do
+  test "tenant_admin create redirects to wizard" do
     sign_in_as @tenant_admin
 
-    assert_difference -> { ResidentialProperty.count }, 1 do
-      post admin_residential_properties_path, params: {
-        residential_property: valid_property_params(name: "Controller Created Property")
-      }
-    end
+    post admin_residential_properties_path, params: {
+      residential_property: valid_property_params(name: "Controller Created Property")
+    }
 
-    assert_redirected_to admin_residential_properties_path
-    created = ResidentialProperty.order(:created_at).last
-    assert_equal PropertyStatuses::ACTIVE, created.status
-    assert_equal @organization.id, created.organization_id
+    assert_redirected_to admin_property_setup_new_wizard_path
   end
 
-  test "create rejects duplicate normalized name with field errors" do
+  test "create redirects to wizard instead of showing field errors" do
     sign_in_as @tenant_admin
 
     post admin_residential_properties_path, params: {
       residential_property: valid_property_params(name: @property.name)
     }
 
-    assert_redirected_to new_admin_residential_property_path
-    follow_redirect!
-    assert_includes response.body, "errors"
+    assert_redirected_to admin_property_setup_new_wizard_path
   end
 
   test "property_admin cannot create properties" do

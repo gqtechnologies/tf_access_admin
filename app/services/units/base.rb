@@ -30,9 +30,7 @@ module Units
             "not allowed to manage_units for ResidentialProperty #{property.id}"
     end
 
-    def property_operable?(property)
-      property.status == PropertyStatuses::ACTIVE
-    end
+    include PropertyOperable
 
     def reject_inoperative_property!(unit)
       return true if property_operable?(unit.residential_property)

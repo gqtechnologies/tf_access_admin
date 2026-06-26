@@ -22,24 +22,12 @@ class Admin::ResidentialPropertiesController < AdminController
 
   def new
     authorize ResidentialProperty
-    render inertia: "admin/residential_properties/new", props: {
-      residential_property: serialize_property(ResidentialProperty.new),
-      property_types: PropertyTypes::ALL
-    }, status: :ok
+    redirect_to admin_property_setup_new_wizard_path
   end
 
   def create
     authorize ResidentialProperty
-
-    result = Properties::Create.call(
-      actor: current_user,
-      attributes: residential_property_params
-    )
-    respond_to_property_result(
-      result,
-      success_path: admin_residential_properties_path,
-      error_path: new_admin_residential_property_path
-    )
+    redirect_to admin_property_setup_new_wizard_path
   end
 
   def edit

@@ -54,7 +54,7 @@ module PropertySections
     # actions that are not tied to a single node (§5.6 / §8.4).
     def page_permissions
       manage = can_manage?
-      operable = property_operable?
+      operable = property_operable?(property)
 
       {
         view: manage,
@@ -145,7 +145,7 @@ module PropertySections
         view: can_manage?,
         edit: can_manage?,
         move: can_manage?,
-        add_child: is_root && can_manage? && property_operable? && effectively_active,
+        add_child: is_root && can_manage? && property_operable?(property) && effectively_active,
         archive: can_manage? && section.status != SectionStatuses::ARCHIVED
       }
     end
@@ -182,8 +182,6 @@ module PropertySections
                     policy.property_allowed?(:manage_sections, property: property)
     end
 
-    def property_operable?
-      property.status == PropertyStatuses::ACTIVE
-    end
+    include PropertyOperable
   end
 end

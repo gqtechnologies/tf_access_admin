@@ -2,15 +2,27 @@
 
 # Allowed +residential_properties.status+ values (string-backed lifecycle).
 #
-# - +active+:   operational property that admits normal management.
-# - +inactive+: temporarily suspended, reversible.
-# - +archived+: retired property, preserved for history and consultation (terminal).
+# - +draft+:      Wizard initiated; configuration in progress.
+# - +configured+: Wizard completed; pending explicit activation.
+# - +active+:     Operational property that admits normal management.
+# - +inactive+:   Temporarily suspended, reversible.
+# - +archived+:   Retired property, preserved for history (terminal).
 module PropertyStatuses
-  ACTIVE   = "active"
-  INACTIVE = "inactive"
-  ARCHIVED = "archived"
+  DRAFT      = "draft"
+  CONFIGURED = "configured"
+  ACTIVE     = "active"
+  INACTIVE   = "inactive"
+  ARCHIVED   = "archived"
+
+  # Statuses that allow section/unit mutations.
+  OPERABLE = [ DRAFT, CONFIGURED, ACTIVE ].freeze
+
+  # Statuses introduced by the setup wizard.
+  SETUP = [ DRAFT, CONFIGURED ].freeze
 
   ALL = [
+    DRAFT,
+    CONFIGURED,
     ACTIVE,
     INACTIVE,
     ARCHIVED

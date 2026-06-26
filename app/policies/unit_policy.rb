@@ -182,7 +182,5 @@ class UnitPolicy < ApplicationPolicy
     org.present? && property.organization_id == org.id
   end
 
-  def property_operable?(property)
-    property.status == PropertyStatuses::ACTIVE
-  end
+  include PropertyOperable
 end

@@ -1,0 +1,60 @@
+# frozen_string_literal: true
+
+class Admin::PropertySetup::WizardSerializer
+  def initialize(property:, current_user:, step:)
+    @property = property
+    @current_user = current_user
+    @step = step
+  end
+
+  def as_json
+    {
+      step: @step,
+      property: property_json,
+      wizard: Properties::Setup::WizardState.read(@property),
+      preview: preview_json,
+      property_types: PropertyTypes::ALL,
+      section_types: SectionTypes::ALL,
+      unit_types: UnitTypes::ALL,
+      permissions: permissions_json,
+      next_actions: next_actions_json
+    }
+  end
+
+  private
+
+  def property_json
+    return nil if @property.nil? || !@property.persisted?
+
+    Admin::ResidentialPropertySerializer.new(@property, current_user: @current_user).as_json
+  end
+
+  def preview_json
+    return {} unless @property&.persisted?
+
+    Properties::Setup::BuildPreview.call(property: @property, actor: @current_user)
+  end
+
+  def permissions_json
+    policy = ResidentialPropertyPolicy.new(@current_user, @property || ResidentialProperty.new)
+
+    {
+      manage_setup: policy.create?,
+      activate: @property&.status == PropertyStatuses::CONFIGURED && policy.update?
+    }
+  end
+
+  def next_actions_json
+    return [] unless @property&.persisted?
+
+    policy = ResidentialPropertyPolicy.new(@current_user, @property)
+    unit_policy = UnitPolicy.new(@current_user, Unit)
+
+    actions = []
+    actions << "property_detail" if policy.show?
+    actions << "manage_units" if unit_policy.property_allowed?(:manage_units, property: @property)
+    actions << "import_owners"
+    actions << "configure_residents"
+    actions
+  end
+end

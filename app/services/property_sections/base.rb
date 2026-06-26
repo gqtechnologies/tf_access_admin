@@ -32,9 +32,7 @@ module PropertySections
             "not allowed to manage_sections for ResidentialProperty #{property.id}"
     end
 
-    def property_operable?(property)
-      property.status == PropertyStatuses::ACTIVE
-    end
+    include PropertyOperable
 
     def reject_inoperative_property!(section)
       return true if property_operable?(section.residential_property)

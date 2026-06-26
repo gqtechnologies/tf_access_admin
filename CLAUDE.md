@@ -59,6 +59,17 @@ Skill loading rules:
 - If the task is small and the relevant convention is already clear from nearby code, prefer following existing patterns without loading extra skills.
 - If a skill is loaded, use only the relevant section. Do not restate or summarize the skill in the final response.
 
+## Forms
+
+Every form must define client-side validation with **Zod** and **VeeValidate**.
+
+* Define Zod schemas in `app/javascript/lib/schemas/`.
+* Wire schemas to VeeValidate via `toTypedSchema` from `@vee-validate/zod`.
+* Use `useForm` with the typed schema; bind fields with `Field as VeeField` from `vee-validate`.
+* Display field errors with `FieldError` and translate Zod messages via `useTranslateErrors`.
+* Merge Rails/server errors with `useServerFormErrors` when the form submits to the backend.
+* Before creating a new form, inspect a similar existing form (e.g. `app/javascript/components/admin/organization/Form.vue`) and follow the same pattern.
+
 ## OpenSpec Workflow
 
 Follow OpenSpec only for non-trivial changes or when the user references an OpenSpec change.

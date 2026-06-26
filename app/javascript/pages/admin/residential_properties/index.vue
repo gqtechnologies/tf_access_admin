@@ -16,7 +16,7 @@
               {{ t('common.actions.search') }}
             </Button>
           </div>
-          <Link v-if="canCreate" :href="new_admin_residential_property_path()">
+          <Link v-if="canCreate" :href="admin_property_setup_new_wizard_path()">
             <Button>
               <PlusIcon class="w-4 h-4" />
               {{ t('admin.residential_properties.index.actions.create') }}
@@ -85,7 +85,7 @@ import { Button } from '@/components/ui/button'
 import { PlusIcon, SearchIcon, PencilIcon, ArchiveIcon, Layers, Loader2 } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import {
-  new_admin_residential_property_path,
+  admin_property_setup_new_wizard_path,
   edit_admin_residential_property_path,
   admin_residential_property_structure_path,
 } from '@/routes'

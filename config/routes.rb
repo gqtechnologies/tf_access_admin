@@ -85,6 +85,19 @@ Rails.application.routes.draw do
         end
       end
     end
+    namespace :property_setup do
+      get  "wizard/new",                to: "wizard#new",            as: :new_wizard
+      post "wizard",                    to: "wizard#create",         as: :create_wizard
+      get  "wizard/:id",                to: "wizard#show",           as: :wizard
+      post "wizard/:id/advance",        to: "wizard#advance",        as: :advance_wizard
+      post "wizard/:id/back",           to: "wizard#back",           as: :back_wizard
+      post "wizard/:id/cancel",         to: "wizard#cancel",         as: :cancel_wizard
+      post "wizard/:id/confirm",        to: "wizard#confirm",        as: :confirm_wizard
+      post "wizard/:id/create_section", to: "wizard#create_section", as: :create_section_wizard
+      post "wizard/:id/create_unit",    to: "wizard#create_unit",    as: :create_unit_wizard
+      get  "wizard/:id/structure_preview", to: "wizard#structure_preview", as: :structure_preview_wizard
+      get  "wizard/:id/units_preview",  to: "wizard#units_preview",  as: :units_preview_wizard
+    end
     resources :property_sections, only: [:index, :edit]
     resources :units, only: [:index]
     namespace :operational_roles do

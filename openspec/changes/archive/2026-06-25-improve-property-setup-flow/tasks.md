@@ -109,4 +109,4 @@
 - [x] 11.2 Confirmar que `Admin::ResidentialPropertiesController#new` y `#create` fueron eliminados o redirigidos (ver tarea 3.1)
 - [x] 11.3 Verificar que usuarios no autorizados no vean la entrada al wizard
 - [x] 11.4 Verificar que propiedades `draft` y `configured` aparecen en el catálogo con badge de estado para usuarios autorizados
-- [x] 11.5 Verificar que la acción de activación explícita (`configured → active`) es accesible desde el detalle de la propiedad
+- [ ] 11.5 Verificar que la acción de activación explícita (`configured → active`) es accesible desde el detalle de la propiedad
