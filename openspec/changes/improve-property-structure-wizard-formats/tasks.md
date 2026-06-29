@@ -30,22 +30,22 @@
 
 ## 6. Frontend — formularios dinámicos de step 2
 
-- [ ] 6.1 Crear componente `QuickStructureForm.vue` que recibe `format: PropertyStructureFormat` como prop y renderiza los campos apropiados según los niveles (tower/floor, floor-only, sector/block, block-only); el modo `quick` no se muestra en el selector si `format` es `null`
-- [ ] 6.2 Reemplazar la sección `v-if="selectedMode === 'quick'"` de `Step2Structure.vue` con `<QuickStructureForm :format="structureFormat" />`
-- [ ] 6.3 Agregar prop `structureFormat` a `Step2Structure.vue` recibida desde el wizard
-- [ ] 6.4 Agregar toggle "¿El edificio tiene torres?" que aparece solo cuando `property_type === 'building'` y cambia el formato efectivo de tower/floor a floor-only
-- [ ] 6.5 Eliminar el campo `units_per_floor` / `units_per_leaf` del formulario quick de `Step2Structure.vue` y de `QuickStructureParams` en `structurePreview.ts`
-- [ ] 6.6 Eliminar `estimated_units` de `quickStructureCounts()` en `structurePreview.ts`; el panel de preview de Step 2 muestra solo secciones (torres, pisos, sectores, bloques según formato) sin conteo de unidades
-- [ ] 6.7 Reutilizar los tipos existentes de nodos del preview (`structurePreview.ts`); extenderlos solo si el formato requiere campos nuevos
-- [ ] 6.8 Agregar advertencia inline en `ManualSectionForm.vue` cuando el `section_type` seleccionado no forma parte del formato recomendado
-- [ ] 6.9 Agregar i18n keys en todos los locales (`es`, `en`, `pt`) para los nuevos textos de formulario, advertencias y toggle de torres
+- [x] 6.1 Crear componente `QuickStructureForm.vue` que recibe `format: PropertyStructureFormat` como prop y renderiza los campos apropiados según los niveles (tower/floor, floor-only, sector/block, block-only); el modo `quick` no se muestra en el selector si `format` es `null`
+- [x] 6.2 Reemplazar la sección `v-if="selectedMode === 'quick'"` de `Step2Structure.vue` con `<QuickStructureForm :format="structureFormat" />`
+- [x] 6.3 Agregar prop `structureFormat` a `Step2Structure.vue` recibida desde el wizard
+- [x] 6.4 Agregar toggle "¿El edificio tiene torres?" que aparece solo cuando `property_type === 'building'` y cambia el formato efectivo de tower/floor a floor-only
+- [x] 6.5 Eliminar el campo `units_per_floor` / `units_per_leaf` del formulario quick de `Step2Structure.vue` y de `QuickStructureParams` en `structurePreview.ts`
+- [x] 6.6 Eliminar `estimated_units` de `quickStructureCounts()` en `structurePreview.ts`; el panel de preview de Step 2 muestra solo secciones (torres, pisos, sectores, bloques según formato) sin conteo de unidades
+- [x] 6.7 Reutilizar los tipos existentes de nodos del preview (`structurePreview.ts`); extenderlos solo si el formato requiere campos nuevos
+- [x] 6.8 Agregar advertencia inline en `ManualSectionForm.vue` cuando el `section_type` seleccionado no forma parte del formato recomendado
+- [x] 6.9 Agregar i18n keys en todos los locales (`es`, `en`, `pt`) para los nuevos textos de formulario, advertencias y toggle de torres
 
 ## 7. Frontend — reutilizar panel de preview y flujo existente
 
-- [ ] 7.1 Auditar `StructurePreviewPanel.vue` y `StructurePreviewTreeNode.vue` existentes; confirmar que aceptan nodos de secciones con `section_type`/`depth` y unidades opcionales, ajustando props/tipos solo si es necesario
-- [ ] 7.2 Confirmar que `StructurePreviewPanel.vue` se usa en `Step2Structure.vue` (solo secciones) y `Step3Units.vue` (secciones + unidades); ajustar el binding según el formato activo
-- [ ] 7.3 Adaptar la llamada existente al endpoint `structure_preview` del wizard para enviar los parámetros del formato activo (no solo tower/floor); alimentar el resultado al panel
-- [ ] 7.4 Confirmar que el commit de estructura ocurre vía `advance` (step 2 → `ApplyQuickStructure`); manejar errores mostrando mensaje claro con opción de repetir preview
+- [x] 7.1 Auditar `StructurePreviewPanel.vue` y `StructurePreviewTreeNode.vue` existentes; confirmar que aceptan nodos de secciones con `section_type`/`depth` y unidades opcionales, ajustando props/tipos solo si es necesario
+- [x] 7.2 Confirmar que `StructurePreviewPanel.vue` se usa en `Step2Structure.vue` (solo secciones) y `Step3Units.vue` (secciones + unidades); ajustar el binding según el formato activo
+- [x] 7.3 Adaptar la llamada existente al endpoint `structure_preview` del wizard para enviar los parámetros del formato activo (no solo tower/floor); alimentar el resultado al panel
+- [x] 7.4 Confirmar que el commit de estructura ocurre vía `advance` (step 2 → `ApplyQuickStructure`); manejar errores mostrando mensaje claro con opción de repetir preview
 
 ## 8. Step 3 — gate de modo automatic y formulario adaptado
 

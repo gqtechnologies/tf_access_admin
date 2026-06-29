@@ -17,11 +17,8 @@ export const propertySetupValidationKeys = {
     mode_required: 'admin.property_setup.step2.errors.mode_required',
     manual_empty: 'admin.property_setup.step2.errors.manual_empty',
     quick_not_confirmed: 'admin.property_setup.step2.errors.quick_not_confirmed',
-    towers_min: 'admin.property_setup.step2.validations.towers_min',
-    floors_per_tower_min: 'admin.property_setup.step2.validations.floors_per_tower_min',
-    units_per_floor_min: 'admin.property_setup.step2.validations.units_per_floor_min',
-    tower_prefix_required: 'admin.property_setup.step2.validations.tower_prefix_required',
-    floor_prefix_required: 'admin.property_setup.step2.validations.floor_prefix_required',
+    level_count_min: 'admin.property_setup.step2.validations.level_count_min',
+    level_prefix_required: 'admin.property_setup.step2.validations.level_prefix_required',
   },
   step3: {
     mode_required: 'admin.property_setup.step3.errors.mode_required',
@@ -56,11 +53,11 @@ export const propertySetupStep1Schema = z.object({
 })
 
 export const propertySetupQuickStructureSchema = z.object({
-  towers: positiveInt(propertySetupValidationKeys.step2.towers_min),
-  floors_per_tower: positiveInt(propertySetupValidationKeys.step2.floors_per_tower_min),
-  units_per_floor: positiveInt(propertySetupValidationKeys.step2.units_per_floor_min),
-  tower_prefix: z.string().trim().min(1, propertySetupValidationKeys.step2.tower_prefix_required),
-  floor_prefix: z.string().trim().min(1, propertySetupValidationKeys.step2.floor_prefix_required),
+  level_1_count: positiveInt(propertySetupValidationKeys.step2.level_count_min),
+  level_1_prefix: z.string().trim().min(1, propertySetupValidationKeys.step2.level_prefix_required),
+  level_2_count: positiveInt(propertySetupValidationKeys.step2.level_count_min).optional(),
+  level_2_prefix: z.string().trim().optional(),
+  skip_top_level: z.boolean().optional(),
 })
 
 export const propertySetupUnitGenerationSchema = z.object({

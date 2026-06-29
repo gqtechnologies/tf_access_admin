@@ -1,11 +1,3 @@
-export type QuickStructureParams = {
-  towers: number
-  floors_per_tower: number
-  units_per_floor: number
-  tower_prefix: string
-  floor_prefix: string
-}
-
 export type StructureFormatLevel = {
   section_type: string
   label_key: string
@@ -15,6 +7,25 @@ export type StructureFormatLevel = {
 export type PropertyStructureFormat = {
   levels: StructureFormatLevel[]
   units_in: string
+}
+
+/** Generic quick-structure params emitted by the dynamic form, sent to the
+ * format-aware backend preview/commit. */
+export type QuickStructureFormParams = {
+  level_1_count: number
+  level_2_count: number
+  level_1_prefix: string
+  level_2_prefix: string
+  skip_top_level: boolean
+}
+
+/** Flat node returned by the backend structure_preview endpoint. */
+export type PreviewNode = {
+  id: string
+  parent_id?: string
+  name: string
+  section_type: string
+  depth: number
 }
 
 export type StructureTreeNode = {
@@ -41,29 +52,24 @@ export function displayTreeChildren(children: StructureTreeNode[] = []): TreeChi
   ]
 }
 
-export function buildQuickStructureTree(params: QuickStructureParams): StructureTreeNode[] {
-  const towers = Math.max(params.towers, 0)
-  const floorsPerTower = Math.max(params.floors_per_tower, 0)
+/** Builds a nested tree from the flat preview nodes returned by the backend. */
+export function buildTreeFromPreviewNodes(nodes: PreviewNode[]): StructureTreeNode[] {
+  const byId = new Map<string, StructureTreeNode>()
+  const roots: StructureTreeNode[] = []
 
-  return Array.from({ length: towers }, (_, towerIndex) => {
-    const towerLabel = String.fromCharCode(65 + towerIndex)
-    const children = Array.from({ length: floorsPerTower }, (_, floorIndex) => ({
-      id: `tower-${towerIndex}-floor-${floorIndex + 1}`,
-      name: `${params.floor_prefix} ${floorIndex + 1}`,
-    }))
+  for (const node of nodes) {
+    byId.set(node.id, { id: node.id, name: node.name, children: [] })
+  }
 
-    return {
-      id: `tower-${towerIndex}`,
-      name: `${params.tower_prefix} ${towerLabel}`,
-      children,
+  for (const node of nodes) {
+    const current = byId.get(node.id)!
+    const parent = node.parent_id ? byId.get(node.parent_id) : undefined
+    if (parent) {
+      parent.children!.push(current)
+    } else {
+      roots.push(current)
     }
-  })
-}
+  }
 
-export function quickStructureCounts(params: QuickStructureParams) {
-  const towers = Math.max(params.towers, 0)
-  const floors = towers * Math.max(params.floors_per_tower, 0)
-  const estimatedUnits = floors * Math.max(params.units_per_floor, 0)
-
-  return { towers, floors, estimated_units: estimatedUnits, sections: towers + floors }
+  return roots
 }

@@ -32,6 +32,9 @@
           v-if="fieldErrors.section_type"
           :errors="translateErrors([fieldErrors.section_type])"
         />
+        <p v-if="showFormatWarning" class="text-amber-600 text-xs">
+          {{ t('admin.property_setup.step2.manual.format_warning', { types: recommendedLabels }) }}
+        </p>
       </Field>
       <Field class="md:col-span-2" :data-invalid="!!fieldErrors.parent_id">
         <FieldLabel>{{ t('admin.property_setup.step2.manual.parent') }}</FieldLabel>
@@ -75,6 +78,7 @@ type SectionNode = {
 const props = defineProps<{
   propertyId: string
   sectionTypes: string[]
+  recommendedSectionTypes?: string[]
   tree: SectionNode[]
   selectedMode: string
 }>()
@@ -91,6 +95,14 @@ const form = reactive({
 
 const hasSections = computed(() => props.tree.length > 0)
 const rootSections = computed(() => flattenSections(props.tree))
+
+const recommended = computed(() => props.recommendedSectionTypes ?? [])
+const showFormatWarning = computed(
+  () => recommended.value.length > 0 && !recommended.value.includes(form.section_type),
+)
+const recommendedLabels = computed(() =>
+  recommended.value.map((type) => t(`admin.property_sections.section_types.${type}`)).join(', '),
+)
 
 function flattenSections(nodes: SectionNode[], depth = 0): Array<SectionNode & { depth: number }> {
   return nodes.flatMap((node) => [

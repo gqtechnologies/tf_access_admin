@@ -41,54 +41,18 @@
       </p>
     </div>
 
-    <section v-if="selectedMode === 'quick'" class="space-y-4 rounded-lg border p-4">
-      <h3 class="text-sm font-medium">{{ t('admin.property_setup.step2.quick.title') }}</h3>
-
-      <div class="grid gap-3 md:grid-cols-3">
-        <Field v-for="field in quickNumericFields" :key="field.key" :data-invalid="!!fieldError(field.errorKey)">
-          <FieldLabel>{{ field.label }}</FieldLabel>
-          <Input
-            v-model.number="quickStructure[field.key as 'towers' | 'floors_per_tower' | 'units_per_floor']"
-            type="number"
-            min="1"
-            :aria-invalid="!!fieldError(field.errorKey)"
-          />
-          <FieldError
-            v-if="fieldError(field.errorKey)"
-            :errors="translateErrors([fieldError(field.errorKey)])"
-          />
-        </Field>
-      </div>
-
-      <div class="grid gap-3 md:grid-cols-2">
-        <Field :data-invalid="!!fieldError('quick_structure.tower_prefix')">
-          <FieldLabel>{{ t('admin.property_setup.step2.quick.tower_prefix') }}</FieldLabel>
-          <Input v-model="quickStructure.tower_prefix" :aria-invalid="!!fieldError('quick_structure.tower_prefix')" />
-          <FieldError
-            v-if="fieldError('quick_structure.tower_prefix')"
-            :errors="translateErrors([fieldError('quick_structure.tower_prefix')])"
-          />
-        </Field>
-        <Field :data-invalid="!!fieldError('quick_structure.floor_prefix')">
-          <FieldLabel>{{ t('admin.property_setup.step2.quick.floor_prefix') }}</FieldLabel>
-          <Input v-model="quickStructure.floor_prefix" :aria-invalid="!!fieldError('quick_structure.floor_prefix')" />
-          <FieldError
-            v-if="fieldError('quick_structure.floor_prefix')"
-            :errors="translateErrors([fieldError('quick_structure.floor_prefix')])"
-          />
-        </Field>
-      </div>
-
-      <Alert>
-        <Info class="size-4" />
-        <AlertDescription>{{ t('admin.property_setup.step2.quick.info') }}</AlertDescription>
-      </Alert>
-    </section>
+    <QuickStructureForm
+      v-if="selectedMode === 'quick' && structureFormat"
+      v-model="quickParams"
+      :format="structureFormat"
+      :property-type="propertyType"
+    />
 
     <ManualSectionForm
       v-if="selectedMode === 'manual' && propertyId"
       :property-id="propertyId"
       :section-types="sectionTypes"
+      :recommended-section-types="recommendedSectionTypes"
       :tree="structureTree"
       :selected-mode="selectedMode"
     />
@@ -96,14 +60,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref, toRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Box, Info, Layers, Zap } from 'lucide-vue-next'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Input } from '@/components/ui/input'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Box, Layers, Zap } from 'lucide-vue-next'
+import QuickStructureForm from '@/components/admin/property_setup/QuickStructureForm.vue'
 import ManualSectionForm from '@/components/admin/property_setup/ManualSectionForm.vue'
-import type { QuickStructureParams } from '@/lib/property_setup/structurePreview'
+import type {
+  PropertyStructureFormat,
+  QuickStructureFormParams,
+} from '@/lib/property_setup/structurePreview'
+import { usePropertySetupStructurePreview } from '@/lib/composables/usePropertySetupStructurePreview'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
 import { usePropertySetupStepValidation } from '@/lib/composables/property_setup/usePropertySetupStepValidation'
 import type { PropertySetupStep2Values } from '@/lib/schemas/property_setup'
@@ -113,18 +79,21 @@ const props = defineProps<{
   wizard: Record<string, unknown>
   sectionTypes: string[]
   preview: Record<string, any>
+  structureFormat: PropertyStructureFormat | null
+  propertyType: string
 }>()
 
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 const { fieldError, validateStep2 } = usePropertySetupStepValidation()
 const selectedMode = ref((props.wizard.structure_mode as string) || 'none')
-const quickStructure = reactive<QuickStructureParams>({
-  towers: 2,
-  floors_per_tower: 10,
-  units_per_floor: 4,
-  tower_prefix: 'Torre',
-  floor_prefix: 'Piso',
+
+const quickParams = ref<QuickStructureFormParams>({
+  level_1_count: 1,
+  level_2_count: 1,
+  level_1_prefix: '',
+  level_2_prefix: '',
+  skip_top_level: false,
 })
 
 watch(
@@ -134,56 +103,64 @@ watch(
   },
 )
 
+// When the property type has no mapped format, quick mode is not offered.
+watch(
+  () => props.structureFormat,
+  (format) => {
+    if (!format && selectedMode.value === 'quick') selectedMode.value = 'none'
+  },
+)
+
 const structureTree = computed(() => props.preview?.structure?.tree ?? [])
 const sectionsCount = computed(() => structureTree.value.length)
 
-const modes = computed(() => [
-  {
-    id: 'none',
-    icon: Box,
-    label: t('admin.property_setup.step2.modes.none.title'),
-    description: t('admin.property_setup.step2.modes.none.description'),
-  },
-  {
-    id: 'manual',
-    icon: Layers,
-    label: t('admin.property_setup.step2.modes.manual.title'),
-    description: t('admin.property_setup.step2.modes.manual.description'),
-  },
-  {
-    id: 'quick',
-    icon: Zap,
-    label: t('admin.property_setup.step2.modes.quick.title'),
-    description: t('admin.property_setup.step2.modes.quick.description'),
-  },
-])
+const recommendedSectionTypes = computed(
+  () => props.structureFormat?.levels.map((level) => level.section_type) ?? [],
+)
 
-const quickNumericFields = computed(() => [
-  { key: 'towers', label: t('admin.property_setup.step2.quick.towers'), errorKey: 'quick_structure.towers' },
-  {
-    key: 'floors_per_tower',
-    label: t('admin.property_setup.step2.quick.floors_per_tower'),
-    errorKey: 'quick_structure.floors_per_tower',
-  },
-  {
-    key: 'units_per_floor',
-    label: t('admin.property_setup.step2.quick.units_per_floor'),
-    errorKey: 'quick_structure.units_per_floor',
-  },
-])
+const propertyIdRef = toRef(() => props.propertyId)
+const quickEnabled = computed(() => selectedMode.value === 'quick' && !!props.structureFormat)
+const { nodes: quickNodes, counts: quickCounts } = usePropertySetupStructurePreview(
+  propertyIdRef,
+  quickParams,
+  quickEnabled,
+)
 
-const quickStructureSnapshot = computed(() => ({ ...quickStructure }))
+const quickPreview = computed(() => ({ nodes: quickNodes.value, counts: quickCounts.value }))
 
-const exposedStructureMode = computed(() => selectedMode.value)
+const modes = computed(() => {
+  const base = [
+    {
+      id: 'none',
+      icon: Box,
+      label: t('admin.property_setup.step2.modes.none.title'),
+      description: t('admin.property_setup.step2.modes.none.description'),
+    },
+    {
+      id: 'manual',
+      icon: Layers,
+      label: t('admin.property_setup.step2.modes.manual.title'),
+      description: t('admin.property_setup.step2.modes.manual.description'),
+    },
+  ]
+
+  if (props.structureFormat) {
+    base.push({
+      id: 'quick',
+      icon: Zap,
+      label: t('admin.property_setup.step2.modes.quick.title'),
+      description: t('admin.property_setup.step2.modes.quick.description'),
+    })
+  }
+
+  return base
+})
 
 function getValues() {
   return {
     structure_mode: selectedMode.value,
     quick_structure_confirmed: selectedMode.value === 'quick',
-    quick_structure:
-      selectedMode.value === 'quick'
-        ? { ...quickStructure }
-        : undefined,
+    quick_structure: selectedMode.value === 'quick' ? { ...quickParams.value } : undefined,
   }
 }
 
@@ -194,7 +171,7 @@ function validate() {
 defineExpose({
   getValues,
   validate,
-  selectedMode: exposedStructureMode,
-  quickStructure: quickStructureSnapshot,
+  selectedMode: computed(() => selectedMode.value),
+  quickPreview,
 })
 </script>

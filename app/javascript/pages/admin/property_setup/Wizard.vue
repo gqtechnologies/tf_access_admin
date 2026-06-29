@@ -33,6 +33,8 @@
             :wizard="wizardState"
             :section-types="sectionTypes"
             :preview="preview"
+            :structure-format="structureFormat"
+            :property-type="step2PropertyType"
           />
           <Step3Units
             v-else-if="currentStep === 3"
@@ -126,7 +128,7 @@
           v-else-if="currentStep === 2"
           :preview="preview"
           :structure-mode="step2StructureMode"
-          :quick-params="step2QuickParams"
+          :quick-preview="step2QuickPreview"
         />
         <UnitsPreviewPanel
           v-else-if="currentStep === 3"
@@ -169,6 +171,7 @@ import InitialSummaryPanel from '@/components/admin/property_setup/InitialSummar
 import StructurePreviewPanel from '@/components/admin/property_setup/StructurePreviewPanel.vue'
 import UnitsPreviewPanel from '@/components/admin/property_setup/UnitsPreviewPanel.vue'
 import Step5AsidePanel from '@/components/admin/property_setup/Step5AsidePanel.vue'
+import type { PropertyStructureFormat } from '@/lib/property_setup/structurePreview'
 
 const props = defineProps<{
   step: number
@@ -178,6 +181,8 @@ const props = defineProps<{
   property_types: string[]
   section_types: string[]
   unit_types: string[]
+  structure_format: PropertyStructureFormat | null
+  units_in: string | null
   next_actions: string[]
   errors?: Record<string, string[]>
 }>()
@@ -202,7 +207,11 @@ const formErrors = computed(() => props.errors ?? (page.props.errors as Record<s
 const isCompleted = computed(() => props.property?.status === 'configured')
 const completedThrough = computed(() => Math.max(0, currentStep.value - 1))
 
-const step2QuickParams = computed(() => toValue(step2Ref.value?.quickStructure) ?? undefined)
+const structureFormat = computed(() => props.structure_format ?? null)
+const step2PropertyType = computed(
+  () => (props.property?.property_type as string) ?? (wizardState.value.property_type as string) ?? '',
+)
+const step2QuickPreview = computed(() => toValue(step2Ref.value?.quickPreview) ?? undefined)
 const step2StructureMode = computed(
   () => toValue(step2Ref.value?.selectedMode) ?? (wizardState.value.structure_mode as string) ?? 'none',
 )

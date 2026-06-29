@@ -41,37 +41,28 @@ import { Building2, DoorOpen, Layers } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import StructurePreviewTreeNode from '@/components/admin/property_setup/StructurePreviewTreeNode.vue'
 import {
-  buildQuickStructureTree,
-  quickStructureCounts,
-  type QuickStructureParams,
+  buildTreeFromPreviewNodes,
+  type PreviewNode,
 } from '@/lib/property_setup/structurePreview'
+
+type QuickPreview = {
+  nodes: PreviewNode[]
+  counts: { level_1: number; level_2: number; sections: number }
+}
 
 const props = defineProps<{
   preview: Record<string, any>
   structureMode?: string
-  quickParams?: QuickStructureParams
+  quickPreview?: QuickPreview
 }>()
 
 const { t } = useI18n()
 
 const isQuickMode = computed(() => props.structureMode === 'quick')
 
-const counts = computed(() => {
-  if (isQuickMode.value && props.quickParams) {
-    return quickStructureCounts(props.quickParams)
-  }
-
-  return {
-    towers: props.preview?.counts?.towers ?? 0,
-    floors: props.preview?.counts?.floors ?? 0,
-    sections: props.preview?.counts?.sections ?? 0,
-    estimated_units: props.preview?.counts?.units ?? 0,
-  }
-})
-
 const tree = computed(() => {
-  if (isQuickMode.value && props.quickParams) {
-    return buildQuickStructureTree(props.quickParams)
+  if (isQuickMode.value && props.quickPreview) {
+    return buildTreeFromPreviewNodes(props.quickPreview.nodes)
   }
 
   return props.preview?.structure?.tree ?? []
@@ -81,24 +72,25 @@ const showStats = computed(() => props.structureMode !== 'none')
 
 const statCards = computed(() => {
   if (isQuickMode.value) {
+    const counts = props.quickPreview?.counts ?? { level_1: 0, level_2: 0, sections: 0 }
     return [
       {
-        key: 'towers',
+        key: 'level_1',
         icon: Building2,
-        value: counts.value.towers,
-        label: t('admin.property_setup.step2.preview.stats.towers'),
+        value: counts.level_1,
+        label: t('admin.property_setup.step2.preview.stats.level_1'),
       },
       {
-        key: 'floors',
+        key: 'level_2',
         icon: Layers,
-        value: counts.value.floors,
-        label: t('admin.property_setup.step2.preview.stats.floors'),
+        value: counts.level_2,
+        label: t('admin.property_setup.step2.preview.stats.level_2'),
       },
       {
-        key: 'units',
+        key: 'sections',
         icon: DoorOpen,
-        value: counts.value.estimated_units,
-        label: t('admin.property_setup.step2.preview.stats.estimated_units'),
+        value: counts.sections,
+        label: t('admin.property_setup.step2.preview.stats.sections'),
       },
     ]
   }
@@ -107,19 +99,19 @@ const statCards = computed(() => {
     {
       key: 'towers',
       icon: Building2,
-      value: counts.value.towers,
+      value: props.preview?.counts?.towers ?? 0,
       label: t('admin.property_setup.step2.preview.stats.towers'),
     },
     {
       key: 'floors',
       icon: Layers,
-      value: counts.value.floors,
+      value: props.preview?.counts?.floors ?? 0,
       label: t('admin.property_setup.step2.preview.stats.floors'),
     },
     {
       key: 'sections',
       icon: DoorOpen,
-      value: counts.value.sections,
+      value: props.preview?.counts?.sections ?? 0,
       label: t('admin.property_setup.step2.preview.stats.sections'),
     },
   ]
