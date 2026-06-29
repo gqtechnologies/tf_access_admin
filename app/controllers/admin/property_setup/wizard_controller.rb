@@ -223,6 +223,8 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def apply_step_side_effects!
     case current_step
+    when 1
+      apply_property_step!
     when 2
       apply_structure_step!
     when 3
@@ -230,7 +232,21 @@ class Admin::PropertySetup::WizardController < AdminController
     end
   end
 
+  def apply_property_step!
+    old_type = @property.property_type
+    update_property_descriptive!
+    return if @property.property_type == old_type
+
+    Properties::Setup::WizardState.merge!(
+      @property,
+      structure_mode: nil,
+      quick_structure_confirmed: nil,
+      property_type_changed: true
+    )
+  end
+
   def apply_structure_step!
+    Properties::Setup::WizardState.merge!(@property, property_type_changed: false)
     mode = step_params[:structure_mode].presence || Properties::Setup::WizardState.structure_mode(@property)
     Properties::Setup::WizardState.merge!(@property, structure_mode: mode)
 

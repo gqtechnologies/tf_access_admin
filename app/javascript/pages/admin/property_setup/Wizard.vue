@@ -26,16 +26,24 @@
             :initial-values="step1Values"
             :errors="formErrors"
           />
-          <Step2Structure
-            v-else-if="currentStep === 2"
-            ref="step2Ref"
-            :property-id="propertyId"
-            :wizard="wizardState"
-            :section-types="sectionTypes"
-            :preview="preview"
-            :structure-format="structureFormat"
-            :property-type="step2PropertyType"
-          />
+          <template v-else-if="currentStep === 2">
+            <Alert
+              v-if="wizardState.property_type_changed"
+              class="mb-4 border-amber-200 bg-amber-50 text-amber-900 [&>svg]:text-amber-700"
+            >
+              <Info class="size-4" />
+              <AlertDescription>{{ t('admin.property_setup.step2.property_type_changed_notice') }}</AlertDescription>
+            </Alert>
+            <Step2Structure
+              ref="step2Ref"
+              :property-id="propertyId"
+              :wizard="wizardState"
+              :section-types="sectionTypes"
+              :preview="preview"
+              :structure-format="structureFormat"
+              :property-type="step2PropertyType"
+            />
+          </template>
           <Step3Units
             v-else-if="currentStep === 3"
             ref="step3Ref"

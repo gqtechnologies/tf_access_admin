@@ -1575,6 +1575,7 @@ pt:
         step2:
           title: "Estrutura / seções"
           description: "Defina como o imóvel é organizado internamente."
+          property_type_changed_notice: "O tipo de imóvel foi alterado. A configuração de estrutura foi redefinida."
           modes:
             none:
               title: "Sem seções"

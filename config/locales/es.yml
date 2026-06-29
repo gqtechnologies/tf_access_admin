@@ -1554,6 +1554,7 @@ es:
         step2:
           title: "Estructura / secciones"
           description: "Define cómo se organiza internamente la propiedad."
+          property_type_changed_notice: "El tipo de propiedad cambió. La configuración de estructura fue reiniciada."
           modes:
             none:
               title: "Sin secciones"

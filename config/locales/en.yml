@@ -1627,6 +1627,7 @@ en:
         step2:
           title: "Structure / sections"
           description: "Define how the property is internally organized."
+          property_type_changed_notice: "The property type changed. The structure configuration has been reset."
           modes:
             none:
               title: "No sections"
