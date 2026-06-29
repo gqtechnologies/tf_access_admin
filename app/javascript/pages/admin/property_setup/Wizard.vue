@@ -44,6 +44,8 @@
             :unit-types="unitTypes"
             :preview="preview"
             :errors="formErrors"
+            :structure-mode="step3StructureMode"
+            :units-in="props.units_in"
           />
           <Step4Summary v-else-if="currentStep === 4" :preview="preview" />
           <Step5Confirm

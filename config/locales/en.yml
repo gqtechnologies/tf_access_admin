@@ -1681,6 +1681,7 @@ en:
           errors:
             mode_required: "Select a units creation mode."
             no_units: "Create at least one unit before continuing."
+            no_leaf_sections: "The structure has no sections of the required type to generate units automatically."
           validations:
             unit_type_required: "Unit type is required"
             identifier_format_required: "Identifier format is required"
@@ -1694,9 +1695,11 @@ en:
             unit_type: "Unit type"
             identifier_format: "Identifier format"
             example: "Example"
-            quantity_per_floor: "Quantity per floor"
+            units_per_floor: "Quantity per floor"
+            units_per_block: "Quantity per block"
             formats:
               floor_sequential: "Floor + sequential"
+              block_sequential: "Block + sequential"
               sequential: "Simple sequential"
             parking:
               title: "Also create parking spaces"

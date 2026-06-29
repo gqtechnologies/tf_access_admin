@@ -253,7 +253,7 @@ class Admin::PropertySetup::WizardController < AdminController
     Properties::Setup::ApplyAutomaticUnits.call(
       actor: current_user,
       property: @property,
-      count: step_params.dig(:unit_generation, :quantity_per_floor)
+      count: step_params.dig(:unit_generation, :units_per_leaf)
     ) if mode == "automatic"
   end
 

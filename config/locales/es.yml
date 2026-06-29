@@ -1608,6 +1608,7 @@ es:
           errors:
             mode_required: "Selecciona un modo para crear unidades."
             no_units: "Debes crear al menos una unidad antes de continuar."
+            no_leaf_sections: "La estructura no tiene secciones del tipo requerido para generar unidades automáticamente."
           validations:
             unit_type_required: "El tipo de unidad es obligatorio"
             identifier_format_required: "El formato de identificador es obligatorio"
@@ -1621,9 +1622,11 @@ es:
             unit_type: "Tipo de unidad"
             identifier_format: "Formato de identificador"
             example: "Ejemplo"
-            quantity_per_floor: "Cantidad por piso"
+            units_per_floor: "Cantidad por piso"
+            units_per_block: "Cantidad por bloque"
             formats:
               floor_sequential: "Piso + correlativo"
+              block_sequential: "Bloque + correlativo"
               sequential: "Correlativo simple"
             parking:
               title: "Crear también estacionamientos"

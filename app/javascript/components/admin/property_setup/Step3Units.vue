@@ -79,11 +79,12 @@
                 class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
                 :aria-invalid="!!fieldError('unit_generation.identifier_format')"
               >
-                <option value="floor_sequential">
-                  {{ t('admin.property_setup.step3.automatic.formats.floor_sequential') }}
-                </option>
-                <option value="sequential">
-                  {{ t('admin.property_setup.step3.automatic.formats.sequential') }}
+                <option
+                  v-for="opt in identifierFormatOptions"
+                  :key="opt.value"
+                  :value="opt.value"
+                >
+                  {{ opt.label }}
                 </option>
               </select>
               <FieldError
@@ -95,17 +96,17 @@
               <FieldLabel>{{ t('admin.property_setup.step3.automatic.example') }}</FieldLabel>
               <Input :model-value="exampleIdentifiers" readonly class="bg-muted" />
             </Field>
-            <Field :data-invalid="!!fieldError('unit_generation.quantity_per_floor')">
-              <FieldLabel>{{ t('admin.property_setup.step3.automatic.quantity_per_floor') }}</FieldLabel>
+            <Field :data-invalid="!!fieldError('unit_generation.units_per_leaf')">
+              <FieldLabel>{{ unitsPerLeafLabel }}</FieldLabel>
               <Input
-                v-model.number="autoForm.quantity_per_floor"
+                v-model.number="autoForm.units_per_leaf"
                 type="number"
                 min="1"
-                :aria-invalid="!!fieldError('unit_generation.quantity_per_floor')"
+                :aria-invalid="!!fieldError('unit_generation.units_per_leaf')"
               />
               <FieldError
-                v-if="fieldError('unit_generation.quantity_per_floor')"
-                :errors="translateErrors([fieldError('unit_generation.quantity_per_floor')])"
+                v-if="fieldError('unit_generation.units_per_leaf')"
+                :errors="translateErrors([fieldError('unit_generation.units_per_leaf')])"
               />
             </Field>
           </div>
@@ -167,6 +168,8 @@ const props = defineProps<{
   unitTypes: string[]
   preview: Record<string, any>
   errors?: Record<string, string[]>
+  structureMode?: string
+  unitsIn?: string | null
 }>()
 
 const { t } = useI18n()
@@ -177,13 +180,20 @@ const selectedMode = ref((props.wizard.units_mode as string) || 'automatic')
 const autoForm = reactive({
   unit_type: 'apartment',
   identifier_format: 'floor_sequential',
-  quantity_per_floor: 4,
+  units_per_leaf: 4,
 })
 
 watch(
   () => props.wizard.units_mode,
   (mode) => {
     if (mode) selectedMode.value = mode as string
+  },
+)
+
+watch(
+  () => props.unitsIn,
+  (val) => {
+    autoForm.identifier_format = val === 'block' ? 'block_sequential' : 'floor_sequential'
   },
 )
 
@@ -204,10 +214,33 @@ const towerCount = computed(() => props.preview?.counts?.towers ?? 0)
 const floorCount = computed(() => props.preview?.counts?.floors ?? 0)
 const sectionTree = computed(() => props.preview?.structure?.tree ?? [])
 
+const identifierFormatOptions = computed(() => {
+  const base = [
+    { value: 'floor_sequential', label: t('admin.property_setup.step3.automatic.formats.floor_sequential') },
+    { value: 'sequential', label: t('admin.property_setup.step3.automatic.formats.sequential') },
+  ]
+  if (props.unitsIn === 'block') {
+    return [
+      { value: 'block_sequential', label: t('admin.property_setup.step3.automatic.formats.block_sequential') },
+      { value: 'sequential', label: t('admin.property_setup.step3.automatic.formats.sequential') },
+    ]
+  }
+  return base
+})
+
+const unitsPerLeafLabel = computed(() =>
+  props.unitsIn === 'block'
+    ? t('admin.property_setup.step3.automatic.units_per_block')
+    : t('admin.property_setup.step3.automatic.units_per_floor'),
+)
+
 const exampleIdentifiers = computed(() => {
-  const qty = Math.max(autoForm.quantity_per_floor, 1)
+  const qty = Math.max(autoForm.units_per_leaf, 1)
   if (autoForm.identifier_format === 'floor_sequential') {
     return Array.from({ length: qty }, (_, index) => 101 + index).join(', ')
+  }
+  if (autoForm.identifier_format === 'block_sequential') {
+    return Array.from({ length: qty }, (_, index) => `B${101 + index}`).join(', ')
   }
   return Array.from({ length: qty }, (_, index) => index + 1).join(', ')
 })
@@ -215,7 +248,7 @@ const exampleIdentifiers = computed(() => {
 const previewParams = computed(() => ({
   unit_type: autoForm.unit_type,
   identifier_format: autoForm.identifier_format,
-  quantity_per_floor: autoForm.quantity_per_floor,
+  units_per_leaf: autoForm.units_per_leaf,
 }))
 
 const isAutomaticMode = computed(() => selectedMode.value === 'automatic')
@@ -236,28 +269,30 @@ const issues = computed(() => {
   return list
 })
 
-const modes = computed(() => [
-  {
-    id: 'automatic',
-    icon: Sparkles,
-    label: t('admin.property_setup.step3.modes.automatic.title'),
-    description: t('admin.property_setup.step3.modes.automatic.description'),
-  },
-  {
+const isQuickStructure = computed(() => props.structureMode === 'quick')
+
+const modes = computed(() => {
+  const list = []
+  if (isQuickStructure.value) {
+    list.push({
+      id: 'automatic',
+      icon: Sparkles,
+      label: t('admin.property_setup.step3.modes.automatic.title'),
+      description: t('admin.property_setup.step3.modes.automatic.description'),
+    })
+  }
+  list.push({
     id: 'import',
     icon: FileSpreadsheet,
     label: t('admin.property_setup.step3.modes.import.title'),
     description: t('admin.property_setup.step3.modes.import.description'),
-  },
-])
+  })
+  return list
+})
 
 const estimatedUnitsCount = computed(() => {
   if (selectedMode.value !== 'automatic') return null
-  const groups = buildUnitsPreviewFromTree(
-    sectionTree.value,
-    previewParams.value,
-  )
-  return countUnitsPreviewGroups(groups)
+  return countUnitsPreviewGroups(buildUnitsPreviewFromTree(sectionTree.value, previewParams.value))
 })
 
 function getValues() {
@@ -272,7 +307,7 @@ function getValues() {
     units_mode: selectedMode.value,
     unit_generation: {
       unit_type: autoForm.unit_type,
-      quantity_per_floor: autoForm.quantity_per_floor,
+      units_per_leaf: autoForm.units_per_leaf,
     },
   }
 }

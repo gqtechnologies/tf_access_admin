@@ -3,7 +3,7 @@ import type { StructureTreeNode } from '@/lib/property_setup/structurePreview'
 export type UnitsPreviewParams = {
   unit_type?: string
   identifier_format?: string
-  quantity_per_floor?: number
+  units_per_leaf?: number
 }
 
 export type UnitsPreviewGroup = {
@@ -12,12 +12,14 @@ export type UnitsPreviewGroup = {
 }
 
 export function unitIdentifiers(node: StructureTreeNode, params: UnitsPreviewParams): string[] {
-  const quantity = Math.max(params.quantity_per_floor ?? 4, 1)
+  const quantity = Math.max(params.units_per_leaf ?? 4, 1)
   const format = params.identifier_format ?? 'floor_sequential'
   const base = floorBase(node, format)
-  return Array.from({ length: quantity }, (_, index) =>
-    format === 'floor_sequential' ? String(base + index + 1) : String(index + 1),
-  )
+  return Array.from({ length: quantity }, (_, index) => {
+    if (format === 'floor_sequential') return String(base + index + 1)
+    if (format === 'block_sequential') return `B${base + index + 1}`
+    return String(index + 1)
+  })
 }
 
 /** Deep-clones the section tree and injects projected unit identifiers into each
@@ -48,14 +50,7 @@ function floorBase(floor: StructureTreeNode, format: string): number {
 }
 
 function identifiersForFloor(floor: StructureTreeNode, params: UnitsPreviewParams): string {
-  const quantity = Math.max(params.quantity_per_floor ?? 4, 1)
-  const format = params.identifier_format ?? 'floor_sequential'
-  const base = floorBase(floor, format)
-
-  return Array.from({ length: quantity }, (_, index) => {
-    if (format === 'floor_sequential') return String(base + index + 1)
-    return String(index + 1)
-  }).join(', ')
+  return unitIdentifiers(floor, params).join(', ')
 }
 
 export function buildUnitsPreviewFromTree(

@@ -87,6 +87,13 @@ module Properties
           errors[:units] = [ I18n.t("frontend.admin.property_setup.step3.errors.no_units") ]
         end
 
+        if mode == "automatic"
+          format = StructureFormatResolver.for(property_type: @property.property_type)
+          if format && @property.property_sections.where(section_type: format.units_in).none?
+            errors[:structure] = [ I18n.t("frontend.admin.property_setup.step3.errors.no_leaf_sections") ]
+          end
+        end
+
         { valid: errors.empty?, errors: errors }
       end
 

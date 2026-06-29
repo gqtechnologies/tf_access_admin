@@ -121,7 +121,7 @@ const displayTotalUnits = computed(() => {
 
   const towers = props.preview?.counts?.towers ?? 0
   const floors = props.preview?.counts?.floors ?? 0
-  const perFloor = props.generationParams?.quantity_per_floor ?? 4
+  const perFloor = props.generationParams?.units_per_leaf ?? 4
 
   if (towers > 0 && floors > 0) return floors * perFloor
 
@@ -132,7 +132,7 @@ const displayTotalUnits = computed(() => {
 const summaryExplanation = computed(() => {
   const towers = props.preview?.counts?.towers ?? 0
   const floors = props.preview?.counts?.floors ?? 0
-  const perFloor = props.generationParams?.quantity_per_floor ?? 4
+  const perFloor = props.generationParams?.units_per_leaf ?? 4
 
   if (towers > 0 && floors > 0) {
     return t('admin.property_setup.step3.preview.explanation_with_structure', {

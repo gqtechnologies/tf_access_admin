@@ -79,7 +79,7 @@ export function usePropertySetupUnitsPreview(
       per_page: String(FETCH_PER_PAGE),
       unit_type: params.value.unit_type ?? 'apartment',
       identifier_format: params.value.identifier_format ?? 'floor_sequential',
-      quantity_per_floor: String(params.value.quantity_per_floor ?? 4),
+      units_per_leaf: String(params.value.units_per_leaf ?? 4),
     })
 
     const { res, data } = await railsFetchJson<{
