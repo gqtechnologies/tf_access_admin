@@ -130,13 +130,20 @@
           :structure-mode="step2StructureMode"
           :quick-preview="step2QuickPreview"
         />
-        <UnitsPreviewPanel
-          v-else-if="currentStep === 3"
-          :property-id="propertyId"
-          :preview="preview"
-          :generation-params="step3PreviewParams"
-          :automatic-mode="step3AutomaticMode"
-        />
+        <template v-else-if="currentStep === 3">
+          <StructurePreviewPanel
+            :preview="preview"
+            :structure-mode="step3StructureMode"
+            :tree-with-units="step3ClientPreviewTree"
+            :units-count="step3UnitsCount"
+          />
+          <!-- <UnitsPreviewPanel
+            :property-id="propertyId"
+            :preview="preview"
+            :generation-params="step3PreviewParams"
+            :automatic-mode="step3AutomaticMode"
+          /> -->
+        </template>
         <StructurePreviewPanel
           v-else-if="currentStep === 4"
           :preview="preview"
@@ -169,7 +176,6 @@ import Step4Summary from '@/components/admin/property_setup/Step4Summary.vue'
 import Step5Confirm from '@/components/admin/property_setup/Step5Confirm.vue'
 import InitialSummaryPanel from '@/components/admin/property_setup/InitialSummaryPanel.vue'
 import StructurePreviewPanel from '@/components/admin/property_setup/StructurePreviewPanel.vue'
-import UnitsPreviewPanel from '@/components/admin/property_setup/UnitsPreviewPanel.vue'
 import Step5AsidePanel from '@/components/admin/property_setup/Step5AsidePanel.vue'
 import type { PropertyStructureFormat } from '@/lib/property_setup/structurePreview'
 
@@ -216,8 +222,16 @@ const step2StructureMode = computed(
   () => toValue(step2Ref.value?.selectedMode) ?? (wizardState.value.structure_mode as string) ?? 'none',
 )
 
-const step3PreviewParams = computed(() => toValue(step3Ref.value?.previewParams) ?? undefined)
-const step3AutomaticMode = computed(() => toValue(step3Ref.value?.isAutomaticMode) ?? false)
+const step3ClientPreviewTree = computed(() => toValue(step3Ref.value?.clientPreviewTree) ?? undefined)
+const step3UnitsCount = computed(() => {
+  const fromForm = toValue(step3Ref.value?.estimatedUnitsCount)
+  if (fromForm != null) return fromForm
+
+  // fallback: unidades ya guardadas en servidor
+  return (preview.value as any)?.counts?.units ?? null
+})
+const step3StructureMode = computed(() => (wizardState.value.structure_mode as string) ?? 'none')
+// const step3UnitsCount = computed(() => (preview.value as any)?.counts?.units ?? 0)
 const step4StructureMode = computed(() => (wizardState.value.structure_mode as string) ?? 'none')
 
 const showAside = computed(() => currentStep.value <= 5)

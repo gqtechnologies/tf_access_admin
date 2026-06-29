@@ -11,6 +11,31 @@ export type UnitsPreviewGroup = {
   identifiers: string
 }
 
+export function unitIdentifiers(node: StructureTreeNode, params: UnitsPreviewParams): string[] {
+  const quantity = Math.max(params.quantity_per_floor ?? 4, 1)
+  const format = params.identifier_format ?? 'floor_sequential'
+  const base = floorBase(node, format)
+  return Array.from({ length: quantity }, (_, index) =>
+    format === 'floor_sequential' ? String(base + index + 1) : String(index + 1),
+  )
+}
+
+/** Deep-clones the section tree and injects projected unit identifiers into each
+ * leaf node. Used to render the step-3 client preview. */
+export function buildTreeWithUnits(
+  tree: StructureTreeNode[],
+  params: UnitsPreviewParams,
+): StructureTreeNode[] {
+  function inject(node: StructureTreeNode): StructureTreeNode {
+    const children = node.children ?? []
+    if (children.length > 0) {
+      return { ...node, children: children.map(inject) }
+    }
+    return { ...node, units: unitIdentifiers(node, params) }
+  }
+  return tree.map(inject)
+}
+
 function floorBase(floor: StructureTreeNode, format: string): number {
   if (format !== 'floor_sequential') return 1
 

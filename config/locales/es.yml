@@ -1601,6 +1601,7 @@ es:
               estimated_units: "unidades estimadas"
               level_1: "Nivel 1"
               level_2: "Nivel 2"
+              units: "unidades"
         step3:
           title: "Unidades"
           description: "Elige el método para crear unidades."

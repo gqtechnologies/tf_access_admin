@@ -33,6 +33,8 @@ export type StructureTreeNode = {
   name: string
   position?: number
   children?: StructureTreeNode[]
+  /** Projected unit identifiers injected into leaf nodes for step 3 preview. */
+  units?: string[]
 }
 
 export type TreeChildDisplayItem =

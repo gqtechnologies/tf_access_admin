@@ -2,7 +2,7 @@
   <li class="list-none">
     <Collapsible v-model:open="open" class="w-full">
       <CollapsibleTrigger
-        v-if="hasChildren"
+        v-if="isCollapsible"
         class="hover:bg-muted/50 flex w-full items-center gap-2 rounded-md px-1 py-1.5 text-left"
       >
         <ChevronRight
@@ -19,22 +19,52 @@
         <span class="text-sm font-medium">{{ node.name }}</span>
       </div>
 
-      <CollapsibleContent v-if="hasChildren">
+      <CollapsibleContent v-if="isCollapsible">
         <ul class="text-muted-foreground mt-1 ml-3 space-y-1 border-l border-dashed pl-4">
-          <li
-            v-for="item in visibleChildren"
-            :key="item.kind === 'ellipsis' ? `${node.id}-ellipsis` : item.node.id"
-            class="relative flex items-center gap-2 py-0.5"
-          >
-            <span
-              class="bg-border absolute top-1/2 -left-4 h-px w-3 -translate-y-1/2"
-              aria-hidden="true"
-            />
-            <Layers class="size-3.5 shrink-0" />
-            <span class="text-sm">
-              {{ item.kind === 'ellipsis' ? '...' : item.node.name }}
-            </span>
-          </li>
+          <!-- Nested section children -->
+          <template v-if="hasChildren">
+            <li
+              v-for="item in visibleChildren"
+              :key="item.kind === 'ellipsis' ? `${node.id}-ellipsis` : item.node.id"
+              class="relative list-none"
+            >
+              <span
+                class="bg-border absolute top-1/2 -left-4 h-px w-3 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <StructurePreviewTreeNode
+                v-if="item.kind === 'child'"
+                :node="item.node"
+              />
+              <div v-else class="flex items-center gap-2 py-0.5">
+                <Layers class="size-3.5 shrink-0" />
+                <span class="text-sm">...</span>
+              </div>
+            </li>
+          </template>
+
+          <!-- Projected units inside leaf nodes -->
+          <template v-if="hasUnits">
+            <li
+              v-for="(uid, i) in visibleUnits"
+              :key="`unit-${i}`"
+              class="relative flex items-center gap-2 py-0.5"
+            >
+              <span
+                class="bg-border absolute top-1/2 -left-4 h-px w-3 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              <DoorOpen class="size-3.5 shrink-0" />
+              <span class="text-sm">{{ uid }}</span>
+            </li>
+            <li v-if="(node.units?.length ?? 0) > MAX_UNITS" class="relative flex items-center gap-2 py-0.5 text-sm">
+              <span
+                class="bg-border absolute top-1/2 -left-4 h-px w-3 -translate-y-1/2"
+                aria-hidden="true"
+              />
+              ...
+            </li>
+          </template>
         </ul>
       </CollapsibleContent>
     </Collapsible>
@@ -43,7 +73,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Building2, ChevronRight, Layers } from 'lucide-vue-next'
+import { Building2, ChevronRight, DoorOpen, Layers } from 'lucide-vue-next'
 import {
   Collapsible,
   CollapsibleContent,
@@ -58,7 +88,12 @@ const props = defineProps<{
   node: StructureTreeNode
 }>()
 
+const MAX_UNITS = 4
+
 const open = ref(true)
 const hasChildren = computed(() => (props.node.children?.length ?? 0) > 0)
+const hasUnits = computed(() => (props.node.units?.length ?? 0) > 0)
+const isCollapsible = computed(() => hasChildren.value || hasUnits.value)
 const visibleChildren = computed(() => displayTreeChildren(props.node.children))
+const visibleUnits = computed(() => (props.node.units ?? []).slice(0, MAX_UNITS))
 </script>

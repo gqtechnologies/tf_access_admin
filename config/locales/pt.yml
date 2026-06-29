@@ -1622,6 +1622,7 @@ pt:
               estimated_units: "unidades estimadas"
               level_1: "Nível 1"
               level_2: "Nível 2"
+              units: "unidades"
         step3:
           title: "Unidades"
           description: "Escolha o método para criar unidades."

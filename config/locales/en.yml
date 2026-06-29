@@ -1674,6 +1674,7 @@ en:
               estimated_units: "estimated units"
               level_1: "Level 1"
               level_2: "Level 2"
+              units: "units"
         step3:
           title: "Units"
           description: "Choose how to create units."

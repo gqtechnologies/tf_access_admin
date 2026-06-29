@@ -159,6 +159,7 @@ import BulkUnitsImportDrawer from '@/components/admin/bulk_units/BulkUnitsImport
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
 import { usePropertySetupStepValidation } from '@/lib/composables/property_setup/usePropertySetupStepValidation'
 import type { PropertySetupStep3Values } from '@/lib/schemas/property_setup'
+import { buildTreeWithUnits, buildUnitsPreviewFromTree, countUnitsPreviewGroups } from '@/lib/property_setup/unitsPreview'
 
 const props = defineProps<{
   property: Record<string, unknown> | null
@@ -219,12 +220,18 @@ const previewParams = computed(() => ({
 
 const isAutomaticMode = computed(() => selectedMode.value === 'automatic')
 
+const attempted = ref(false)
+
 const issues = computed(() => {
   const list: string[] = []
   if (props.errors) {
     Object.values(props.errors).forEach((messages) => list.push(...messages))
   }
-  if (props.preview?.blocking_errors?.length) list.push(...props.preview.blocking_errors)
+  // Proactive server blocking errors (e.g. "no units yet") are only surfaced
+  // after the user tries to continue, not on first render.
+  if (attempted.value && props.preview?.blocking_errors?.length) {
+    list.push(...props.preview.blocking_errors)
+  }
   if (props.preview?.warnings?.length) list.push(...props.preview.warnings)
   return list
 })
@@ -244,6 +251,15 @@ const modes = computed(() => [
   },
 ])
 
+const estimatedUnitsCount = computed(() => {
+  if (selectedMode.value !== 'automatic') return null
+  const groups = buildUnitsPreviewFromTree(
+    sectionTree.value,
+    previewParams.value,
+  )
+  return countUnitsPreviewGroups(groups)
+})
+
 function getValues() {
   if (selectedMode.value === 'automatic') {
     return {
@@ -262,8 +278,14 @@ function getValues() {
 }
 
 function validate() {
+  attempted.value = true
   return validateStep3(getValues() as PropertySetupStep3Values)
 }
 
-defineExpose({ getValues, previewParams, isAutomaticMode, validate })
+const clientPreviewTree = computed(() => {
+  if (selectedMode.value !== 'automatic') return undefined
+  return buildTreeWithUnits(sectionTree.value, previewParams.value)
+})
+
+defineExpose({ getValues, previewParams, isAutomaticMode, validate, estimatedUnitsCount, clientPreviewTree })
 </script>

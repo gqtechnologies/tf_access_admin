@@ -19,7 +19,7 @@
         </CardContent>
       </Card>
 
-      <div v-if="showStats" class="grid shrink-0 grid-cols-3 gap-2 border-t pt-3">
+      <div v-if="showStats" class="grid shrink-0 grid-cols-1 gap-2 border-t pt-3">
         <div
           v-for="stat in statCards"
           :key="stat.key"
@@ -37,12 +37,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Building2, DoorOpen, Layers } from 'lucide-vue-next'
+import { DoorOpen } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import StructurePreviewTreeNode from '@/components/admin/property_setup/StructurePreviewTreeNode.vue'
 import {
   buildTreeFromPreviewNodes,
   type PreviewNode,
+  type StructureTreeNode,
 } from '@/lib/property_setup/structurePreview'
 
 type QuickPreview = {
@@ -53,7 +54,13 @@ type QuickPreview = {
 const props = defineProps<{
   preview: Record<string, any>
   structureMode?: string
+  /** Step 2: client preview built from quick-structure form (backend flat nodes). */
   quickPreview?: QuickPreview
+  /** Step 3: section tree with projected units already injected into leaf nodes. */
+  treeWithUnits?: StructureTreeNode[]
+  // When provided, a units total is shown below the tree (step 3). Omitted in
+  // step 2, where the panel shows only the section hierarchy.
+  unitsCount?: number | null
 }>()
 
 const { t } = useI18n()
@@ -61,6 +68,10 @@ const { t } = useI18n()
 const isQuickMode = computed(() => props.structureMode === 'quick')
 
 const tree = computed(() => {
+  if (props.treeWithUnits) {
+    return props.treeWithUnits
+  }
+
   if (isQuickMode.value && props.quickPreview) {
     return buildTreeFromPreviewNodes(props.quickPreview.nodes)
   }
@@ -68,54 +79,18 @@ const tree = computed(() => {
   return props.preview?.structure?.tree ?? []
 })
 
-const showStats = computed(() => props.structureMode !== 'none')
+// The numeric stat refers to the property's units, shown only when a units
+// total is provided (step 3). Step 2 shows just the section hierarchy.
+const showStats = computed(() => props.unitsCount != null)
 
-const statCards = computed(() => {
-  if (isQuickMode.value) {
-    const counts = props.quickPreview?.counts ?? { level_1: 0, level_2: 0, sections: 0 }
-    return [
-      {
-        key: 'level_1',
-        icon: Building2,
-        value: counts.level_1,
-        label: t('admin.property_setup.step2.preview.stats.level_1'),
-      },
-      {
-        key: 'level_2',
-        icon: Layers,
-        value: counts.level_2,
-        label: t('admin.property_setup.step2.preview.stats.level_2'),
-      },
-      {
-        key: 'sections',
-        icon: DoorOpen,
-        value: counts.sections,
-        label: t('admin.property_setup.step2.preview.stats.sections'),
-      },
-    ]
-  }
-
-  return [
-    {
-      key: 'towers',
-      icon: Building2,
-      value: props.preview?.counts?.towers ?? 0,
-      label: t('admin.property_setup.step2.preview.stats.towers'),
-    },
-    {
-      key: 'floors',
-      icon: Layers,
-      value: props.preview?.counts?.floors ?? 0,
-      label: t('admin.property_setup.step2.preview.stats.floors'),
-    },
-    {
-      key: 'sections',
-      icon: DoorOpen,
-      value: props.preview?.counts?.sections ?? 0,
-      label: t('admin.property_setup.step2.preview.stats.sections'),
-    },
-  ]
-})
+const statCards = computed(() => [
+  {
+    key: 'units',
+    icon: DoorOpen,
+    value: props.unitsCount ?? 0,
+    label: t('admin.property_setup.step2.preview.stats.units'),
+  },
+])
 
 const placeholder = computed(() => {
   if (props.structureMode === 'none') {
