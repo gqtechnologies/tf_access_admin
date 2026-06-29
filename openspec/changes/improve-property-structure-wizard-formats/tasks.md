@@ -49,15 +49,15 @@
 
 ## 8. Step 3 — gate de modo automatic y formulario adaptado
 
-- [ ] 8.1 Agregar `structure_mode` a las props del wizard en step 3 para que el frontend sepa si step 2 fue `quick`, `manual` o `none`
-- [ ] 8.2 En `Step3Units.vue`, mostrar la opción de generación automática solo cuando `structure_mode === 'quick'`; en los demás casos mostrar únicamente bulk import
-- [ ] 8.3 Leer `units_in` de las props del wizard en `Step3Units.vue` y usarlo para determinar las opciones de formato de identificador
-- [ ] 8.4 Cuando `units_in === 'floor'`, mostrar opciones "piso + correlativo" (101, 102...) y "solo correlativo" (1, 2...)
-- [ ] 8.5 Cuando `units_in === 'block'`, mostrar opciones "bloque + correlativo" (B101, B102...) y "solo correlativo" (1, 2...)
-- [ ] 8.6 Agregar validación en backend que verifica que la sección destino de cada unidad tenga el `section_type` igual a `units_in`
-- [ ] 8.7 Renombrar `quantity_per_floor` a `units_per_leaf` en `Step3Units.vue` y adaptar su etiqueta según `units_in`: "Unidades por piso" cuando `floor`, "Unidades por bloque" cuando `block`
-- [ ] 8.8 Agregar i18n keys para las nuevas opciones de formato de identificador y etiqueta adaptada en `es`, `en` y `pt`
-- [ ] 8.9 Escribir tests para la validación backend de `units_in`
+- [x] 8.1 Agregar `structure_mode` a las props del wizard en step 3 para que el frontend sepa si step 2 fue `quick`, `manual` o `none`
+- [x] 8.2 En `Step3Units.vue`, mostrar la opción de generación automática solo cuando `structure_mode === 'quick'`; en los demás casos mostrar únicamente bulk import
+- [x] 8.3 Leer `units_in` de las props del wizard en `Step3Units.vue` y usarlo para determinar las opciones de formato de identificador
+- [x] 8.4 Cuando `units_in === 'floor'`, mostrar opciones "piso + correlativo" (101, 102...) y "solo correlativo" (1, 2...)
+- [x] 8.5 Cuando `units_in === 'block'`, mostrar opciones "bloque + correlativo" (B101, B102...) y "solo correlativo" (1, 2...)
+- [x] 8.6 Agregar validación en backend que verifica que la sección destino de cada unidad tenga el `section_type` igual a `units_in`
+- [x] 8.7 Renombrar `quantity_per_floor` a `units_per_leaf` en `Step3Units.vue` y adaptar su etiqueta según `units_in`: "Unidades por piso" cuando `floor`, "Unidades por bloque" cuando `block`
+- [x] 8.8 Agregar i18n keys para las nuevas opciones de formato de identificador y etiqueta adaptada en `es`, `en` y `pt`
+- [x] 8.9 Escribir tests para la validación backend de `units_in`
 - [ ] 8.10 Escribir tests de controller/frontend para el gate: automatic disponible solo con structure_mode quick
 
 ## 9. Reinicio de formato al cambiar property_type

@@ -45,6 +45,42 @@ class Properties::Setup::ValidateStepTest < ActiveSupport::TestCase
     refute result[:valid]
   end
 
+  test "step 3 automatic mode passes when leaf sections of units_in type exist" do
+    @property.update!(
+      property_type: PropertyTypes::BUILDING,
+      metadata: { "setup_wizard" => { "structure_mode" => "quick" } }
+    )
+    @property.property_sections.create!(
+      organization: @organization,
+      name: "Piso 1",
+      section_type: SectionTypes::FLOOR
+    )
+
+    result = Properties::Setup::ValidateStep.new(
+      property: @property,
+      step: 3,
+      attributes: { units_mode: "automatic" }
+    ).call
+
+    assert result[:valid]
+  end
+
+  test "step 3 automatic mode fails when no leaf sections of units_in type exist" do
+    @property.update!(
+      property_type: PropertyTypes::BUILDING,
+      metadata: { "setup_wizard" => { "structure_mode" => "quick" } }
+    )
+
+    result = Properties::Setup::ValidateStep.new(
+      property: @property,
+      step: 3,
+      attributes: { units_mode: "automatic" }
+    ).call
+
+    refute result[:valid]
+    assert result[:errors].key?(:structure)
+  end
+
   test "generate structure preview paginates nodes" do
     preview = Properties::Setup::GenerateStructurePreview.call(
       params: { towers: 2, floors_per_tower: 3, units_per_floor: 4 },
