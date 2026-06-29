@@ -62,15 +62,15 @@
 
 ## 9. Reinicio de formato al cambiar property_type
 
-- [ ] 9.1 Detectar cambio de `property_type` al navegar de step 2 a step 1 en el wizard frontend
-- [ ] 9.2 Descarta los valores de structure del wizardState cuando el formato cambia
-- [ ] 9.3 Mostrar aviso "El tipo de propiedad cambió. La configuración de estructura fue reiniciada."
-- [ ] 9.4 Asegurar que el controller del wizard retorna el nuevo `structure_format` al regresar a step 2
+- [x] 9.1 Detectar cambio de `property_type` al navegar de step 2 a step 1 en el wizard frontend
+- [x] 9.2 Descarta los valores de structure del wizardState cuando el formato cambia
+- [x] 9.3 Mostrar aviso "El tipo de propiedad cambió. La configuración de estructura fue reiniciada."
+- [x] 9.4 Asegurar que el controller del wizard retorna el nuevo `structure_format` al regresar a step 2
 
 ## 10. Compatibilidad con propiedades existentes y verificación final
 
-- [ ] 10.1 Verificar que propiedades con secciones existentes de cualquier tipo siguen visualizándose correctamente
-- [ ] 10.2 Verificar que el wizard en modo de re-configuración (propiedad con secciones ya creadas) muestra step 2 en modo lectura
-- [ ] 10.3 Verificar que ningún cambio de `property_type` en edición altera secciones ya persistidas
-- [ ] 10.4 Ejecutar suite de tests del wizard para confirmar que los scenarios existentes no regresionan
-- [ ] 10.5 Revisar i18n: confirmar que todas las keys existen en `es`, `en` y `pt` sin strings hardcodeados
+- [x] 10.1 Verificar que propiedades con secciones existentes de cualquier tipo siguen visualizándose correctamente
+- [x] 10.2 Verificar que el wizard en modo de re-configuración (propiedad con secciones ya creadas) muestra step 2 en modo lectura
+- [x] 10.3 Verificar que ningún cambio de `property_type` en edición altera secciones ya persistidas
+- [x] 10.4 Ejecutar suite de tests del wizard para confirmar que los scenarios existentes no regresionan
+- [x] 10.5 Revisar i18n: confirmar que todas las keys existen en `es`, `en` y `pt` sin strings hardcodeados
