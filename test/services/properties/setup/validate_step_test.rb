@@ -54,7 +54,7 @@ class Properties::Setup::ValidateStepTest < ActiveSupport::TestCase
 
     assert_equal 5, preview[:nodes].size
     assert_equal 8, preview[:pagination][:total]
-    assert_equal 2, preview[:counts][:towers]
+    assert_equal 2, preview[:counts][:level_1]
   end
 
   test "generate units preview paginates rows" do

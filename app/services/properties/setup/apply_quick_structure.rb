@@ -14,8 +14,9 @@ module Properties
         authorize_setup_property!(@property)
         return Result.invalid(@property) unless @property.status == PropertyStatuses::DRAFT
 
-        preview = GenerateStructurePreview.call(params: @params, page: 1, per_page: 10_000)
-        tower_map = {}
+        format = StructureFormatResolver.for(property_type: @property.property_type)
+        preview = GenerateStructurePreview.call(params: @params, format: format, page: 1, per_page: 10_000)
+        parent_map = {}
 
         ActiveRecord::Base.transaction do
           @property.property_sections.where.not(parent_id: nil).destroy_all
@@ -33,14 +34,14 @@ module Properties
               )
               raise ActiveRecord::Rollback unless result.success?
 
-              tower_map[node[:id]] = result.section
+              parent_map[node[:id]] = result.section
             end
           end
 
           preview[:nodes].each do |node|
             next unless node[:depth] == 2
 
-            parent = tower_map[node[:parent_id]]
+            parent = parent_map[node[:parent_id]]
             next if parent.nil?
 
             result = PropertySections::Create.call(

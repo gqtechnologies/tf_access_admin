@@ -129,8 +129,10 @@ class Admin::PropertySetup::WizardController < AdminController
   end
 
   def structure_preview
+    format = Properties::Setup::StructureFormatResolver.for(property_type: @property.property_type)
     preview = Properties::Setup::GenerateStructurePreview.call(
       params: structure_preview_params,
+      format: format,
       page: params[:page],
       per_page: params[:per_page]
     )
@@ -185,13 +187,19 @@ class Admin::PropertySetup::WizardController < AdminController
     params.fetch(:setup, {}).permit(
       :name, :code, :property_type, :address_line, :city, :region, :country, :timezone,
       :estimated_units, :structure_mode, :units_mode, :quick_structure_confirmed,
-      quick_structure: %i[towers floors_per_tower units_per_floor tower_prefix floor_prefix],
-      unit_generation: %i[unit_type identifier_format quantity_per_floor]
+      quick_structure: %i[
+        towers floors_per_tower units_per_floor tower_prefix floor_prefix
+        level_1_count level_2_count level_1_prefix level_2_prefix skip_top_level
+      ],
+      unit_generation: %i[unit_type identifier_format quantity_per_floor units_per_leaf]
     ).to_h
   end
 
   def structure_preview_params
-    params.permit(:towers, :floors_per_tower, :units_per_floor, :tower_prefix, :floor_prefix)
+    params.permit(
+      :towers, :floors_per_tower, :units_per_floor, :tower_prefix, :floor_prefix,
+      :level_1_count, :level_2_count, :level_1_prefix, :level_2_prefix, :skip_top_level
+    )
   end
 
   def units_preview_params

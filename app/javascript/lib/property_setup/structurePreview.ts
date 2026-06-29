@@ -6,6 +6,17 @@ export type QuickStructureParams = {
   floor_prefix: string
 }
 
+export type StructureFormatLevel = {
+  section_type: string
+  label_key: string
+  suffix_type: 'letter' | 'number'
+}
+
+export type PropertyStructureFormat = {
+  levels: StructureFormatLevel[]
+  units_in: string
+}
+
 export type StructureTreeNode = {
   id: string
   name: string

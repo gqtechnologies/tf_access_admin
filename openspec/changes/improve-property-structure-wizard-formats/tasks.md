@@ -1,32 +1,32 @@
 ## 1. Auditoría del wizard actual
 
-- [ ] 1.1 Leer `Step2Structure.vue` y mapear todos los campos del modo `quick` actual (towers, floors_per_tower, tower_prefix, floor_prefix, units_per_floor)
-- [ ] 1.2 Leer `structurePreview.ts` y mapear `QuickStructureParams`, `buildQuickStructureTree` y `quickStructureCounts`
-- [ ] 1.3 Leer el controller del wizard y el serializer para entender qué props llegan al step 2 hoy
-- [ ] 1.4 Leer el modelo `PropertySection` para confirmar `section_type` enum, `eligible_for_units?` y `can_contain_units?`
-- [ ] 1.5 Leer la spec de `property-section` existente para identificar contratos que no deben romperse
+- [x] 1.1 Leer `Step2Structure.vue` y mapear todos los campos del modo `quick` actual (towers, floors_per_tower, tower_prefix, floor_prefix, units_per_floor)
+- [x] 1.2 Leer `structurePreview.ts` y mapear `QuickStructureParams`, `buildQuickStructureTree` y `quickStructureCounts`
+- [x] 1.3 Leer el controller del wizard y el serializer para entender qué props llegan al step 2 hoy
+- [x] 1.4 Leer el modelo `PropertySection` para confirmar `section_type` enum, `eligible_for_units?` y `can_contain_units?`
+- [x] 1.5 Leer la spec de `property-section` existente para identificar contratos que no deben romperse
 
 ## 2. Catálogo de formatos de estructura
 
-- [ ] 2.1 Crear `app/services/properties/setup/structure_format_catalog.rb` con el hash de formatos para los 7 tipos soportados (`building`, `tower`, `condominium`, `horizontal_community`, `residential_complex`, `sector`, `mixed_use`), usando constantes de `SectionTypes`
-- [ ] 2.2 Crear value object `PropertyStructureFormat = Data.define(:levels, :units_in)` con levels `[{ section_type:, label_key:, suffix_type: }]`
-- [ ] 2.3 Crear `Properties::Setup::StructureFormatResolver.for(property_type:)` que retorna el `PropertyStructureFormat` o `nil` si el tipo no tiene formato mapeado
-- [ ] 2.4 Escribir tests unitarios para el catálogo: un test por `property_type` verificando niveles, `units_in` y `suffix_type`; un test para tipo no mapeado que retorna `nil`
+- [x] 2.1 Crear `app/services/properties/setup/structure_format_catalog.rb` con el hash de formatos para los 7 tipos soportados (`building`, `tower`, `condominium`, `horizontal_community`, `residential_complex`, `sector`, `mixed_use`), usando constantes de `SectionTypes`
+- [x] 2.2 Crear value object `PropertyStructureFormat = Data.define(:levels, :units_in)` con levels `[{ section_type:, label_key:, suffix_type: }]`
+- [x] 2.3 Crear `Properties::Setup::StructureFormatResolver.for(property_type:)` que retorna el `PropertyStructureFormat` o `nil` si el tipo no tiene formato mapeado
+- [x] 2.4 Escribir tests unitarios para el catálogo: un test por `property_type` verificando niveles, `units_in` y `suffix_type`; un test para tipo no mapeado que retorna `nil`
 
 ## 3. Serialización del formato al frontend
 
-- [ ] 3.1 Agregar `structure_format` y `units_in` a `Admin::PropertySetup::WizardSerializer#as_json`, resueltos desde `StructureFormatResolver.for(property_type:)` (o `null` si no hay formato)
-- [ ] 3.2 Pasar el formato resuelto a `structure_preview_params` en `WizardController` para que `GenerateStructurePreview` reciba los niveles/section_types del formato
-- [ ] 3.3 Agregar tipos TypeScript para `PropertyStructureFormat` (con `levels` y `units_in`) en `app/javascript/types/`
-- [ ] 3.4 Escribir test del serializer: verifica `structure_format` y `units_in` correctos por `property_type`, y `null` cuando no hay formato
+- [x] 3.1 Agregar `structure_format` y `units_in` a `Admin::PropertySetup::WizardSerializer#as_json`, resueltos desde `StructureFormatResolver.for(property_type:)` (o `null` si no hay formato)
+- [x] 3.2 Pasar el formato resuelto a `structure_preview_params` en `WizardController` para que `GenerateStructurePreview` reciba los niveles/section_types del formato
+- [x] 3.3 Agregar tipos TypeScript para `PropertyStructureFormat` (con `levels` y `units_in`) en `app/javascript/types/`
+- [x] 3.4 Escribir test del serializer: verifica `structure_format` y `units_in` correctos por `property_type`, y `null` cuando no hay formato
 
 ## 4. Extender los servicios de preview/commit existentes (format-aware)
 
-- [ ] 4.1 Extender `Properties::Setup::GenerateStructurePreview` para aceptar un `PropertyStructureFormat` y generar nodos según sus niveles (1 o 2), `section_type`, prefijos y `suffix_type`; mantener compatibilidad con el comportamiento tower/floor actual
-- [ ] 4.2 Eliminar `estimated_units` de los `counts` retornados por `GenerateStructurePreview` (el preview de estructura ya no calcula unidades)
-- [ ] 4.3 Extender `Properties::Setup::ApplyQuickStructure` para construir secciones desde el formato activo en lugar de asumir tower/floor; conservar la transacción y el rollback total existentes
-- [ ] 4.4 Escribir/actualizar tests para `GenerateStructurePreview`: cada formato del catálogo, sufijo número y letra, formatos de 1 y 2 niveles, building sin torres
-- [ ] 4.5 Escribir/actualizar tests para `ApplyQuickStructure`: persiste la estructura correcta por formato; rollback ante fallo
+- [x] 4.1 Extender `Properties::Setup::GenerateStructurePreview` para aceptar un `PropertyStructureFormat` y generar nodos según sus niveles (1 o 2), `section_type`, prefijos y `suffix_type`; mantener compatibilidad con el comportamiento tower/floor actual
+- [x] 4.2 Eliminar `estimated_units` de los `counts` retornados por `GenerateStructurePreview` (el preview de estructura ya no calcula unidades)
+- [x] 4.3 Extender `Properties::Setup::ApplyQuickStructure` para construir secciones desde el formato activo en lugar de asumir tower/floor; conservar la transacción y el rollback total existentes
+- [x] 4.4 Escribir/actualizar tests para `GenerateStructurePreview`: cada formato del catálogo, sufijo número y letra, formatos de 1 y 2 niveles, building sin torres
+- [x] 4.5 Escribir/actualizar tests para `ApplyQuickStructure`: persiste la estructura correcta por formato; rollback ante fallo
 
 ## 6. Frontend — formularios dinámicos de step 2
 

@@ -16,12 +16,22 @@ class Admin::PropertySetup::WizardSerializer
       property_types: PropertyTypes::ALL,
       section_types: SectionTypes::ALL,
       unit_types: UnitTypes::ALL,
+      structure_format: structure_format&.as_json,
+      units_in: structure_format&.units_in,
       permissions: permissions_json,
       next_actions: next_actions_json
     }
   end
 
   private
+
+  def structure_format
+    return @structure_format if defined?(@structure_format)
+
+    @structure_format = Properties::Setup::StructureFormatResolver.for(
+      property_type: @property&.property_type
+    )
+  end
 
   def property_json
     return nil if @property.nil? || !@property.persisted?
