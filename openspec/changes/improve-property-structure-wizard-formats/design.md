@@ -36,11 +36,11 @@ PropertyStructureFormat = Data.define(:levels, :units_in)
 # units_in: section_type del nivel hoja donde se ubican las unidades
 ```
 
-El catálogo de formatos vive en `PropertySetup::StructureFormatCatalog` como un hash constante indexado por `property_type` (string). Esto centraliza las reglas y evita duplicación entre backend y frontend.
+El catálogo de formatos vive en `Properties::Setup::StructureFormatCatalog` como un hash constante indexado por `property_type` (string), usando las constantes de `SectionTypes` (`TOWER`, `FLOOR`, `SECTOR`, `BLOCK`). Esto centraliza las reglas y evita duplicación entre backend y frontend.
 
 ### 2. `StructureFormatResolver` expone el formato al wizard
 
-`PropertySetup::StructureFormatResolver.for(property_type:)` retorna el `PropertyStructureFormat` correspondiente. Si el `property_type` no tiene formato en el catálogo, retorna `nil` — en ese caso el modo `quick` no se ofrece y el usuario debe usar modo `manual`.
+`Properties::Setup::StructureFormatResolver.for(property_type:)` retorna el `PropertyStructureFormat` correspondiente. Si el `property_type` no tiene formato en el catálogo, retorna `nil` — en ese caso el modo `quick` no se ofrece y el usuario debe usar modo `manual`.
 
 El catálogo completo (7 tipos soportados):
 
@@ -58,7 +58,7 @@ El catálogo completo (7 tipos soportados):
 
 ### 3. El formato se serializa al frontend como parte de las props del wizard
 
-El controller del wizard incluye el `PropertyStructureFormat` serializado en las props de Inertia al cargar el step 2. El frontend consume el formato para:
+`Admin::PropertySetup::WizardSerializer#as_json` agrega dos claves nuevas: `structure_format` (resuelto desde `StructureFormatResolver.for(property_type:)`, o `null`) y `units_in` (derivado del formato). El frontend consume el formato para:
 - Renderizar el formulario correcto en modo `quick`.
 - Mostrar advertencias en modo `manual`.
 - Conocer `units_in` para el step 3.
@@ -88,21 +88,21 @@ En modo `manual`, el usuario puede crear secciones de cualquier `section_type`. 
 
 Esto permite flexibilidad para casos edge, mientras guía la experiencia habitual.
 
-### 7. Preview genérico de estructura + Commit exclusivo para modo quick
+### 7. Reutilizar el flujo preview/commit existente, hecho format-aware
 
-El panel de preview es un componente genérico de visualización de árbol que recibe `sections` (requerido) y `units` (opcional). Cuando `units` está presente, las muestra anidadas bajo su sección hoja. Cuando no, muestra solo la jerarquía de secciones. Esto permite reutilizarlo en Step 2 y Step 3 sin lógica especial en el componente:
+El wizard **ya tiene** el flujo preview/commit para estructura quick; no se crean servicios ni controllers nuevos. Se extienden los existentes para que sean conscientes del formato:
+
+- **Preview** — `Properties::Setup::GenerateStructurePreview` (expuesto por `WizardController#structure_preview`, devuelve JSON paginado). Hoy está hardcodeado a `tower → floor`. Se extiende para recibir el `PropertyStructureFormat` y generar los `section_type`, prefijos y sufijos del formato activo (incluyendo formatos de 1 nivel y el caso building sin torres).
+- **Commit** — `Properties::Setup::ApplyQuickStructure` (invocado al avanzar de step 2 vía `WizardController#advance` → `apply_structure_step!`). Ya persiste en transacción con rollback total. Se extiende para construir las secciones desde el formato en lugar de asumir tower/floor.
+
+El panel de preview es un componente de visualización de árbol que recibe `sections` (requerido) y `units` (opcional). Cuando `units` está presente, las muestra anidadas bajo su sección hoja. Cuando no, muestra solo la jerarquía de secciones. El componente `StructurePreviewPanel.vue` **ya existe** (junto con `StructurePreviewTreeNode.vue` y `UnitsPreviewPanel.vue`); se reutiliza tal cual:
 
 - **Step 2, modo none**: `sections: []` → estado vacío.
 - **Step 2, modo manual**: `sections: [secciones persistidas]`, `units: null`.
 - **Step 2, modo quick**: `sections: [batch en memoria]`, `units: null`.
 - **Step 3, modo automatic**: `sections: [secciones existentes]`, `units: [batch en memoria]`.
 
-El **commit** es exclusivo del modo `quick`:
-
-1. **Preview** (`POST /admin/properties/:id/sections_generator/preview`): `PropertySetup::PreviewSections` genera la lista en memoria, detecta duplicados y conflictos. No escribe en DB.
-2. **Commit** (`POST /admin/properties/:id/sections_generator/commit`): `PropertySetup::CommitSections` persiste en transacción. Si ocurre un error de unicidad concurrente, hace rollback total y el usuario repite el preview.
-
-Los modos `none` y `manual` no pasan por este flujo — no tienen commit de batch.
+Los modos `none` y `manual` no pasan por el commit de batch — `none` no persiste nada y `manual` usa `PropertySections::Create` por sección.
 
 ### 8. Step 3: modo automatic gateado por modo quick de step 2
 
@@ -157,11 +157,12 @@ Cuando el usuario vuelve al step 1 y cambia `property_type`, el wizardState inva
 No hay migraciones de schema nuevas. Las tablas `property_sections` ya existen.
 
 Rollout:
-1. Crear `PropertyStructureFormat`, `StructureFormatCatalog`, `StructureFormatResolver` y serialización.
-2. Crear `GenerateSections`, `PreviewSections`, `CommitSections` y `SectionsGeneratorController`.
-3. Adaptar props del wizard (agregar `structure_format` a las props del step 2).
-4. Adaptar `Step2Structure.vue` con `QuickStructureForm.vue` y advertencias en modo manual.
-5. Sin rollback especial; el wizard manual sigue disponible como fallback.
+1. Crear `Properties::Setup::StructureFormatCatalog`, `StructureFormatResolver` y el value object `PropertyStructureFormat`.
+2. Extender `Properties::Setup::GenerateStructurePreview` y `ApplyQuickStructure` para que sean format-aware (sin servicios ni controllers nuevos).
+3. Agregar `structure_format` y `units_in` a `WizardSerializer`; pasar el `PropertyStructureFormat` al `structure_preview` params.
+4. Adaptar `Step2Structure.vue` con `QuickStructureForm.vue`, toggle de torres y advertencias en modo manual; reutilizar `StructurePreviewPanel.vue` existente.
+5. Adaptar `Step3Units.vue`: gate de modo automatic por `structure_mode`, formulario de identificador por `units_in`.
+6. Sin rollback especial; el wizard manual sigue disponible como fallback.
 
 ## Open Questions
 

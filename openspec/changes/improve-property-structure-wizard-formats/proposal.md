@@ -30,15 +30,17 @@ El wizard de configuración de propiedad permite crear secciones manualmente o c
 **Modelos afectados**: `ResidentialProperty`, `PropertySection`, `Unit` (solo validación de sección destino en step 3; sin cambios al contrato público)
 
 **Nuevos objetos**:
-- `PropertyStructureFormat` — value object / catálogo con niveles, `section_type` por nivel y `units_in`.
-- `PropertySetup::StructureFormatResolver` — retorna el `PropertyStructureFormat` dado un `property_type`.
-- `PropertySetup::GenerateSections` — genera secciones en memoria desde un `PropertyStructureFormat` y parámetros de conteo/prefijo.
-- `PropertySetup::PreviewSections` — detecta duplicados y conflictos sin persistir.
-- `PropertySetup::CommitSections` — persiste secciones en transacción con auditoría.
+- `PropertyStructureFormat` — value object con niveles, `section_type` por nivel y `units_in`.
+- `Properties::Setup::StructureFormatCatalog` — hash de formatos por `property_type`.
+- `Properties::Setup::StructureFormatResolver` — retorna el `PropertyStructureFormat` dado un `property_type`.
 
-**Controladores / rutas**: `SectionsGeneratorController` bajo `resources :properties` (preview + commit).
+**Servicios extendidos** (no nuevos):
+- `Properties::Setup::GenerateStructurePreview` — se hace format-aware (hoy hardcodea tower/floor).
+- `Properties::Setup::ApplyQuickStructure` — persiste secciones desde el formato activo.
 
-**Frontend**: Refactor del componente `Step2Structure.vue` para renderizar formulario dinámico por formato.
+**Controladores / rutas**: Sin controllers ni rutas nuevas. Se reutiliza `Admin::PropertySetup::WizardController` (`structure_preview`, `advance`) y se extiende `WizardSerializer` con `structure_format` + `units_in`.
+
+**Frontend**: Refactor del componente `Step2Structure.vue` para renderizar formulario dinámico por formato; reutiliza `StructurePreviewPanel.vue` existente.
 
 **Tablas**: `property_sections` (sin migraciones nuevas)
 

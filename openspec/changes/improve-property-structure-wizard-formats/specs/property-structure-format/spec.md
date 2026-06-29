@@ -158,7 +158,7 @@ El sistema SHALL mostrar un panel de preview de estructura en todo momento duran
 
 #### Scenario: Commit persiste el batch de modo quick
 - **WHEN** el usuario confirma el preview de modo quick y no hay ítems con estado `:conflict` o errores bloqueantes
-- **THEN** `CommitSections` persiste todas las secciones con estado `:new` en transacción
+- **THEN** `ApplyQuickStructure` persiste todas las secciones con estado `:new` en transacción
 - **AND** se registra auditoría del batch
 
 #### Scenario: Error en commit hace rollback total

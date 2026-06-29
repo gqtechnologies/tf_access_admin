@@ -8,34 +8,25 @@
 
 ## 2. Catálogo de formatos de estructura
 
-- [ ] 2.1 Crear `app/services/property_setup/structure_format_catalog.rb` con el hash de formatos para los 7 tipos soportados: `building`, `tower`, `condominium`, `horizontal_community`, `residential_complex`, `sector`, `mixed_use`
+- [ ] 2.1 Crear `app/services/properties/setup/structure_format_catalog.rb` con el hash de formatos para los 7 tipos soportados (`building`, `tower`, `condominium`, `horizontal_community`, `residential_complex`, `sector`, `mixed_use`), usando constantes de `SectionTypes`
 - [ ] 2.2 Crear value object `PropertyStructureFormat = Data.define(:levels, :units_in)` con levels `[{ section_type:, label_key:, suffix_type: }]`
-- [ ] 2.3 Crear `PropertySetup::StructureFormatResolver.for(property_type:)` que retorna el `PropertyStructureFormat` o `nil` si el tipo no tiene formato mapeado
+- [ ] 2.3 Crear `Properties::Setup::StructureFormatResolver.for(property_type:)` que retorna el `PropertyStructureFormat` o `nil` si el tipo no tiene formato mapeado
 - [ ] 2.4 Escribir tests unitarios para el catálogo: un test por `property_type` verificando niveles, `units_in` y `suffix_type`; un test para tipo no mapeado que retorna `nil`
 
 ## 3. Serialización del formato al frontend
 
-- [ ] 3.1 Agregar `structure_format` a las props del wizard (step 2) como hash serializado desde `StructureFormatResolver`
-- [ ] 3.2 Agregar `units_in` derivado del formato a las props del wizard (step 3) para que step 3 conozca el nivel hoja
-- [ ] 3.3 Actualizar el serializer/controller del wizard para recalcular el formato si el `property_type` cambia entre steps
-- [ ] 3.4 Agregar tipos TypeScript para `PropertyStructureFormat` en `app/javascript/types/`
+- [ ] 3.1 Agregar `structure_format` y `units_in` a `Admin::PropertySetup::WizardSerializer#as_json`, resueltos desde `StructureFormatResolver.for(property_type:)` (o `null` si no hay formato)
+- [ ] 3.2 Pasar el formato resuelto a `structure_preview_params` en `WizardController` para que `GenerateStructurePreview` reciba los niveles/section_types del formato
+- [ ] 3.3 Agregar tipos TypeScript para `PropertyStructureFormat` (con `levels` y `units_in`) en `app/javascript/types/`
+- [ ] 3.4 Escribir test del serializer: verifica `structure_format` y `units_in` correctos por `property_type`, y `null` cuando no hay formato
 
-## 4. Servicios de generación y preview de secciones
+## 4. Extender los servicios de preview/commit existentes (format-aware)
 
-- [ ] 4.1 Crear `PropertySetup::GenerateSections` — genera lista de secciones en memoria desde un `PropertyStructureFormat` y parámetros de conteo/prefijo
-- [ ] 4.2 Crear `PropertySetup::PreviewSections` — llama a `GenerateSections`, detecta duplicados con secciones existentes y conflictos internos, retorna lista con estado (`:new`, `:duplicate`, `:conflict`)
-- [ ] 4.3 Crear `PropertySetup::CommitSections` — persiste secciones con estado `:new` en transacción; registra auditoría manualmente vía `Audited::Audit.create!`; rollback total ante error de unicidad concurrente
-- [ ] 4.4 Escribir tests para `GenerateSections`: todos los formatos, sufijo número y letra, 1 y 2 niveles
-- [ ] 4.5 Escribir tests para `PreviewSections`: detección de duplicados, conflictos, caso sin secciones existentes
-- [ ] 4.6 Escribir tests para `CommitSections`: commit exitoso, rollback ante race condition, auditoría registrada
-
-## 5. Controller y rutas
-
-- [ ] 5.1 Crear `Admin::SectionsGeneratorController` con acciones `preview` (POST) y `commit` (POST) bajo `resources :properties`
-- [ ] 5.2 Agregar rutas en `config/routes.rb` bajo el namespace `admin`
-- [ ] 5.3 Aplicar policy de administración de propiedad en el controller
-- [ ] 5.4 Validar tenant isolation: scoping a `Current.organization` y `ResidentialProperty` del context
-- [ ] 5.5 Escribir tests de controller: preview con formato válido, preview con duplicados, commit exitoso, commit sin autorización
+- [ ] 4.1 Extender `Properties::Setup::GenerateStructurePreview` para aceptar un `PropertyStructureFormat` y generar nodos según sus niveles (1 o 2), `section_type`, prefijos y `suffix_type`; mantener compatibilidad con el comportamiento tower/floor actual
+- [ ] 4.2 Eliminar `estimated_units` de los `counts` retornados por `GenerateStructurePreview` (el preview de estructura ya no calcula unidades)
+- [ ] 4.3 Extender `Properties::Setup::ApplyQuickStructure` para construir secciones desde el formato activo en lugar de asumir tower/floor; conservar la transacción y el rollback total existentes
+- [ ] 4.4 Escribir/actualizar tests para `GenerateStructurePreview`: cada formato del catálogo, sufijo número y letra, formatos de 1 y 2 niveles, building sin torres
+- [ ] 4.5 Escribir/actualizar tests para `ApplyQuickStructure`: persiste la estructura correcta por formato; rollback ante fallo
 
 ## 6. Frontend — formularios dinámicos de step 2
 
@@ -45,17 +36,16 @@
 - [ ] 6.4 Agregar toggle "¿El edificio tiene torres?" que aparece solo cuando `property_type === 'building'` y cambia el formato efectivo de tower/floor a floor-only
 - [ ] 6.5 Eliminar el campo `units_per_floor` / `units_per_leaf` del formulario quick de `Step2Structure.vue` y de `QuickStructureParams` en `structurePreview.ts`
 - [ ] 6.6 Eliminar `estimated_units` de `quickStructureCounts()` en `structurePreview.ts`; el panel de preview de Step 2 muestra solo secciones (torres, pisos, sectores, bloques según formato) sin conteo de unidades
-- [ ] 6.7 Definir tipos TypeScript `SectionNode` y `UnitNode` para las props de `StructurePreviewPanel.vue`
+- [ ] 6.7 Reutilizar los tipos existentes de nodos del preview (`structurePreview.ts`); extenderlos solo si el formato requiere campos nuevos
 - [ ] 6.8 Agregar advertencia inline en `ManualSectionForm.vue` cuando el `section_type` seleccionado no forma parte del formato recomendado
 - [ ] 6.9 Agregar i18n keys en todos los locales (`es`, `en`, `pt`) para los nuevos textos de formulario, advertencias y toggle de torres
 
-## 7. Frontend — panel de preview genérico y commit flow
+## 7. Frontend — reutilizar panel de preview y flujo existente
 
-- [ ] 7.1 Crear componente `StructurePreviewPanel.vue` que recibe props `sections: SectionNode[]` y `units?: UnitNode[] | null`; renderiza la jerarquía de secciones y, cuando `units` está presente, las muestra anidadas bajo su sección hoja; soporta estado vacío cuando `sections` está vacío y estado de items con `:new`/`:duplicate`/`:conflict`
-- [ ] 7.2 Integrar `StructurePreviewPanel.vue` en `Step2Structure.vue` pasando solo `sections` (sin `units`); integrar también en `Step3Units.vue` pasando `sections` y el batch de `units` en memoria
-- [ ] 7.3 Agregar llamada a `POST /admin/properties/:id/sections_generator/preview` al cambiar parámetros en modo quick; alimentar el resultado al panel
-- [ ] 7.4 Agregar llamada a `POST /admin/properties/:id/sections_generator/commit` al confirmar el preview de modo quick
-- [ ] 7.5 Manejar errores de commit mostrando mensaje claro con opción de repetir preview
+- [ ] 7.1 Auditar `StructurePreviewPanel.vue` y `StructurePreviewTreeNode.vue` existentes; confirmar que aceptan nodos de secciones con `section_type`/`depth` y unidades opcionales, ajustando props/tipos solo si es necesario
+- [ ] 7.2 Confirmar que `StructurePreviewPanel.vue` se usa en `Step2Structure.vue` (solo secciones) y `Step3Units.vue` (secciones + unidades); ajustar el binding según el formato activo
+- [ ] 7.3 Adaptar la llamada existente al endpoint `structure_preview` del wizard para enviar los parámetros del formato activo (no solo tower/floor); alimentar el resultado al panel
+- [ ] 7.4 Confirmar que el commit de estructura ocurre vía `advance` (step 2 → `ApplyQuickStructure`); manejar errores mostrando mensaje claro con opción de repetir preview
 
 ## 8. Step 3 — gate de modo automatic y formulario adaptado
 
