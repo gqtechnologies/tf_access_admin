@@ -1606,7 +1606,9 @@ es:
               code_placeholder: "Ej. TOR, BLQ, EDIF"
               preview: "De creación:"
               preview_will_create: "Se crearán:"
-              info_root: "Las secciones raíz pueden tener secciones hijas. Las unidades se asignarán luego a las secciones finales."
+              preview_skipped: "{names} ya existen en este nivel y se omitirán."
+              insufficient_available_names: "No hay suficientes nombres disponibles para crear {count} secciones en este nivel. Prueba otro prefijo o reduce la cantidad."
+              info_root: "Las secciones raíz pueden tener secciones hijas."
               info_child: "Las unidades podrán asignarse a estas secciones si no tienen más hijos."
               cancel: "Cancelar"
               submit: "Crear secciones"
@@ -2220,6 +2222,8 @@ es:
             parent_id:
               move_requires_service: "los cambios de padre deben realizarse mediante la acción de mover, no en una edición ordinaria"
             base:
+              empty_batch: "Indica al menos una sección para crear"
+              insufficient_available_names: "No hay suficientes nombres disponibles para crear %{count} secciones en este nivel. Prueba otro prefijo o reduce la cantidad."
               property_not_operative: "no se pueden modificar secciones mientras la propiedad no esté activa"
         unit:
           attributes:

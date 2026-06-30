@@ -1679,7 +1679,9 @@ en:
               code_placeholder: "E.g. TOR, BLQ, EDIF"
               preview: "Will create:"
               preview_will_create: "Will create:"
-              info_root: "Root sections can have child sections. Units will be assigned later to final sections."
+              preview_skipped: "{names} already exist at this level and will be skipped."
+              insufficient_available_names: "Not enough available names to create {count} sections at this level. Try a different prefix or reduce the quantity."
+              info_root: "Root sections can have child sections."
               info_child: "Units can be assigned to these sections if they have no further children."
               cancel: "Cancel"
               submit: "Create sections"
@@ -2229,6 +2231,8 @@ en:
             parent_id:
               move_requires_service: "parent changes must use the move action, not an ordinary edit"
             base:
+              empty_batch: "Provide at least one section to create"
+              insufficient_available_names: "Not enough available names to create %{count} sections at this level. Try a different prefix or reduce the quantity."
               property_not_operative: "cannot modify sections while the property is not active"
         unit:
           attributes:

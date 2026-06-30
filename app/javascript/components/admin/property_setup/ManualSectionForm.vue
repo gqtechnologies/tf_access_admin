@@ -177,7 +177,14 @@
               {{ name }}
             </span>
           </div>
+          <p v-if="skippedPreviewText" class="text-xs text-amber-700">
+            {{ skippedPreviewText }}
+          </p>
         </div>
+
+        <p v-if="createInsufficientAvailable" class="text-destructive text-sm">
+          {{ t('admin.property_setup.step2.manual.create.insufficient_available_names', { count: createForm.count }) }}
+        </p>
 
         <Alert class="border-blue-200 bg-blue-50 text-blue-900 [&>svg]:text-blue-600">
           <Info class="size-4" />
@@ -194,7 +201,7 @@
           <Button type="button" variant="outline" @click="createOpen = false">
             {{ t('admin.property_setup.step2.manual.create.cancel') }}
           </Button>
-          <Button type="button" :disabled="submitting" @click="submitCreate">
+          <Button type="button" :disabled="submitting || createInsufficientAvailable" @click="submitCreate">
             {{ t('admin.property_setup.step2.manual.create.submit') }}
           </Button>
         </DialogFooter>
@@ -298,7 +305,8 @@
 import { computed, reactive, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
-import { CheckCircle2, Info, Minus, Plus } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
+import { Info, Minus, Plus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -330,7 +338,13 @@ import {
   propertySectionBatchCreateSchema,
   propertySectionStructureEditSchema,
 } from '@/lib/schemas/property_section_structure'
-import { sectionNames, type SuffixType } from '@/lib/property_setup/structurePreview'
+import { mapServerErrorsToForm } from '@/lib/forms/map_server_errors'
+import { formatFieldValueErrorToast } from '@/lib/forms/format_field_value_error_toast'
+import {
+  allocateSectionNames,
+  normalizeSectionName,
+  type SuffixType,
+} from '@/lib/property_setup/structurePreview'
 
 type SectionNode = {
   id: string
@@ -403,20 +417,71 @@ const createForm = reactive({
   code: '',
 })
 
-const namePreview = computed(() => {
-  if (createForm.mode !== 'multiple') return []
+function siblingNodesForCreate(): SectionNode[] {
+  if (createParent.value) return createParent.value.children ?? []
+  return props.tree
+}
+
+const siblingNormalizedNames = computed(() =>
+  new Set(siblingNodesForCreate().map((section) => normalizeSectionName(section.name))),
+)
+
+const createNameAllocation = computed(() => {
+  if (createForm.mode !== 'multiple') {
+    return { names: [] as string[], skipped: [] as string[], insufficient: false }
+  }
+
   const count = Number(createForm.count)
-  if (!createForm.prefix || Number.isNaN(count) || count < 1) return []
-  return sectionNames(createForm.prefix, createForm.suffix_type, Math.min(count, 6))
+  if (!createForm.prefix || Number.isNaN(count) || count < 1) {
+    return { names: [] as string[], skipped: [] as string[], insufficient: false }
+  }
+
+  return allocateSectionNames(
+    createForm.prefix,
+    createForm.suffix_type,
+    count,
+    siblingNormalizedNames.value,
+  )
 })
 
+const namePreview = computed(() => createNameAllocation.value.names.slice(0, 6))
+
 const namePreviewText = computed(() => {
-  const count = Number(createForm.count)
-  if (!createForm.prefix || Number.isNaN(count) || count < 1) return ''
-  const all = sectionNames(createForm.prefix, createForm.suffix_type, count)
+  const all = createNameAllocation.value.names
+  if (all.length === 0) return ''
   if (all.length <= 3) return all.join(', ')
   return `${all.slice(0, 2).join(', ')}, ..., ${all[all.length - 1]}`
 })
+
+const skippedPreviewText = computed(() => {
+  const skipped = createNameAllocation.value.skipped
+  if (skipped.length === 0) return ''
+  return t('admin.property_setup.step2.manual.create.preview_skipped', {
+    names: skipped.join(', '),
+  })
+})
+
+const createInsufficientAvailable = computed(
+  () => createForm.mode === 'multiple' && createNameAllocation.value.insufficient,
+)
+
+function createFormFieldValues(): Record<string, string | undefined> {
+  return {
+    name:
+      createForm.mode === 'individual'
+        ? createForm.name
+        : createNameAllocation.value.names[0],
+    code: createForm.code,
+    prefix: createForm.prefix,
+    count: createForm.count,
+    section_type: typeLabel(createForm.section_type),
+  }
+}
+
+function showCreateServerErrorToast(errors: Record<string, string | string[]>) {
+  const message = formatFieldValueErrorToast(errors, createFormFieldValues())
+  if (message) toast.error(message)
+}
 
 const showCreateFormatWarning = computed(
   () => recommended.value.length > 0 && !recommended.value.includes(createForm.section_type),
@@ -478,6 +543,8 @@ function submitCreate() {
     return
   }
 
+  if (createInsufficientAvailable.value) return
+
   createErrors.value = {}
   submitting.value = true
   router.post(
@@ -499,6 +566,9 @@ function submitCreate() {
       onSuccess: () => {
         createOpen.value = false
         createParent.value = null
+      },
+      onError: (errors) => {
+        showCreateServerErrorToast(errors)
       },
       onFinish: () => {
         submitting.value = false
@@ -566,6 +636,9 @@ function submitEdit() {
       onSuccess: () => {
         editOpen.value = false
         editTarget.value = null
+      },
+      onError: (errors) => {
+        editErrors.value = mapServerErrorsToForm(errors)
       },
       onFinish: () => {
         submitting.value = false

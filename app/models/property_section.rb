@@ -150,9 +150,12 @@ class PropertySection < ApplicationRecord
   # Comparison value for sibling-name uniqueness: trim, whitespace collapse,
   # Unicode NFKC normalization and case folding (§2.1). Populates the NOT NULL
   # +normalized_name+ column used by the unique indexes (§1.2).
+  def self.normalize_name(value)
+    value.to_s.strip.gsub(/\s+/, " ").unicode_normalize(:nfkc).downcase.presence
+  end
+
   def assign_normalized_name
-    self.normalized_name =
-      name.to_s.strip.gsub(/\s+/, " ").unicode_normalize(:nfkc).downcase.presence
+    self.normalized_name = self.class.normalize_name(name)
   end
 
   # §2.2: the section's organization must match its property's organization.

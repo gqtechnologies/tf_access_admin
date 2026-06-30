@@ -6,7 +6,7 @@ module InertiaErrorsSerializable
 
   private
 
-  def serialize_inertia_errors(record)
-    record.errors.to_hash(true).transform_values { |messages| Array(messages) }
+  def serialize_inertia_errors(record, full_messages: true)
+    record.errors.to_hash(full_messages).transform_values { |messages| Array(messages) }
   end
 end

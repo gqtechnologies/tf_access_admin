@@ -79,20 +79,44 @@ class PropertySections::CreateBatchTest < ActiveSupport::TestCase
     end
   end
 
-  test "rolls back the whole batch when a later node fails" do
-    # "Edificio B" pre-exists, so the batch's first node ("Edificio A") would
-    # succeed and the second ("Edificio B") would collide — the whole batch,
-    # including the already-created first node, must roll back.
+  test "skips taken names and creates the next available siblings" do
     root_section(@property, "Edificio B")
 
-    assert_no_difference -> { @property.property_sections.count } do
+    assert_difference -> { @property.property_sections.count }, 2 do
       result = PropertySections::CreateBatch.call(
         actor: @actor, property: @property, section_type: SectionTypes::TOWER,
         prefix: "Edificio", suffix_type: :letter, count: 2
       )
 
-      assert result.invalid?
+      assert result.success?
+      assert_equal [ "Edificio A", "Edificio C" ], result.sections.map(&:name)
     end
+  end
+
+  test "creates numeric names alongside a non-sequential sibling name" do
+    root_section(@property, "Torre 123")
+
+    result = PropertySections::CreateBatch.call(
+      actor: @actor, property: @property, section_type: SectionTypes::TOWER,
+      prefix: "Torre", suffix_type: :number, count: 2
+    )
+
+    assert result.success?
+    assert_equal [ "Torre 1", "Torre 2" ], result.sections.map(&:name)
+  end
+
+  test "returns insufficient_available_names when not enough suffixes remain" do
+    26.times do |index|
+      root_section(@property, "Torre #{('A'.ord + index).chr}")
+    end
+
+    result = PropertySections::CreateBatch.call(
+      actor: @actor, property: @property, section_type: SectionTypes::TOWER,
+      prefix: "Torre", suffix_type: :letter, count: 1
+    )
+
+    assert result.invalid?
+    assert result.section.errors.of_kind?(:base, :insufficient_available_names)
   end
 
   test "empty batch is invalid" do

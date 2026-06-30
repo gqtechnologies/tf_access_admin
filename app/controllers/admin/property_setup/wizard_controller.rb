@@ -95,7 +95,7 @@ class Admin::PropertySetup::WizardController < AdminController
 
     if result.invalid?
       redirect_to admin_property_setup_wizard_path(@property),
-                  inertia: { errors: serialize_inertia_errors(result.section) }
+                  inertia: { errors: serialize_inertia_errors(result.section, full_messages: false) }
     else
       redirect_to admin_property_setup_wizard_path(@property)
     end
@@ -117,7 +117,7 @@ class Admin::PropertySetup::WizardController < AdminController
 
     if result.invalid?
       redirect_to admin_property_setup_wizard_path(@property),
-                  inertia: { errors: serialize_inertia_errors(result.section) }
+                  inertia: { errors: serialize_inertia_errors(result.section, full_messages: false) }
     else
       redirect_to admin_property_setup_wizard_path(@property)
     end
@@ -230,11 +230,7 @@ class Admin::PropertySetup::WizardController < AdminController
       property: @property,
       current_user: current_user,
       step: step
-    ).as_json.merge(errors: inertia_errors_from_flash)
-  end
-
-  def inertia_errors_from_flash
-    {}
+    ).as_json
   end
 
   def step_params

@@ -70,6 +70,48 @@ export function sectionNames(prefix: string, suffixType: SuffixType, count: numb
   )
 }
 
+export const SECTION_NAME_LETTER_MAX_INDEX = 25
+export const SECTION_NAME_NUMBER_MAX_INDEX = 999
+
+/** Mirror of `PropertySection.normalize_name` (Ruby). Keep in sync. */
+export function normalizeSectionName(name: string): string {
+  return name.trim().replace(/\s+/g, ' ').normalize('NFKC').toLowerCase()
+}
+
+export type SectionNameAllocation = {
+  names: string[]
+  skipped: string[]
+  insufficient: boolean
+}
+
+/** Allocates the next +count+ free sequential names, skipping taken siblings
+ * by full normalized name comparison (never parses existing suffixes). */
+export function allocateSectionNames(
+  prefix: string,
+  suffixType: SuffixType,
+  count: number,
+  takenNormalizedNames: Iterable<string>,
+): SectionNameAllocation {
+  const taken = new Set(takenNormalizedNames)
+  const names: string[] = []
+  const skipped: string[] = []
+  const limit = suffixType === 'letter' ? SECTION_NAME_LETTER_MAX_INDEX : SECTION_NAME_NUMBER_MAX_INDEX
+  let index = 0
+
+  while (names.length < count && index <= limit) {
+    const candidate = sectionName(prefix, suffixType, index)
+    const normalized = normalizeSectionName(candidate)
+    if (normalized && taken.has(normalized)) {
+      skipped.push(candidate)
+    } else if (normalized) {
+      names.push(candidate)
+    }
+    index += 1
+  }
+
+  return { names, skipped, insufficient: names.length < count }
+}
+
 export function sectionNameSuffix(suffixType: SuffixType, index: number): string {
   return suffixType === 'letter' ? String.fromCharCode('A'.charCodeAt(0) + index) : String(index + 1)
 }

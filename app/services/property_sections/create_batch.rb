@@ -8,9 +8,10 @@ module PropertySections
   #
   # Names come from {Properties::Setup::SectionNameSequence}: either an explicit
   # +names+ list (individual mode) or generated from +prefix+/+suffix_type+/+count+
-  # (multiple mode). Because each node goes through +Create+, a child batch under a
-  # non-root parent is rejected by the hierarchy validation; any single failure
-  # rolls back the whole batch and returns the failing node with its errors.
+  # (multiple mode), skipping siblings whose normalized name is already taken.
+  # Because each node goes through +Create+, a child batch under a non-root parent
+  # is rejected by the hierarchy validation; any single failure rolls back the
+  # whole batch and returns the failing node with its errors.
   class CreateBatch < Base
     def initialize(actor:, property:, parent: nil, section_type:, names: nil,
                    prefix: nil, suffix_type: :letter, count: nil, code: nil)
@@ -29,7 +30,11 @@ module PropertySections
       authorize_manage_sections!(@property)
 
       names = resolved_names
-      return BatchResult.invalid(blank_batch_section) if names.empty?
+      return BatchResult.invalid(blank_batch_section) if names.empty? && @names.blank?
+
+      if batch_mode? && names.size < @count.to_i
+        return BatchResult.invalid(insufficient_batch_section)
+      end
 
       created = []
       ActiveRecord::Base.transaction do
@@ -57,13 +62,24 @@ module PropertySections
 
     private
 
+    def batch_mode?
+      @names.blank? && @prefix.present? && @count.to_i.positive?
+    end
+
     def resolved_names
       return Array(@names).map(&:to_s).reject(&:blank?) if @names.present?
       return [] if @prefix.blank? || @count.to_i <= 0
 
-      Properties::Setup::SectionNameSequence.names(
-        prefix: @prefix, suffix_type: @suffix_type, count: @count
+      Properties::Setup::SectionNameSequence.available_names(
+        prefix: @prefix,
+        suffix_type: @suffix_type,
+        count: @count,
+        taken_normalized_names: sibling_normalized_names
       )
+    end
+
+    def sibling_normalized_names
+      @property.property_sections.where(parent_id: @parent&.id).pluck(:normalized_name)
     end
 
     # A single internal code only applies when creating exactly one section, to
@@ -78,6 +94,13 @@ module PropertySections
       section = PropertySection.new(section_type: @section_type)
       assign_organization_from_property!(section, @property)
       section.errors.add(:base, :empty_batch)
+      section
+    end
+
+    def insufficient_batch_section
+      section = PropertySection.new(section_type: @section_type)
+      assign_organization_from_property!(section, @property)
+      section.errors.add(:base, :insufficient_available_names, count: @count.to_i)
       section
     end
   end
