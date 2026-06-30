@@ -121,8 +121,10 @@ Step 2 SHALL let the user choose how the property internal structure will be def
 The user MUST be able to choose exactly one of:
 
 1. no sections;
-2. manual hierarchical structure (guided by the recommended format);
+2. manual hierarchical structure (a free-form builder constrained to the two-level model, guided by the recommended format);
 3. quick repetitive structure generation (form fields determined by the active format).
+
+In manual mode the wizard SHALL provide a full structure builder that lets the user create, rename, and delete sections, choose each section's type and parent, and see the tree update live in the shared preview panel. The builder SHALL enforce the existing hierarchy rules (max two levels; a section with children cannot hold units; units attach only to leaf sections) by delegating to `PropertySections::Create` and the section-removal use case, surfacing model validation errors rather than bypassing them.
 
 The wizard SHALL load the recommended `PropertyStructureFormat` for the `property_type` and pass it to step 2 as a prop. The format defines up to 2 section levels and the target level for units (`units_in`).
 
@@ -133,13 +135,20 @@ The wizard SHALL load the recommended `PropertyStructureFormat` for the `propert
 - **THEN** the wizard records that units will belong only to the property
 - **AND** step 3 does not require section placement for generated units
 
-#### Scenario: Manual structure allows hierarchical sections with format guidance
+#### Scenario: Manual structure builder creates, edits, and removes sections
 
 - **GIVEN** the user selects "Crear estructura manual"
-- **WHEN** they add sections and nested sections
-- **THEN** each section is persisted via `PropertySections::Create` on the draft property and shown in the workspace
+- **WHEN** they add root sections and child sections
+- **THEN** each section is persisted via `PropertySections::Create` on the draft property and shown in the live preview
 - **AND** the wizard shows a warning when the created `section_type` does not match the recommended format for the `property_type`
-- **AND** the user may edit or remove sections before continuing
+- **AND** the user may rename or delete sections before continuing, with deletions guarded by the existing dependent-section/unit rules
+
+#### Scenario: Manual builder rejects a third hierarchy level
+
+- **GIVEN** a root section that already has a child section
+- **WHEN** the user attempts to add a section under that child
+- **THEN** the operation is rejected with the two-level validation message
+- **AND** the persisted structure is unchanged
 
 #### Scenario: Quick structure form adapts to active format
 
@@ -201,18 +210,27 @@ Step 3 SHALL let the user choose how units for the property will be created and 
 Supported modes:
 
 1. create a single unit;
-2. create multiple units, ideally using the structure from step 2;
+2. create multiple units automatically, using the structure from step 2 — available **only** when step 2 used quick mode;
 3. import units from Excel through the existing bulk import flow.
+
+Automatic generation is gated to quick mode: when step 2 was manual or none, the automatic option SHALL NOT be offered and the user is directed to single creation or import. When quick mode was used, automatic generation applies the established identifier-format rules (`floor_sequential` / `block_sequential` / `sequential`, `units_per_leaf`) derived from the active `PropertyStructureFormat` (`units_in`).
 
 The step MUST show contextual information from previous steps, including property name and structure summary when available.
 
-#### Scenario: Automatic generation from structure is available when structure exists
+#### Scenario: Automatic generation is available only for quick structures
 
-- **GIVEN** step 2 produced a hierarchical structure
+- **GIVEN** step 2 used quick mode and produced a hierarchical structure
 - **WHEN** the user opens step 3
 - **THEN** they may choose to generate units automatically from that structure
-- **AND** configuration fields such as unit type, identifier format and quantity per floor are available
+- **AND** configuration fields such as unit type, identifier format, and units per leaf are available
 - **AND** a live preview shows sample generated unit identifiers
+
+#### Scenario: Automatic generation is unavailable for manual and none modes
+
+- **GIVEN** step 2 used manual or none mode
+- **WHEN** the user opens step 3
+- **THEN** the automatic generation mode is not offered
+- **AND** the user is directed to single creation or import
 
 #### Scenario: Single unit creation is available for simple cases
 
@@ -220,13 +238,6 @@ The step MUST show contextual information from previous steps, including propert
 - **WHEN** they provide valid unit data
 - **THEN** the unit is persisted via `Units::Create` on the draft property
 - **AND** the unit is associated with the draft property and optional section
-
-#### Scenario: Multiple unit creation uses structure context when present
-
-- **GIVEN** the user chooses batch unit creation
-- **WHEN** a structure exists from step 2
-- **THEN** generation options use that structure as placement context
-- **AND** the preview shows how many units will be created
 
 #### Scenario: Excel import reuses existing bulk import behavior
 

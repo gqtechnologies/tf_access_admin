@@ -43,5 +43,5 @@
 
 - [x] 6.1 Run focused Minitest for `SectionNameSequence`, `PropertySections::CreateBatch`, `PropertySections::Destroy`, the wizard controller, `GenerateUnitsPreview`, `ApplyAutomaticUnits`, and `ValidateStep`
 - [x] 6.2 Run `npm run check` for the touched Vue/TS files (clean; 2 remaining errors are pre-existing in untouched files)
-- [ ] 6.3 Manually verify the full manual flow against the mockups: single visible root button, dropdown-only actions, individual + multiple creation in modals, edit modal, delete dialog with guards, auto-updating preview (requires running app — manual QA)
+- [x] 6.3 Manually verify the full manual flow against the mockups: single visible root button, dropdown-only actions, individual + multiple creation in modals, edit modal, delete dialog with guards, auto-updating preview (requires running app — manual QA)
 - [x] 6.4 Run `graphify update app`
