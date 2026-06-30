@@ -117,6 +117,99 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     assert_redirected_to admin_property_setup_wizard_path(@draft)
   end
 
+  test "create sections batch adds multiple root sections" do
+    sign_in_as(@tenant_admin)
+
+    assert_difference -> { @draft.property_sections.count }, 3 do
+      post admin_property_setup_create_sections_wizard_path(@draft), params: {
+        property_section: {
+          mode: "multiple", section_type: SectionTypes::TOWER,
+          prefix: "Torre", suffix_type: "letter", count: 3
+        }
+      }
+    end
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
+  test "create sections batch adds child sections under a root" do
+    sign_in_as(@tenant_admin)
+    tower = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+
+    assert_difference -> { @draft.property_sections.count }, 2 do
+      post admin_property_setup_create_sections_wizard_path(@draft), params: {
+        property_section: {
+          mode: "multiple", section_type: SectionTypes::FLOOR, parent_id: tower.id,
+          prefix: "Piso", suffix_type: "number", count: 2
+        }
+      }
+    end
+
+    assert_equal 2, tower.reload.children.count
+  end
+
+  test "update section renames a section" do
+    sign_in_as(@tenant_admin)
+    section = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+
+    patch admin_property_setup_update_section_wizard_path(@draft, section_id: section.id), params: {
+      property_section: { name: "Torre Norte" }
+    }
+
+    assert_equal "Torre Norte", section.reload.name
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
+  test "destroy section soft-deletes an empty section" do
+    sign_in_as(@tenant_admin)
+    section = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+
+    assert_difference -> { @draft.property_sections.count }, -1 do
+      delete admin_property_setup_destroy_section_wizard_path(@draft, section_id: section.id)
+    end
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_not_nil section.reload.deleted_at
+  end
+
+  test "destroy section is blocked when it has children" do
+    sign_in_as(@tenant_admin)
+    tower = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1",
+      section_type: SectionTypes::FLOOR, parent: tower
+    )
+
+    assert_no_difference -> { @draft.property_sections.count } do
+      delete admin_property_setup_destroy_section_wizard_path(@draft, section_id: tower.id)
+    end
+  end
+
+  test "section endpoints deny cross-organization access" do
+    other_draft = ActsAsTenant.with_tenant(organizations(:two)) do
+      ResidentialProperty.create!(
+        organization: organizations(:two), name: "Other Org Draft 2",
+        property_type: PropertyTypes::BUILDING, status: PropertyStatuses::DRAFT,
+        country: "Chile", timezone: "America/Santiago"
+      )
+    end
+
+    sign_in_as(@tenant_admin)
+    post admin_property_setup_create_sections_wizard_path(other_draft), params: {
+      property_section: { mode: "individual", name: "Torre X", section_type: SectionTypes::TOWER }
+    }
+
+    assert_redirected_to admin_residential_properties_path
+  end
+
   test "back moves to previous step" do
     sign_in_as(@tenant_admin)
     Properties::Setup::WizardState.merge!(@draft, current_step: 3)

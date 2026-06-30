@@ -114,11 +114,7 @@ module Properties
       end
 
       def section_name(prefix, suffix_type, index)
-        "#{prefix} #{suffix(suffix_type, index)}".strip
-      end
-
-      def suffix(suffix_type, index)
-        suffix_type.to_sym == :letter ? ("A".ord + index).chr : (index + 1).to_s
+        SectionNameSequence.name(prefix: prefix, suffix_type: suffix_type, index: index)
       end
 
       # --- Legacy tower/floor generation -------------------------------------

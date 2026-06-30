@@ -101,6 +101,60 @@ class Admin::PropertySetup::WizardController < AdminController
     end
   end
 
+  def create_sections
+    parent = find_section(batch_section_params[:parent_id])
+    result = PropertySections::CreateBatch.call(
+      actor: current_user,
+      property: @property,
+      parent: parent,
+      section_type: batch_section_params[:section_type],
+      names: batch_names,
+      prefix: batch_section_params[:prefix],
+      suffix_type: (batch_section_params[:suffix_type].presence || "letter").to_sym,
+      count: batch_section_params[:count],
+      code: batch_section_params[:code]
+    )
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.section) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
+  def update_section
+    section = @property.property_sections.find_by(id: params[:section_id])
+    return section_not_found if section.nil?
+
+    result = PropertySections::Update.call(
+      actor: current_user,
+      section: section,
+      attributes: section_update_params
+    )
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.section) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
+  def destroy_section
+    section = @property.property_sections.find_by(id: params[:section_id])
+    return section_not_found if section.nil?
+
+    result = PropertySections::Destroy.call(actor: current_user, section: section)
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.section) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
   def create_unit
     result = Units::Create.call(
       actor: current_user,
@@ -275,6 +329,35 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def section_params
     params.require(:property_section).permit(:name, :section_type, :parent_id)
+  end
+
+  def batch_section_params
+    params.require(:property_section).permit(
+      :section_type, :parent_id, :mode, :name, :prefix, :suffix_type, :count, :code
+    )
+  end
+
+  # Individual mode supplies a single explicit name; multiple mode generates names
+  # from prefix/suffix_type/count inside CreateBatch.
+  def batch_names
+    return [ batch_section_params[:name] ] if batch_section_params[:mode] == "individual"
+
+    nil
+  end
+
+  def section_update_params
+    params.require(:property_section).permit(:name, :section_type, :code, :status)
+  end
+
+  def section_not_found
+    redirect_to admin_property_setup_wizard_path(@property),
+                inertia: { errors: { base: [ I18n.t("frontend.admin.property_sections.not_found", default: "Section not found") ] } }
+  end
+
+  def find_section(section_id)
+    return nil if section_id.blank?
+
+    @property.property_sections.find_by(id: section_id)
   end
 
   def unit_params

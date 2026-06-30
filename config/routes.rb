@@ -94,6 +94,9 @@ Rails.application.routes.draw do
       post "wizard/:id/cancel",         to: "wizard#cancel",         as: :cancel_wizard
       post "wizard/:id/confirm",        to: "wizard#confirm",        as: :confirm_wizard
       post "wizard/:id/create_section", to: "wizard#create_section", as: :create_section_wizard
+      post   "wizard/:id/sections",             to: "wizard#create_sections",  as: :create_sections_wizard
+      patch  "wizard/:id/sections/:section_id", to: "wizard#update_section",    as: :update_section_wizard
+      delete "wizard/:id/sections/:section_id", to: "wizard#destroy_section",   as: :destroy_section_wizard
       post "wizard/:id/create_unit",    to: "wizard#create_unit",    as: :create_unit_wizard
       get  "wizard/:id/structure_preview", to: "wizard#structure_preview", as: :structure_preview_wizard
       get  "wizard/:id/units_preview",  to: "wizard#units_preview",  as: :units_preview_wizard

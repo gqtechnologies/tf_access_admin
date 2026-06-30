@@ -1639,13 +1639,53 @@ en:
               title: "Quick"
               description: "Generate the hierarchy automatically with parameters."
           manual:
+            title: "Structure builder"
+            rule_hint: "Maximum two levels: root section and child section. Units attach only to leaf sections (a childless root or a child section)."
             add: "Add section"
+            add_root: "Add root section"
             empty: "No sections added yet."
             name: "Name"
             parent: "Parent section"
             root: "Root"
             type: "Type"
             format_warning: "The recommended format for this property type uses: {types}."
+            level:
+              root: "Root"
+              child: "Child"
+            summary:
+              total: "Total sections: {count}"
+              leaf: "Leaf sections for units: {count}"
+            actions:
+              menu: "Section actions"
+              edit: "Edit section"
+              add_child: "Add child section"
+              delete: "Delete section"
+            create:
+              title_root: "Add root section"
+              title_child: "Add child section"
+              parent_label: "Parent section: {name}"
+              child_no_children: "Child sections cannot have their own sub-sections."
+              tab_individual: "Individual"
+              tab_multiple: "Multiple"
+              prefix: "Prefix"
+              count: "Quantity"
+              format: "Name format"
+              format_letter: "Letter (A, B, C…)"
+              format_number: "Number (1, 2, 3…)"
+              code: "Internal code (optional)"
+              preview: "Will create:"
+              submit: "Create"
+            edit:
+              title: "Edit section"
+              submit: "Save changes"
+            delete:
+              title: "Delete {name}?"
+              guards: "A section with units cannot be deleted and child sections must be removed first."
+              cancel: "Cancel"
+              confirm: "Delete"
+            validations:
+              prefix_required: "Prefix is required"
+              count_min: "Quantity must be at least 1"
           quick:
             title: "Quick structure configuration"
             count: "{section} count"

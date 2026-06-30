@@ -1566,13 +1566,53 @@ es:
               title: "Rápida"
               description: "Genera la jerarquía automáticamente con parámetros."
           manual:
+            title: "Constructor de estructura"
+            rule_hint: "Máximo dos niveles: sección raíz y sección hija. Las unidades se asocian solo a secciones hoja (una raíz sin hijas o una sección hija)."
             add: "Agregar sección"
+            add_root: "Agregar sección raíz"
             empty: "No has agregado secciones aún."
             name: "Nombre"
             parent: "Sección padre"
             root: "Raíz"
             type: "Tipo"
             format_warning: "El formato recomendado para este tipo de propiedad usa: {types}."
+            level:
+              root: "Raíz"
+              child: "Hija"
+            summary:
+              total: "Total de secciones: {count}"
+              leaf: "Secciones hoja para unidades: {count}"
+            actions:
+              menu: "Acciones de la sección"
+              edit: "Editar sección"
+              add_child: "Agregar sección hija"
+              delete: "Eliminar sección"
+            create:
+              title_root: "Agregar sección raíz"
+              title_child: "Agregar sección hija"
+              parent_label: "Sección padre: {name}"
+              child_no_children: "Las secciones hijas no pueden tener sub-secciones."
+              tab_individual: "Individual"
+              tab_multiple: "Múltiple"
+              prefix: "Prefijo"
+              count: "Cantidad"
+              format: "Formato de nombre"
+              format_letter: "Letra (A, B, C…)"
+              format_number: "Número (1, 2, 3…)"
+              code: "Código interno (opcional)"
+              preview: "De creación:"
+              submit: "Crear"
+            edit:
+              title: "Editar sección"
+              submit: "Guardar cambios"
+            delete:
+              title: "¿Eliminar {name}?"
+              guards: "Una sección con unidades no puede eliminarse y las secciones hijas deben eliminarse primero."
+              cancel: "Cancelar"
+              confirm: "Eliminar"
+            validations:
+              prefix_required: "El prefijo es obligatorio"
+              count_min: "La cantidad debe ser al menos 1"
           quick:
             title: "Configuración de estructura rápida"
             count: "Cantidad de {section}"

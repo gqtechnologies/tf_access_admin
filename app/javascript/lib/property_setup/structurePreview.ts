@@ -54,6 +54,26 @@ export function displayTreeChildren(children: StructureTreeNode[] = []): TreeChi
   ]
 }
 
+export type SuffixType = 'letter' | 'number'
+
+/** Mirror of `Properties::Setup::SectionNameSequence` (Ruby). Single source of
+ * truth for "prefix + suffix" naming, shared by the quick engine and the manual
+ * builder modal's live "De creación" preview. `index` is zero-based:
+ * index 0 → "A" / "1". Keep in sync with the Ruby helper. */
+export function sectionName(prefix: string, suffixType: SuffixType, index: number): string {
+  return `${prefix} ${sectionNameSuffix(suffixType, index)}`.trim()
+}
+
+export function sectionNames(prefix: string, suffixType: SuffixType, count: number): string[] {
+  return Array.from({ length: Math.max(count, 0) }, (_, index) =>
+    sectionName(prefix, suffixType, index),
+  )
+}
+
+export function sectionNameSuffix(suffixType: SuffixType, index: number): string {
+  return suffixType === 'letter' ? String.fromCharCode('A'.charCodeAt(0) + index) : String(index + 1)
+}
+
 /** Builds a nested tree from the flat preview nodes returned by the backend. */
 export function buildTreeFromPreviewNodes(nodes: PreviewNode[]): StructureTreeNode[] {
   const byId = new Map<string, StructureTreeNode>()

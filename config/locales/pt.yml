@@ -1587,13 +1587,53 @@ pt:
               title: "Rápida"
               description: "Gere a hierarquia automaticamente com parâmetros."
           manual:
+            title: "Construtor de estrutura"
+            rule_hint: "Máximo de dois níveis: seção raiz e seção filha. As unidades se associam apenas a seções folha (uma raiz sem filhas ou uma seção filha)."
             add: "Adicionar seção"
+            add_root: "Adicionar seção raiz"
             empty: "Nenhuma seção adicionada ainda."
             name: "Nome"
             parent: "Seção pai"
             root: "Raiz"
             type: "Tipo"
             format_warning: "O formato recomendado para este tipo de imóvel usa: {types}."
+            level:
+              root: "Raiz"
+              child: "Filha"
+            summary:
+              total: "Total de seções: {count}"
+              leaf: "Seções folha para unidades: {count}"
+            actions:
+              menu: "Ações da seção"
+              edit: "Editar seção"
+              add_child: "Adicionar seção filha"
+              delete: "Excluir seção"
+            create:
+              title_root: "Adicionar seção raiz"
+              title_child: "Adicionar seção filha"
+              parent_label: "Seção pai: {name}"
+              child_no_children: "Seções filhas não podem ter sub-seções."
+              tab_individual: "Individual"
+              tab_multiple: "Múltiplo"
+              prefix: "Prefixo"
+              count: "Quantidade"
+              format: "Formato do nome"
+              format_letter: "Letra (A, B, C…)"
+              format_number: "Número (1, 2, 3…)"
+              code: "Código interno (opcional)"
+              preview: "Será criado:"
+              submit: "Criar"
+            edit:
+              title: "Editar seção"
+              submit: "Salvar alterações"
+            delete:
+              title: "Excluir {name}?"
+              guards: "Uma seção com unidades não pode ser excluída e as seções filhas devem ser removidas primeiro."
+              cancel: "Cancelar"
+              confirm: "Excluir"
+            validations:
+              prefix_required: "O prefixo é obrigatório"
+              count_min: "A quantidade deve ser no mínimo 1"
           quick:
             title: "Configuração de estrutura rápida"
             count: "Quantidade de {section}"
