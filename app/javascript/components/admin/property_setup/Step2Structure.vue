@@ -1,6 +1,8 @@
 <template>
   <div class="space-y-5">
-    <p class="text-muted-foreground text-sm">{{ t('admin.property_setup.step2.description') }}</p>
+    <p v-if="selectedMode !== 'manual'" class="text-muted-foreground text-sm">
+      {{ t('admin.property_setup.step2.description') }}
+    </p>
 
     <div class="grid gap-3 md:grid-cols-3">
       <button

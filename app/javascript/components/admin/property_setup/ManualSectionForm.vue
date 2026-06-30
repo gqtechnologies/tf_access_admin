@@ -1,195 +1,232 @@
 <template>
-  <div v-if="selectedMode === 'manual'" class="space-y-4 rounded-lg border p-4">
-    <!-- Header: explains the two-level + leaf-units rule -->
-    <div class="space-y-1">
-      <p class="text-sm font-medium">{{ t('admin.property_setup.step2.manual.title') }}</p>
-      <p class="text-muted-foreground text-xs">{{ t('admin.property_setup.step2.manual.rule_hint') }}</p>
+  <div v-if="selectedMode === 'manual'" class="space-y-4">
+    <template v-if="hasSections">
+      <Alert class="border-blue-200 bg-blue-50 text-blue-900 [&>svg]:text-blue-600">
+        <Info class="size-4" />
+        <AlertDescription>{{ t('admin.property_setup.step2.manual.hints.actions') }}</AlertDescription>
+      </Alert>
+    </template>
+    <div class="w-full flex flex-wrap items-start justify-start gap-3">
+      <p class="text-muted-foreground max-w-2xl text-sm">
+        {{ t('admin.property_setup.step2.manual.rule_hint') }}
+      </p>
+      <div class="w-full flex justify-end">
+        <Button type="button" class="shrink-0" @click="openAddRoot">
+          <Plus class="size-4" />
+          {{ t('admin.property_setup.step2.manual.add_root') }}
+        </Button>
+      </div>
     </div>
 
-    <!-- Section count summary -->
-    <div v-if="hasSections" class="text-muted-foreground flex gap-4 text-xs">
-      <span>{{ t('admin.property_setup.step2.manual.summary.total', { count: totalCount }) }}</span>
-      <span>{{ t('admin.property_setup.step2.manual.summary.leaf', { count: leafForUnitsCount }) }}</span>
-    </div>
+    <p v-if="!hasSections" class="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-sm">
+      {{ t('admin.property_setup.step2.manual.empty') }}
+    </p>
 
-    <!-- Tree -->
-    <ul v-if="hasSections" class="space-y-1 rounded-md border p-2 text-sm">
-      <li v-for="root in tree" :key="root.id" class="space-y-1">
-        <div class="flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-muted/50">
-          <div class="flex min-w-0 items-center gap-2">
-            <span class="truncate font-medium">{{ root.name }}</span>
-            <Badge variant="secondary">{{ typeLabel(root.section_type) }}</Badge>
-            <Badge variant="outline">{{ t('admin.property_setup.step2.manual.level.root') }}</Badge>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="ghost" size="icon" :aria-label="t('admin.property_setup.step2.manual.actions.menu')">
-                <MoreHorizontal class="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem @select="openEdit(root)">
-                <Pencil class="size-4" />{{ t('admin.property_setup.step2.manual.actions.edit') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem @select="openAddChild(root)">
-                <Plus class="size-4" />{{ t('admin.property_setup.step2.manual.actions.add_child') }}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem variant="destructive" @select="openDelete(root)">
-                <Trash2 class="size-4" />{{ t('admin.property_setup.step2.manual.actions.delete') }}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+    <ul v-else class="space-y-1">
+      <li v-for="root in tree" :key="root.id" class="space-y-0.5">
+        <ManualSectionTreeRow
+          :section="root"
+          :is-root="true"
+          @edit="openEdit"
+          @add-child="openAddChild"
+          @delete="openDelete"
+        />
 
-        <ul v-if="root.children?.length" class="space-y-1 pl-5">
-          <li
-            v-for="child in root.children"
-            :key="child.id"
-            class="flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-muted/50"
-          >
-            <div class="flex min-w-0 items-center gap-2">
-              <span class="truncate">{{ child.name }}</span>
-              <Badge variant="secondary">{{ typeLabel(child.section_type) }}</Badge>
-              <Badge variant="outline">{{ t('admin.property_setup.step2.manual.level.child') }}</Badge>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button variant="ghost" size="icon" :aria-label="t('admin.property_setup.step2.manual.actions.menu')">
-                  <MoreHorizontal class="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <!-- Child rows: no "add child" (third level not allowed) -->
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem @select="openEdit(child)">
-                  <Pencil class="size-4" />{{ t('admin.property_setup.step2.manual.actions.edit') }}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" @select="openDelete(child)">
-                  <Trash2 class="size-4" />{{ t('admin.property_setup.step2.manual.actions.delete') }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        <ul
+          v-if="root.children?.length"
+          class="relative m-0 ml-5 list-none space-y-0.5 border-l border-dashed border-border/80 py-0.5 pl-3"
+        >
+          <li v-for="child in root.children" :key="child.id">
+            <ManualSectionTreeRow
+              :section="child"
+              :is-root="false"
+              @edit="openEdit"
+              @delete="openDelete"
+            />
           </li>
         </ul>
       </li>
     </ul>
 
-    <p v-if="!hasSections" class="text-muted-foreground text-sm">
-      {{ t('admin.property_setup.step2.manual.empty') }}
-    </p>
-
-    <!-- The single visible creation button -->
-    <Button type="button" @click="openAddRoot">
-      <Plus class="size-4" />{{ t('admin.property_setup.step2.manual.add_root') }}
-    </Button>
-
-    <!-- Create sheet (root or child), Individual / Múltiple tabs -->
-    <Sheet :open="createOpen" @update:open="onCreateOpenChange">
-      <SheetContent class="flex flex-col gap-4 overflow-y-auto sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>
-            {{ createParent
-              ? t('admin.property_setup.step2.manual.create.title_child')
-              : t('admin.property_setup.step2.manual.create.title_root') }}
-          </SheetTitle>
-          <SheetDescription v-if="createParent">
+    <!-- Create dialog -->
+    <Dialog :open="createOpen" @update:open="onCreateOpenChange">
+      <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {{
+              createParent
+                ? t('admin.property_setup.step2.manual.create.title_child')
+                : t('admin.property_setup.step2.manual.create.title_root')
+            }}
+          </DialogTitle>
+          <DialogDescription v-if="createParent">
             {{ t('admin.property_setup.step2.manual.create.parent_label', { name: createParent.name }) }}
-            — {{ t('admin.property_setup.step2.manual.create.child_no_children') }}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div class="flex flex-col gap-4 px-4">
-          <Tabs v-model="createForm.mode">
-            <TabsList class="w-full">
-              <TabsTrigger value="individual" class="flex-1">
-                {{ t('admin.property_setup.step2.manual.create.tab_individual') }}
-              </TabsTrigger>
-              <TabsTrigger value="multiple" class="flex-1">
-                {{ t('admin.property_setup.step2.manual.create.tab_multiple') }}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="individual" class="space-y-3 pt-3">
-              <Field :data-invalid="!!createErrors.name">
-                <FieldLabel>{{ t('admin.property_setup.step2.manual.name') }}</FieldLabel>
-                <Input v-model="createForm.name" :aria-invalid="!!createErrors.name" />
-                <FieldError v-if="createErrors.name" :errors="translateErrors([createErrors.name])" />
-              </Field>
-            </TabsContent>
-
-            <TabsContent value="multiple" class="space-y-3 pt-3">
-              <div class="grid grid-cols-2 gap-3">
-                <Field :data-invalid="!!createErrors.prefix">
-                  <FieldLabel>{{ t('admin.property_setup.step2.manual.create.prefix') }}</FieldLabel>
-                  <Input v-model="createForm.prefix" :aria-invalid="!!createErrors.prefix" />
-                  <FieldError v-if="createErrors.prefix" :errors="translateErrors([createErrors.prefix])" />
-                </Field>
-                <Field :data-invalid="!!createErrors.count">
-                  <FieldLabel>{{ t('admin.property_setup.step2.manual.create.count') }}</FieldLabel>
-                  <Input v-model="createForm.count" type="number" min="1" :aria-invalid="!!createErrors.count" />
-                  <FieldError v-if="createErrors.count" :errors="translateErrors([createErrors.count])" />
-                </Field>
-              </div>
-              <Field>
-                <FieldLabel>{{ t('admin.property_setup.step2.manual.create.format') }}</FieldLabel>
-                <select
-                  v-model="createForm.suffix_type"
-                  class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-                >
-                  <option value="letter">{{ t('admin.property_setup.step2.manual.create.format_letter') }}</option>
-                  <option value="number">{{ t('admin.property_setup.step2.manual.create.format_number') }}</option>
-                </select>
-              </Field>
-              <div v-if="namePreview.length" class="rounded-md bg-muted/50 p-2 text-xs">
-                <p class="text-muted-foreground mb-1">{{ t('admin.property_setup.step2.manual.create.preview') }}</p>
-                <p class="font-medium">{{ namePreview.join(', ') }}</p>
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          <!-- Shared fields -->
-          <Field :data-invalid="!!createErrors.section_type">
-            <FieldLabel>{{ t('admin.property_setup.step2.manual.type') }}</FieldLabel>
-            <select
-              v-model="createForm.section_type"
-              class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-              :aria-invalid="!!createErrors.section_type"
-            >
-              <option v-for="type in sectionTypes" :key="type" :value="type">{{ typeLabel(type) }}</option>
-            </select>
-            <FieldError v-if="createErrors.section_type" :errors="translateErrors([createErrors.section_type])" />
-            <p v-if="showCreateFormatWarning" class="text-xs text-amber-600">
-              {{ t('admin.property_setup.step2.manual.format_warning', { types: recommendedLabels }) }}
-            </p>
-          </Field>
-
-          <Field v-if="createForm.mode === 'individual'">
-            <FieldLabel>{{ t('admin.property_setup.step2.manual.create.code') }}</FieldLabel>
-            <Input v-model="createForm.code" />
-          </Field>
+        <div v-if="createParent" class="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+          <span class="text-muted-foreground">{{ t('admin.property_setup.step2.manual.parent') }}:</span>
+          <span class="ml-1 font-medium">{{ createParent.name }}</span>
         </div>
 
-        <SheetFooter>
+        <Tabs v-model="createForm.mode" class="gap-4">
+          <TabsList class="grid w-full grid-cols-2">
+            <TabsTrigger value="individual">
+              {{ t('admin.property_setup.step2.manual.create.tab_individual') }}
+            </TabsTrigger>
+            <TabsTrigger value="multiple">
+              {{ t('admin.property_setup.step2.manual.create.tab_multiple') }}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="individual" class="space-y-4 pt-2">
+            <Field :data-invalid="!!createErrors.name">
+              <FieldLabel>{{ t('admin.property_setup.step2.manual.name') }}</FieldLabel>
+              <Input v-model="createForm.name" :aria-invalid="!!createErrors.name" />
+              <FieldError v-if="createErrors.name" :errors="translateErrors([createErrors.name])" />
+            </Field>
+          </TabsContent>
+
+          <TabsContent value="multiple" class="space-y-4 pt-2">
+            <div class="grid grid-cols-2 gap-3">
+              <Field :data-invalid="!!createErrors.count">
+                <FieldLabel>{{ t('admin.property_setup.step2.manual.create.count') }}</FieldLabel>
+                <div class="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    class="size-9 shrink-0"
+                    :disabled="Number(createForm.count) <= 1"
+                    @click="decrementCount"
+                  >
+                    <Minus class="size-4" />
+                  </Button>
+                  <Input
+                    v-model="createForm.count"
+                    type="number"
+                    min="1"
+                    class="text-center"
+                    :aria-invalid="!!createErrors.count"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    class="size-9 shrink-0"
+                    @click="incrementCount"
+                  >
+                    <Plus class="size-4" />
+                  </Button>
+                </div>
+                <FieldError v-if="createErrors.count" :errors="translateErrors([createErrors.count])" />
+              </Field>
+
+              <Field :data-invalid="!!createErrors.prefix">
+                <FieldLabel>{{ t('admin.property_setup.step2.manual.create.prefix') }}</FieldLabel>
+                <Input v-model="createForm.prefix" :aria-invalid="!!createErrors.prefix" />
+                <FieldError v-if="createErrors.prefix" :errors="translateErrors([createErrors.prefix])" />
+              </Field>
+            </div>
+
+            <Field>
+              <FieldLabel>{{ t('admin.property_setup.step2.manual.create.format') }}</FieldLabel>
+              <select
+                v-model="createForm.suffix_type"
+                class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
+              >
+                <option value="letter">{{ t('admin.property_setup.step2.manual.create.format_letter') }}</option>
+                <option value="number">{{ t('admin.property_setup.step2.manual.create.format_number') }}</option>
+              </select>
+            </Field>
+          </TabsContent>
+        </Tabs>
+
+        <Field :data-invalid="!!createErrors.section_type">
+          <FieldLabel>{{ t('admin.property_setup.step2.manual.type') }}</FieldLabel>
+          <select
+            v-model="createForm.section_type"
+            class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
+            :aria-invalid="!!createErrors.section_type"
+          >
+            <option v-for="type in sectionTypes" :key="type" :value="type">{{ typeLabel(type) }}</option>
+          </select>
+          <FieldError v-if="createErrors.section_type" :errors="translateErrors([createErrors.section_type])" />
+          <p v-if="showCreateFormatWarning" class="text-xs text-amber-600">
+            {{ t('admin.property_setup.step2.manual.format_warning', { types: recommendedLabels }) }}
+          </p>
+        </Field>
+
+        <Field>
+          <FieldLabel>{{ t('admin.property_setup.step2.manual.create.code') }}</FieldLabel>
+          <Input v-model="createForm.code" :placeholder="t('admin.property_setup.step2.manual.create.code_placeholder')" />
+        </Field>
+
+        <div v-if="namePreview.length" class="space-y-2">
+          <p class="text-muted-foreground text-xs">
+            {{ t('admin.property_setup.step2.manual.create.preview_will_create') }}
+            {{ namePreviewText }}
+          </p>
+          <div class="flex flex-wrap gap-1.5">
+            <span
+              v-for="(name, index) in namePreview"
+              :key="`${name}-${index}`"
+              class="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 px-2.5 py-1 text-xs font-medium"
+            >
+              <component :is="iconFor(createForm.section_type)" class="text-muted-foreground size-3.5" />
+              {{ name }}
+            </span>
+          </div>
+        </div>
+
+        <Alert class="border-blue-200 bg-blue-50 text-blue-900 [&>svg]:text-blue-600">
+          <Info class="size-4" />
+          <AlertDescription>
+            {{
+              createParent
+                ? t('admin.property_setup.step2.manual.create.info_child')
+                : t('admin.property_setup.step2.manual.create.info_root')
+            }}
+          </AlertDescription>
+        </Alert>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" @click="createOpen = false">
+            {{ t('admin.property_setup.step2.manual.create.cancel') }}
+          </Button>
           <Button type="button" :disabled="submitting" @click="submitCreate">
             {{ t('admin.property_setup.step2.manual.create.submit') }}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
-    <!-- Edit sheet -->
-    <Sheet :open="editOpen" @update:open="onEditOpenChange">
-      <SheetContent class="flex flex-col gap-4 overflow-y-auto sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>{{ t('admin.property_setup.step2.manual.edit.title') }}</SheetTitle>
-        </SheetHeader>
-        <div class="flex flex-col gap-4 px-4">
+    <!-- Edit dialog -->
+    <Dialog :open="editOpen" @update:open="onEditOpenChange">
+      <DialogContent class="max-h-[90vh] overflow-y-auto sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{{ t('admin.property_setup.step2.manual.edit.title') }}</DialogTitle>
+          <DialogDescription>{{ t('admin.property_setup.step2.manual.edit.description') }}</DialogDescription>
+        </DialogHeader>
+
+        <div v-if="editTarget" class="space-y-1 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+          <p>
+            <span class="text-muted-foreground">{{ t('admin.property_setup.step2.manual.edit.current') }}:</span>
+            <span class="ml-1 font-medium">{{ editTarget.name }}</span>
+          </p>
+          <p v-if="editParentName">
+            <span class="text-muted-foreground">{{ t('admin.property_setup.step2.manual.edit.parent') }}:</span>
+            <span class="ml-1 font-medium">{{ editParentName }}</span>
+          </p>
+        </div>
+
+        <div class="space-y-4">
           <Field :data-invalid="!!editErrors.name">
             <FieldLabel>{{ t('admin.property_setup.step2.manual.name') }}</FieldLabel>
             <Input v-model="editForm.name" :aria-invalid="!!editErrors.name" />
             <FieldError v-if="editErrors.name" :errors="translateErrors([editErrors.name])" />
           </Field>
+
           <Field :data-invalid="!!editErrors.section_type">
             <FieldLabel>{{ t('admin.property_setup.step2.manual.type') }}</FieldLabel>
             <select
@@ -199,18 +236,41 @@
               <option v-for="type in sectionTypes" :key="type" :value="type">{{ typeLabel(type) }}</option>
             </select>
           </Field>
+
           <Field>
             <FieldLabel>{{ t('admin.property_setup.step2.manual.create.code') }}</FieldLabel>
-            <Input v-model="editForm.code" />
+            <Input v-model="editForm.code" :placeholder="t('admin.property_setup.step2.manual.create.code_placeholder')" />
           </Field>
         </div>
-        <SheetFooter>
-          <Button type="button" :disabled="submitting" @click="submitEdit">
-            {{ t('admin.property_setup.step2.manual.edit.submit') }}
+
+        <Alert
+          v-if="editTargetHasChildren"
+          class="border-amber-200 bg-amber-50 text-amber-900 [&>svg]:text-amber-700"
+        >
+          <Info class="size-4" />
+          <AlertDescription>{{ t('admin.property_setup.step2.manual.edit.warning_has_children') }}</AlertDescription>
+        </Alert>
+
+        <DialogFooter class="sm:justify-between">
+          <Button
+            type="button"
+            variant="ghost"
+            class="text-destructive hover:text-destructive mr-auto"
+            @click="editOpen = false; openDelete(editTarget!)"
+          >
+            {{ t('admin.property_setup.step2.manual.actions.delete') }}
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          <div class="flex gap-2">
+            <Button type="button" variant="outline" @click="editOpen = false">
+              {{ t('admin.property_setup.step2.manual.create.cancel') }}
+            </Button>
+            <Button type="button" :disabled="submitting" @click="submitEdit">
+              {{ t('admin.property_setup.step2.manual.edit.submit') }}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     <!-- Delete confirmation -->
     <AlertDialog :open="deleteOpen" @update:open="(v: boolean) => (deleteOpen = v)">
@@ -238,27 +298,20 @@
 import { computed, reactive, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
-import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { CheckCircle2, Info, Minus, Plus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -269,6 +322,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import ManualSectionTreeRow from '@/components/admin/property_setup/ManualSectionTreeRow.vue'
+import { useSectionTypeIcon } from '@/lib/composables/property_section/useSectionTypeIcon'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
 import { mapPropertySetupZodErrors } from '@/lib/schemas/property_setup'
 import {
@@ -294,6 +349,7 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
+const { iconFor } = useSectionTypeIcon()
 const submitting = ref(false)
 
 const UNIT_ELIGIBLE_TYPES = ['block', 'tower', 'floor']
@@ -322,6 +378,17 @@ function typeLabel(type: string) {
   return t(`admin.property_sections.section_types.${type}`)
 }
 
+function findParentName(sectionId: string): string | null {
+  for (const root of props.tree) {
+    if (root.children?.some((child) => child.id === sectionId)) return root.name
+  }
+  return null
+}
+
+function sectionHasChildren(section: SectionNode): boolean {
+  return (section.children?.length ?? 0) > 0
+}
+
 // --- Create -----------------------------------------------------------------
 const createOpen = ref(false)
 const createParent = ref<SectionNode | null>(null)
@@ -343,6 +410,14 @@ const namePreview = computed(() => {
   return sectionNames(createForm.prefix, createForm.suffix_type, Math.min(count, 6))
 })
 
+const namePreviewText = computed(() => {
+  const count = Number(createForm.count)
+  if (!createForm.prefix || Number.isNaN(count) || count < 1) return ''
+  const all = sectionNames(createForm.prefix, createForm.suffix_type, count)
+  if (all.length <= 3) return all.join(', ')
+  return `${all.slice(0, 2).join(', ')}, ..., ${all[all.length - 1]}`
+})
+
 const showCreateFormatWarning = computed(
   () => recommended.value.length > 0 && !recommended.value.includes(createForm.section_type),
 )
@@ -356,6 +431,14 @@ function resetCreateForm() {
   createForm.count = '2'
   createForm.code = ''
   createErrors.value = {}
+}
+
+function incrementCount() {
+  createForm.count = String(Math.max(1, Number(createForm.count) + 1))
+}
+
+function decrementCount() {
+  createForm.count = String(Math.max(1, Number(createForm.count) - 1))
 }
 
 function openAddRoot() {
@@ -377,10 +460,9 @@ function onCreateOpenChange(value: boolean) {
 }
 
 function submitCreate() {
-  const placement = createParent.value ? 'child' : 'root'
   const payload = {
     mode: createForm.mode,
-    placement,
+    placement: createParent.value ? 'child' : 'root',
     section_type: createForm.section_type,
     parent_id: createParent.value?.id,
     name: createForm.mode === 'individual' ? createForm.name : undefined,
@@ -430,6 +512,14 @@ const editOpen = ref(false)
 const editTarget = ref<SectionNode | null>(null)
 const editErrors = ref<Record<string, string>>({})
 const editForm = reactive({ name: '', section_type: 'tower', code: '' })
+
+const editParentName = computed(() =>
+  editTarget.value ? findParentName(editTarget.value.id) : null,
+)
+
+const editTargetHasChildren = computed(() =>
+  editTarget.value ? sectionHasChildren(editTarget.value) : false,
+)
 
 function openEdit(section: SectionNode) {
   editTarget.value = section

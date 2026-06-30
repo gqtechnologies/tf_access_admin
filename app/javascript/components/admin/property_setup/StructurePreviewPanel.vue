@@ -19,6 +19,14 @@
         </CardContent>
       </Card>
 
+      <Alert
+        v-if="showAutoUpdateNote"
+        class="shrink-0 border-muted bg-muted/30 text-muted-foreground [&>svg]:text-muted-foreground"
+      >
+        <Info class="size-4" />
+        <AlertDescription>{{ t('admin.property_setup.step2.preview.auto_update') }}</AlertDescription>
+      </Alert>
+
       <div v-if="showStats" class="grid shrink-0 grid-cols-1 gap-2 border-t pt-3">
         <div
           v-for="stat in statCards"
@@ -37,7 +45,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { DoorOpen } from 'lucide-vue-next'
+import { DoorOpen, Info } from 'lucide-vue-next'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import StructurePreviewTreeNode from '@/components/admin/property_setup/StructurePreviewTreeNode.vue'
 import {
@@ -82,6 +91,10 @@ const tree = computed(() => {
 // The numeric stat refers to the property's units, shown only when a units
 // total is provided (step 3). Step 2 shows just the section hierarchy.
 const showStats = computed(() => props.unitsCount != null)
+
+const showAutoUpdateNote = computed(
+  () => props.structureMode === 'manual' || props.structureMode === 'quick',
+)
 
 const statCards = computed(() => [
   {
