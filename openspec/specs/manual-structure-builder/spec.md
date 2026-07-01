@@ -175,6 +175,8 @@ The base view (mockup 01) SHALL expose exactly one visible creation button, "Agr
 
 The creation modal SHALL offer two modes, "Individual" and "Múltiple". Individual creates a single section; Múltiple generates a batch under one parent context from a `cantidad`, an optional `prefijo`, and a naming `formato` (letter `A, B, C…` or numeric `1, 2, 3…`), with an optional internal code/prefix. The modal SHALL show a live "De creación" preview of the names that will be generated.
 
+Batch name allocation SHALL be sibling-collision-aware: when generating `cantidad` names, the system SHALL skip any candidate whose full normalized name already matches an existing sibling in the same parent context, advancing the sequence until it has allocated `cantidad` free names. Allocation SHALL compare complete normalized candidates only (trim, whitespace-collapse, NFKC, downcase) and MUST NOT parse or infer suffixes from existing names. The suffix sequence is bounded (letters `A–Z`, numbers up to a fixed cap); when the range is exhausted before `cantidad` free names are found, the batch SHALL be rejected as invalid with an `insufficient_available_names` error rather than creating a partial batch. The live "De creación" preview SHALL mirror this same allocation (skipped names and the insufficiency condition) so the preview matches what will actually be persisted.
+
 The add-root modal creates root sections; the add-child modal is bound to a fixed parent root section and SHALL create only child sections under it. Batch creation MUST respect the two-level limit and unit-placement rules and SHALL persist through the existing section creation path; child batches MUST NOT create a third level.
 
 #### Scenario: Multiple mode generates a named batch
@@ -196,6 +198,20 @@ The add-root modal creates root sections; the add-child modal is bound to a fixe
 - **GIVEN** the creation modal in "Individual" mode
 - **WHEN** the user provides a name and type and confirms
 - **THEN** exactly one section is created in the corresponding context (root or under the fixed parent)
+
+#### Scenario: Multiple mode skips names already taken by siblings
+
+- **GIVEN** a parent context that already contains a section named "Torre A"
+- **WHEN** the user generates a "Múltiple" batch with prefijo "Torre", letter format, and cantidad 2
+- **THEN** allocation skips "Torre A" and produces "Torre B" and "Torre C"
+- **AND** the "De creación" preview shows the same names before the user confirms
+
+#### Scenario: Batch is rejected when the suffix range is exhausted
+
+- **GIVEN** a parent context whose existing siblings occupy the entire suffix range for the chosen format
+- **WHEN** the user attempts to generate a batch that needs more free names than remain
+- **THEN** the batch is rejected as invalid with an `insufficient_available_names` error
+- **AND** no partial batch is created
 
 ### Requirement: Structure preview updates automatically after each change
 

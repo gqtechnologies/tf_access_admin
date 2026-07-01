@@ -1,6 +1,10 @@
 # property-setup-wizard
 
-## ADDED Requirements
+## Purpose
+
+Defines the guided five-step property setup wizard: authorization to start the flow, the step-by-step layout (property data, structure, units, review, confirmation), incremental draft persistence, per-step validation via existing domain services, and the `draft → configured → active` property lifecycle.
+
+## Requirements
 
 ### Requirement: Authorized users can start the property setup wizard
 

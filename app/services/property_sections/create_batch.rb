@@ -30,10 +30,14 @@ module PropertySections
       authorize_manage_sections!(@property)
 
       names = resolved_names
-      return BatchResult.invalid(blank_batch_section) if names.empty? && @names.blank?
 
-      if batch_mode? && names.size < @count.to_i
-        return BatchResult.invalid(insufficient_batch_section)
+      # In batch mode, allocating fewer free names than requested (including zero,
+      # when every sibling suffix is already taken) is an insufficiency — checked
+      # before the generic empty guard so it is not misreported as an empty batch.
+      if batch_mode?
+        return BatchResult.invalid(insufficient_batch_section) if names.size < @count.to_i
+      elsif names.empty?
+        return BatchResult.invalid(blank_batch_section)
       end
 
       created = []

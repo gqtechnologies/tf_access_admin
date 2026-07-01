@@ -106,9 +106,9 @@ class PropertySections::CreateBatchTest < ActiveSupport::TestCase
   end
 
   test "returns insufficient_available_names when not enough suffixes remain" do
-    26.times do |index|
-      root_section(@property, "Torre #{('A'.ord + index).chr}")
-    end
+    # @tower already occupies "Torre A"; fill "Torre B".."Torre Z" so the whole
+    # letter range (A–Z) is taken.
+    ("B".."Z").each { |letter| root_section(@property, "Torre #{letter}") }
 
     result = PropertySections::CreateBatch.call(
       actor: @actor, property: @property, section_type: SectionTypes::TOWER,

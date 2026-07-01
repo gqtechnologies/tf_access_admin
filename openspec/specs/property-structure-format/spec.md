@@ -114,6 +114,8 @@ El sistema SHALL adaptar las opciones de formato de identificador de unidades en
 
 El sistema SHALL permitir creación manual de secciones, pero SHALL mostrar advertencia cuando el `section_type` creado no corresponde al formato recomendado del `property_type`.
 
+> Fuente de verdad: este requisito define la **regla de formato** (qué tipos son recomendados y que la advertencia no bloquea). El comportamiento de UI del builder manual (dónde y cómo se muestra la advertencia) es autoritativo en la capability `manual-structure-builder` — ver "Builder shows recommended-format guidance without enforcing it". No dupliques la conducta de UI aquí.
+
 #### Scenario: Usuario crea secciones compatibles con el formato sin advertencias
 - **WHEN** el usuario crea manualmente secciones con `section_type` incluidos en el formato recomendado
 - **THEN** no se muestra ninguna advertencia y la creación procede normalmente
@@ -142,6 +144,8 @@ El sistema SHALL permitir creación manual de secciones, pero SHALL mostrar adve
 ### Requirement: Structure preview renders current structure state
 
 El sistema SHALL mostrar un panel de preview de estructura en todo momento durante el step 2, independientemente del modo activo. El panel refleja el estado actual de la estructura y se actualiza reactivamente.
+
+> Fuente de verdad: este requisito cubre el panel de preview en **todos** los modos (none/manual/quick). La actualización automática específica del builder manual tras cada create/edit/delete es autoritativa en `manual-structure-builder` — ver "Structure preview updates automatically after each change". No dupliques esa conducta aquí.
 
 #### Scenario: Preview en modo none muestra estado vacío
 - **WHEN** el modo activo es `none`

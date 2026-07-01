@@ -316,6 +316,8 @@ The system MUST keep a section and its subtree in their original property and or
 
 The system SHALL archive a section non-destructively and SHALL preserve subsections, units, visits, and history.
 
+> Exception (setup wizard only): while a property is in `draft`, a section **without** children or units may be removed by soft delete through `PropertySections::Destroy` — see "Draft-phase section removal via soft delete". That path is scoped to draft construction and does not change the rule that, in the ordinary admin flow, archive is the supported operation and deleting a section with dependents is denied.
+
 #### Scenario: Section with children is archived
 
 - **GIVEN** S has child sections

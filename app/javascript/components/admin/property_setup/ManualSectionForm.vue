@@ -18,6 +18,11 @@
       </div>
     </div>
 
+    <div v-if="hasSections" class="text-muted-foreground flex flex-wrap gap-4 text-xs">
+      <span>{{ t('admin.property_setup.step2.manual.summary.total', { count: totalCount }) }}</span>
+      <span>{{ t('admin.property_setup.step2.manual.summary.leaf', { count: leafForUnitsCount }) }}</span>
+    </div>
+
     <p v-if="!hasSections" class="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-sm">
       {{ t('admin.property_setup.step2.manual.empty') }}
     </p>
