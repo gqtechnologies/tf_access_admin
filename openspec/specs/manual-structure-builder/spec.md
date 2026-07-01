@@ -173,7 +173,7 @@ The base view (mockup 01) SHALL expose exactly one visible creation button, "Agr
 
 ### Requirement: Section creation supports individual and multiple modes
 
-The creation modal SHALL offer two modes, "Individual" and "Múltiple". Individual creates a single section; Múltiple generates a batch under one parent context from a `cantidad`, an optional `prefijo`, and a naming `formato` (letter `A, B, C…` or numeric `1, 2, 3…`), with an optional internal code/prefix. The modal SHALL show a live "De creación" preview of the names that will be generated.
+The creation modal SHALL offer two modes, "Individual" and "Múltiple". Individual creates a single section; Múltiple generates a batch under one parent context from a `cantidad`, an optional `prefijo`, and a naming `formato` (letter `A, B, C…` or numeric `1, 2, 3…`). Section codes are assigned automatically by the backend; the modal MUST NOT expose a code input. The modal SHALL show a live "De creación" preview of the names that will be generated.
 
 Batch name allocation SHALL be sibling-collision-aware: when generating `cantidad` names, the system SHALL skip any candidate whose full normalized name already matches an existing sibling in the same parent context, advancing the sequence until it has allocated `cantidad` free names. Allocation SHALL compare complete normalized candidates only (trim, whitespace-collapse, NFKC, downcase) and MUST NOT parse or infer suffixes from existing names. The suffix sequence is bounded (letters `A–Z`, numbers up to a fixed cap); when the range is exhausted before `cantidad` free names are found, the batch SHALL be rejected as invalid with an `insufficient_available_names` error rather than creating a partial batch. The live "De creación" preview SHALL mirror this same allocation (skipped names and the insufficiency condition) so the preview matches what will actually be persisted.
 
@@ -185,6 +185,7 @@ The add-root modal creates root sections; the add-child modal is bound to a fixe
 - **WHEN** the user sets a type, a cantidad, a prefijo, and a letter or numeric naming format
 - **THEN** the "De creación" preview lists the resulting names (e.g., "Torre A, Torre B")
 - **AND** confirming creates the batch of root sections and the live preview updates
+- **AND** each section receives a server-derived code
 
 #### Scenario: Child modal is scoped to its parent root
 
@@ -198,6 +199,12 @@ The add-root modal creates root sections; the add-child modal is bound to a fixe
 - **GIVEN** the creation modal in "Individual" mode
 - **WHEN** the user provides a name and type and confirms
 - **THEN** exactly one section is created in the corresponding context (root or under the fixed parent)
+- **AND** the section receives a server-derived code
+
+#### Scenario: No code input in creation or edit modal
+
+- **WHEN** the user opens the add-section or edit-section modal
+- **THEN** no `code` field is visible or submittable
 
 #### Scenario: Multiple mode skips names already taken by siblings
 
