@@ -37,21 +37,6 @@
                 <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
               </Field>
             </VeeField>
-            <VeeField v-slot="{ componentField, errors }" name="code">
-              <Field :data-invalid="!!errors.length">
-                <FieldLabel for="form-residential-property-code">
-                  {{ t('admin.residential_properties.input.code.label') }}
-                </FieldLabel>
-                <Input
-                  id="form-residential-property-code"
-                  v-bind="componentField"
-                  :placeholder="t('admin.residential_properties.input.code.placeholder')"
-                  autocomplete="off"
-                  :aria-invalid="!!errors.length"
-                />
-                <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
-              </Field>
-            </VeeField>
           </FieldGroup>
           <FieldGroup class="mt-4 flex flex-col md:flex-row">
             <VeeField v-slot="{ field, errors }" name="property_type">
@@ -288,7 +273,6 @@ function buildInitialValues() {
   if (props.mode === 'create') {
     return {
       name: '',
-      code: '',
       property_type: PROPERTY_TYPE_VALUES[0],
       address_line: '',
       city: '',
@@ -300,7 +284,6 @@ function buildInitialValues() {
 
   return {
     name: '',
-    code: '',
     property_type: PROPERTY_TYPE_VALUES[0],
     address_line: '',
     city: '',
@@ -338,7 +321,6 @@ function formValuesFromResidentialProperty(defaults: ResidentialProperty) {
 
   return {
     name: defaults.name ?? '',
-    code: defaults.code ?? '',
     property_type: safeType,
     address_line: defaults.address_line ?? '',
     city: defaults.city ?? '',

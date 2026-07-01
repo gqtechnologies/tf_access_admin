@@ -62,6 +62,21 @@ class Properties::Setup::BuildPreviewTest < ActiveSupport::TestCase
     assert_equal "101", preview[:units].first[:identifier]
   end
 
+  test "does not flag missing units in automatic mode before generation" do
+    @property.update!(
+      metadata: {
+        "setup_wizard" => {
+          "structure_mode" => "quick",
+          "units_mode" => "automatic"
+        }
+      }
+    )
+
+    preview = Properties::Setup::BuildPreview.call(property: @property)
+
+    refute_includes preview[:blocking_errors], I18n.t("frontend.admin.property_setup.step3.errors.no_units")
+  end
+
   test "flags blocking errors when manual structure is empty" do
     preview = Properties::Setup::BuildPreview.call(property: @property)
 

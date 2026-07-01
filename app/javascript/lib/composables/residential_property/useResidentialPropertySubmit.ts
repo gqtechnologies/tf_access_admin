@@ -23,7 +23,6 @@ export function useResidentialPropertySubmit(formRef: FormRef) {
       {
         residential_property: {
           name: data.name,
-          code: data.code,
           property_type: data.property_type,
           address_line: data.address_line,
           city: data.city,
@@ -54,7 +53,6 @@ export function useResidentialPropertySubmit(formRef: FormRef) {
       {
         residential_property: {
           name: data.name,
-          code: data.code,
           property_type: data.property_type,
           address_line: data.address_line,
           city: data.city,

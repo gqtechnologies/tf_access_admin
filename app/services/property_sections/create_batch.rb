@@ -14,7 +14,7 @@ module PropertySections
   # whole batch and returns the failing node with its errors.
   class CreateBatch < Base
     def initialize(actor:, property:, parent: nil, section_type:, names: nil,
-                   prefix: nil, suffix_type: :letter, count: nil, code: nil)
+                   prefix: nil, suffix_type: :letter, count: nil)
       super(actor: actor)
       @property = property
       @parent = parent
@@ -23,7 +23,6 @@ module PropertySections
       @prefix = prefix
       @suffix_type = suffix_type
       @count = count
-      @code = code
     end
 
     def call
@@ -47,7 +46,7 @@ module PropertySections
             actor: actor,
             property: @property,
             parent: @parent,
-            attributes: node_attributes(name, single: names.one?)
+            attributes: { name: name, section_type: @section_type }
           )
 
           unless result.success?
@@ -84,14 +83,6 @@ module PropertySections
 
     def sibling_normalized_names
       @property.property_sections.where(parent_id: @parent&.id).pluck(:normalized_name)
-    end
-
-    # A single internal code only applies when creating exactly one section, to
-    # avoid duplicate-code collisions across a generated batch.
-    def node_attributes(name, single:)
-      attrs = { name: name, section_type: @section_type }
-      attrs[:code] = @code if single && @code.present?
-      attrs
     end
 
     def blank_batch_section

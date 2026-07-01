@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_25_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_01_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -934,6 +934,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_030000) do
 
   create_table "units", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.decimal "area_m2", precision: 10, scale: 2
+    t.string "code"
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.string "display_name"
@@ -949,8 +950,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_030000) do
     t.index ["deleted_at"], name: "index_units_on_deleted_at"
     t.index ["metadata"], name: "index_units_on_metadata", using: :gin
     t.index ["organization_id", "property_section_id"], name: "index_units_on_organization_id_and_property_section_id"
+    t.index ["organization_id", "residential_property_id", "code"], name: "idx_units_unique_code_in_property_root", unique: true, where: "((deleted_at IS NULL) AND (property_section_id IS NULL) AND (code IS NOT NULL))"
     t.index ["organization_id", "residential_property_id", "normalized_identifier"], name: "idx_units_on_org_property_normalized_identifier_lookup", where: "(deleted_at IS NULL)"
     t.index ["organization_id", "residential_property_id", "normalized_identifier"], name: "index_units_on_org_property_normalized_when_no_section", unique: true, where: "((property_section_id IS NULL) AND (deleted_at IS NULL))"
+    t.index ["organization_id", "residential_property_id", "property_section_id", "code"], name: "idx_units_unique_code_in_section", unique: true, where: "((deleted_at IS NULL) AND (property_section_id IS NOT NULL) AND (code IS NOT NULL))"
     t.index ["organization_id", "residential_property_id", "property_section_id", "normalized_identifier"], name: "index_units_on_org_property_section_normalized_when_section", unique: true, where: "((property_section_id IS NOT NULL) AND (deleted_at IS NULL))"
     t.index ["organization_id", "residential_property_id", "status"], name: "idx_on_organization_id_residential_property_id_stat_47cefd6e3a"
     t.index ["organization_id"], name: "index_units_on_organization_id"

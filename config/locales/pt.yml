@@ -589,6 +589,7 @@ pt:
         not_found: "Unidade não encontrada"
         validations:
           identifier_taken: "Já existe uma unidade com este identificador neste contexto"
+          code_taken: "Já existe uma unidade com este código neste contexto"
           section_invalid: "A seção indicada não é válida"
           section_same_property: "A seção deve pertencer à mesma propriedade"
           section_not_operative: "Não é possível atribuir unidades a uma seção ou propriedade não operativa"

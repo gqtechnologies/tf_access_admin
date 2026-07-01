@@ -6,6 +6,7 @@
 #
 #  id                      :uuid             not null, primary key
 #  area_m2                 :decimal(10, 2)
+#  code                    :string
 #  deleted_at              :datetime
 #  display_name            :string
 #  identifier              :string           not null
@@ -23,6 +24,8 @@
 #
 #  idx_on_organization_id_residential_property_id_stat_47cefd6e3a  (organization_id,residential_property_id,status)
 #  idx_units_on_org_property_normalized_identifier_lookup          (organization_id,residential_property_id,normalized_identifier) WHERE (deleted_at IS NULL)
+#  idx_units_unique_code_in_property_root                          (organization_id,residential_property_id,code) UNIQUE WHERE ((deleted_at IS NULL) AND (property_section_id IS NULL) AND (code IS NOT NULL))
+#  idx_units_unique_code_in_section                                (organization_id,residential_property_id,property_section_id,code) UNIQUE WHERE ((deleted_at IS NULL) AND (property_section_id IS NOT NULL) AND (code IS NOT NULL))
 #  index_units_on_deleted_at                                       (deleted_at)
 #  index_units_on_metadata                                         (metadata) USING gin
 #  index_units_on_org_property_normalized_when_no_section          (organization_id,residential_property_id,normalized_identifier) UNIQUE WHERE ((property_section_id IS NULL) AND (deleted_at IS NULL))
@@ -82,6 +85,9 @@ class Unit < ApplicationRecord
   # §1.1 minimal contract: presence of the identity/placement/type/status fields.
   validates :identifier, presence: true
   validates_alphanumeric_hyphen_code :identifier, allow_whitespace: true
+  # System-derived machine key (hierarchical-code-generation); strict slug format.
+  # The validator already skips blank values, so the nullable code is optional.
+  validates_alphanumeric_hyphen_code :code
   validates :normalized_identifier, presence: true
   validates :unit_type, presence: true
   validates :status, presence: true, inclusion: { in: UnitStatuses::ALL }
@@ -111,6 +117,9 @@ class Unit < ApplicationRecord
   # §1.8: uniqueness by placement context, treating "no section" as one logical
   # context (the DB index alone cannot, since NULLs are distinct in Postgres).
   validate :identifier_unique_in_context
+  # Derived code is unique within the same placement context (nil section is its
+  # own context), matching the partial unique indexes.
+  validate :code_unique_in_context
 
   before_validation :derive_organization_from_property, on: :create
   before_validation :assign_normalized_identifier
@@ -236,6 +245,19 @@ class Unit < ApplicationRecord
     errors.add(:identifier, t_validation("identifier_taken")) if scope.exists?
   end
 
+  def code_unique_in_context
+    return if code.blank? || residential_property_id.blank?
+
+    scope = self.class.where(
+      residential_property_id: residential_property_id,
+      property_section_id: property_section_id,
+      code: code
+    )
+    scope = scope.where.not(id: id) if persisted?
+
+    errors.add(:code, t_validation("code_taken")) if scope.exists?
+  end
+
   # Translates a +ActiveRecord::RecordNotUnique+ DB exception into a field error
   # so services can surface it as a domain conflict rather than a 500
   # (improve-units-foundation §2.9). The index→field mapping lives here so it
@@ -243,11 +265,14 @@ class Unit < ApplicationRecord
   UNIQUE_INDEX_FIELDS = {
     "index_units_on_org_property_section_normalized_when_section" => :identifier,
     "index_units_on_org_property_normalized_when_no_section" => :identifier,
-    "idx_units_unique_normalized_id_per_context" => :identifier
+    "idx_units_unique_normalized_id_per_context" => :identifier,
+    "idx_units_unique_code_in_section" => :code,
+    "idx_units_unique_code_in_property_root" => :code
   }.freeze
 
-  def register_uniqueness_conflict(_exception)
-    errors.add(:identifier, t_validation("identifier_taken"))
+  def register_uniqueness_conflict(exception)
+    field = UNIQUE_INDEX_FIELDS.find { |index, _| exception.message.include?(index) }&.last || :identifier
+    errors.add(field, t_validation(field == :code ? "code_taken" : "identifier_taken"))
     self
   end
 

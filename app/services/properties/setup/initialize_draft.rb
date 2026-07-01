@@ -15,6 +15,7 @@ module Properties
         property = ResidentialProperty.new(descriptive_attributes(@attributes))
         property.organization = ActsAsTenant.current_tenant
         property.status = PropertyStatuses::DRAFT
+        assign_derived_code!(property)
         merge_setup_metadata!(property, @attributes)
         WizardState.merge!(property, current_step: 2)
 

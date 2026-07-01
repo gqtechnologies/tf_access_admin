@@ -42,7 +42,9 @@ class Units::FoundationCoverageTest < ActiveSupport::TestCase
     result = Units::NormalizeIdentifier.call("  Niño 2B ")
 
     assert_equal "Niño 2B", result.identifier
-    assert_equal "niño-2b", result.normalized_identifier
+    # normalized_identifier is a transliterating slug (hierarchical-code-generation),
+    # so accents fold to ASCII: "Niño" → "nino".
+    assert_equal "nino-2b", result.normalized_identifier
   end
 
   test "rejects a section from another organization property" do

@@ -42,6 +42,12 @@ module Properties
       attributes.to_h.symbolize_keys.slice(*DESCRIPTIVE_ATTRIBUTES)
     end
 
+    # System-derived code from hierarchy + type + name; overwrites any client
+    # value (hierarchical-code-generation). Requires organization to be set.
+    def assign_derived_code!(property)
+      property.code = DomainCodes::DerivePropertyCode.call(property: property)
+    end
+
     # Persists and maps a concurrent unique-violation to a field error (§2.8)
     # so the caller still receives a structured invalid result instead of a 500.
     def save_property(property)

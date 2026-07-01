@@ -14,7 +14,11 @@ module Properties
         authorize_setup_property!(@property)
         return Result.success(@property) if @property.units.any?
 
-        total = [ @count || WizardState.estimated_units(@property).to_i, 1 ].max
+        # +count+ arrives from params as a string (e.g. "4"); coerce before
+        # comparing. Fall back to the wizard's estimated units when unset.
+        requested = @count.to_i
+        requested = WizardState.estimated_units(@property).to_i if requested <= 0
+        total = [ requested, 1 ].max
 
         total.times do |index|
           result = Units::Create.call(

@@ -111,8 +111,7 @@ class Admin::PropertySetup::WizardController < AdminController
       names: batch_names,
       prefix: batch_section_params[:prefix],
       suffix_type: (batch_section_params[:suffix_type].presence || "letter").to_sym,
-      count: batch_section_params[:count],
-      code: batch_section_params[:code]
+      count: batch_section_params[:count]
     )
 
     if result.invalid?
@@ -235,7 +234,7 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def step_params
     params.fetch(:setup, {}).permit(
-      :name, :code, :property_type, :address_line, :city, :region, :country, :timezone,
+      :name, :property_type, :address_line, :city, :region, :country, :timezone,
       :estimated_units, :structure_mode, :units_mode, :quick_structure_confirmed,
       quick_structure: %i[
         towers floors_per_tower units_per_floor tower_prefix floor_prefix
@@ -264,7 +263,7 @@ class Admin::PropertySetup::WizardController < AdminController
   end
 
   def update_property_descriptive!
-    attrs = step_params.slice(:name, :code, :property_type, :address_line, :city, :region, :country, :timezone)
+    attrs = step_params.slice(:name, :property_type, :address_line, :city, :region, :country, :timezone)
     return if attrs.blank?
 
     @property.assign_attributes(attrs)
@@ -329,7 +328,7 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def batch_section_params
     params.require(:property_section).permit(
-      :section_type, :parent_id, :mode, :name, :prefix, :suffix_type, :count, :code
+      :section_type, :parent_id, :mode, :name, :prefix, :suffix_type, :count
     )
   end
 
@@ -342,7 +341,7 @@ class Admin::PropertySetup::WizardController < AdminController
   end
 
   def section_update_params
-    params.require(:property_section).permit(:name, :section_type, :code, :status)
+    params.require(:property_section).permit(:name, :section_type, :status)
   end
 
   def section_not_found

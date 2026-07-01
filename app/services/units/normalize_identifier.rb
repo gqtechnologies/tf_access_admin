@@ -26,7 +26,9 @@ module Units
     def call
       NormalizeIdentifierResult.new(
         identifier: @trimmed,
-        normalized_identifier: AlphanumericHyphenCodeValidatable.normalize_identifier(@trimmed)
+        # Transliterating slug so `Área 4` and `Area 4` normalize to the same
+        # `area-4` and align with property/section codes (hierarchical-code-generation).
+        normalized_identifier: DomainCodes::Slug.call(@trimmed)
       )
     end
   end

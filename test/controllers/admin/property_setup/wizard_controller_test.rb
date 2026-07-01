@@ -80,6 +80,29 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     assert_equal 3, Properties::Setup::WizardState.current_step(@draft.reload)
   end
 
+  test "advance from step 3 in quick automatic mode generates units and advances" do
+    sign_in_as(@tenant_admin)
+    Properties::Setup::ApplyQuickStructure.call(
+      actor: @tenant_admin, property: @draft,
+      params: { level_1_count: 1, level_2_count: 2, level_1_prefix: "Torre", level_2_prefix: "Piso" }
+    )
+    Properties::Setup::WizardState.merge!(@draft, current_step: 3, structure_mode: "quick")
+    @draft.save!
+
+    # units_per_leaf arrives as a string from params; the advance must not raise.
+    assert_difference -> { @draft.units.count }, 4 do
+      post admin_property_setup_advance_wizard_path(@draft), params: {
+        setup: {
+          units_mode: "automatic",
+          unit_generation: { unit_type: "apartment", identifier_format: "floor_sequential", units_per_leaf: "4" }
+        }
+      }
+    end
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_equal 4, Properties::Setup::WizardState.current_step(@draft.reload)
+  end
+
   test "confirm transitions draft to configured" do
     sign_in_as(@tenant_admin)
     Units::Create.call(

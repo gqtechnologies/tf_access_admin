@@ -4,6 +4,7 @@
 class Admin::UnitSerializer < ActiveModel::Serializer
   attributes :id,
     :identifier,
+    :code,
     :display_name,
     :title,
     :unit_type,

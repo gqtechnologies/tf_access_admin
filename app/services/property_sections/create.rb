@@ -27,6 +27,7 @@ module PropertySections
 
       return Result.invalid(section) unless reject_inoperative_property!(section)
 
+      assign_derived_code!(section)
       save_section(section)
     end
   end

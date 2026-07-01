@@ -600,6 +600,7 @@ en:
         not_found: "Unit not found"
         validations:
           identifier_taken: "A unit with this identifier already exists in this context"
+          code_taken: "A unit with this code already exists in this context"
           section_invalid: "The selected section is not valid"
           section_same_property: "The section must belong to the same property"
           section_not_operative: "Units cannot be assigned to a non-operative section or property"

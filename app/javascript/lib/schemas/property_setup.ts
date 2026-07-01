@@ -3,7 +3,7 @@ import { PROPERTY_TYPE_VALUES } from '@/lib/schemas/residential_property'
 
 export const STRUCTURE_MODES = ['none', 'manual', 'quick'] as const
 export const UNITS_MODES = ['automatic', 'import', 'individual'] as const
-export const IDENTIFIER_FORMATS = ['floor_sequential', 'sequential'] as const
+export const IDENTIFIER_FORMATS = ['floor_sequential', 'block_sequential', 'sequential'] as const
 
 export const propertySetupValidationKeys = {
   step1: {
@@ -24,7 +24,7 @@ export const propertySetupValidationKeys = {
     mode_required: 'admin.property_setup.step3.errors.mode_required',
     unit_type_required: 'admin.property_setup.step3.validations.unit_type_required',
     identifier_format_required: 'admin.property_setup.step3.validations.identifier_format_required',
-    quantity_per_floor_min: 'admin.property_setup.step3.validations.quantity_per_floor_min',
+    units_per_leaf_min: 'admin.property_setup.step3.validations.quantity_per_floor_min',
   },
 } as const
 
@@ -66,7 +66,7 @@ export const propertySetupUnitGenerationSchema = z.object({
     required_error: propertySetupValidationKeys.step3.identifier_format_required,
     invalid_type_error: propertySetupValidationKeys.step3.identifier_format_required,
   }),
-  quantity_per_floor: positiveInt(propertySetupValidationKeys.step3.quantity_per_floor_min),
+  units_per_leaf: positiveInt(propertySetupValidationKeys.step3.units_per_leaf_min),
 })
 
 export const propertySetupStep2Schema = z.object({

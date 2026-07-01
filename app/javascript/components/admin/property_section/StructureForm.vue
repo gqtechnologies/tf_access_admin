@@ -161,21 +161,6 @@
             </Field>
           </VeeField>
 
-          <VeeField v-slot="{ componentField, errors }" name="code">
-            <Field :data-invalid="!!errors.length">
-              <FieldLabel for="form-structure-code">
-                {{ t('admin.residential_properties.structure.form.code_label') }}
-              </FieldLabel>
-              <Input
-                id="form-structure-code"
-                v-bind="componentField"
-                :placeholder="t('admin.residential_properties.structure.form.code_placeholder')"
-                :aria-invalid="!!errors.length"
-              />
-              <FieldError v-if="errors.length" :errors="translateErrors(errors)" />
-            </Field>
-          </VeeField>
-
           <Collapsible v-model:open="advancedOpen">
             <CollapsibleTrigger as-child>
               <Button type="button" variant="ghost" class="w-full justify-between px-0 hover:bg-transparent">
@@ -361,7 +346,6 @@ function buildInitialValues() {
     return {
       placement: 'root' as const,
       name: '',
-      code: '',
       section_type: SECTION_TYPE_VALUES[0],
       parent_id: '',
       position: undefined as number | undefined,
@@ -372,7 +356,6 @@ function buildInitialValues() {
   return {
     placement: 'root' as const,
     name: '',
-    code: '',
     section_type: SECTION_TYPE_VALUES[0],
     parent_id: '',
     position: undefined as number | undefined,
@@ -396,7 +379,6 @@ function applyFormIntent() {
       values: {
         placement: node.parent_id ? 'child' : 'root',
         name: node.name,
-        code: node.code ?? '',
         section_type: safeType,
         parent_id: node.parent_id ?? '',
         position: node.position ?? undefined,
@@ -411,7 +393,6 @@ function applyFormIntent() {
     values: {
       placement,
       name: '',
-      code: '',
       section_type: SECTION_TYPE_VALUES[0],
       parent_id: placement === 'child' ? (props.initialParentId ?? '') : '',
       position: undefined,

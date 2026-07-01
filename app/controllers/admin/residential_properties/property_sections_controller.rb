@@ -62,7 +62,7 @@ class Admin::ResidentialProperties::PropertySectionsController < AdminController
   # client. Lifecycle/parent changes are mediated by their dedicated services.
   def section_params
     params.require(:property_section).permit(
-      :name, :code, :section_type, :position, :parent_id, :status, metadata: {}
+      :name, :section_type, :position, :parent_id, :status, metadata: {}
     )
   end
 

@@ -26,6 +26,9 @@ module Units
 
       return Result.invalid(unit) unless reject_inoperative_property!(unit)
 
+      # Machine key derived from placement + normalized identifier; client-supplied
+      # code is never accepted (hierarchical-code-generation).
+      unit.code = DomainCodes::DeriveUnitCode.call(unit: unit)
       save_unit(unit)
     end
 

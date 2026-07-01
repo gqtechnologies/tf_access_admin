@@ -46,7 +46,6 @@ const editableStatusSchema = z.enum(EDITABLE_RESIDENTIAL_PROPERTY_STATUSES, {
 
 const baseResidentialPropertySchema = z.object({
   name: z.string().min(1, residentialPropertyValidationKeys.name_required),
-  code: emptyToUndefined,
   property_type: propertyTypeSchema,
   address_line: emptyToUndefined,
   city: emptyToUndefined,

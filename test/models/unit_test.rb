@@ -6,6 +6,7 @@
 #
 #  id                      :uuid             not null, primary key
 #  area_m2                 :decimal(10, 2)
+#  code                    :string
 #  deleted_at              :datetime
 #  display_name            :string
 #  identifier              :string           not null
@@ -23,6 +24,8 @@
 #
 #  idx_on_organization_id_residential_property_id_stat_47cefd6e3a  (organization_id,residential_property_id,status)
 #  idx_units_on_org_property_normalized_identifier_lookup          (organization_id,residential_property_id,normalized_identifier) WHERE (deleted_at IS NULL)
+#  idx_units_unique_code_in_property_root                          (organization_id,residential_property_id,code) UNIQUE WHERE ((deleted_at IS NULL) AND (property_section_id IS NULL) AND (code IS NOT NULL))
+#  idx_units_unique_code_in_section                                (organization_id,residential_property_id,property_section_id,code) UNIQUE WHERE ((deleted_at IS NULL) AND (property_section_id IS NOT NULL) AND (code IS NOT NULL))
 #  index_units_on_deleted_at                                       (deleted_at)
 #  index_units_on_metadata                                         (metadata) USING gin
 #  index_units_on_org_property_normalized_when_no_section          (organization_id,residential_property_id,normalized_identifier) UNIQUE WHERE ((property_section_id IS NULL) AND (deleted_at IS NULL))

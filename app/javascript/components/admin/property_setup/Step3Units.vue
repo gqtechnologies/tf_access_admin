@@ -176,7 +176,13 @@ const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 const { fieldError, validateStep3, setFieldErrors } = usePropertySetupStepValidation()
 const importOpen = ref(false)
-const selectedMode = ref((props.wizard.units_mode as string) || 'automatic')
+function defaultUnitsMode() {
+  if (props.structureMode !== 'quick') return 'import'
+
+  return (props.wizard.units_mode as string) || 'automatic'
+}
+
+const selectedMode = ref(defaultUnitsMode())
 const autoForm = reactive({
   unit_type: 'apartment',
   identifier_format: 'floor_sequential',
@@ -184,10 +190,15 @@ const autoForm = reactive({
 })
 
 watch(
-  () => props.wizard.units_mode,
-  (mode) => {
+  () => [props.wizard.units_mode, props.structureMode] as const,
+  ([mode, structureMode]) => {
+    if (structureMode !== 'quick') {
+      selectedMode.value = 'import'
+      return
+    }
     if (mode) selectedMode.value = mode as string
   },
+  { immediate: true },
 )
 
 watch(
@@ -253,17 +264,10 @@ const previewParams = computed(() => ({
 
 const isAutomaticMode = computed(() => selectedMode.value === 'automatic')
 
-const attempted = ref(false)
-
 const issues = computed(() => {
   const list: string[] = []
   if (props.errors) {
     Object.values(props.errors).forEach((messages) => list.push(...messages))
-  }
-  // Proactive server blocking errors (e.g. "no units yet") are only surfaced
-  // after the user tries to continue, not on first render.
-  if (attempted.value && props.preview?.blocking_errors?.length) {
-    list.push(...props.preview.blocking_errors)
   }
   if (props.preview?.warnings?.length) list.push(...props.preview.warnings)
   return list
@@ -313,7 +317,6 @@ function getValues() {
 }
 
 function validate() {
-  attempted.value = true
   return validateStep3(getValues() as PropertySetupStep3Values)
 }
 

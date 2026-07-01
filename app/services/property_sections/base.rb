@@ -5,8 +5,10 @@ module PropertySections
   # Subclasses implement +#call+ and return a {PropertySections::Result}.
   class Base
     # Descriptive attributes a caller may set. Organization and property are
-    # derived from trusted context, never from params (§4.5).
-    DESCRIPTIVE_ATTRIBUTES = %i[name code section_type position metadata].freeze
+    # derived from trusted context, never from params (§4.5). +code+ is excluded:
+    # it is always system-derived on create and immutable thereafter
+    # (hierarchical-code-generation).
+    DESCRIPTIVE_ATTRIBUTES = %i[name section_type position metadata].freeze
 
     # Sentinel for Move when +parent_id+ is intentionally omitted.
     PARENT_UNCHANGED = :parent_unchanged
@@ -43,6 +45,13 @@ module PropertySections
 
     def descriptive_attributes(attributes)
       attributes.to_h.symbolize_keys.slice(*DESCRIPTIVE_ATTRIBUTES)
+    end
+
+    # System-derived code from hierarchy + type + name; overwrites any client
+    # value (hierarchical-code-generation). Requires organization, property,
+    # section_type, name, and parent (if any) to be assigned first.
+    def assign_derived_code!(section)
+      section.code = DomainCodes::DeriveSectionCode.call(section: section)
     end
 
     def save_section(section)

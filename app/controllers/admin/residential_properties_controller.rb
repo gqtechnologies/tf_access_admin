@@ -72,7 +72,7 @@ class Admin::ResidentialPropertiesController < AdminController
 
   def residential_property_params
     params.require(:residential_property).permit(
-      :name, :code, :property_type, :address_line, :city, :region, :country, :timezone, :status
+      :name, :property_type, :address_line, :city, :region, :country, :timezone, :status
     )
   end
 

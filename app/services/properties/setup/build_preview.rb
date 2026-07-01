@@ -92,7 +92,8 @@ module Properties
         if WizardState.structure_mode(@property) == "manual" && @property.property_sections.none?
           errors << I18n.t("frontend.admin.property_setup.step2.errors.manual_empty")
         end
-        if units.none? && WizardState.units_mode(@property) != "import"
+        units_mode = WizardState.units_mode(@property)
+        if units.none? && units_mode != "import" && units_mode != "automatic"
           errors << I18n.t("frontend.admin.property_setup.step3.errors.no_units")
         end
         errors

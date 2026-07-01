@@ -15,6 +15,7 @@ module Properties
       property.organization = ActsAsTenant.current_tenant
       # Ordinary creation always starts active; lifecycle overrides are not accepted here.
       property.status = PropertyStatuses::ACTIVE
+      assign_derived_code!(property)
 
       authorize!(property, :create?)
       save_property(property)

@@ -44,7 +44,6 @@
           </thead>
           <tbody>
             <tr v-for="unit in unitsPreview" :key="unit.id" class="border-t">
-              <td class="px-3 py-2 whitespace-nowrap">{{ unit.code || unit.identifier }}</td>
               <td class="px-3 py-2 whitespace-nowrap">{{ unit.tower_name || '—' }}</td>
               <td class="px-3 py-2 whitespace-nowrap">{{ unit.floor_name || '—' }}</td>
               <td class="px-3 py-2 whitespace-nowrap">{{ unit.identifier }}</td>
@@ -124,7 +123,6 @@ const propertyDetails = computed(() => {
 })
 
 const tableColumns = computed(() => [
-  { key: 'code', label: t('admin.property_setup.step4.table.code') },
   { key: 'tower', label: t('admin.property_setup.step4.table.tower') },
   { key: 'floor', label: t('admin.property_setup.step4.table.floor') },
   { key: 'unit', label: t('admin.property_setup.step4.table.unit') },

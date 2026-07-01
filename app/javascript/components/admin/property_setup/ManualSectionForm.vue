@@ -162,11 +162,6 @@
           </p>
         </Field>
 
-        <Field>
-          <FieldLabel>{{ t('admin.property_setup.step2.manual.create.code') }}</FieldLabel>
-          <Input v-model="createForm.code" :placeholder="t('admin.property_setup.step2.manual.create.code_placeholder')" />
-        </Field>
-
         <div v-if="namePreview.length" class="space-y-2">
           <p class="text-muted-foreground text-xs">
             {{ t('admin.property_setup.step2.manual.create.preview_will_create') }}
@@ -247,11 +242,6 @@
             >
               <option v-for="type in sectionTypes" :key="type" :value="type">{{ typeLabel(type) }}</option>
             </select>
-          </Field>
-
-          <Field>
-            <FieldLabel>{{ t('admin.property_setup.step2.manual.create.code') }}</FieldLabel>
-            <Input v-model="editForm.code" :placeholder="t('admin.property_setup.step2.manual.create.code_placeholder')" />
           </Field>
         </div>
 
@@ -419,7 +409,6 @@ const createForm = reactive({
   prefix: '',
   suffix_type: 'letter' as SuffixType,
   count: '2',
-  code: '',
 })
 
 function siblingNodesForCreate(): SectionNode[] {
@@ -476,7 +465,6 @@ function createFormFieldValues(): Record<string, string | undefined> {
       createForm.mode === 'individual'
         ? createForm.name
         : createNameAllocation.value.names[0],
-    code: createForm.code,
     prefix: createForm.prefix,
     count: createForm.count,
     section_type: typeLabel(createForm.section_type),
@@ -499,7 +487,6 @@ function resetCreateForm() {
   createForm.prefix = ''
   createForm.suffix_type = 'letter'
   createForm.count = '2'
-  createForm.code = ''
   createErrors.value = {}
 }
 
@@ -536,7 +523,6 @@ function submitCreate() {
     section_type: createForm.section_type,
     parent_id: createParent.value?.id,
     name: createForm.mode === 'individual' ? createForm.name : undefined,
-    code: createForm.code || undefined,
     prefix: createForm.mode === 'multiple' ? createForm.prefix : undefined,
     suffix_type: createForm.suffix_type,
     count: createForm.mode === 'multiple' ? createForm.count : undefined,
@@ -560,7 +546,6 @@ function submitCreate() {
         section_type: createForm.section_type,
         parent_id: createParent.value?.id ?? null,
         name: createForm.mode === 'individual' ? createForm.name : null,
-        code: createForm.code || null,
         prefix: createForm.mode === 'multiple' ? createForm.prefix : null,
         suffix_type: createForm.suffix_type,
         count: createForm.mode === 'multiple' ? Number(createForm.count) : null,
@@ -586,7 +571,7 @@ function submitCreate() {
 const editOpen = ref(false)
 const editTarget = ref<SectionNode | null>(null)
 const editErrors = ref<Record<string, string>>({})
-const editForm = reactive({ name: '', section_type: 'tower', code: '' })
+const editForm = reactive({ name: '', section_type: 'tower' })
 
 const editParentName = computed(() =>
   editTarget.value ? findParentName(editTarget.value.id) : null,
@@ -600,7 +585,6 @@ function openEdit(section: SectionNode) {
   editTarget.value = section
   editForm.name = section.name
   editForm.section_type = section.section_type
-  editForm.code = ''
   editErrors.value = {}
   editOpen.value = true
 }
@@ -618,7 +602,6 @@ function submitEdit() {
     status: 'active',
     name: editForm.name,
     section_type: editForm.section_type,
-    code: editForm.code || undefined,
   })
   if (!result.success) {
     editErrors.value = mapPropertySetupZodErrors(result.error)
@@ -633,7 +616,6 @@ function submitEdit() {
       property_section: {
         name: editForm.name,
         section_type: editForm.section_type,
-        code: editForm.code || null,
       },
     },
     {
