@@ -11,24 +11,26 @@
 
     <ul v-else class="space-y-1">
       <li v-for="root in tree" :key="root.id" class="space-y-0.5">
-        <UnitSectionTreeRow :section="root" :eligible="isEligible(root)" @add-unit="openAdd" />
-        <ul v-if="isEligible(root)" class="space-y-0.5">
-          <li v-for="unit in root.units ?? []" :key="unit.id">
-            <UnitTreeRow :unit="unit" @edit="openEdit" @delete="openDelete" />
-          </li>
-        </ul>
+        <UnitSectionTreeRow
+          :section="root"
+          :eligible="isEligible(root)"
+          @add-unit="openAdd"
+          @edit="openEdit"
+          @delete="openDelete"
+        />
 
         <ul
           v-if="root.children?.length"
           class="relative m-0 ml-5 list-none space-y-0.5 border-l border-dashed border-border/80 py-0.5 pl-3"
         >
           <li v-for="child in root.children" :key="child.id" class="space-y-0.5">
-            <UnitSectionTreeRow :section="child" :eligible="isEligible(child)" @add-unit="openAdd" />
-            <ul v-if="isEligible(child)" class="space-y-0.5">
-              <li v-for="unit in child.units ?? []" :key="unit.id">
-                <UnitTreeRow :unit="unit" @edit="openEdit" @delete="openDelete" />
-              </li>
-            </ul>
+            <UnitSectionTreeRow
+              :section="child"
+              :eligible="isEligible(child)"
+              @add-unit="openAdd"
+              @edit="openEdit"
+              @delete="openDelete"
+            />
           </li>
         </ul>
       </li>
@@ -111,26 +113,29 @@
 
             <Field>
               <FieldLabel>{{ t('admin.property_setup.step3.manual.create.format') }}</FieldLabel>
-              <select
-                v-model="createForm.suffix_type"
-                class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-              >
-                <option value="letter">{{ t('admin.property_setup.step3.manual.create.format_letter') }}</option>
-                <option value="number">{{ t('admin.property_setup.step3.manual.create.format_number') }}</option>
-              </select>
+              <Select v-model="createForm.suffix_type">
+                <SelectTrigger class="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="letter">{{ t('admin.property_setup.step3.manual.create.format_letter') }}</SelectItem>
+                  <SelectItem value="number">{{ t('admin.property_setup.step3.manual.create.format_number') }}</SelectItem>
+                </SelectContent>
+              </Select>
             </Field>
           </TabsContent>
         </Tabs>
 
         <Field :data-invalid="!!createErrors.unit_type">
           <FieldLabel>{{ t('admin.property_setup.step3.manual.unit_type') }}</FieldLabel>
-          <select
-            v-model="createForm.unit_type"
-            class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-            :aria-invalid="!!createErrors.unit_type"
-          >
-            <option v-for="type in unitTypes" :key="type" :value="type">{{ unitTypeLabel(type) }}</option>
-          </select>
+          <Select v-model="createForm.unit_type">
+            <SelectTrigger class="w-full" :aria-invalid="!!createErrors.unit_type">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="type in unitTypes" :key="type" :value="type">{{ unitTypeLabel(type) }}</SelectItem>
+            </SelectContent>
+          </Select>
           <FieldError v-if="createErrors.unit_type" :errors="translateErrors([createErrors.unit_type])" />
         </Field>
 
@@ -198,12 +203,14 @@
           </Field>
           <Field :data-invalid="!!editErrors.unit_type">
             <FieldLabel>{{ t('admin.property_setup.step3.manual.unit_type') }}</FieldLabel>
-            <select
-              v-model="editForm.unit_type"
-              class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-            >
-              <option v-for="type in unitTypes" :key="type" :value="type">{{ unitTypeLabel(type) }}</option>
-            </select>
+            <Select v-model="editForm.unit_type">
+              <SelectTrigger class="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="type in unitTypes" :key="type" :value="type">{{ unitTypeLabel(type) }}</SelectItem>
+              </SelectContent>
+            </Select>
           </Field>
           <Field :data-invalid="!!editErrors.area_m2">
             <FieldLabel>{{ t('admin.property_setup.step3.manual.area_m2') }}</FieldLabel>
@@ -264,6 +271,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -275,7 +283,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import UnitSectionTreeRow from '@/components/admin/property_setup/UnitSectionTreeRow.vue'
-import UnitTreeRow, { type UnitNode } from '@/components/admin/property_setup/UnitTreeRow.vue'
+import type { UnitNode } from '@/components/admin/property_setup/UnitTreeRow.vue'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
 import { manualUnitCreateSchema, manualUnitEditSchema, mapManualUnitZodErrors } from '@/lib/schemas/manual_unit'
 import { mapServerErrorsToForm } from '@/lib/forms/map_server_errors'

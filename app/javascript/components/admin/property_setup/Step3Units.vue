@@ -58,15 +58,16 @@
           <div class="grid gap-4 md:grid-cols-2">
             <Field :data-invalid="!!fieldError('unit_generation.unit_type')">
               <FieldLabel>{{ t('admin.property_setup.step3.automatic.unit_type') }}</FieldLabel>
-              <select
-                v-model="autoForm.unit_type"
-                class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-                :aria-invalid="!!fieldError('unit_generation.unit_type')"
-              >
-                <option v-for="type in unitTypes" :key="type" :value="type">
-                  {{ t(`admin.units.unit_types.${type}`) }}
-                </option>
-              </select>
+              <Select v-model="autoForm.unit_type">
+                <SelectTrigger class="w-full" :aria-invalid="!!fieldError('unit_generation.unit_type')">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="type in unitTypes" :key="type" :value="type">
+                    {{ t(`admin.units.unit_types.${type}`) }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FieldError
                 v-if="fieldError('unit_generation.unit_type')"
                 :errors="translateErrors([fieldError('unit_generation.unit_type')])"
@@ -74,19 +75,20 @@
             </Field>
             <Field :data-invalid="!!fieldError('unit_generation.identifier_format')">
               <FieldLabel>{{ t('admin.property_setup.step3.automatic.identifier_format') }}</FieldLabel>
-              <select
-                v-model="autoForm.identifier_format"
-                class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-                :aria-invalid="!!fieldError('unit_generation.identifier_format')"
-              >
-                <option
-                  v-for="opt in identifierFormatOptions"
-                  :key="opt.value"
-                  :value="opt.value"
-                >
-                  {{ opt.label }}
-                </option>
-              </select>
+              <Select v-model="autoForm.identifier_format">
+                <SelectTrigger class="w-full" :aria-invalid="!!fieldError('unit_generation.identifier_format')">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem
+                    v-for="opt in identifierFormatOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
+                    {{ opt.label }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FieldError
                 v-if="fieldError('unit_generation.identifier_format')"
                 :errors="translateErrors([fieldError('unit_generation.identifier_format')])"
@@ -160,6 +162,7 @@ import { Building, Building2, FileSpreadsheet, Layers, ListTree, Sparkles } from
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import BulkUnitsImportDrawer from '@/components/admin/bulk_units/BulkUnitsImportDrawer.vue'
 import ManualUnitsForm from '@/components/admin/property_setup/ManualUnitsForm.vue'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'

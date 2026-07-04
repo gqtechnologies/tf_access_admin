@@ -9,6 +9,10 @@ Project context (stack, domains, conventions) lives in `openspec/config.yaml` an
 - Use skills lazily and only when they directly apply to the current task.
 - Do not produce implementation summaries or change logs unless explicitly requested.
 
+### Frontend Guidelines
+
+When frontend implementation details are needed, read `frontend-guidelines.md`.
+
 ## Context & Token Efficiency
 
 Prefer minimal, targeted context.
