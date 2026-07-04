@@ -14,6 +14,16 @@ module Properties
         authorize_setup_property!(@property)
         return Result.invalid(@property) unless @property.status == PropertyStatuses::DRAFT
 
+        # fix-automatic-unit-generation §4a: regenerating the quick structure
+        # destroys existing sections, but +destroy_all+ silently skips sections
+        # whose +units+ block deletion (+restrict_with_error+) without raising or
+        # rolling back. Guard explicitly before any destroy so generated units are
+        # never orphaned or left half-regenerated.
+        if @property.units.any?
+          @property.errors.add(:base, :structure_regeneration_blocked_by_units)
+          return Result.invalid(@property)
+        end
+
         format = StructureFormatResolver.for(property_type: @property.property_type)
         preview = GenerateStructurePreview.call(params: @params, format: format, page: 1, per_page: 10_000)
         parent_map = {}

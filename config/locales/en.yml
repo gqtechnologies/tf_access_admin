@@ -2214,6 +2214,9 @@ en:
               invalid_timezone: "is not a valid time zone"
             organization_id:
               immutable: "cannot be changed"
+            base:
+              automatic_generation_unavailable: "Automatic unit generation is not available for this property's structure"
+              structure_regeneration_blocked_by_units: "Clear the generated units before changing the structure"
         property_section:
           attributes:
             name:

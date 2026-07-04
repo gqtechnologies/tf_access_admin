@@ -76,8 +76,8 @@ const ackModel = computed({
 
 const unitCount = computed(() => props.preview?.counts?.units ?? 0)
 const estimatedUnits = computed(() => props.preview?.property?.estimated_units ?? 0)
-const towerCount = computed(() => props.preview?.counts?.towers ?? 0)
-const floorCount = computed(() => props.preview?.counts?.floors ?? 0)
+const towerCount = computed(() => props.preview?.counts?.level_1 ?? 0)
+const floorCount = computed(() => props.preview?.counts?.level_2 ?? 0)
 const structureMode = computed(() => props.preview?.structure?.mode)
 
 const checklist = computed(() => {

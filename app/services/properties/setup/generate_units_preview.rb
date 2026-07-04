@@ -3,6 +3,11 @@
 module Properties
   module Setup
     # Builds paginated unit identifier previews from structure parameters.
+    #
+    # Delegates the "which units, with which identifiers, in which leaf"
+    # calculation to the shared {UnitGenerationPlan}, so the preview shown here
+    # matches exactly what {ApplyAutomaticUnits} persists
+    # (fix-automatic-unit-generation §2).
     class GenerateUnitsPreview
       DEFAULT_PER_PAGE = 20
 
@@ -38,41 +43,20 @@ module Properties
       private
 
       def build_rows
-        quantity_per_floor = @params.fetch(:quantity_per_floor, 4).to_i
-        format = @params.fetch(:identifier_format, "floor_sequential")
+        UnitGenerationPlan.call(property: @property, format: format, params: @params).map do |row|
+          leaf = row.property_section
+          parent = leaf&.parent
 
-        floor_sections = @property.property_sections
-          .where(section_type: SectionTypes::FLOOR)
-          .includes(:parent)
-          .order(:position, :name)
-
-        if floor_sections.none?
-          return build_flat_rows(quantity_per_floor, format)
-        end
-
-        floor_sections.flat_map do |floor|
-          tower_name = floor.parent&.name
-          base = format == "floor_sequential" ? ((floor.position || 1) * 100) : 1
-
-          quantity_per_floor.times.map do |index|
-            identifier = (base + index + 1).to_s
-            {
-              tower: tower_name,
-              floor: floor.name,
-              identifier: identifier
-            }
-          end
+          {
+            tower: parent&.name,
+            floor: leaf&.name,
+            identifier: row.identifier
+          }
         end
       end
 
-      def build_flat_rows(quantity_per_floor, format)
-        estimated = WizardState.estimated_units(@property).to_i
-        count = estimated.positive? ? estimated : quantity_per_floor
-
-        count.times.map do |index|
-          identifier = format == "floor_sequential" ? (101 + index).to_s : (index + 1).to_s
-          { tower: nil, floor: nil, identifier: identifier }
-        end
+      def format
+        @format ||= StructureFormatResolver.for(property_type: @property.property_type)
       end
     end
   end

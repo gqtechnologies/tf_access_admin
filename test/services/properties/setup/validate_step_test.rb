@@ -93,13 +93,19 @@ class Properties::Setup::ValidateStepTest < ActiveSupport::TestCase
     assert_equal 2, preview[:counts][:level_1]
   end
 
-  test "generate units preview paginates rows" do
-    Properties::Setup::WizardState.merge!(@property, estimated_units: 12)
-    @property.save!
+  test "generate units preview paginates rows over leaf sections" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "vs-units-preview@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    # 1 tower x 3 floors x 4 units_per_leaf = 12 planned units.
+    Properties::Setup::ApplyQuickStructure.call(
+      actor: admin, property: @property,
+      params: { level_1_count: 1, level_2_count: 3, level_1_prefix: "Torre", level_2_prefix: "Piso" }
+    )
 
     preview = Properties::Setup::GenerateUnitsPreview.call(
-      property: @property,
-      params: { quantity_per_floor: 4 },
+      property: @property.reload,
+      params: { units_per_leaf: 4, identifier_format: "floor_sequential" },
       page: 1,
       per_page: 5
     )

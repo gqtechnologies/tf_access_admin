@@ -14,11 +14,12 @@ export type UnitsPreviewGroup = {
 export function unitIdentifiers(node: StructureTreeNode, params: UnitsPreviewParams): string[] {
   const quantity = Math.max(params.units_per_leaf ?? 4, 1)
   const format = params.identifier_format ?? 'floor_sequential'
-  const base = floorBase(node, format)
+  const base = leafBase(node)
   return Array.from({ length: quantity }, (_, index) => {
-    if (format === 'floor_sequential') return String(base + index + 1)
     if (format === 'block_sequential') return `B${base + index + 1}`
-    return String(index + 1)
+    if (format === 'sequential') return String(index + 1)
+    // floor_sequential (default)
+    return String(base + index + 1)
   })
 }
 
@@ -38,14 +39,16 @@ export function buildTreeWithUnits(
   return tree.map(inject)
 }
 
-function floorBase(floor: StructureTreeNode, format: string): number {
-  if (format !== 'floor_sequential') return 1
-
-  if (typeof floor.position === 'number' && floor.position > 0) {
-    return floor.position * 100
+/** Position-based base shared by `floor_sequential` and `block_sequential`
+ * (matches the backend `UnitGenerationPlan#position_base`: `position * 100`,
+ * starting at 100 → first identifier 101 / B101 for position 1). Falls back to
+ * the trailing digits of the leaf name when no explicit position is set. */
+function leafBase(leaf: StructureTreeNode): number {
+  if (typeof leaf.position === 'number' && leaf.position > 0) {
+    return leaf.position * 100
   }
 
-  const match = floor.name.match(/(\d+)\s*$/)
+  const match = leaf.name.match(/(\d+)\s*$/)
   return (match ? Number.parseInt(match[1], 10) : 1) * 100
 }
 

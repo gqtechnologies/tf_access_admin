@@ -80,7 +80,7 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     assert_equal 3, Properties::Setup::WizardState.current_step(@draft.reload)
   end
 
-  test "advance from step 3 in quick automatic mode generates units and advances" do
+  test "advance from step 3 in quick automatic mode generates units per leaf and advances" do
     sign_in_as(@tenant_admin)
     Properties::Setup::ApplyQuickStructure.call(
       actor: @tenant_admin, property: @draft,
@@ -89,8 +89,9 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     Properties::Setup::WizardState.merge!(@draft, current_step: 3, structure_mode: "quick")
     @draft.save!
 
+    # 2 floors x 4 units_per_leaf = 8 units, all under their leaf section.
     # units_per_leaf arrives as a string from params; the advance must not raise.
-    assert_difference -> { @draft.units.count }, 4 do
+    assert_difference -> { @draft.units.count }, 8 do
       post admin_property_setup_advance_wizard_path(@draft), params: {
         setup: {
           units_mode: "automatic",
@@ -101,6 +102,45 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
 
     assert_redirected_to admin_property_setup_wizard_path(@draft)
     assert_equal 4, Properties::Setup::WizardState.current_step(@draft.reload)
+    assert @draft.units.all? { |u| u.property_section_id.present? }
+  end
+
+  test "advance from step 3 automatic stays on step 3 and surfaces error when generation fails" do
+    sign_in_as(@tenant_admin)
+    # No structure format resolves for OTHER, so automatic generation is unavailable.
+    @draft.update!(property_type: PropertyTypes::OTHER)
+    Properties::Setup::WizardState.merge!(@draft, current_step: 3, structure_mode: "quick")
+    @draft.save!
+
+    assert_no_difference -> { @draft.units.count } do
+      post admin_property_setup_advance_wizard_path(@draft), params: {
+        setup: {
+          units_mode: "automatic",
+          unit_generation: { unit_type: "apartment", identifier_format: "floor_sequential", units_per_leaf: "4" }
+        }
+      }
+    end
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_equal 3, Properties::Setup::WizardState.current_step(@draft.reload)
+  end
+
+  test "advance from step 3 automatic is blocked when there is no quick leaf structure" do
+    sign_in_as(@tenant_admin)
+    # BUILDING resolves a format, but no sections were generated (structure_mode not quick).
+    Properties::Setup::WizardState.merge!(@draft, current_step: 3, structure_mode: "none")
+    @draft.save!
+
+    assert_no_difference -> { @draft.units.count } do
+      post admin_property_setup_advance_wizard_path(@draft), params: {
+        setup: {
+          units_mode: "automatic",
+          unit_generation: { unit_type: "apartment", identifier_format: "floor_sequential", units_per_leaf: "4" }
+        }
+      }
+    end
+
+    assert_equal 3, Properties::Setup::WizardState.current_step(@draft.reload)
   end
 
   test "confirm transitions draft to configured" do

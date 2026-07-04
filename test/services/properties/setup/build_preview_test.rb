@@ -82,4 +82,66 @@ class Properties::Setup::BuildPreviewTest < ActiveSupport::TestCase
 
     assert_includes preview[:blocking_errors], I18n.t("frontend.admin.property_setup.step2.errors.manual_empty")
   end
+
+  # fix-automatic-unit-generation §8: structure counts are format-aware.
+  def draft_property(property_type)
+    ResidentialProperty.create!(
+      organization: @organization,
+      name: "Counts #{property_type} #{SecureRandom.hex(3)}",
+      property_type: property_type,
+      status: PropertyStatuses::DRAFT,
+      country: "Chile",
+      timezone: "America/Santiago"
+    )
+  end
+
+  test "condominium reports non-zero level_1 (sectors) and level_2 (blocks)" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-condo@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    property = draft_property(PropertyTypes::CONDOMINIUM)
+    Properties::Setup::ApplyQuickStructure.call(
+      actor: admin, property: property,
+      params: { level_1_count: 2, level_2_count: 3, level_1_prefix: "Sector", level_2_prefix: "Bloque" }
+    )
+
+    counts = Properties::Setup::BuildPreview.call(property: property.reload, actor: admin)[:counts]
+
+    assert_equal 2, counts[:level_1]
+    assert_equal 6, counts[:level_2]
+  end
+
+  test "single-level sector counts blocks in level_1 only, not duplicated in level_2" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-sector@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    property = draft_property(PropertyTypes::SECTOR)
+    Properties::Setup::ApplyQuickStructure.call(
+      actor: admin, property: property, params: { level_1_count: 4, level_1_prefix: "Bloque" }
+    )
+
+    counts = Properties::Setup::BuildPreview.call(property: property.reload, actor: admin)[:counts]
+
+    assert_equal 4, counts[:level_1]
+    assert_equal 0, counts[:level_2]
+  end
+
+  test "unit preview row shows the derived code, not the raw identifier" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-code@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    unit = Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+
+    row = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)[:units].first
+
+    assert_equal unit.code, row[:code]
+    assert_not_equal unit.identifier, row[:code]
+  end
 end

@@ -2205,6 +2205,9 @@ es:
               invalid_timezone: "no es una zona horaria válida"
             organization_id:
               immutable: "no puede modificarse"
+            base:
+              automatic_generation_unavailable: "La generación automática de unidades no está disponible para la estructura de esta propiedad"
+              structure_regeneration_blocked_by_units: "Elimina las unidades generadas antes de cambiar la estructura"
         property_section:
           attributes:
             name:

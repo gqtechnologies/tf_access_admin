@@ -9,14 +9,14 @@
         <span class="text-muted-foreground" aria-hidden="true">|</span>
         <span class="text-muted-foreground flex items-center gap-1.5">
           <Building class="size-3.5 shrink-0" />
-          {{ t('admin.property_setup.step3.context.towers', { count: towerCount }) }}
+          {{ topLevelLabel }}
         </span>
       </template>
       <template v-if="floorCount">
         <span class="text-muted-foreground" aria-hidden="true">|</span>
         <span class="text-muted-foreground flex items-center gap-1.5">
           <Layers class="size-3.5 shrink-0" />
-          {{ t('admin.property_setup.step3.context.floors', { count: floorCount }) }}
+          {{ leafLevelLabel }}
         </span>
       </template>
     </div>
@@ -183,11 +183,25 @@ function defaultUnitsMode() {
 }
 
 const selectedMode = ref(defaultUnitsMode())
-const autoForm = reactive({
-  unit_type: 'apartment',
-  identifier_format: 'floor_sequential',
-  units_per_leaf: 4,
-})
+
+// Default identifier format derived from the property's leaf type when no value
+// was persisted yet.
+function defaultIdentifierFormat() {
+  return props.unitsIn === 'block' ? 'block_sequential' : 'floor_sequential'
+}
+
+// Hydrate the automatic-generation form from the persisted wizard state so a
+// full page reload restores step 3 instead of showing blank defaults.
+function initialAutoForm() {
+  const saved = (props.wizard.unit_generation ?? {}) as Record<string, unknown>
+  return {
+    unit_type: (saved.unit_type as string) ?? 'apartment',
+    identifier_format: (saved.identifier_format as string) ?? defaultIdentifierFormat(),
+    units_per_leaf: Number(saved.units_per_leaf ?? 4),
+  }
+}
+
+const autoForm = reactive(initialAutoForm())
 
 watch(
   () => [props.wizard.units_mode, props.structureMode] as const,
@@ -201,6 +215,9 @@ watch(
   { immediate: true },
 )
 
+// When the property's leaf type changes after mount (e.g. the user changed the
+// property type), reset the identifier format to a valid default for the new
+// leaf type. The initial default is already applied by initialAutoForm().
 watch(
   () => props.unitsIn,
   (val) => {
@@ -221,8 +238,22 @@ watch(
 )
 
 const propertyId = computed(() => props.property?.id as string | undefined)
-const towerCount = computed(() => props.preview?.counts?.towers ?? 0)
-const floorCount = computed(() => props.preview?.counts?.floors ?? 0)
+const towerCount = computed(() => props.preview?.counts?.level_1 ?? 0)
+const floorCount = computed(() => props.preview?.counts?.level_2 ?? 0)
+
+// Floor-based structures keep the "towers"/"floors" wording; other leaf types
+// (e.g. sector/block) fall back to the generic section-count phrasing so the
+// context bar is never mislabeled (fix-automatic-unit-generation §9.3).
+const topLevelLabel = computed(() =>
+  props.unitsIn === 'floor'
+    ? t('admin.property_setup.step3.context.towers', { count: towerCount.value })
+    : t('admin.property_setup.step3.context.structure_count', { count: towerCount.value }),
+)
+const leafLevelLabel = computed(() =>
+  props.unitsIn === 'floor'
+    ? t('admin.property_setup.step3.context.floors', { count: floorCount.value })
+    : t('admin.property_setup.step3.context.structure_count', { count: floorCount.value }),
+)
 const sectionTree = computed(() => props.preview?.structure?.tree ?? [])
 
 const identifierFormatOptions = computed(() => {

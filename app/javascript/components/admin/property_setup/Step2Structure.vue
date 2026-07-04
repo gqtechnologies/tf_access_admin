@@ -90,13 +90,20 @@ const { translateErrors } = useTranslateErrors()
 const { fieldError, validateStep2 } = usePropertySetupStepValidation()
 const selectedMode = ref((props.wizard.structure_mode as string) || 'none')
 
-const quickParams = ref<QuickStructureFormParams>({
-  level_1_count: 1,
-  level_2_count: 1,
-  level_1_prefix: '',
-  level_2_prefix: '',
-  skip_top_level: false,
-})
+// Hydrate from the persisted wizard state so a full page reload restores the
+// quick-structure form instead of falling back to blank defaults.
+function initialQuickParams(): QuickStructureFormParams {
+  const saved = (props.wizard.quick_structure ?? {}) as Record<string, unknown>
+  return {
+    level_1_count: Number(saved.level_1_count ?? 1),
+    level_2_count: Number(saved.level_2_count ?? 1),
+    level_1_prefix: (saved.level_1_prefix as string) ?? '',
+    level_2_prefix: (saved.level_2_prefix as string) ?? '',
+    skip_top_level: Boolean(saved.skip_top_level ?? false),
+  }
+}
+
+const quickParams = ref<QuickStructureFormParams>(initialQuickParams())
 
 watch(
   () => props.wizard.structure_mode,

@@ -119,27 +119,29 @@ const {
 const displayTotalUnits = computed(() => {
   if (totalUnits.value > 0) return totalUnits.value
 
-  const towers = props.preview?.counts?.towers ?? 0
-  const floors = props.preview?.counts?.floors ?? 0
-  const perFloor = props.generationParams?.units_per_leaf ?? 4
+  const leafSections = props.preview?.counts?.level_2 ?? 0
+  const perLeaf = props.generationParams?.units_per_leaf ?? 4
 
-  if (towers > 0 && floors > 0) return floors * perFloor
+  // Gate on the leaf level alone: single-level formats and "no towers" buildings
+  // legitimately have a zero top-level count while still having real leaf
+  // sections (fix-automatic-unit-generation §9.6).
+  if (leafSections > 0) return leafSections * perLeaf
 
   const estimated = props.preview?.property?.estimated_units
-  return typeof estimated === 'number' && estimated > 0 ? estimated : perFloor
+  return typeof estimated === 'number' && estimated > 0 ? estimated : perLeaf
 })
 
 const summaryExplanation = computed(() => {
-  const towers = props.preview?.counts?.towers ?? 0
-  const floors = props.preview?.counts?.floors ?? 0
-  const perFloor = props.generationParams?.units_per_leaf ?? 4
+  const topLevel = props.preview?.counts?.level_1 ?? 0
+  const leafSections = props.preview?.counts?.level_2 ?? 0
+  const perLeaf = props.generationParams?.units_per_leaf ?? 4
 
-  if (towers > 0 && floors > 0) {
+  if (leafSections > 0) {
     return t('admin.property_setup.step3.preview.explanation_with_structure', {
       count: displayTotalUnits.value,
-      towers,
-      floors,
-      per_floor: perFloor,
+      towers: topLevel,
+      floors: leafSections,
+      per_floor: perLeaf,
     })
   }
 

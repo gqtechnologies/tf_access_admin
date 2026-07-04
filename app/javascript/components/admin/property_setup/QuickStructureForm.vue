@@ -79,14 +79,21 @@ const effectiveLevels = computed<StructureFormatLevel[]>(() => {
   return props.format.levels
 })
 
-// Seed defaults for every level in the format (counts and section-derived prefixes).
+// Seed each level from the persisted modelValue when present (so a page reload
+// restores the form), otherwise fall back to count=1 and a section-derived
+// prefix. modelValue is keyed by level position (level_1/level_2) while internal
+// state is keyed by section_type, so map by index.
 watch(
   () => props.format,
   (format) => {
-    format.levels.forEach((level) => {
-      if (counts[level.section_type] == null) counts[level.section_type] = 1
-      if (prefixes[level.section_type] == null) prefixes[level.section_type] = sectionLabel(level)
+    const saved = props.modelValue
+    format.levels.forEach((level, index) => {
+      const savedCount = index === 0 ? saved?.level_1_count : saved?.level_2_count
+      const savedPrefix = index === 0 ? saved?.level_1_prefix : saved?.level_2_prefix
+      if (counts[level.section_type] == null) counts[level.section_type] = savedCount ?? 1
+      if (prefixes[level.section_type] == null) prefixes[level.section_type] = savedPrefix || sectionLabel(level)
     })
+    if (saved?.skip_top_level != null) hasTopLevel.value = !saved.skip_top_level
   },
   { immediate: true },
 )

@@ -2158,6 +2158,9 @@ pt:
               invalid_timezone: "não é um fuso horário válido"
             organization_id:
               immutable: "não pode ser alterado"
+            base:
+              automatic_generation_unavailable: "A geração automática de unidades não está disponível para a estrutura desta propriedade"
+              structure_regeneration_blocked_by_units: "Remova as unidades geradas antes de alterar a estrutura"
         property_section:
           attributes:
             name:

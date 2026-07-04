@@ -25,8 +25,7 @@ module Properties
           counts: {
             sections: sections.count,
             units: units.count,
-            towers: sections.where(section_type: SectionTypes::TOWER).count,
-            floors: sections.where(section_type: SectionTypes::FLOOR).count
+            **structure_level_counts(sections)
           },
           blocking_errors: blocking_errors(units),
           warnings: warnings(wizard),
@@ -36,6 +35,26 @@ module Properties
       end
 
       private
+
+      # fix-automatic-unit-generation §8: structure counts are resolved from the
+      # property's recommended +PropertyStructureFormat+ (top level + +units_in+
+      # leaf), not from hardcoded tower/floor section types, so condominium/sector
+      # structures report accurate, non-zero counts.
+      #
+      # +level_2+ is only populated for two-level formats. For a single-level
+      # format the sole level *is* the leaf (+levels.first == units_in+), so
+      # counting +units_in+ again would double-count the same sections; +level_2+
+      # stays 0. Mirrors +GenerateStructurePreview.counts+.
+      def structure_level_counts(sections)
+        format = StructureFormatResolver.for(property_type: @property.property_type)
+        return { level_1: 0, level_2: 0 } if format.nil?
+
+        top_type = format.levels.first[:section_type]
+        {
+          level_1: sections.where(section_type: top_type).count,
+          level_2: format.single_level? ? 0 : sections.where(section_type: format.units_in).count
+        }
+      end
 
       def property_summary
         {
@@ -75,7 +94,7 @@ module Properties
 
         {
           id: unit.id,
-          code: unit.identifier,
+          code: unit.code,
           identifier: unit.identifier,
           unit_type: unit.unit_type,
           tower_name: tower&.name,

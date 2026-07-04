@@ -56,7 +56,13 @@ class Admin::PropertySetup::WizardController < AdminController
       return
     end
 
-    apply_step_side_effects!
+    side_effect = apply_step_side_effects!
+    if side_effect&.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: side_effect.property.errors.messages }
+      return
+    end
+
     Properties::Setup::WizardState.merge!(@property, current_step: [ current_step + 1, 5 ].min)
     @property.save!
 
@@ -240,7 +246,7 @@ class Admin::PropertySetup::WizardController < AdminController
         towers floors_per_tower units_per_floor tower_prefix floor_prefix
         level_1_count level_2_count level_1_prefix level_2_prefix skip_top_level
       ],
-      unit_generation: %i[unit_type identifier_format quantity_per_floor units_per_leaf]
+      unit_generation: %i[unit_type identifier_format units_per_leaf]
     ).to_h
   end
 
@@ -252,7 +258,7 @@ class Admin::PropertySetup::WizardController < AdminController
   end
 
   def units_preview_params
-    params.permit(:unit_type, :identifier_format, :quantity_per_floor)
+    params.permit(:unit_type, :identifier_format, :units_per_leaf)
   end
 
   def merge_wizard_state!
@@ -260,6 +266,8 @@ class Admin::PropertySetup::WizardController < AdminController
       :structure_mode, :units_mode, :estimated_units, :quick_structure_confirmed
     ))
     Properties::Setup::WizardState.merge!(@property, quick_structure: step_params[:quick_structure]) if step_params[:quick_structure].present?
+    # Persist the automatic-generation config so step 3 can be restored on reload.
+    Properties::Setup::WizardState.merge!(@property, unit_generation: step_params[:unit_generation]) if step_params[:unit_generation].present?
   end
 
   def update_property_descriptive!
@@ -312,14 +320,13 @@ class Admin::PropertySetup::WizardController < AdminController
     mode = step_params[:units_mode].presence || "automatic"
     Properties::Setup::WizardState.merge!(@property, units_mode: mode)
 
-    return if mode == "import"
-    return if mode == "individual" && @property.units.any?
+    return unless mode == "automatic"
 
     Properties::Setup::ApplyAutomaticUnits.call(
       actor: current_user,
       property: @property,
-      count: step_params.dig(:unit_generation, :units_per_leaf)
-    ) if mode == "automatic"
+      params: step_params[:unit_generation] || {}
+    )
   end
 
   def section_params
