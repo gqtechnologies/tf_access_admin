@@ -4,7 +4,7 @@
 
 Step 3 SHALL provide a new `manual` unit management mode for draft properties. The mode SHALL use the same visual tree pattern already used by `ManualSectionForm` and `ManualSectionTreeRow`, with units rendered under their assigned section when present.
 
-The manual mode SHALL be available even when the property has no sections. When sections exist, eligible section rows SHALL expose only an add-unit action; ineligible section rows SHALL NOT show the add-unit action. The mode SHALL also provide a property-level add-unit action for creating units directly under the property without a section. Unit creation, edit, and deletion SHALL remain scoped to the current draft property and organization and require the property-scoped `manage_units` permission.
+The manual mode requires at least one eligible section to exist; eligible section rows SHALL expose only an add-unit action, and ineligible section rows SHALL NOT show the add-unit action. Unit creation, edit, and deletion SHALL remain scoped to the current draft property and organization and require the property-scoped `manage_units` permission.
 
 #### Scenario: Manual unit view reuses section preview
 
@@ -26,13 +26,6 @@ The manual mode SHALL be available even when the property has no sections. When 
 - **WHEN** the section row renders in manual unit mode
 - **THEN** no add-unit action is shown for that section
 - **AND** the user is not invited to submit a unit for that section
-
-#### Scenario: Manual mode supports property-level units
-
-- **GIVEN** the user is in step 3 manual unit management
-- **WHEN** they trigger the property-level add-unit action
-- **THEN** the creation dialog opens without a selected section
-- **AND** created units are assigned directly to the draft property
 
 #### Scenario: Add-unit opens individual and multiple options
 

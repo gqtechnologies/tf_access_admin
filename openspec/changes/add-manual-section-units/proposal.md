@@ -1,12 +1,11 @@
 ## Why
 
-The current setup flow lets users define sections manually, but unit creation is separated from the section-level structure view. Users need a manual way to add, edit, and remove units directly from each eligible section or directly from the property while preserving the same tree interaction model used in the manual builder.
+The current setup flow lets users define sections manually, but unit creation is separated from the section-level structure view. Users need a manual way to add, edit, and remove units directly from each eligible section while preserving the same tree interaction model used in the manual builder.
 
 ## What Changes
 
 - Add a new manual unit mode in the unit step using the same visual pattern as `ManualSectionForm` and `ManualSectionTreeRow`.
 - Replace section actions in this unit-management view with only an "add unit" action for eligible section rows.
-- Support property-level unit creation without a section.
 - Reuse the manual section creation pattern for individual and multiple unit creation, including all-or-nothing multiple creation.
 - Add per-unit dropdown actions for edit and delete.
 - Add a unit edit dialog for `area_m2`, optional `display_name`, `unit_type`, and `identifier`.

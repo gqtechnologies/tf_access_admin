@@ -14,7 +14,7 @@ Integration points: `Admin::PropertySetup::WizardController`, `Admin::PropertySe
 **Goals:**
 
 - Show a manual unit management mode in step 3 using the visual pattern from `ManualSectionForm` and `ManualSectionTreeRow`.
-- Let users add one unit or many units from an eligible section, or directly under the property with no section.
+- Let users add one unit or many units from an eligible section.
 - Let users edit a unit's descriptive fields in a dialog: `area_m2`, optional `display_name`, `unit_type`, and `identifier`.
 - Let users delete a unit only after confirmation, using soft delete.
 - Keep all unit mutations scoped to the current draft property and organization.
@@ -32,7 +32,7 @@ Integration points: `Admin::PropertySetup::WizardController`, `Admin::PropertySe
 
 ### Reuse the manual section tree visual pattern for manual unit management
 
-The step 3 manual section view will reuse the `ManualSectionForm` / `ManualSectionTreeRow` visual pattern and render persisted units beneath each section. In unit-management mode, eligible section rows expose only "add unit"; ineligible section rows do not show the action. Section edit/add-child/delete actions remain step 2 concerns. A property-level unit area provides the same add/edit/delete unit behavior for units without a section.
+The step 3 manual section view will reuse the `ManualSectionForm` / `ManualSectionTreeRow` visual pattern and render persisted units beneath each section. In unit-management mode, eligible section rows expose only "add unit"; ineligible section rows do not show the action. Section edit/add-child/delete actions remain step 2 concerns.
 
 Alternative considered: create a separate unit tree component. This was rejected because it would duplicate the preview hierarchy and increase the risk of step 2 and step 3 rendering the same structure differently.
 
@@ -44,7 +44,7 @@ Alternative considered: adding units in step 2 while building sections. This was
 
 ### Resolve section placement on the server
 
-When a user adds units from a section row, the client sends the selected section ID and unit payload. The controller resolves the section through the current draft property and organization before calling `Units::Create`. Invalid, foreign, deleted, or non-eligible sections are rejected by the same rules used by the `Unit` contract. When the user adds units from the property-level action, no `property_section_id` is sent and units are created directly under the property.
+When a user adds units from a section row, the client sends the selected section ID and unit payload. The controller resolves the section through the current draft property and organization before calling `Units::Create`. Invalid, foreign, deleted, or non-eligible sections are rejected by the same rules used by the `Unit` contract.
 
 Alternative considered: trusting the preview's section data in the client. This was rejected because tenant isolation and section eligibility must be enforced server-side.
 

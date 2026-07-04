@@ -42,13 +42,6 @@ The mode MUST NOT change the step 2 manual builder contract: step 2 continues to
 - **THEN** the section remains visible
 - **AND** the unit area shows an empty state or zero-unit indication without hiding the section
 
-#### Scenario: Property-level units render without a section
-
-- **GIVEN** the draft property has non-deleted units with no section
-- **WHEN** the preview renders in unit-management mode
-- **THEN** those units appear at the end of the preview component after all section rows
-- **AND** each property-level unit exposes the same unit row actions as sectioned units
-
 ### Requirement: Unit rows expose edit and delete dropdown actions
 
 Unit rows rendered inside the shared preview SHALL expose a dropdown menu with exactly edit and delete actions. Editing SHALL open a unit edit dialog. Deleting SHALL open a confirmation dialog before any destructive request is sent.

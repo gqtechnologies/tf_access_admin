@@ -2,7 +2,7 @@
 
 ### Requirement: Manual wizard unit creation supports individual and multiple modes
 
-The system SHALL allow authorized step 3 users to create units manually from the draft property or from an eligible section using individual or multiple creation modes. Both modes MUST delegate each persisted unit to `Units::Create` and enforce tenant isolation, property scoping, section eligibility, identifier normalization, and uniqueness.
+The system SHALL allow authorized step 3 users to create units manually from an eligible section using individual or multiple creation modes. Both modes MUST delegate each persisted unit to `Units::Create` and enforce tenant isolation, property scoping, section eligibility, identifier normalization, and uniqueness.
 
 Multiple unit creation SHALL mirror the manual section multiple-creation interaction: the dialog offers "Individual" and "Multiple"; Multiple uses `cantidad`, optional `prefijo`, and `formato` (`letter` or `number`) to generate identifiers; and the dialog shows a live "De creación" preview before persistence. The generated identifier is the unit identifier. Multiple mode inherits the same quantity and suffix-range limits as manual section multiple creation. Shared fields such as `unit_type` and optional `area_m2` apply to every generated unit; `display_name` is not available in the multiple-unit creation dialog and remains blank for generated units.
 
@@ -15,13 +15,6 @@ Multiple creation MUST be all-or-nothing. If any planned unit fails validation, 
 - **THEN** exactly one unit is persisted through `Units::Create`
 - **AND** the unit belongs to P, organization O, and section S
 
-#### Scenario: Individual mode creates one property-level unit
-
-- **GIVEN** an authorized setup user selects the property-level add-unit action in draft property P
-- **WHEN** they submit valid individual unit data without a section
-- **THEN** exactly one unit is persisted through `Units::Create`
-- **AND** the unit belongs to P and organization O with no section
-
 #### Scenario: Multiple mode creates units in selected section
 
 - **GIVEN** an authorized user selects add-unit on eligible section S
@@ -29,13 +22,6 @@ Multiple creation MUST be all-or-nothing. If any planned unit fails validation, 
 - **THEN** each unit is persisted through `Units::Create`
 - **AND** each unit belongs to S and uses a generated identifier shown in the preview
 - **AND** each unit uses the shared submitted `unit_type` and optional `area_m2`
-
-#### Scenario: Multiple mode creates property-level units
-
-- **GIVEN** an authorized setup user selects the property-level add-unit action
-- **WHEN** they confirm a valid multiple-unit preview
-- **THEN** each unit is persisted through `Units::Create` without a section
-- **AND** every persisted identifier matches the preview
 
 #### Scenario: Multiple mode blocks duplicate identifiers
 
