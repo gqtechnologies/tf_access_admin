@@ -28,13 +28,26 @@ export type PreviewNode = {
   depth: number
 }
 
+/** Persisted unit row embedded in a leaf node by the backend tree (manual mode,
+ * step 2/4 previews). Step 3 automatic mode instead injects plain projected
+ * identifier strings client-side (see `unitsPreview.ts`). */
+export type StructureTreeUnit = {
+  id: string
+  identifier: string
+  display_name?: string | null
+  unit_type?: string
+  area_m2?: number | null
+}
+
 export type StructureTreeNode = {
   id: string
   name: string
+  section_type?: string
   position?: number
   children?: StructureTreeNode[]
-  /** Projected unit identifiers injected into leaf nodes for step 3 preview. */
-  units?: string[]
+  /** Projected identifier strings (automatic preview) or persisted unit rows
+   * (backend tree) injected into leaf nodes. */
+  units?: string[] | StructureTreeUnit[]
 }
 
 export type TreeChildDisplayItem =

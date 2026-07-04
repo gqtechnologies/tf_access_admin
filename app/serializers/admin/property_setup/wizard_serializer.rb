@@ -47,10 +47,12 @@ class Admin::PropertySetup::WizardSerializer
 
   def permissions_json
     policy = ResidentialPropertyPolicy.new(@current_user, @property || ResidentialProperty.new)
+    unit_policy = UnitPolicy.new(@current_user, Unit)
 
     {
       manage_setup: policy.create?,
-      activate: @property&.status == PropertyStatuses::CONFIGURED && policy.update?
+      activate: @property&.status == PropertyStatuses::CONFIGURED && policy.update?,
+      manage_units: @property.present? && unit_policy.property_allowed?(:manage_units, property: @property)
     }
   end
 

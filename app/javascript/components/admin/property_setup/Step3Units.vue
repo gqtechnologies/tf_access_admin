@@ -124,6 +124,10 @@
           </div>
         </section>
 
+        <section v-else-if="selectedMode === 'manual' && propertyId" class="rounded-lg border p-4">
+          <ManualUnitsForm :property-id="propertyId" :unit-types="unitTypes" :tree="sectionTree" />
+        </section>
+
         <section v-else-if="selectedMode === 'import' && propertyId" class="space-y-3 rounded-lg border p-4">
           <p class="text-muted-foreground text-sm">{{ t('admin.property_setup.step3.import.description') }}</p>
           <Button variant="outline" @click="importOpen = true">
@@ -152,11 +156,12 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Building, Building2, FileSpreadsheet, Layers, Sparkles } from 'lucide-vue-next'
+import { Building, Building2, FileSpreadsheet, Layers, ListTree, Sparkles } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import BulkUnitsImportDrawer from '@/components/admin/bulk_units/BulkUnitsImportDrawer.vue'
+import ManualUnitsForm from '@/components/admin/property_setup/ManualUnitsForm.vue'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
 import { usePropertySetupStepValidation } from '@/lib/composables/property_setup/usePropertySetupStepValidation'
 import type { PropertySetupStep3Values } from '@/lib/schemas/property_setup'
@@ -176,10 +181,33 @@ const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 const { fieldError, validateStep3, setFieldErrors } = usePropertySetupStepValidation()
 const importOpen = ref(false)
-function defaultUnitsMode() {
-  if (props.structureMode !== 'quick') return 'import'
 
-  return (props.wizard.units_mode as string) || 'automatic'
+const UNIT_ELIGIBLE_TYPES = ['block', 'tower', 'floor']
+const sectionTree = computed(() => props.preview?.structure?.tree ?? [])
+const hasEligibleSections = computed(() =>
+  flattenSectionTree(sectionTree.value).some(
+    (section: Record<string, unknown>) =>
+      ((section.children as unknown[] | undefined)?.length ?? 0) === 0 &&
+      UNIT_ELIGIBLE_TYPES.includes(section.section_type as string),
+  ),
+)
+
+function flattenSectionTree(nodes: Record<string, unknown>[]): Record<string, unknown>[] {
+  return nodes.flatMap((node) => [node, ...((node.children as Record<string, unknown>[] | undefined) ?? [])])
+}
+
+// Manual is preferred whenever the property already has persisted units, or
+// when eligible sections exist but the structure did not come from quick mode
+// (quick structures default to automatic). No persisted mode falls back to
+// automatic for a fresh quick setup, or import when no sections are eligible.
+function defaultUnitsMode() {
+  const persisted = props.wizard.units_mode as string | undefined
+  if (persisted) return persisted
+
+  const persistedUnitsCount = Number(props.preview?.counts?.units ?? 0)
+  if (persistedUnitsCount > 0) return 'manual'
+  if (props.structureMode === 'quick') return 'automatic'
+  return hasEligibleSections.value ? 'manual' : 'import'
 }
 
 const selectedMode = ref(defaultUnitsMode())
@@ -205,12 +233,12 @@ const autoForm = reactive(initialAutoForm())
 
 watch(
   () => [props.wizard.units_mode, props.structureMode] as const,
-  ([mode, structureMode]) => {
-    if (structureMode !== 'quick') {
-      selectedMode.value = 'import'
+  ([mode]) => {
+    if (mode) {
+      selectedMode.value = mode as string
       return
     }
-    if (mode) selectedMode.value = mode as string
+    selectedMode.value = defaultUnitsMode()
   },
   { immediate: true },
 )
@@ -254,7 +282,6 @@ const leafLevelLabel = computed(() =>
     ? t('admin.property_setup.step3.context.floors', { count: floorCount.value })
     : t('admin.property_setup.step3.context.structure_count', { count: floorCount.value }),
 )
-const sectionTree = computed(() => props.preview?.structure?.tree ?? [])
 
 const identifierFormatOptions = computed(() => {
   const base = [
@@ -314,6 +341,14 @@ const modes = computed(() => {
       icon: Sparkles,
       label: t('admin.property_setup.step3.modes.automatic.title'),
       description: t('admin.property_setup.step3.modes.automatic.description'),
+    })
+  }
+  if (hasEligibleSections.value) {
+    list.push({
+      id: 'manual',
+      icon: ListTree,
+      label: t('admin.property_setup.step3.modes.manual.title'),
+      description: t('admin.property_setup.step3.modes.manual.description'),
     })
   }
   list.push({

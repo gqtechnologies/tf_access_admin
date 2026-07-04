@@ -535,6 +535,7 @@ es:
           section_not_eligible: "La sección no es elegible para contener unidades"
           unit_type_invalid: "El tipo de unidad no es válido"
           residential_property_immutable: "La propiedad de la unidad no puede cambiarse"
+          code_conflict: "Este identificador colisionaría con el código de otra unidad existente"
         unit_types:
           apartment: "Apartamento"
           house: "Casa"
@@ -1689,9 +1690,9 @@ es:
               title: "Crear también estacionamientos"
               hint: "Esta opción se habilitará en el siguiente paso."
           modes:
-            individual:
-              title: "Individual"
-              description: "Crea unidades una a una."
+            manual:
+              title: "Manual"
+              description: "Agrega unidades directamente desde cada sección elegible."
             automatic:
               title: "Generar automáticamente desde la estructura"
               description: "Crea unidades por piso y torre según la configuración."
@@ -1702,6 +1703,48 @@ es:
             add: "Agregar unidad"
             identifier: "Identificador"
             type: "Tipo"
+          manual:
+            hint: "Agrega unidades a las secciones elegibles. Cada fila expone solo las acciones disponibles para ese contexto."
+            no_eligible_sections: "Esta propiedad aún no tiene secciones que puedan contener unidades. Crea secciones en el paso 2 para agregar unidades manualmente."
+            add_unit: "Agregar unidad"
+            identifier: "Identificador"
+            display_name: "Nombre para mostrar"
+            unit_type: "Tipo de unidad"
+            area_m2: "Área (m²)"
+            unit_count: "{count} unidades"
+            actions:
+              menu: "Acciones"
+              edit: "Editar"
+              delete: "Eliminar"
+            create:
+              title: "Agregar unidad"
+              section_label: "Sección: {name}"
+              tab_individual: "Individual"
+              tab_multiple: "Múltiple"
+              count: "Cantidad"
+              prefix: "Prefijo"
+              format: "Formato del identificador"
+              format_letter: "Letras (A, B, C…)"
+              format_number: "Numérico (1, 2, 3…)"
+              preview_will_create: "Se creará:"
+              insufficient_available_identifiers: "No hay suficientes identificadores disponibles para crear {count} unidades. Prueba otro prefijo o reduce la cantidad."
+              info: "La(s) unidad(es) se crearán dentro de {name}."
+              cancel: "Cancelar"
+              submit: "Crear"
+            edit:
+              title: "Editar unidad"
+              submit: "Guardar cambios"
+            delete:
+              title: "¿Eliminar la unidad {name}?"
+              warning: "La eliminación reversible conserva los registros relacionados existentes, como propiedades, ocupaciones, arriendos, visitas e historial de auditoría. La unidad desaparecerá de esta vista previa tras confirmar."
+              cancel: "Cancelar"
+              confirm: "Eliminar"
+            validations:
+              unit_type_required: "El tipo de unidad es obligatorio"
+              identifier_required: "El identificador es obligatorio"
+              prefix_required: "El prefijo es obligatorio"
+              count_min: "Debe haber al menos 1 unidad"
+              area_m2_positive: "El área debe ser mayor a 0"
           import:
             open: "Abrir importador"
             description: "Sube un archivo Excel para crear unidades en lote. Podrás revisar y corregir antes de importar."
@@ -2240,6 +2283,7 @@ es:
               not_deleted: "la unidad no está eliminada de forma reversible"
               already_deleted: "la unidad ya está eliminada de forma reversible"
               destroy_requires_service: "la eliminación reversible debe realizarse mediante la acción de soft delete, no con destroy directo"
+              insufficient_available_identifiers: "No hay suficientes identificadores disponibles para crear %{count} unidades en esta sección. Prueba otro prefijo o reduce la cantidad."
         visit:
           attributes:
             host_person:

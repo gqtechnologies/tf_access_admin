@@ -98,6 +98,9 @@ Rails.application.routes.draw do
       patch  "wizard/:id/sections/:section_id", to: "wizard#update_section",    as: :update_section_wizard
       delete "wizard/:id/sections/:section_id", to: "wizard#destroy_section",   as: :destroy_section_wizard
       post "wizard/:id/create_unit",    to: "wizard#create_unit",    as: :create_unit_wizard
+      post   "wizard/:id/units",           to: "wizard#create_units",  as: :create_units_wizard
+      patch  "wizard/:id/units/:unit_id",   to: "wizard#update_unit",   as: :update_unit_wizard
+      delete "wizard/:id/units/:unit_id",   to: "wizard#destroy_unit",  as: :destroy_unit_wizard
       get  "wizard/:id/structure_preview", to: "wizard#structure_preview", as: :structure_preview_wizard
       get  "wizard/:id/units_preview",  to: "wizard#units_preview",  as: :units_preview_wizard
     end

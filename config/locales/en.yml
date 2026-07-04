@@ -607,6 +607,7 @@ en:
           section_not_eligible: "The section is not eligible to contain units"
           unit_type_invalid: "The unit type is not valid"
           residential_property_immutable: "The unit's property cannot be changed"
+          code_conflict: "This identifier would collide with an existing unit's code"
         unit_types:
           apartment: "Apartment"
           house: "House"
@@ -1762,9 +1763,9 @@ en:
               title: "Also create parking spaces"
               hint: "This option will be enabled in a later step."
           modes:
-            individual:
-              title: "Individual"
-              description: "Create units one by one."
+            manual:
+              title: "Manual"
+              description: "Add units directly from each eligible section."
             automatic:
               title: "Generate automatically from structure"
               description: "Create units per floor and tower based on your configuration."
@@ -1775,6 +1776,48 @@ en:
             add: "Add unit"
             identifier: "Identifier"
             type: "Type"
+          manual:
+            hint: "Add units to eligible sections. Each row exposes only the actions available for that context."
+            no_eligible_sections: "This property has no sections that can contain units yet. Create sections in step 2 to add units manually."
+            add_unit: "Add unit"
+            identifier: "Identifier"
+            display_name: "Display name"
+            unit_type: "Unit type"
+            area_m2: "Area (m²)"
+            unit_count: "{count} units"
+            actions:
+              menu: "Actions"
+              edit: "Edit"
+              delete: "Delete"
+            create:
+              title: "Add unit"
+              section_label: "Section: {name}"
+              tab_individual: "Individual"
+              tab_multiple: "Multiple"
+              count: "Quantity"
+              prefix: "Prefix"
+              format: "Identifier format"
+              format_letter: "Letters (A, B, C…)"
+              format_number: "Numeric (1, 2, 3…)"
+              preview_will_create: "Will create:"
+              insufficient_available_identifiers: "Not enough available identifiers to create {count} units. Try a different prefix or reduce the quantity."
+              info: "The new unit(s) will be created under {name}."
+              cancel: "Cancel"
+              submit: "Create"
+            edit:
+              title: "Edit unit"
+              submit: "Save changes"
+            delete:
+              title: "Delete unit {name}?"
+              warning: "Soft-deleting preserves existing related records such as ownerships, occupancies, leases, visits and audit history. The unit will disappear from this preview after confirmation."
+              cancel: "Cancel"
+              confirm: "Delete"
+            validations:
+              unit_type_required: "Unit type is required"
+              identifier_required: "Identifier is required"
+              prefix_required: "Prefix is required"
+              count_min: "There must be at least 1 unit"
+              area_m2_positive: "Area must be greater than 0"
           import:
             open: "Open importer"
             description: "Upload an Excel file to create units in bulk. You can review and fix rows before importing."
@@ -2249,6 +2292,7 @@ en:
               not_deleted: "the unit is not soft-deleted"
               already_deleted: "the unit is already soft-deleted"
               destroy_requires_service: "soft delete must use the soft-delete action, not destroy directly"
+              insufficient_available_identifiers: "Not enough available identifiers to create %{count} units in this section. Try a different prefix or reduce the quantity."
         visit:
           attributes:
             host_person:

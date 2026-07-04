@@ -162,6 +162,43 @@ class Units::ServicesTest < ActiveSupport::TestCase
     assert_equal @property.id, unit.reload.residential_property_id
   end
 
+  test "update regenerates derived code when identifier changes" do
+    unit = create_unit(@property, "UPD-CODE-1")
+    unit.update!(property_section: @floor)
+
+    result = Units::Update.call(
+      actor: @tenant_admin,
+      unit: unit,
+      attributes: { identifier: "UPD-CODE-2" }
+    )
+
+    assert result.success?
+    unit.reload
+    assert_equal "upd-code-2", unit.code
+  end
+
+  test "update rejects identifier change when regenerated code collides" do
+    unit = create_unit(@property, "UPD-COL-1")
+    unit.update!(property_section: @floor)
+    # Simulates legacy data / a console correction: another unit in the same
+    # section carries a code that does not match its own identifier, so the
+    # collision is on `code` alone, not on `identifier` uniqueness.
+    other = create_unit(@property, "UPD-COL-OTHER")
+    other.update!(property_section: @floor)
+    other.update_column(:code, "upd-col-2")
+
+    result = Units::Update.call(
+      actor: @tenant_admin,
+      unit: unit,
+      attributes: { identifier: "UPD-COL-2" }
+    )
+
+    assert result.invalid?
+    assert_includes result.errors[:identifier], I18n.t("frontend.admin.units.validations.code_conflict")
+    unit.reload
+    assert_equal "UPD-COL-1", unit.identifier
+  end
+
   test "move changes section within the same property and supports no-section context" do
     unit = create_unit(@property, "MOV-1")
     unit.update!(property_section: @floor)

@@ -596,6 +596,7 @@ pt:
           section_not_eligible: "A seção não é elegível para conter unidades"
           unit_type_invalid: "O tipo de unidade não é válido"
           residential_property_immutable: "A propriedade da unidade não pode ser alterada"
+          code_conflict: "Este identificador colidiria com o código de outra unidade existente"
         unit_types:
           apartment: "Apartamento"
           house: "Casa"
@@ -1710,9 +1711,9 @@ pt:
               title: "Criar também vagas de estacionamento"
               hint: "Esta opção será habilitada em uma etapa posterior."
           modes:
-            individual:
-              title: "Individual"
-              description: "Crie unidades uma a uma."
+            manual:
+              title: "Manual"
+              description: "Adicione unidades diretamente a partir de cada seção elegível."
             automatic:
               title: "Gerar automaticamente a partir da estrutura"
               description: "Crie unidades por andar e torre conforme a configuração."
@@ -1723,6 +1724,48 @@ pt:
             add: "Adicionar unidade"
             identifier: "Identificador"
             type: "Tipo"
+          manual:
+            hint: "Adicione unidades às seções elegíveis. Cada linha expõe apenas as ações disponíveis para esse contexto."
+            no_eligible_sections: "Esta propriedade ainda não possui seções que possam conter unidades. Crie seções na etapa 2 para adicionar unidades manualmente."
+            add_unit: "Adicionar unidade"
+            identifier: "Identificador"
+            display_name: "Nome de exibição"
+            unit_type: "Tipo de unidade"
+            area_m2: "Área (m²)"
+            unit_count: "{count} unidades"
+            actions:
+              menu: "Ações"
+              edit: "Editar"
+              delete: "Excluir"
+            create:
+              title: "Adicionar unidade"
+              section_label: "Seção: {name}"
+              tab_individual: "Individual"
+              tab_multiple: "Múltiplo"
+              count: "Quantidade"
+              prefix: "Prefixo"
+              format: "Formato do identificador"
+              format_letter: "Letras (A, B, C…)"
+              format_number: "Numérico (1, 2, 3…)"
+              preview_will_create: "Será criado:"
+              insufficient_available_identifiers: "Não há identificadores disponíveis suficientes para criar {count} unidades. Tente outro prefixo ou reduza a quantidade."
+              info: "A(s) unidade(s) será(ão) criada(s) em {name}."
+              cancel: "Cancelar"
+              submit: "Criar"
+            edit:
+              title: "Editar unidade"
+              submit: "Salvar alterações"
+            delete:
+              title: "Excluir a unidade {name}?"
+              warning: "A exclusão reversível preserva os registros relacionados existentes, como propriedades, ocupações, contratos de locação, visitas e histórico de auditoria. A unidade desaparecerá desta pré-visualização após a confirmação."
+              cancel: "Cancelar"
+              confirm: "Excluir"
+            validations:
+              unit_type_required: "O tipo de unidade é obrigatório"
+              identifier_required: "O identificador é obrigatório"
+              prefix_required: "O prefixo é obrigatório"
+              count_min: "Deve haver pelo menos 1 unidade"
+              area_m2_positive: "A área deve ser maior que 0"
           import:
             open: "Abrir importador"
             description: "Envie um arquivo Excel para criar unidades em lote. Você poderá revisar e corrigir antes de importar."
@@ -2193,6 +2236,7 @@ pt:
               not_deleted: "a unidade não está excluída de forma reversível"
               already_deleted: "a unidade já está excluída de forma reversível"
               destroy_requires_service: "a exclusão reversível deve ser feita pela ação de soft delete, não por destroy direto"
+              insufficient_available_identifiers: "Não há identificadores disponíveis suficientes para criar %{count} unidades nesta seção. Tente outro prefixo ou reduza a quantidade."
         visit:
           attributes:
             host_person:

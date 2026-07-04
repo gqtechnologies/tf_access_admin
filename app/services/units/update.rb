@@ -18,6 +18,7 @@ module Units
       @unit.assign_attributes(descriptive_attributes(@attributes))
       return Result.invalid(@unit) if archive_via_status_requested?
       return Result.invalid(@unit) if invalid_status_transition?
+      return Result.invalid(@unit) if identifier_code_conflict?
 
       apply_status
 
@@ -25,6 +26,45 @@ module Units
     end
 
     private
+
+    # Regenerating the derived code on a supported identifier edit must reject on
+    # collision rather than silently suffix, unlike creation (hierarchical-code-
+    # generation §Unit code, add-manual-section-units). Only recompute when the
+    # identifier actually changed so an edit that leaves it untouched keeps its
+    # existing code.
+    def identifier_code_conflict?
+      return false unless @unit.identifier_changed?
+
+      candidate = regenerated_code
+      return false if candidate.blank?
+
+      if code_taken?(candidate)
+        @unit.errors.add(:identifier, t_validation("code_conflict"))
+        return true
+      end
+
+      @unit.code = candidate
+      false
+    end
+
+    # Uses the identifier being submitted rather than `normalized_identifier`,
+    # which is only recomputed by the `before_validation` callback on save and
+    # would still read the previous value here.
+    def regenerated_code
+      segment = Units::NormalizeIdentifier.call(@unit.identifier)&.normalized_identifier
+      return nil if segment.blank?
+
+      prefix = @unit.property_section&.code.presence || @unit.residential_property&.code
+      [ prefix, segment ].reject(&:blank?).join("-").presence
+    end
+
+    def code_taken?(candidate)
+      ::Unit.where(
+        residential_property_id: @unit.residential_property_id,
+        property_section_id: @unit.property_section_id,
+        code: candidate
+      ).where.not(id: @unit.id).exists?
+    end
 
     def archive_via_status_requested?
       return false unless @attributes.key?(:status)

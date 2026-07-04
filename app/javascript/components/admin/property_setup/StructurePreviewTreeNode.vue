@@ -55,7 +55,7 @@
                 aria-hidden="true"
               />
               <DoorOpen class="size-3.5 shrink-0" />
-              <span class="text-sm">{{ uid }}</span>
+              <span class="text-sm">{{ unitLabel(uid) }}</span>
             </li>
             <li v-if="(node.units?.length ?? 0) > MAX_UNITS" class="relative flex items-center gap-2 py-0.5 text-sm">
               <span
@@ -96,4 +96,11 @@ const hasUnits = computed(() => (props.node.units?.length ?? 0) > 0)
 const isCollapsible = computed(() => hasChildren.value || hasUnits.value)
 const visibleChildren = computed(() => displayTreeChildren(props.node.children))
 const visibleUnits = computed(() => (props.node.units ?? []).slice(0, MAX_UNITS))
+
+// Step 3 automatic mode injects projected identifier strings; the persisted
+// backend tree (step 2/4 and step 3 manual mode) carries real unit rows.
+function unitLabel(unit: string | { identifier: string; display_name?: string | null }): string {
+  if (typeof unit === 'string') return unit
+  return unit.display_name || unit.identifier
+}
 </script>

@@ -158,7 +158,8 @@ module PropertySections
           id: unit.id,
           identifier: unit.identifier,
           display_name: unit.display_name,
-          unit_type: unit.unit_type
+          unit_type: unit.unit_type,
+          area_m2: unit.area_m2
         }
       end
     end

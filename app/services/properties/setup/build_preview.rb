@@ -68,13 +68,16 @@ module Properties
         }
       end
 
+      # +include_units+ is always on so step 3 manual unit management can render
+      # persisted units under their section without a second tree fetch
+      # (add-manual-section-units). Step 2 consumers ignore the extra `units` key.
       def structure_summary(sections, wizard)
         {
           mode: wizard[:structure_mode],
           tree: PropertySections::TreeBuilder.new(
             actor: @actor,
             property: @property,
-            include_units: false
+            include_units: true
           ).tree
         }
       rescue StandardError

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { PROPERTY_TYPE_VALUES } from '@/lib/schemas/residential_property'
 
 export const STRUCTURE_MODES = ['none', 'manual', 'quick'] as const
-export const UNITS_MODES = ['automatic', 'import', 'individual'] as const
+export const UNITS_MODES = ['automatic', 'import', 'manual'] as const
 export const IDENTIFIER_FORMATS = ['floor_sequential', 'block_sequential', 'sequential'] as const
 
 export const propertySetupValidationKeys = {

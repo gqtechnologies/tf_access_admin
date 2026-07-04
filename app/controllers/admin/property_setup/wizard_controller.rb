@@ -176,6 +176,55 @@ class Admin::PropertySetup::WizardController < AdminController
     end
   end
 
+  def create_units
+    return unit_section_required_error if unit_batch_params[:property_section_id].blank?
+
+    result = Units::CreateBatch.call(
+      actor: current_user,
+      property: @property,
+      section_id: unit_batch_params[:property_section_id],
+      attributes: unit_batch_attributes,
+      prefix: unit_batch_params[:prefix],
+      suffix_type: (unit_batch_params[:suffix_type].presence || "letter").to_sym,
+      count: unit_batch_params[:count]
+    )
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.unit) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
+  def update_unit
+    unit = find_unit
+    return unit_not_found if unit.nil?
+
+    result = Units::Update.call(actor: current_user, unit: unit, attributes: unit_update_params)
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.unit) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
+  def destroy_unit
+    unit = find_unit
+    return unit_not_found if unit.nil?
+
+    result = Units::SoftDelete.call(actor: current_user, unit: unit)
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.unit) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
   def confirm
     result = Properties::Setup::Confirm.call(actor: current_user, property: @property)
 
@@ -364,6 +413,34 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def unit_params
     params.require(:unit).permit(:identifier, :display_name, :unit_type, :property_section_id)
+  end
+
+  def unit_batch_params
+    params.require(:unit).permit(:property_section_id, :unit_type, :area_m2, :prefix, :suffix_type, :count)
+  end
+
+  def unit_batch_attributes
+    unit_batch_params.slice(:unit_type, :area_m2)
+  end
+
+  def unit_update_params
+    params.require(:unit).permit(:area_m2, :display_name, :unit_type, :identifier)
+  end
+
+  def find_unit
+    @property.units.find_by(id: params[:unit_id])
+  end
+
+  def unit_not_found
+    redirect_to admin_property_setup_wizard_path(@property),
+                inertia: { errors: { base: [ I18n.t("frontend.admin.units.not_found") ] } }
+  end
+
+  def unit_section_required_error
+    unit = Unit.new
+    unit.errors.add(:property_section_id, :blank)
+    redirect_to admin_property_setup_wizard_path(@property),
+                inertia: { errors: serialize_inertia_errors(unit) }
   end
 
   def find_parent_section

@@ -314,6 +314,70 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     assert_redirected_to admin_property_setup_wizard_path(@draft)
   end
 
+  test "create units batch adds multiple units to an eligible section" do
+    sign_in_as(@tenant_admin)
+    floor = @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1", section_type: SectionTypes::FLOOR
+    )
+
+    assert_difference -> { @draft.units.count }, 3 do
+      post admin_property_setup_create_units_wizard_path(@draft), params: {
+        unit: {
+          property_section_id: floor.id, unit_type: UnitTypes::APARTMENT,
+          prefix: "Depto", suffix_type: "letter", count: 3
+        }
+      }
+    end
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
+  test "create units batch is rejected without a section" do
+    sign_in_as(@tenant_admin)
+
+    assert_no_difference -> { @draft.units.count } do
+      post admin_property_setup_create_units_wizard_path(@draft), params: {
+        unit: { unit_type: UnitTypes::APARTMENT, prefix: "Depto", suffix_type: "letter", count: 2 }
+      }
+    end
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
+  test "update unit changes descriptive fields" do
+    sign_in_as(@tenant_admin)
+    floor = @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1", section_type: SectionTypes::FLOOR
+    )
+    unit = Units::Create.call(
+      actor: @tenant_admin, property: @draft, section_id: floor.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+
+    patch admin_property_setup_update_unit_wizard_path(@draft, unit_id: unit.id), params: {
+      unit: { display_name: "Depto renombrado" }
+    }
+
+    assert_equal "Depto renombrado", unit.reload.display_name
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
+  test "destroy unit soft-deletes it" do
+    sign_in_as(@tenant_admin)
+    floor = @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1", section_type: SectionTypes::FLOOR
+    )
+    unit = Units::Create.call(
+      actor: @tenant_admin, property: @draft, section_id: floor.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+
+    delete admin_property_setup_destroy_unit_wizard_path(@draft, unit_id: unit.id)
+
+    assert_not_nil unit.reload.deleted_at
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
   test "cancel without delete keeps configured property" do
     configured = ResidentialProperty.create!(
       organization: @organization,
