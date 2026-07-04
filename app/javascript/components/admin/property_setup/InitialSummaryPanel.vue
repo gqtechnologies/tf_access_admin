@@ -26,13 +26,6 @@
           </div>
         </div>
 
-        <div class="flex items-start gap-3">
-          <Users class="text-muted-foreground mt-0.5 size-4 shrink-0" />
-          <div class="min-w-0">
-            <p class="text-muted-foreground text-xs">{{ t('admin.property_setup.step1.summary.estimation') }}</p>
-            <p class="text-sm font-medium">{{ estimationLabel }}</p>
-          </div>
-        </div>
       </div>
 
       <div class="border-t pt-4">
@@ -53,7 +46,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Building2, Clock, MapPin, Users } from 'lucide-vue-next'
+import { Building2, Clock, MapPin } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -74,9 +67,4 @@ const locationLabel = computed(() => {
   return city?.trim() || '—'
 })
 
-const estimationLabel = computed(() => {
-  const units = props.values.estimated_units as number | undefined
-  if (!units || units <= 0) return '—'
-  return t('admin.property_setup.step1.summary.estimation_units', { count: units })
-})
 </script>

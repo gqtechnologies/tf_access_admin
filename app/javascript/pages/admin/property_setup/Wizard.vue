@@ -266,7 +266,6 @@ const step1Values = computed(() => ({
   region: (props.property?.region as string) ?? '',
   country: (props.property?.country as string) ?? 'Chile',
   timezone: (props.property?.timezone as string) ?? 'America/Santiago',
-  estimated_units: (wizardState.value.estimated_units as number) ?? undefined,
 }))
 
 const step1Preview = computed(() => toValue(step1Ref.value?.preview) ?? step1Values.value)

@@ -102,7 +102,6 @@ const fullAddress = computed(() => {
 
 const propertyDetails = computed(() => {
   const property = props.preview.property ?? {}
-  const estimatedUnits = property.estimated_units
 
   return [
     { label: t('admin.property_setup.step1.fields.name'), value: property.name || '—' },
@@ -113,12 +112,6 @@ const propertyDetails = computed(() => {
         : '—',
     },
     { label: t('admin.property_setup.step1.fields.address'), value: fullAddress.value },
-    {
-      label: t('admin.property_setup.step1.fields.estimated_units'),
-      value: estimatedUnits
-        ? t('admin.property_setup.step1.summary.estimation_units', { count: estimatedUnits })
-        : '—',
-    },
   ]
 })
 

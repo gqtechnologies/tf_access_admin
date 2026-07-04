@@ -52,4 +52,33 @@ class Admin::PropertySetup::WizardSerializerTest < ActiveSupport::TestCase
     assert_nil json[:structure_format]
     assert_nil json[:units_in]
   end
+
+  test "preview counts.units are identical across step 4, step 5, and the completed view" do
+    property = draft_property(PropertyTypes::BUILDING)
+    section = PropertySections::Create.call(
+      actor: @tenant_admin, property: property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    Units::Create.call(
+      actor: @tenant_admin, property: property, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    )
+    property.reload
+
+    step4_units = Admin::PropertySetup::WizardSerializer.new(
+      property: property, current_user: @tenant_admin, step: 4
+    ).as_json.dig(:preview, :counts, :units)
+    step5_units = Admin::PropertySetup::WizardSerializer.new(
+      property: property, current_user: @tenant_admin, step: 5
+    ).as_json.dig(:preview, :counts, :units)
+
+    assert_equal 1, step4_units
+    assert_equal step4_units, step5_units
+  end
+
+  test "preview property contract does not expose an estimated_units field" do
+    json = serialize(draft_property(PropertyTypes::BUILDING))
+
+    refute json.dig(:preview, :property).key?(:estimated_units)
+  end
 end

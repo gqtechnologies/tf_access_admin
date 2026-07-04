@@ -290,7 +290,7 @@ class Admin::PropertySetup::WizardController < AdminController
   def step_params
     params.fetch(:setup, {}).permit(
       :name, :property_type, :address_line, :city, :region, :country, :timezone,
-      :estimated_units, :structure_mode, :units_mode, :quick_structure_confirmed,
+      :structure_mode, :units_mode, :quick_structure_confirmed,
       quick_structure: %i[
         towers floors_per_tower units_per_floor tower_prefix floor_prefix
         level_1_count level_2_count level_1_prefix level_2_prefix skip_top_level
@@ -312,7 +312,7 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def merge_wizard_state!
     Properties::Setup::WizardState.merge!(@property, step_params.slice(
-      :structure_mode, :units_mode, :estimated_units, :quick_structure_confirmed
+      :structure_mode, :units_mode, :quick_structure_confirmed
     ))
     Properties::Setup::WizardState.merge!(@property, quick_structure: step_params[:quick_structure]) if step_params[:quick_structure].present?
     # Persist the automatic-generation config so step 3 can be restored on reload.

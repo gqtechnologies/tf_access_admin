@@ -36,19 +36,6 @@
         <FieldLabel>{{ t('admin.property_setup.step1.fields.city') }}</FieldLabel>
         <Input v-model="form.city" />
       </Field>
-      <Field :data-invalid="!!fieldError('estimated_units')">
-        <FieldLabel>{{ t('admin.property_setup.step1.fields.estimated_units') }}</FieldLabel>
-        <Input
-          v-model.number="form.estimated_units"
-          type="number"
-          min="1"
-          :aria-invalid="!!fieldError('estimated_units')"
-        />
-        <FieldError
-          v-if="fieldError('estimated_units')"
-          :errors="translateErrors([fieldError('estimated_units')])"
-        />
-      </Field>
     </FieldGroup>
   </form>
 </template>
@@ -80,7 +67,6 @@ const form = reactive({
   region: '',
   country: 'Chile',
   timezone: 'America/Santiago',
-  estimated_units: 1,
 })
 
 watch(
@@ -106,7 +92,6 @@ watch(
 const preview = computed(() => ({
   property_type: form.property_type,
   city: form.city,
-  estimated_units: form.estimated_units,
 }))
 
 function getValues() {

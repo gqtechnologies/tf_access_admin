@@ -126,6 +126,179 @@ class Properties::Setup::BuildPreviewTest < ActiveSupport::TestCase
     assert_equal 0, counts[:level_2]
   end
 
+  test "counts.units matches 24 persisted non-deleted section-associated units" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-24@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+
+    24.times do |i|
+      Units::Create.call(
+        actor: admin, property: @property, section_id: section.id,
+        attributes: { identifier: format("%03d", i + 1), unit_type: UnitTypes::APARTMENT }
+      )
+    end
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 24, preview.dig(:counts, :units)
+  end
+
+  test "property_summary does not expose an estimated_units key" do
+    preview = Properties::Setup::BuildPreview.call(property: @property)
+
+    refute preview[:property].key?(:estimated_units)
+  end
+
+  test "excludes soft-deleted units from counts and nested preview" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-soft-deleted@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    kept = Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+    removed = Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "102", unit_type: UnitTypes::APARTMENT }
+    ).unit
+    Units::SoftDelete.call(actor: admin, unit: removed)
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 1, preview.dig(:counts, :units)
+    assert_equal [ kept.id ], preview[:units].map { |row| row[:id] }
+  end
+
+  test "soft-deleting one of several persisted units reduces the total by one" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-reduce@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    units = 3.times.map do |i|
+      Units::Create.call(
+        actor: admin, property: @property, section_id: section.id,
+        attributes: { identifier: format("%03d", i + 1), unit_type: UnitTypes::APARTMENT }
+      ).unit
+    end
+
+    assert_equal 3, Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin).dig(:counts, :units)
+
+    Units::SoftDelete.call(actor: admin, unit: units.first)
+
+    assert_equal 2, Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin).dig(:counts, :units)
+  end
+
+  test "excludes units whose section was soft-deleted, even when the unit itself is not" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-deleted-section@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    kept_section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    kept_unit = Units::Create.call(
+      actor: admin, property: @property, section_id: kept_section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+
+    removed_section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre B", section_type: SectionTypes::TOWER }
+    ).section
+    orphaned_unit = Units::Create.call(
+      actor: admin, property: @property, section_id: removed_section.id,
+      attributes: { identifier: "201", unit_type: UnitTypes::APARTMENT }
+    ).unit
+    # Bypasses PropertySection's `dependent: :restrict_with_error` on units, simulating
+    # a section soft-deleted while non-deleted units still reference it (legacy/edge
+    # data state the backend must still defend against).
+    removed_section.update_column(:deleted_at, Time.current)
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 1, preview.dig(:counts, :units)
+    assert_equal [ kept_unit.id ], preview[:units].map { |row| row[:id] }
+    refute_includes preview[:units].map { |row| row[:id] }, orphaned_unit.id
+  end
+
+  test "excludes units and sections belonging to another property" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-other-property@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    other_property = draft_property(PropertyTypes::BUILDING)
+    other_section = PropertySections::Create.call(
+      actor: admin, property: other_property, parent: nil,
+      attributes: { name: "Otra torre", section_type: SectionTypes::TOWER }
+    ).section
+    Units::Create.call(
+      actor: admin, property: other_property, section_id: other_section.id,
+      attributes: { identifier: "999", unit_type: UnitTypes::APARTMENT }
+    )
+
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    )
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 1, preview.dig(:counts, :units)
+    assert_equal 1, preview.dig(:counts, :sections)
+  end
+
+  test "excludes properties, sections, and units from another organization" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-other-org@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    )
+
+    ActsAsTenant.with_tenant(organizations(:two)) do
+      other_org = organizations(:two)
+      other_property = ResidentialProperty.create!(
+        organization: other_org, name: "Other Org Property", property_type: PropertyTypes::BUILDING,
+        status: PropertyStatuses::DRAFT, country: "Chile", timezone: "America/Santiago"
+      )
+      other_admin = create_user_for_organization(
+        organization: other_org, email: "counts-other-org-admin@example.test", role: AvailableRoles::TENANT_ADMIN
+      )
+      other_section = PropertySections::Create.call(
+        actor: other_admin, property: other_property, parent: nil,
+        attributes: { name: "Otra org torre", section_type: SectionTypes::TOWER }
+      ).section
+      Units::Create.call(
+        actor: other_admin, property: other_property, section_id: other_section.id,
+        attributes: { identifier: "999", unit_type: UnitTypes::APARTMENT }
+      )
+    end
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 1, preview.dig(:counts, :units)
+    assert_equal 1, preview.dig(:counts, :sections)
+  end
+
   test "unit preview row shows the derived code, not the raw identifier" do
     admin = create_user_for_organization(
       organization: @organization, email: "counts-code@example.test", role: AvailableRoles::TENANT_ADMIN

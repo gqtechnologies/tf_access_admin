@@ -1538,19 +1538,14 @@ es:
             property_type: "Tipo de propiedad"
             address: "Dirección"
             city: "Ciudad"
-            estimated_units: "Estimación de unidades"
           validations:
             name_required: "El nombre es obligatorio"
             property_type_required: "El tipo de propiedad es obligatorio"
             address_required: "La dirección es obligatoria"
-            estimated_units_required: "La estimación de unidades es obligatoria"
-            estimated_units_min: "La estimación debe ser mayor a 0"
           summary:
             title: "Resumen inicial"
             type: "Tipo"
             location: "Ubicación"
-            estimation: "Estimación"
-            estimation_units: "{count} unidades"
             flow_status: "Estado del flujo"
             flow_status_pending: "Pendiente de estructura"
         step2:

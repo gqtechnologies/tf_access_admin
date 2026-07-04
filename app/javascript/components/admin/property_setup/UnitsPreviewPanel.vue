@@ -127,8 +127,7 @@ const displayTotalUnits = computed(() => {
   // sections (fix-automatic-unit-generation §9.6).
   if (leafSections > 0) return leafSections * perLeaf
 
-  const estimated = props.preview?.property?.estimated_units
-  return typeof estimated === 'number' && estimated > 0 ? estimated : perLeaf
+  return perLeaf
 })
 
 const summaryExplanation = computed(() => {

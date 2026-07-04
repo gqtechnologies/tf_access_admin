@@ -209,7 +209,7 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
         unit: @unit,
         host_person: resident.person_for(@organization),
         visitor_params: { name: "Resident Flow Visitor", document: "RF-DOC-1", phone: "+56911112222" },
-        scheduled_at: 1.hour.from_now,
+        scheduled_at: Time.zone.now.change(hour: 12),
         actor: resident
       )
     end

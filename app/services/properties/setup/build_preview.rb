@@ -15,7 +15,7 @@ module Properties
 
       def call
         sections = @property.property_sections.includes(:parent)
-        units = @property.units.includes(:property_section)
+        units = visible_units
         wizard = WizardState.read(@property)
 
         {
@@ -35,6 +35,19 @@ module Properties
       end
 
       private
+
+      # Excludes units whose section was soft-deleted. +Unit#property_section+
+      # already returns nil for a soft-deleted parent (PropertySection's own
+      # paranoid default scope applies to the eager-loaded preload query), but a
+      # plain `@property.units.count` still counts the row itself, so section
+      # membership must be checked explicitly (fix-wizard-summary-persisted-data).
+      def visible_units
+        deleted_section_ids = PropertySection.only_deleted
+          .where(residential_property_id: @property.id)
+          .pluck(:id)
+        scope = @property.units.includes(:property_section)
+        deleted_section_ids.any? ? scope.where.not(property_section_id: deleted_section_ids) : scope
+      end
 
       # fix-automatic-unit-generation §8: structure counts are resolved from the
       # property's recommended +PropertyStructureFormat+ (top level + +units_in+
@@ -63,8 +76,7 @@ module Properties
           address_line: @property.address_line,
           city: @property.city,
           region: @property.region,
-          country: @property.country,
-          estimated_units: WizardState.estimated_units(@property)
+          country: @property.country
         }
       end
 

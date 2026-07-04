@@ -33,10 +33,6 @@ module Properties
       def units_mode(property)
         read(property)[:units_mode].presence
       end
-
-      def estimated_units(property)
-        read(property)[:estimated_units]
-      end
     end
   end
 end

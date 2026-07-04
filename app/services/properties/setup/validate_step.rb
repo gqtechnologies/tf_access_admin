@@ -31,13 +31,6 @@ module Properties
         draft.status = PropertyStatuses::DRAFT
         draft.assign_attributes(descriptive_attributes(@attributes))
 
-        estimated = @attributes[:estimated_units]
-        if estimated.blank?
-          draft.errors.add(:estimated_units, :blank)
-        elsif estimated.to_i <= 0
-          draft.errors.add(:estimated_units, :greater_than, count: 0)
-        end
-
         unless address_present?(draft)
           draft.errors.add(:address_line, :blank)
         end

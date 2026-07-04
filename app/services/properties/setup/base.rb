@@ -4,7 +4,7 @@ module Properties
   module Setup
     class Base < Properties::Base
       SETUP_ATTRIBUTES = %i[
-        estimated_units structure_mode units_mode
+        structure_mode units_mode
         quick_structure quick_structure_confirmed
       ].freeze
 
@@ -28,9 +28,7 @@ module Properties
 
       def merge_setup_metadata!(property, attributes)
         attrs = strip_untrusted!(attributes)
-        estimated = attrs[:estimated_units]
         setup_attrs = {
-          estimated_units: estimated,
           structure_mode: attrs[:structure_mode],
           units_mode: attrs[:units_mode],
           quick_structure: attrs[:quick_structure],
@@ -38,9 +36,6 @@ module Properties
         }.compact
 
         WizardState.merge!(property, setup_attrs) if setup_attrs.any?
-        property.metadata = property.metadata.merge(
-          "estimated_units" => estimated
-        ) if estimated.present?
       end
 
       def address_present?(property)

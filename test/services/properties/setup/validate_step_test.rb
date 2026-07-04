@@ -25,6 +25,21 @@ class Properties::Setup::ValidateStepTest < ActiveSupport::TestCase
     ActsAsTenant.current_tenant = nil
   end
 
+  test "step 1 does not require an estimated_units param" do
+    result = Properties::Setup::ValidateStep.new(
+      property: @property,
+      step: 1,
+      attributes: {
+        name: "Validated Property",
+        property_type: PropertyTypes::BUILDING,
+        address_line: "Addr 1"
+      }
+    ).call
+
+    assert result[:valid]
+    refute result[:errors].key?(:estimated_units)
+  end
+
   test "step 2 passes for none structure mode" do
     result = Properties::Setup::ValidateStep.new(
       property: @property,

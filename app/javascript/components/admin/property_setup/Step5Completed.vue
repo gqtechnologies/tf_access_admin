@@ -102,7 +102,7 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const propertyName = computed(() => props.preview?.property?.name || '—')
-const estimatedUnits = computed(() => props.preview?.property?.estimated_units ?? 0)
+const unitCount = computed(() => props.preview?.counts?.units ?? 0)
 const towerCount = computed(() => props.preview?.counts?.level_1 ?? 0)
 const floorCount = computed(() => props.preview?.counts?.level_2 ?? 0)
 const structureMode = computed(() => props.preview?.structure?.mode)
@@ -137,7 +137,7 @@ const summaryCards = computed(() => [
     key: 'units',
     icon: DoorOpen,
     label: t('admin.property_setup.step5.completed.summary.units'),
-    value: t('admin.property_setup.step5.completed.summary.units_value', { count: estimatedUnits.value }),
+    value: t('admin.property_setup.step5.completed.summary.units_value', { count: unitCount.value }),
   },
   {
     key: 'status',

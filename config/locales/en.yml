@@ -1611,19 +1611,14 @@ en:
             property_type: "Property type"
             address: "Address"
             city: "City"
-            estimated_units: "Estimated units"
           validations:
             name_required: "Name is required"
             property_type_required: "Property type is required"
             address_required: "Address is required"
-            estimated_units_required: "Estimated units is required"
-            estimated_units_min: "Estimated units must be greater than 0"
           summary:
             title: "Initial summary"
             type: "Type"
             location: "Location"
-            estimation: "Estimation"
-            estimation_units: "{count} units"
             flow_status: "Flow status"
             flow_status_pending: "Pending structure"
         step2:

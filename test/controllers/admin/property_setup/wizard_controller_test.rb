@@ -159,6 +159,54 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     assert_redirected_to admin_property_setup_wizard_path(@draft, completed: true)
   end
 
+  test "step 5 confirmation reloads the current persisted unit total instead of a stale step 4 count" do
+    sign_in_as(@tenant_admin)
+    section = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    unit = Units::Create.call(
+      actor: @tenant_admin, property: @draft, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+    Properties::Setup::WizardState.merge!(@draft, current_step: 4)
+    @draft.save!
+
+    get admin_property_setup_wizard_path(@draft)
+    assert_response :success
+    step4_preview = Properties::Setup::BuildPreview.call(property: @draft.reload)
+    assert_equal 1, step4_preview.dig(:counts, :units)
+
+    Units::SoftDelete.call(actor: @tenant_admin, unit: unit)
+    Properties::Setup::WizardState.merge!(@draft, current_step: 5)
+    @draft.save!
+
+    get admin_property_setup_wizard_path(@draft)
+    assert_response :success
+    step5_preview = Properties::Setup::BuildPreview.call(property: @draft.reload)
+
+    assert_equal 0, step5_preview.dig(:counts, :units)
+  end
+
+  test "completed view shows the same persisted unit total as confirmation" do
+    sign_in_as(@tenant_admin)
+    section = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    Units::Create.call(
+      actor: @tenant_admin, property: @draft, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    )
+    Properties::Setup::WizardState.merge!(@draft, current_step: 5)
+    @draft.save!
+
+    post admin_property_setup_confirm_wizard_path(@draft)
+    assert_redirected_to admin_property_setup_wizard_path(@draft, completed: true)
+
+    completed_preview = Properties::Setup::BuildPreview.call(property: @draft.reload)
+
+    assert_equal 1, completed_preview.dig(:counts, :units)
+  end
+
   test "cancel with delete removes draft property" do
     sign_in_as(@tenant_admin)
 

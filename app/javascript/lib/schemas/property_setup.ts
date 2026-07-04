@@ -10,8 +10,6 @@ export const propertySetupValidationKeys = {
     name_required: 'admin.property_setup.step1.validations.name_required',
     property_type_required: 'admin.property_setup.step1.validations.property_type_required',
     address_required: 'admin.property_setup.step1.validations.address_required',
-    estimated_units_required: 'admin.property_setup.step1.validations.estimated_units_required',
-    estimated_units_min: 'admin.property_setup.step1.validations.estimated_units_min',
   },
   step2: {
     mode_required: 'admin.property_setup.step2.errors.mode_required',
@@ -42,14 +40,6 @@ export const propertySetupStep1Schema = z.object({
   region: z.string().optional(),
   country: z.string().optional(),
   timezone: z.string().optional(),
-  estimated_units: z.preprocess((value) => {
-    if (value === '' || value === null || value === undefined) return undefined
-    const parsed = Number(value)
-    return Number.isNaN(parsed) ? undefined : parsed
-  }, z.number({
-    required_error: propertySetupValidationKeys.step1.estimated_units_required,
-    invalid_type_error: propertySetupValidationKeys.step1.estimated_units_required,
-  }).int(propertySetupValidationKeys.step1.estimated_units_min).min(1, propertySetupValidationKeys.step1.estimated_units_min)),
 })
 
 export const propertySetupQuickStructureSchema = z.object({
