@@ -2,15 +2,15 @@
 
 ### Requirement: Step 3 supports manual section-level unit management
 
-Step 3 SHALL provide a manual section-level unit management mode for draft properties. The mode SHALL show the same persisted structure preview model used by step 2, with units rendered under their assigned eligible section when present.
+Step 3 SHALL provide a new `manual` unit management mode for draft properties. The mode SHALL use the same visual tree pattern already used by `ManualSectionForm` and `ManualSectionTreeRow`, with units rendered under their assigned section when present.
 
-The manual section-level mode SHALL be available when the property has sections. In this mode, sections SHALL NOT expose section edit, add-child, or delete actions; each eligible section row SHALL expose only an add-unit action. Unit creation, edit, and deletion SHALL remain scoped to the current draft property and organization and SHALL require the property-scoped unit management capability.
+The manual mode SHALL be available even when the property has no sections. When sections exist, eligible section rows SHALL expose only an add-unit action; ineligible section rows SHALL NOT show the add-unit action. The mode SHALL also provide a property-level add-unit action for creating units directly under the property without a section. Unit creation, edit, and deletion SHALL remain scoped to the current draft property and organization and require the property-scoped `manage_units` permission.
 
 #### Scenario: Manual unit view reuses section preview
 
 - **GIVEN** a draft property has persisted sections from step 2
 - **WHEN** the user opens step 3 manual unit management
-- **THEN** the step renders the same structure preview shape used by step 2
+- **THEN** the step renders the same visual tree pattern used by `ManualSectionForm` and `ManualSectionTreeRow`
 - **AND** any existing non-deleted units are shown beneath their assigned section
 
 #### Scenario: Section rows expose only add-unit action
@@ -19,6 +19,20 @@ The manual section-level mode SHALL be available when the property has sections.
 - **WHEN** an eligible section row renders
 - **THEN** it exposes an add-unit action
 - **AND** it does not expose edit-section, add-child-section, or delete-section actions
+
+#### Scenario: Ineligible section rows do not expose add-unit
+
+- **GIVEN** a section cannot contain units according to the property-section contract
+- **WHEN** the section row renders in manual unit mode
+- **THEN** no add-unit action is shown for that section
+- **AND** the user is not invited to submit a unit for that section
+
+#### Scenario: Manual mode supports property-level units
+
+- **GIVEN** the user is in step 3 manual unit management
+- **WHEN** they trigger the property-level add-unit action
+- **THEN** the creation dialog opens without a selected section
+- **AND** created units are assigned directly to the draft property
 
 #### Scenario: Add-unit opens individual and multiple options
 
@@ -29,8 +43,8 @@ The manual section-level mode SHALL be available when the property has sections.
 
 #### Scenario: Ineligible section cannot receive units
 
-- **GIVEN** a section is not eligible to contain units according to the property-section contract
-- **WHEN** the user attempts to create a unit for that section
+- **GIVEN** a request references a section that is not eligible to contain units according to the property-section contract
+- **WHEN** the server processes the unit creation
 - **THEN** the mutation is rejected
 - **AND** no unit is created or silently assigned elsewhere
 
@@ -38,7 +52,22 @@ The manual section-level mode SHALL be available when the property has sections.
 
 - **GIVEN** the user creates, edits, or deletes a unit in step 3
 - **WHEN** the mutation succeeds
-- **THEN** the preview reflects the persisted non-deleted units without losing wizard state
+- **THEN** the response is used to refresh the persisted unit data shown in the preview
+- **AND** the preview reflects the persisted non-deleted units without losing wizard state
+
+#### Scenario: Automatic is default for new quick setup
+
+- **GIVEN** a draft property reaches step 3 for the first time
+- **AND** step 2 used quick structure
+- **WHEN** no units mode has been persisted yet
+- **THEN** the wizard selects automatic mode by default
+
+#### Scenario: Manual is default when editing or resuming units
+
+- **GIVEN** a draft property returns to step 3 after units have already been created or the units step has already been persisted
+- **WHEN** the wizard renders the units step
+- **THEN** manual mode is selected by default
+- **AND** the user can switch to automatic or import when those modes are available
 
 #### Scenario: Cross-organization unit mutation is denied
 
@@ -46,3 +75,11 @@ The manual section-level mode SHALL be available when the property has sections.
 - **WHEN** a step 3 unit mutation references a property, section, or unit from organization Q
 - **THEN** access is denied
 - **AND** no foreign data is returned or mutated
+
+#### Scenario: User without manage_units is denied
+
+- **GIVEN** a user is authorized to run setup for draft property P
+- **AND** the user lacks `manage_units` for P
+- **WHEN** they attempt to create, edit, or soft-delete a unit through the setup wizard
+- **THEN** authorization is denied
+- **AND** no unit is created, edited, or deleted

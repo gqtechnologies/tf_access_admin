@@ -1,14 +1,16 @@
 ## Why
 
-The current setup flow lets users define sections manually, but unit creation is separated from the section-level structure view. Users need a manual way to add, edit, and remove units directly from each eligible section while preserving the same tree preview mental model used in the wizard.
+The current setup flow lets users define sections manually, but unit creation is separated from the section-level structure view. Users need a manual way to add, edit, and remove units directly from each eligible section or directly from the property while preserving the same tree interaction model used in the manual builder.
 
 ## What Changes
 
-- Add section-level unit management in the unit step using the same shared structure preview pattern used by step 2.
+- Add a new manual unit mode in the unit step using the same visual pattern as `ManualSectionForm` and `ManualSectionTreeRow`.
 - Replace section actions in this unit-management view with only an "add unit" action for eligible section rows.
-- Reuse the existing unit creation choices for individual and multiple creation when "add unit" is triggered from a section.
+- Support property-level unit creation without a section.
+- Reuse the manual section creation pattern for individual and multiple unit creation, including all-or-nothing multiple creation.
 - Add per-unit dropdown actions for edit and delete.
 - Add a unit edit dialog for `area_m2`, optional `display_name`, `unit_type`, and `identifier`.
+- Regenerate server-derived unit `code` when `identifier` changes.
 - Require confirmation before deleting a unit and perform deletion as a soft delete.
 - Keep tenant isolation, section eligibility, unit uniqueness, lifecycle, and authorization enforced through existing domain services and policies.
 
@@ -20,9 +22,9 @@ The current setup flow lets users define sections manually, but unit creation is
 
 ### Modified Capabilities
 
-- `property-setup-wizard`: Step 3 gains manual section-level unit creation and management while reusing the shared preview model.
+- `property-setup-wizard`: Step 3 gains a manual unit creation and management mode while reusing the manual section tree interaction model.
 - `manual-structure-builder`: The shared preview receives a unit-management mode where section rows expose only unit creation and unit rows expose edit/delete actions.
-- `unit`: Unit lifecycle requirements clarify manual wizard edit/delete behavior, including descriptive edit fields and soft delete through an explicit lifecycle operation.
+- `unit`: Unit lifecycle requirements clarify manual wizard create/edit/delete behavior, all-or-nothing multiple creation, code regeneration on identifier edit, and soft delete through an explicit lifecycle operation.
 
 ## Impact
 
@@ -40,7 +42,7 @@ The current setup flow lets users define sections manually, but unit creation is
 ### Tenant isolation and authorization
 
 - All unit reads and writes remain scoped to the draft property and current organization.
-- Manual unit create/edit/delete actions require the same property-scoped unit management capability used by existing unit mutations.
+- Manual unit creation, edit, and deletion require the `manage_units` permission for the draft property.
 - Section IDs submitted from the client must be resolved through the current draft property; foreign or ineligible sections are rejected without exposing cross-tenant data.
 
 ### Dependencies
