@@ -12,6 +12,8 @@ Supported modes:
 
 Automatic generation is gated to quick mode: when step 2 was manual or none, the automatic option SHALL NOT be offered and the user is directed to single creation or import. When quick mode was used, automatic generation applies the established identifier-format rules (`floor_sequential` / `block_sequential` / `sequential`, `units_per_leaf`) derived from the active `PropertyStructureFormat` (`units_in`).
 
+If no active `PropertyStructureFormat` can be resolved for the property type, automatic generation SHALL be unavailable and SHALL NOT create a flat unsectioned fallback batch.
+
 Automatic generation SHALL create units distributed one batch per leaf section resolved from `PropertyStructureFormat#units_in` (e.g. one batch per floor for buildings/towers, one batch per block for condominiums/horizontal/sector properties), not a single flat batch of unsectioned units. Each generated unit SHALL use the `unit_type` and `identifier_format` configured for this generation, not implementation-hardcoded defaults. The preview shown before generating and the units actually persisted SHALL be produced by the same leaf-resolution and identifier-format logic, so the preview accurately represents what will be created.
 
 `identifier_format` SHALL produce identifiers as follows, for `index` ranging over `0..units_per_leaf-1` within each leaf section:
@@ -59,6 +61,14 @@ The step MUST show contextual information from previous steps, including propert
 - **THEN** it states how many units will be created
 - **AND** it explains the calculation basis when generation is automatic
 
+#### Scenario: Estimated summary is structure-aware whenever a leaf level exists, regardless of the top level
+
+- **GIVEN** the property's resolved structure has at least one leaf-level section (per `PropertyStructureFormat#units_in`)
+- **AND** the top level has zero sections (single-level format, or a two-level format with the top level skipped)
+- **WHEN** the auxiliary summary renders
+- **THEN** it computes the structure-aware total (`leaf count × units_per_leaf`) and explanation
+- **AND** it does not fall back to the flat/estimated total merely because the top-level count is zero
+
 #### Scenario: Unit validation errors are shown without losing wizard state
 
 - **GIVEN** one or more units or import rows are invalid
@@ -83,7 +93,7 @@ The step MUST show contextual information from previous steps, including propert
 - **THEN** every generated unit has `unit_type: office`
 - **AND** identifiers follow the `block_sequential` numbering rule for each block
 
-#### Scenario: block_sequential identifiers are position-based and start at B1
+#### Scenario: block_sequential identifiers are position-based and start at B101 for position 1
 
 - **GIVEN** step 3 is configured with `identifier_format: block_sequential` and `units_per_leaf: 2`
 - **AND** the structure has block sections at position 1 and position 2
@@ -118,6 +128,13 @@ The step MUST show contextual information from previous steps, including propert
 - **WHEN** the user opens step 3 for the first time or resumes an in-progress wizard on this property
 - **THEN** the automatic-generation form's `identifier_format` defaults to `block_sequential`
 - **AND** it does not default to `floor_sequential`, which is not a valid option for this property's leaf format
+
+#### Scenario: Automatic generation is unavailable without a resolved format
+
+- **GIVEN** the property type has no recommended `PropertyStructureFormat`
+- **WHEN** the user opens step 3
+- **THEN** automatic generation is not offered
+- **AND** no unsectioned fallback batch is generated automatically
 
 ### Requirement: Each step validates before progression
 
@@ -162,6 +179,13 @@ Validation rules MUST reuse existing domain contracts for property, section and 
 - **AND** the failure is surfaced as a visible error
 - **AND** the wizard's recorded current step is not advanced
 
+#### Scenario: Structure changes are blocked after automatic units exist
+
+- **GIVEN** automatic generation has already created units for a draft property
+- **WHEN** the user returns to step 2 and attempts to regenerate or replace the quick structure
+- **THEN** the destructive structure change is blocked until generated units are explicitly cleared through the supported draft cleanup path
+- **AND** the system does not silently move, delete, or orphan existing units
+
 ### Requirement: Wizard delegates all domain operations to existing services
 
 Each wizard step MUST use the existing domain services and policies for property, section and unit operations. No domain rule is duplicated in the wizard layer.
@@ -201,6 +225,22 @@ The wizard SHALL NOT bypass `ResidentialProperty`, `PropertySection`, `Unit` or 
 - **THEN** `Units::Create` is invoked with the unit's resolved leaf `property_section_id`
 - **AND** section eligibility and uniqueness rules from `unit` are enforced per leaf, exactly as for manually created units
 
+#### Scenario: Automatic generation idempotency uses normalized identifiers
+
+- **GIVEN** a planned unit would normalize to `normalized_identifier: "area-4"` in leaf section S
+- **AND** a non-deleted unit already exists in S with the same `normalized_identifier`
+- **WHEN** automatic generation is retried
+- **THEN** the existing unit is treated as the planned row for idempotency
+- **AND** no duplicate unit is created from a visually different but equivalent identifier
+
+#### Scenario: Existing matching unit with different type is reported
+
+- **GIVEN** a planned unit has `unit_type: office`
+- **AND** a non-deleted matching unit already exists in the same leaf section with the same normalized identifier but a different `unit_type`
+- **WHEN** automatic generation is retried
+- **THEN** the existing unit is not overwritten
+- **AND** a non-blocking warning is surfaced for review
+
 ### Requirement: Step 4 presents an editable review summary
 
 Before final confirmation, the wizard MUST show a clear summary of everything configured in prior steps.
@@ -217,7 +257,7 @@ The summary SHALL include:
 
 The summary MUST allow the user to return to earlier steps to correct information.
 
-Structure counts shown in the step 3/4 summary SHALL be derived from the property's resolved `PropertyStructureFormat` (top level and `units_in` leaf level), not from hardcoded `tower`/`floor` section types, so properties using other formats (e.g. `sector`/`block`) show accurate, non-zero counts. Any unit `code` shown in the summary SHALL be the derived hierarchical code (`unit.code`), not the raw `identifier`.
+Structure counts shown in the step 3/4 summary SHALL be derived from the property's resolved `PropertyStructureFormat` (top level and `units_in` leaf level), not from hardcoded `tower`/`floor` section types, so properties using other formats (e.g. `sector`/`block`) show accurate, non-zero counts. For a property whose resolved format has a single level (the level and the leaf are the same `section_type`), the summary SHALL report that level's count once and SHALL NOT report the same sections twice under two different counts. A resolved two-level format whose top level has no persisted sections (e.g. a "no towers" building) SHALL still report an accurate leaf-level count; the summary's structure-aware presentation SHALL NOT depend on the top-level count being greater than zero. Any unit `code` shown in the summary SHALL be the derived hierarchical code (`unit.code`), not the raw `identifier`.
 
 #### Scenario: Summary shows top-level cards and detailed sections
 
@@ -259,3 +299,18 @@ Structure counts shown in the step 3/4 summary SHALL be derived from the propert
 - **WHEN** the unit appears in the step 3/4 summary preview rows
 - **THEN** the row's code field shows `"clp-tor-torre-a-piso-1-101"`
 - **AND** not the raw `identifier` value
+
+#### Scenario: Summary counts a single-level structure once, not twice
+
+- **GIVEN** a `tower` property (single-level format, leaf sections are `floor`) with 5 floor sections and no units yet
+- **WHEN** the step 3/4 summary renders
+- **THEN** the structure count for the floor level is `5`
+- **AND** no other count also reports `5` for the same set of sections
+
+#### Scenario: Summary shows accurate leaf count when the top level was skipped
+
+- **GIVEN** a `building` property created with the "no towers" quick-structure option (`skip_top_level`), with 6 floor sections at the root and no tower sections
+- **WHEN** the step 3/4 summary renders
+- **THEN** the leaf-level (floor) count is `6`
+- **AND** the top-level (tower) count is `0`
+- **AND** the summary still presents the structure-aware unit estimate and explanation, not the flat/estimated fallback

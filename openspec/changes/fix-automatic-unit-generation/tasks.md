@@ -1,12 +1,12 @@
 ## 1. Shared unit-generation plan
 
-- [ ] 1.1 Extract a pure calculation object (e.g. `Properties::Setup::UnitGenerationPlan`) that, given `property`, resolved `PropertyStructureFormat`, and `unit_generation` params (`unit_type`, `identifier_format`, `units_per_leaf`), returns one row per planned unit: `{ property_section (leaf or nil), identifier, unit_type }`.
+- [ ] 1.1 Extract a pure calculation object (e.g. `Properties::Setup::UnitGenerationPlan`) that, given `property`, resolved `PropertyStructureFormat`, and `unit_generation` params (`unit_type`, `identifier_format`, `units_per_leaf`), returns one row per planned unit: `{ property_section, identifier, normalized_identifier, unit_type }`.
 - [ ] 1.2 Resolve leaf sections via `StructureFormatResolver.for(property_type:)` / `format.units_in` (generalize beyond the current hardcoded `SectionTypes::FLOOR`).
 - [ ] 1.3 Implement `floor_sequential` identifier numbering as `"#{leaf.position * 100 + index + 1}"` (unchanged formula, now shared).
 - [ ] 1.4 Implement `block_sequential` identifier numbering as `"B#{leaf.position * 100 + index + 1}"` — same position-based formula as `floor_sequential` with a `B` prefix, starting at `B1`-equivalent (`B101` for position 1). This corrects the current bug where block identifiers ignore leaf position and start at `B2`.
 - [ ] 1.5 Implement `sequential` identifier numbering as `"#{index + 1}"`, reset at the start of every leaf section (not continuous across the whole property).
-- [ ] 1.6 Preserve the existing flat/unsectioned fallback when the property type has no recommended `PropertyStructureFormat` (mirrors `ApplyQuickStructure`'s existing fallback).
-- [ ] 1.7 Unit-test the plan object directly: multiple leaves, single leaf, no leaves (fallback), each `identifier_format` (including block position 1 vs 2 producing `B101...`/`B201...`), and different `unit_type` values.
+- [ ] 1.6 Reject automatic generation when the property type has no recommended `PropertyStructureFormat`; do not create a flat/unsectioned fallback batch.
+- [ ] 1.7 Unit-test the plan object directly: multiple leaves, single leaf, no resolved format (invalid/unavailable), each `identifier_format` (including block position 1 vs 2 producing `B101...`/`B201...`), normalization of generated identifiers, and different `unit_type` values.
 
 ## 2. Align preview with the plan
 
@@ -25,9 +25,17 @@
 ## 4. Fix automatic unit persistence
 
 - [ ] 4.1 Rewrite `Properties::Setup::ApplyAutomaticUnits#call` to iterate the shared plan and call `Units::Create.call(actor:, property:, section_id: leaf&.id, attributes: { identifier:, unit_type: })` per planned row.
-- [ ] 4.2 Replace the blanket `return Result.success(@property) if @property.units.any?` guard with a per-row check: skip creation only when a non-deleted unit already exists at the exact planned `(property_section_id, identifier)`; otherwise create it.
+- [ ] 4.2 Replace the blanket `return Result.success(@property) if @property.units.any?` guard with a per-row check: skip creation only when a non-deleted unit already exists at the exact planned `(property_section_id, normalized_identifier)`; otherwise create it.
 - [ ] 4.3 Collect and return per-row failures on the `Result` (do not swallow a mid-loop `Units::Create` failure as a whole-batch success or an opaque generic invalid).
 - [ ] 4.4 Confirm derived `code` and `normalized_identifier` still come from `Units::Create` / `Unit` (no duplication of that logic here).
+- [ ] 4.5 When an existing matching unit has a different `unit_type` or status than the planned row, skip without overwriting and add a non-blocking warning for review.
+
+## 4a. Guard structure regeneration after generated units
+
+- [ ] 4a.1 In `Properties::Setup::ApplyQuickStructure#call`, check `@property.units.any?` (or equivalent) **before** the `destroy_all` calls, not after — `PropertySection has_many :units, dependent: :restrict_with_error` does not surface a failure through `destroy_all` (it silently skips undestroyable records with no exception and no rollback), so the model-level constraint cannot be relied on to block this.
+- [ ] 4a.2 When units already exist, return `Result.invalid(@property)` before any `destroy_all` runs, with a distinct, visible error (e.g. `:structure_regeneration_blocked_by_units`) directing the user to clear generated units first through the supported draft cleanup path.
+- [ ] 4a.3 Add a regression test that reproduces the current silent-corruption path: generate automatic units, then resubmit quick structure — assert the operation is rejected up front (not that some sections got silently left behind while others were recreated).
+- [ ] 4a.4 Add/request test coverage that returning to step 2 after automatic unit generation does not silently move, delete, orphan, or duplicate units.
 
 ## 5. Propagate failures from the wizard controller
 
@@ -41,7 +49,7 @@
 - [ ] 6.2 Service test: automatic generation honors configured `unit_type` and `identifier_format` (cover `floor_sequential`, `block_sequential`, `sequential`), asserting the exact identifiers per leaf position (e.g. block 1 → `B101, B102`, block 2 → `B201, B202`).
 - [ ] 6.3 Service test: automatic generation uses the correlativo/quantity configured in the form (per leaf, not a flat total).
 - [ ] 6.4 Service test: a mid-batch `Units::Create` failure is reported on the `Result` and does not silently report success.
-- [ ] 6.5 Service test: re-running automatic generation on a property with a partially-created batch fills in only the missing units per leaf (no duplicates, no silent no-op).
+- [ ] 6.5 Service test: re-running automatic generation on a property with a partially-created batch fills in only the missing units per leaf, matching existing rows by normalized identifier (no duplicates, no silent no-op).
 - [ ] 6.6 Request/controller test: step 3 advance in automatic mode with valid config creates the expected units and advances to step 4.
 - [ ] 6.7 Request/controller test: step 3 advance in automatic mode with a forced failure keeps the wizard on step 3, shows an error, and does not advance `current_step`.
 - [ ] 6.8 Request/controller test: automatic generation remains unavailable/rejected when `structure_mode` is not `quick` (regression guard — must not break existing behavior from `ValidateStep#validate_step_3`).
@@ -51,16 +59,22 @@
 ## 8. Generalize review-summary counts (BuildPreview)
 
 - [ ] 8.1 In `Properties::Setup::BuildPreview#call`, resolve `format = StructureFormatResolver.for(property_type: @property.property_type)`.
-- [ ] 8.2 Replace the hardcoded `towers: sections.where(section_type: SectionTypes::TOWER)` / `floors: sections.where(section_type: SectionTypes::FLOOR)` counts with counts keyed by `format.levels.first[:section_type]` (top level) and `format.units_in` (leaf level) when a format is resolved; expose them as `counts.level_1` / `counts.level_2`, matching the existing convention already used by `GenerateStructurePreview.counts`. When no format is resolved for the property type, both counts are `0`.
+- [ ] 8.2 Replace the hardcoded `towers: sections.where(section_type: SectionTypes::TOWER)` / `floors: sections.where(section_type: SectionTypes::FLOOR)` counts with format-aware counts exposed as `counts.level_1` / `counts.level_2`, matching the existing convention already used by `GenerateStructurePreview.counts`:
+  - 2-level format (`format.levels.size == 2`): `level_1 = sections.where(section_type: format.levels.first[:section_type]).count`, `level_2 = sections.where(section_type: format.units_in).count`.
+  - single-level format (`format.single_level?`): `level_1 = sections.where(section_type: format.levels.first[:section_type]).count`, `level_2 = 0` (do **not** also count `format.units_in` here — for single-level formats it's the same `section_type` as `level_1` and would double-count).
+  - no resolved format: `level_1 = 0`, `level_2 = 0` (unchanged from today).
 - [ ] 8.3 Fix `unit_preview_row` to use `unit.code` instead of `unit.identifier` for the `code:` field.
-- [ ] 8.4 Add/extend `Properties::Setup::BuildPreview` tests: a `condominium`/`sector` property shows non-zero, correct `level_1`/`level_2` counts (regression for the current always-zero bug); a `building`/`tower` property's counts are unaffected; `unit_preview_row[:code]` matches `unit.code`, not `unit.identifier`.
+- [ ] 8.4 Add/extend `Properties::Setup::BuildPreview` tests: a `condominium`/`sector` property shows non-zero, correct `level_1`/`level_2` counts (regression for the current always-zero bug); a `tower`/`sector` (single-level) property shows the real count in `level_1` and `0` in `level_2`, not a duplicated count in both; a `building`/`tower` property's counts are unaffected; a `building` property using `skip_top_level` shows `level_1: 0` and a correct `level_2`; `unit_preview_row[:code]` matches `unit.code`, not `unit.identifier`.
 
 ## 9. Fix Step3Units.vue defaults and consume generalized counts
 
 - [ ] 9.1 Add `{ immediate: true }` to the `watch(() => props.unitsIn, ...)` in `Step3Units.vue` so `autoForm.identifier_format` initializes correctly on first render/resume for block-based properties, not only on later changes to `unitsIn`.
 - [ ] 9.2 Update `towerCount`/`floorCount` (and any template usage) in `Step3Units.vue` to read `preview.counts.level_1` / `preview.counts.level_2` instead of the now-removed `counts.towers` / `counts.floors`.
 - [ ] 9.3 Update the step 3 "context" i18n strings (`towers`, `floors` keys) in `es.yml`/`en.yml`/`pt.yml` so block/sector-based properties use the existing generic `structure_count` wording instead of literal "torres"/"pisos" phrasing when `unitsIn !== 'floor'`.
-- [ ] 9.4 Check `Step2Structure.vue` and any other consumer of `preview.counts.towers`/`floors` for the same rename, so nothing else silently breaks.
+- [ ] 9.4 Update all known consumers of `preview.counts.towers`/`floors` to the generalized `level_1`/`level_2` shape: `Step3Units.vue`, `UnitsPreviewPanel.vue`, `Step5Confirm.vue`, `Step5Completed.vue`, `Step4Summary.vue`, and `Wizard.vue` if related counts are consumed.
+- [ ] 9.5 Do not keep transitional `towers`/`floors` count keys in `BuildPreview`; update consumers in the same change because those names are semantically wrong for sector/block structures.
+- [ ] 9.6 In `UnitsPreviewPanel.vue`'s `displayTotalUnits`/`summaryExplanation`, change the gating condition from `towers > 0 && floors > 0` to `level_2 > 0` alone (using the renamed keys from 9.4), so single-level (`tower`/`sector`) properties and `skip_top_level` buildings — where `level_1` is legitimately `0` — still show the structure-aware total and explanation instead of silently falling back to the flat/estimated count.
+- [ ] 9.7 Add a test/manual check: a `tower`-type property (single-level format) and a `building` property with `skip_top_level` both show the "with structure" explanation and correct total in the step 3 preview summary, not the flat fallback.
 
 ## 10. Validation and closeout
 
