@@ -25,6 +25,12 @@
         </div>
       </template>
       <template #actions="{ row }">
+        <ListItem as="link" :href="admin_residential_property_path(row.id as string)">
+          <span class="flex items-center gap-2">
+            <Eye class="w-4 h-4" />
+            {{ t('admin.residential_properties.index.actions.view_detail') }}
+          </span>
+        </ListItem>
         <ListItem
           v-if="row.permissions?.update && wizardEditableStatuses.includes(row.status)"
           as="link"
@@ -76,11 +82,12 @@ import { useTable } from '@/lib/composables/useTable'
 import { useI18n } from 'vue-i18n'
 import type { ColumnDef } from '@/types/table'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, SearchIcon, ArchiveIcon, Layers, Loader2 } from 'lucide-vue-next'
+import { PlusIcon, SearchIcon, ArchiveIcon, Layers, Loader2, Eye } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import {
   admin_property_setup_new_wizard_path,
   admin_property_setup_wizard_path,
+  admin_residential_property_path,
 } from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'

@@ -1168,6 +1168,7 @@ es:
               status: "Estado"
           actions:
             create: "Nueva propiedad"
+            view_detail: "Ver detalle"
             setup_wizard: "Configuración"
             structure: "Gestionar estructura"
             archive: "Archivar propiedad"
@@ -1191,6 +1192,31 @@ es:
         states:
           forbidden: "No tienes permiso para editar esta propiedad."
           read_only: "Esta propiedad es de solo lectura."
+        show:
+          breadcrumb: "Detalle"
+          actions:
+            edit: "Editar configuración"
+          summary:
+            property: "Propiedad"
+            structure: "Estructura"
+            structure_value: "{towers} torres · {floors} pisos"
+            units: "Unidades"
+            units_value: "{count} unidades"
+            status: "Estado"
+          general_info:
+            title: "Información general"
+            fields:
+              property_type: "Tipo de propiedad"
+              address_line: "Dirección"
+              city: "Ciudad"
+              region: "Región"
+              country: "País"
+              organization: "Organización"
+              created_at: "Creada"
+              updated_at: "Actualizada"
+              empty: "—"
+          structure:
+            title: "Estructura de la propiedad"
         input:
           name:
             label: "Nombre"

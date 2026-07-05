@@ -99,6 +99,46 @@ class Admin::ResidentialPropertiesControllerTest < ActionDispatch::IntegrationTe
     assert_includes row["actions"], "archive"
   end
 
+  test "show exposes detail props scoped to the property" do
+    sign_in_as @tenant_admin
+    inertia_get admin_residential_property_path(@property)
+
+    assert_response :success
+    assert_equal @property.id, inertia_props["residential_property"]["property"]["id"]
+    assert_includes inertia_props["residential_property"], "preview"
+    assert_includes inertia_props["residential_property"], "permissions"
+    assert_includes inertia_props["residential_property"], "next_actions"
+  end
+
+  test "show denies cross-organization access" do
+    sign_in_as @tenant_admin
+    other_org_property = ActsAsTenant.with_tenant(@other_organization) do
+      create_property(@other_organization, "Other Org Detail Property")
+    end
+
+    inertia_get admin_residential_property_path(other_org_property)
+
+    assert_redirected_to admin_residential_properties_path
+  end
+
+  test "show hides primary edit permission for configured/active properties" do
+    sign_in_as @tenant_admin
+    inertia_get admin_residential_property_path(@property)
+
+    assert_response :success
+    refute inertia_props["residential_property"]["permissions"]["edit"]
+  end
+
+  test "show exposes primary edit permission for draft/created properties" do
+    sign_in_as @tenant_admin
+    @property.update!(status: PropertyStatuses::CREATED)
+
+    inertia_get admin_residential_property_path(@property)
+
+    assert_response :success
+    assert inertia_props["residential_property"]["permissions"]["edit"]
+  end
+
   test "record loading uses policy scope" do
     sign_in_as @tenant_admin
     other_org_property = ActsAsTenant.with_tenant(@other_organization) do

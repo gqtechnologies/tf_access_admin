@@ -1240,6 +1240,7 @@ en:
               status: "Status"
           actions:
             create: "New property"
+            view_detail: "View detail"
             setup_wizard: "Setup"
             structure: "Manage structure"
             archive: "Archive property"
@@ -1263,6 +1264,31 @@ en:
         states:
           forbidden: "You do not have permission to edit this property."
           read_only: "This property is read-only."
+        show:
+          breadcrumb: "Detail"
+          actions:
+            edit: "Edit setup"
+          summary:
+            property: "Property"
+            structure: "Structure"
+            structure_value: "{towers} towers · {floors} floors"
+            units: "Units"
+            units_value: "{count} units"
+            status: "Status"
+          general_info:
+            title: "General information"
+            fields:
+              property_type: "Property type"
+              address_line: "Address"
+              city: "City"
+              region: "Region"
+              country: "Country"
+              organization: "Organization"
+              created_at: "Created"
+              updated_at: "Updated"
+              empty: "—"
+          structure:
+            title: "Property structure"
         input:
           name:
             label: "Name"

@@ -35,7 +35,7 @@ class Admin::PropertySetup::WizardSerializer
   def setup_json
     {
       manual_only: @property.present? && PropertyStatuses::WIZARD_EDITABLE.include?(@property.status),
-      configurable: @property.present? && [ PropertyStatuses::DRAFT, PropertyStatuses::CREATED ].include?(@property.status)
+      configurable: @property.present? && PropertyStatuses::DETAIL_EDITABLE.include?(@property.status)
     }
   end
 
@@ -71,17 +71,6 @@ class Admin::PropertySetup::WizardSerializer
   end
 
   def next_actions_json
-    return [] unless @property&.persisted?
-
-    policy = ResidentialPropertyPolicy.new(@current_user, @property)
-    unit_policy = UnitPolicy.new(@current_user, Unit)
-
-    actions = []
-    actions << "property_detail" if policy.show?
-    actions << "reopen_setup" if PropertyStatuses::WIZARD_EDITABLE.include?(@property.status) && policy.update?
-    actions << "manage_units" if unit_policy.property_allowed?(:manage_units, property: @property)
-    actions << "import_owners"
-    actions << "configure_residents"
-    actions
+    Properties::Setup::NextActions.call(property: @property, actor: @current_user)
   end
 end

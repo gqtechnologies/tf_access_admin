@@ -71,6 +71,14 @@ Affected models, services, database tables, and integration points:
 
    New page labels, actions, empty states, status badges, and next-action copy need locale keys under a property-detail namespace in `es`, `en`, and `pt`.
 
+10. Structure map rows render collapsed by default.
+
+    Root sections (towers/roots) load with their subtree closed, requiring an explicit click to expand. Alternative considered: expanded by default, mirroring the wizard's `UnitSectionTreeRow`. Rejected after review: a property with several towers/floors becomes a long, noisy scroll if everything opens at once on a read-only page whose first job is a quick glance, not editing.
+
+11. `manage_units` next-action has no destination in this change.
+
+    While implementing the shared next-actions list (Decision 6), no dedicated units-management HTML page exists in the app: `/admin/residential_properties/:id/units` (`index`) is a JSON-only endpoint consumed only by a controller test, never by any frontend page. The `manage_units` action therefore ships with `href: undefined` — permanently disabled, identically to `import_owners`/`configure_residents` — rather than linking users to a raw JSON response. Building an actual units-management page is out of scope here and left for a future change.
+
 ## Risks / Trade-offs
 
 - [Risk] Detail counts diverge from wizard counts. -> Mitigate by reusing the wizard persisted preview/confirmation data contract.
@@ -92,3 +100,4 @@ Affected models, services, database tables, and integration points:
 
 - None for this change. The aside is explicitly deferred and should be specified separately before implementation.
 - Resolved: the existing `property_detail` next-action in wizard step 5 will be repointed to the new detail route instead of `/edit` (see Decision 8).
+- Open (deferred to a future change): a real units-management page for the `manage_units` next-action. Until then, that action is permanently disabled on both the wizard completion screen and the detail page (see Decision 11).

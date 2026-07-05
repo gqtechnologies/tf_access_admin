@@ -3,7 +3,7 @@
 class Admin::ResidentialPropertiesController < AdminController
   include RespondsToPropertyResult
 
-  before_action :get_residential_property, only: %i[archive]
+  before_action :get_residential_property, only: %i[show archive]
 
   def index
     authorize ResidentialProperty
@@ -28,6 +28,16 @@ class Admin::ResidentialPropertiesController < AdminController
   def create
     authorize ResidentialProperty
     redirect_to admin_property_setup_new_wizard_path
+  end
+
+  def show
+    authorize @residential_property
+
+    render inertia: "admin/residential_properties/show", props: {
+      residential_property: Admin::ResidentialPropertyDetailSerializer.new(
+        property: @residential_property, current_user: current_user
+      ).as_json
+    }, status: :ok
   end
 
   def archive

@@ -25,6 +25,10 @@ module PropertyStatuses
   # Statuses the setup wizard may reopen for editing (enable-wizard-editing-created-state).
   WIZARD_EDITABLE = [ CREATED, CONFIGURED, ACTIVE ].freeze
 
+  # Statuses where the property detail page shows the primary edit action,
+  # opening the setup wizard (add-property-detail-view).
+  DETAIL_EDITABLE = [ DRAFT, CREATED ].freeze
+
   ALL = [
     DRAFT,
     CREATED,

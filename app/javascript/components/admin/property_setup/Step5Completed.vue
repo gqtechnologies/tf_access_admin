@@ -23,55 +23,10 @@
           </Card>
         </div>
 
-        <section class="space-y-4">
-          <h3 class="text-sm font-medium">{{ t('admin.property_setup.step5.completed.next_steps.title') }}</h3>
-          <div class="grid gap-3 md:grid-cols-2">
-            <Card
-              v-for="action in nextStepActions"
-              :key="action.key"
-              class="shadow-none !p-2"
-              :class="action.recommended ? 'border-green-500 ring-1 ring-green-200' : ''"
-            >
-              <CardContent class="flex h-full flex-col gap-4 px-2">
-                <div class="flex items-start justify-between gap-3">
-                  <span
-                    class="inline-flex size-10 shrink-0 items-center justify-center rounded-full"
-                    :class="action.recommended ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'"
-                  >
-                    <component :is="action.icon" class="size-4" />
-                  </span>
-                  <Badge
-                    v-if="action.recommended"
-                    class="border-transparent bg-green-100 font-normal text-green-800 hover:bg-green-100"
-                  >
-                    {{ t('admin.property_setup.step5.completed.next_steps.recommended_badge') }}
-                  </Badge>
-                </div>
-                <div class="space-y-1">
-                  <p class="text-sm font-medium">{{ action.title }}</p>
-                  <p class="text-muted-foreground text-xs leading-relaxed">{{ action.description }}</p>
-                </div>
-                <Button
-                  v-if="action.href && !action.disabled"
-                  as="a"
-                  :href="action.href"
-                  :variant="action.recommended ? 'default' : 'outline'"
-                  class="mt-auto w-full"
-                >
-                  {{ action.buttonLabel }}
-                </Button>
-                <Button
-                  v-else
-                  variant="outline"
-                  class="mt-auto w-full"
-                  disabled
-                >
-                  {{ action.buttonLabel }}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+        <NextStepsGrid
+          :title="t('admin.property_setup.step5.completed.next_steps.title')"
+          :actions="nextStepActions"
+        />
     </div>
   </div>
 </template>
@@ -79,20 +34,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  Building2,
-  CheckCircle2,
-  DoorOpen,
-  Layers,
-  Search,
-  Settings2,
-  ShieldCheck,
-  UserRound,
-  Users,
-} from 'lucide-vue-next'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Building2, CheckCircle2, DoorOpen, Layers, ShieldCheck } from 'lucide-vue-next'
 import { Card, CardContent } from '@/components/ui/card'
+import NextStepsGrid from '@/components/admin/property_setup/NextStepsGrid.vue'
+import { useNextStepActions } from '@/lib/composables/property_setup/useNextStepActions'
 
 const props = defineProps<{
   preview: Record<string, any>
@@ -148,70 +93,8 @@ const summaryCards = computed(() => [
   },
 ])
 
-function showAction(action: string) {
-  return props.nextActions.includes(action)
-}
-
-const nextStepActions = computed(() => {
-  const propertyId = props.propertyId
-
-  return [
-    {
-      key: 'property_detail',
-      recommended: true,
-      icon: Search,
-      title: t('admin.property_setup.step5.completed.next_steps.property_detail.title'),
-      description: t('admin.property_setup.step5.completed.next_steps.property_detail.description'),
-      buttonLabel: t('admin.property_setup.step5.completed.next_steps.property_detail.action'),
-      href: propertyId && showAction('property_detail')
-        ? `/admin/residential_properties/${propertyId}/edit`
-        : undefined,
-      disabled: !showAction('property_detail'),
-    },
-    {
-      key: 'reopen_setup',
-      recommended: false,
-      icon: Settings2,
-      title: t('admin.property_setup.step5.completed.next_steps.reopen_setup.title'),
-      description: t('admin.property_setup.step5.completed.next_steps.reopen_setup.description'),
-      buttonLabel: t('admin.property_setup.step5.completed.next_steps.reopen_setup.action'),
-      href: propertyId && showAction('reopen_setup')
-        ? `/admin/property_setup/wizard/${propertyId}`
-        : undefined,
-      disabled: !showAction('reopen_setup'),
-    },
-    {
-      key: 'manage_units',
-      recommended: false,
-      icon: Building2,
-      title: t('admin.property_setup.step5.completed.next_steps.manage_units.title'),
-      description: t('admin.property_setup.step5.completed.next_steps.manage_units.description'),
-      buttonLabel: t('admin.property_setup.step5.completed.next_steps.manage_units.action'),
-      href: propertyId && showAction('manage_units')
-        ? `/admin/residential_properties/${propertyId}/units`
-        : undefined,
-      disabled: !showAction('manage_units'),
-    },
-    {
-      key: 'import_owners',
-      recommended: false,
-      icon: Users,
-      title: t('admin.property_setup.step5.completed.next_steps.import_owners.title'),
-      description: t('admin.property_setup.step5.completed.next_steps.import_owners.description'),
-      buttonLabel: t('admin.property_setup.step5.completed.next_steps.import_owners.action'),
-      href: undefined,
-      disabled: !showAction('import_owners'),
-    },
-    {
-      key: 'configure_residents',
-      recommended: false,
-      icon: UserRound,
-      title: t('admin.property_setup.step5.completed.next_steps.configure_residents.title'),
-      description: t('admin.property_setup.step5.completed.next_steps.configure_residents.description'),
-      buttonLabel: t('admin.property_setup.step5.completed.next_steps.configure_residents.action'),
-      href: undefined,
-      disabled: !showAction('configure_residents'),
-    },
-  ]
-})
+const { nextStepActions } = useNextStepActions(
+  computed(() => props.nextActions),
+  computed(() => props.propertyId),
+)
 </script>
