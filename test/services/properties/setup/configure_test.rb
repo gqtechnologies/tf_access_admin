@@ -33,4 +33,22 @@ class Properties::Setup::ConfigureTest < ActiveSupport::TestCase
     assert result.success?
     assert_equal PropertyStatuses::CONFIGURED, result.property.status
   end
+
+  test "transitions created to configured" do
+    @property.update!(status: PropertyStatuses::CREATED)
+
+    result = Properties::Setup::Configure.call(actor: @tenant_admin, property: @property)
+
+    assert result.success?
+    assert_equal PropertyStatuses::CONFIGURED, result.property.status
+  end
+
+  test "rejects active to configured" do
+    @property.update!(status: PropertyStatuses::ACTIVE)
+
+    result = Properties::Setup::Configure.call(actor: @tenant_admin, property: @property)
+
+    assert result.invalid?
+    assert_equal PropertyStatuses::ACTIVE, @property.reload.status
+  end
 end

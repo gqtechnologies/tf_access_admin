@@ -1149,6 +1149,7 @@ es:
           other: "Otro"
         statuses:
           draft: "Borrador"
+          created: "Configuración editable"
           configured: "Configurada"
           active: "Activa"
           inactive: "Inactiva"
@@ -1167,6 +1168,7 @@ es:
               status: "Estado"
           actions:
             create: "Nueva propiedad"
+            setup_wizard: "Configuración"
             structure: "Gestionar estructura"
             archive: "Archivar propiedad"
             archive_description: "¿Archivar la propiedad {name}? Se conservará para historial y consulta."
@@ -1527,10 +1529,20 @@ es:
             continue: "Continuar"
             continue_to_confirm: "Continuar a confirmación"
             confirm: "Confirmar configuración"
+            save_created: "Guardar como editable"
+            save: "Guardar"
           cancel:
             draft_confirm: "¿Eliminar el borrador de la propiedad? Se perderán todos los datos ingresados. También puedes mantenerlo y retomarlo después."
+          reset_confirm:
+            title: "Esto eliminará la estructura existente"
+            description: "Cambiar el tipo de propiedad o el modo de estructura eliminará las secciones y unidades ya creadas. Las propiedades ya configuradas archivarán en vez de eliminar lo que tenga historial operativo."
+            cancel: "Cancelar"
+            confirm: "Sí, continuar"
         errors:
           invalid_step: "Paso no válido"
+          not_editable: "Esta propiedad no se puede editar desde el asistente de configuración."
+          confirmation_required: "Esta sección o unidad tiene historial operativo. Confirma para archivarla en lugar de eliminarla."
+          reset_confirmation_required: "Este cambio eliminará la estructura y unidades existentes. Confirma para continuar."
         step1:
           title: "Datos de la propiedad"
           fields:
@@ -1586,7 +1598,15 @@ es:
               menu: "Acciones de la sección"
               edit: "Editar sección"
               add_child: "Agregar sección hija"
+              move: "Mover sección"
               delete: "Eliminar sección"
+            move:
+              title: "Mover sección"
+              description: "Elige el nuevo padre para \"{name}\"."
+              parent_label: "Nuevo padre"
+              root_option: "Sin padre (raíz)"
+              cancel: "Cancelar"
+              submit: "Mover"
             create:
               title_root: "Agregar sección raíz"
               title_child: "Agregar secciones hijas"
@@ -1710,6 +1730,7 @@ es:
             actions:
               menu: "Acciones"
               edit: "Editar"
+              manage_unit: "Gestionar unidad"
               delete: "Eliminar"
             create:
               title: "Agregar unidad"
@@ -1838,6 +1859,10 @@ es:
                 title: "Ver detalle de propiedad"
                 description: "Revisa la ficha completa de la propiedad recién configurada."
                 action: "Ver detalle"
+              reopen_setup:
+                title: "Reabrir configuración"
+                description: "Vuelve al asistente para seguir editando datos, estructura o unidades."
+                action: "Reabrir configuración"
               manage_units:
                 title: "Administrar unidades"
                 description: "Edita identificadores, tipos y secciones de las unidades creadas."
@@ -2234,6 +2259,7 @@ es:
           attributes:
             name:
               taken: "Ya existe una propiedad con este nombre en la organización"
+              code_collision: "Este cambio generaría un código ya usado por otra propiedad. Cambia el nombre de la propiedad."
             code:
               taken: "Ya existe una propiedad con este código en la organización"
             status:

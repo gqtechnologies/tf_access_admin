@@ -48,6 +48,10 @@
           <Plus class="size-4" />
           {{ t('admin.property_setup.step2.manual.actions.add_child') }}
         </DropdownMenuItem>
+        <DropdownMenuItem @select="emit('move', section)">
+          <Move class="size-4" />
+          {{ t('admin.property_setup.step2.manual.actions.move') }}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" @select="emit('delete', section)">
           <Trash2 class="size-4" />
@@ -61,7 +65,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { GripVertical, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { GripVertical, MoreHorizontal, Move, Pencil, Plus, Trash2 } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -88,6 +92,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'edit', section: SectionNode): void
   (e: 'add-child', section: SectionNode): void
+  (e: 'move', section: SectionNode): void
   (e: 'delete', section: SectionNode): void
 }>()
 

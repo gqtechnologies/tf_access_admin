@@ -34,7 +34,7 @@ import {
 } from '@/lib/utils/validity'
 import {
   admin_person_path,
-  admin_residential_property_structure_path,
+  admin_property_setup_wizard_path,
   admin_residential_property_unit_path,
 } from '@/routes'
 import type { ColumnDef } from '@/types/table'
@@ -100,7 +100,7 @@ const columns = computed<ColumnDef<PersonOccupancyRow, unknown>[]>(() => [
       return h(
         Link,
         {
-          href: admin_residential_property_structure_path(occupancy.residential_property_id),
+          href: admin_property_setup_wizard_path(occupancy.residential_property_id),
           class: 'font-medium text-primary hover:underline',
         },
         () => occupancy.residential_property_name,

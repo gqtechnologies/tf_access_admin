@@ -14,6 +14,7 @@
         <UnitSectionTreeRow
           :section="root"
           :eligible="isEligible(root)"
+          :property-id="propertyId"
           @add-unit="openAdd"
           @edit="openEdit"
           @delete="openDelete"
@@ -27,6 +28,7 @@
             <UnitSectionTreeRow
               :section="child"
               :eligible="isEligible(child)"
+              :property-id="propertyId"
               @add-unit="openAdd"
               @edit="openEdit"
               @delete="openDelete"

@@ -178,6 +178,7 @@ const props = defineProps<{
   errors?: Record<string, string[]>
   structureMode?: string
   unitsIn?: string | null
+  manualOnly?: boolean
 }>()
 
 const { t } = useI18n()
@@ -205,11 +206,11 @@ function flattenSectionTree(nodes: Record<string, unknown>[]): Record<string, un
 // automatic for a fresh quick setup, or import when no sections are eligible.
 function defaultUnitsMode() {
   const persisted = props.wizard.units_mode as string | undefined
-  if (persisted) return persisted
+  if (persisted && !(props.manualOnly && persisted === 'automatic')) return persisted
 
   const persistedUnitsCount = Number(props.preview?.counts?.units ?? 0)
   if (persistedUnitsCount > 0) return 'manual'
-  if (props.structureMode === 'quick') return 'automatic'
+  if (props.structureMode === 'quick' && !props.manualOnly) return 'automatic'
   return hasEligibleSections.value ? 'manual' : 'import'
 }
 
@@ -334,7 +335,7 @@ const issues = computed(() => {
   return list
 })
 
-const isQuickStructure = computed(() => props.structureMode === 'quick')
+const isQuickStructure = computed(() => props.structureMode === 'quick' && !props.manualOnly)
 
 const modes = computed(() => {
   const list = []

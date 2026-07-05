@@ -53,6 +53,53 @@ class Admin::PropertySetup::WizardSerializerTest < ActiveSupport::TestCase
     assert_nil json[:units_in]
   end
 
+  test "setup.manual_only is false for a draft property" do
+    json = serialize(draft_property(PropertyTypes::BUILDING))
+
+    refute json.dig(:setup, :manual_only)
+    assert json.dig(:setup, :configurable)
+  end
+
+  test "setup.manual_only is true for created, configured, and active properties" do
+    [ PropertyStatuses::CREATED, PropertyStatuses::CONFIGURED, PropertyStatuses::ACTIVE ].each do |status|
+      property = draft_property(PropertyTypes::BUILDING)
+      property.update!(name: "Serializer #{status}", status: status)
+
+      json = Admin::PropertySetup::WizardSerializer.new(
+        property: property, current_user: @tenant_admin, step: 1
+      ).as_json
+
+      assert json.dig(:setup, :manual_only), "expected manual_only for #{status}"
+    end
+  end
+
+  test "next_actions includes reopen_setup for a created property" do
+    property = draft_property(PropertyTypes::BUILDING)
+    property.update!(status: PropertyStatuses::CREATED)
+
+    json = Admin::PropertySetup::WizardSerializer.new(
+      property: property, current_user: @tenant_admin, step: 5
+    ).as_json
+
+    assert_includes json[:next_actions], "reopen_setup"
+  end
+
+  test "next_actions excludes reopen_setup for a draft property" do
+    json = serialize(draft_property(PropertyTypes::BUILDING))
+
+    refute_includes json[:next_actions], "reopen_setup"
+  end
+
+  test "completed flag reflects what the controller passes in" do
+    property = draft_property(PropertyTypes::BUILDING)
+
+    json = Admin::PropertySetup::WizardSerializer.new(
+      property: property, current_user: @tenant_admin, step: 5, completed: true
+    ).as_json
+
+    assert json[:completed]
+  end
+
   test "preview counts.units are identical across step 4, step 5, and the completed view" do
     property = draft_property(PropertyTypes::BUILDING)
     section = PropertySections::Create.call(

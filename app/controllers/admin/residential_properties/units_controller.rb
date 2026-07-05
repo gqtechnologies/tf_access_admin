@@ -8,7 +8,7 @@ class Admin::ResidentialProperties::UnitsController < AdminController
   include RespondsToUnitResult
 
   before_action :set_residential_property
-  before_action :set_unit, only: %i[show update move archive]
+  before_action :set_unit, only: %i[show update]
   before_action :set_restorable_unit, only: [ :restore ]
   before_action :set_filters, only: %i[index show]
 
@@ -89,19 +89,6 @@ class Admin::ResidentialProperties::UnitsController < AdminController
     }, status: :ok
   end
 
-  def create
-    draft = @residential_property.units.new
-    authorize draft, :create?
-
-    result = Units::Create.call(
-      actor: current_user,
-      property: @residential_property,
-      section_id: unit_params[:property_section_id],
-      attributes: unit_params
-    )
-    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
-  end
-
   def update
     authorize @unit, :update?
 
@@ -117,29 +104,15 @@ class Admin::ResidentialProperties::UnitsController < AdminController
     )
   end
 
-  def move
-    authorize @unit, :move?
-
-    result = Units::MoveToSection.call(
-      actor: current_user,
-      unit: @unit,
-      section_id: move_section_id
-    )
-    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
-  end
-
-  def archive
-    authorize @unit, :archive?
-
-    result = Units::Archive.call(actor: current_user, unit: @unit)
-    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
-  end
-
   def restore
     authorize @unit, :restore?
 
     result = Units::Restore.call(actor: current_user, unit: @unit)
-    respond_to_unit_result(result, success_path: structure_path, error_path: structure_path)
+    respond_to_unit_result(
+      result,
+      success_path: admin_residential_properties_path,
+      error_path: admin_residential_properties_path
+    )
   end
 
   private
@@ -164,22 +137,8 @@ class Admin::ResidentialProperties::UnitsController < AdminController
     )
   end
 
-  def move_section_id
-    return Units::MoveToSection::SECTION_UNCHANGED unless params[:unit].is_a?(ActionController::Parameters)
-
-    if params[:unit].key?(:property_section_id)
-      params.require(:unit).permit(:property_section_id)[:property_section_id]
-    else
-      Units::MoveToSection::SECTION_UNCHANGED
-    end
-  end
-
   def serialize_unit_summary(unit)
     Admin::UnitSummarySerializer.new(unit, current_user: current_user).as_json
-  end
-
-  def structure_path
-    admin_residential_property_structure_path(@residential_property)
   end
 
   def occupancies_filters
@@ -239,7 +198,7 @@ class Admin::ResidentialProperties::UnitsController < AdminController
       .where(residential_property: @residential_property)
       .find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to structure_path,
+    redirect_to admin_residential_properties_path,
                 inertia: { errors: { base: [ I18n.t("frontend.admin.units.not_found") ] } }
   end
 
@@ -249,7 +208,7 @@ class Admin::ResidentialProperties::UnitsController < AdminController
       .where(residential_property: @residential_property)
       .find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to structure_path,
+    redirect_to admin_residential_properties_path,
                 inertia: { errors: { base: [ I18n.t("frontend.admin.units.not_found") ] } }
   end
 end

@@ -42,6 +42,7 @@
               :preview="preview"
               :structure-format="structureFormat"
               :property-type="step2PropertyType"
+              :manual-only="manualOnly"
             />
           </template>
           <Step3Units
@@ -54,6 +55,7 @@
             :errors="formErrors"
             :structure-mode="step3StructureMode"
             :units-in="props.units_in"
+            :manual-only="manualOnly"
           />
           <Step4Summary v-else-if="currentStep === 4" :preview="preview" />
           <Step5Confirm
@@ -62,6 +64,7 @@
             :confirmed="isCompleted"
             :next-actions="nextActions"
             :property-id="propertyId"
+            :requires-acknowledgement="canOfferConfigured"
             v-model:acknowledged="acknowledged"
           />
 
@@ -120,12 +123,20 @@
               >
                 {{ continueLabel }}
               </Button>
+              <template v-else-if="!isCompleted && canOfferConfigured">
+                <Button variant="outline" :disabled="submitting" @click="onSaveCreated">
+                  {{ t('admin.property_setup.wizard.actions.save_created') }}
+                </Button>
+                <Button :disabled="submitting || !acknowledged" @click="onConfirm">
+                  {{ t('admin.property_setup.wizard.actions.confirm') }}
+                </Button>
+              </template>
               <Button
                 v-else-if="!isCompleted"
-                :disabled="submitting || !acknowledged"
-                @click="onConfirm"
+                :disabled="submitting"
+                @click="onSaveExisting"
               >
-                {{ t('admin.property_setup.wizard.actions.confirm') }}
+                {{ t('admin.property_setup.wizard.actions.save') }}
               </Button>
             </template>
           </div>
@@ -166,6 +177,25 @@
         />
       </aside>
     </div>
+
+    <AlertDialog :open="showResetDialog">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ t('admin.property_setup.wizard.reset_confirm.title') }}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ t('admin.property_setup.wizard.reset_confirm.description') }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel :disabled="submitting" @click="cancelReset">
+            {{ t('admin.property_setup.wizard.reset_confirm.cancel') }}
+          </AlertDialogCancel>
+          <AlertDialogAction :disabled="submitting" @click="confirmReset">
+            {{ t('admin.property_setup.wizard.reset_confirm.confirm') }}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>
 
@@ -176,6 +206,16 @@ import { useI18n } from 'vue-i18n'
 import { ArrowLeft, ArrowRight, Info } from 'lucide-vue-next'
 import Header from '@/components/admin/layout/Header.vue'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import WizardStepper from '@/components/admin/property_setup/WizardStepper.vue'
@@ -191,6 +231,7 @@ import type { PropertyStructureFormat } from '@/lib/property_setup/structurePrev
 
 const props = defineProps<{
   step: number
+  completed?: boolean
   property: Record<string, unknown> | null
   wizard: Record<string, unknown>
   preview: Record<string, unknown>
@@ -200,6 +241,7 @@ const props = defineProps<{
   structure_format: PropertyStructureFormat | null
   units_in: string | null
   next_actions: string[]
+  setup?: { manual_only: boolean; configurable: boolean }
   errors?: Record<string, string[]>
 }>()
 
@@ -220,7 +262,11 @@ const sectionTypes = computed(() => props.section_types ?? [])
 const unitTypes = computed(() => props.unit_types ?? [])
 const nextActions = computed(() => props.next_actions ?? [])
 const formErrors = computed(() => props.errors ?? (page.props.errors as Record<string, string[]> | undefined) ?? {})
-const isCompleted = computed(() => props.property?.status === 'configured')
+const isCompleted = computed(() => props.completed === true)
+const manualOnly = computed(() => props.setup?.manual_only === true)
+const canOfferConfigured = computed(() => props.setup?.configurable === true)
+const pendingConfirmPayload = ref<ReturnType<typeof buildPayload> | null>(null)
+const showResetDialog = computed(() => Boolean(page.props.needs_confirmation) && pendingConfirmPayload.value !== null)
 const completedThrough = computed(() => Math.max(0, currentStep.value - 1))
 
 const structureFormat = computed(() => props.structure_format ?? null)
@@ -286,9 +332,30 @@ function onContinue() {
     return
   }
 
+  pendingConfirmPayload.value = payload
   router.post(`/admin/property_setup/wizard/${propertyId.value}/advance`, { setup: payload }, {
     onFinish: () => { submitting.value = false },
   })
+}
+
+function confirmReset() {
+  if (!propertyId.value || !pendingConfirmPayload.value) return
+
+  submitting.value = true
+  router.post(
+    `/admin/property_setup/wizard/${propertyId.value}/advance`,
+    { setup: pendingConfirmPayload.value, confirmed: 'true' },
+    {
+      onFinish: () => {
+        submitting.value = false
+        pendingConfirmPayload.value = null
+      },
+    },
+  )
+}
+
+function cancelReset() {
+  pendingConfirmPayload.value = null
 }
 
 function goBack() {
@@ -327,6 +394,22 @@ function onConfirm() {
   router.post(`/admin/property_setup/wizard/${propertyId.value}/confirm`, {}, {
     onFinish: () => { submitting.value = false },
   })
+}
+
+function onSaveCreated() {
+  if (!propertyId.value) return
+  submitting.value = true
+  router.post(`/admin/property_setup/wizard/${propertyId.value}/complete`, {}, {
+    onFinish: () => { submitting.value = false },
+  })
+}
+
+// Configured/active edits have nothing left to persist (steps already saved
+// incrementally); saving just shows the completion view without a status
+// transition (enable-wizard-editing-created-state).
+function onSaveExisting() {
+  if (!propertyId.value) return
+  router.visit(`/admin/property_setup/wizard/${propertyId.value}?completed=true`)
 }
 
 function buildPayload() {

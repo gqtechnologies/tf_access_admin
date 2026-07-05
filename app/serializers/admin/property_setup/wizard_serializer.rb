@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 class Admin::PropertySetup::WizardSerializer
-  def initialize(property:, current_user:, step:)
+  def initialize(property:, current_user:, step:, completed: false)
     @property = property
     @current_user = current_user
     @step = step
+    @completed = completed
   end
 
   def as_json
     {
       step: @step,
+      completed: @completed,
       property: property_json,
       wizard: Properties::Setup::WizardState.read(@property),
       preview: preview_json,
@@ -19,11 +21,23 @@ class Admin::PropertySetup::WizardSerializer
       structure_format: structure_format&.as_json,
       units_in: structure_format&.units_in,
       permissions: permissions_json,
-      next_actions: next_actions_json
+      next_actions: next_actions_json,
+      setup: setup_json
     }
   end
 
   private
+
+  # Whether this edit session is reopening an already-completed property
+  # (created/configured/active) — the wizard then only offers manual section
+  # and manual unit modes, no quick/automatic generation
+  # (enable-wizard-editing-created-state).
+  def setup_json
+    {
+      manual_only: @property.present? && PropertyStatuses::WIZARD_EDITABLE.include?(@property.status),
+      configurable: @property.present? && [ PropertyStatuses::DRAFT, PropertyStatuses::CREATED ].include?(@property.status)
+    }
+  end
 
   def structure_format
     return @structure_format if defined?(@structure_format)
@@ -64,6 +78,7 @@ class Admin::PropertySetup::WizardSerializer
 
     actions = []
     actions << "property_detail" if policy.show?
+    actions << "reopen_setup" if PropertyStatuses::WIZARD_EDITABLE.include?(@property.status) && policy.update?
     actions << "manage_units" if unit_policy.property_allowed?(:manage_units, property: @property)
     actions << "import_owners"
     actions << "configure_residents"

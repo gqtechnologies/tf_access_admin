@@ -65,14 +65,32 @@ class PropertySections::DestroyTest < ActiveSupport::TestCase
     assert_nil section.reload.deleted_at
   end
 
-  test "rejects deletion when the property is not draft" do
-    active = create_property(@organization, "Active Property")
-    section = root_section(active, "Torre A")
+  test "allows deletion when the property is configured" do
+    configured = ResidentialProperty.create!(
+      organization: @organization, name: "Configured Property",
+      property_type: PropertyTypes::BUILDING, status: PropertyStatuses::CONFIGURED,
+      country: "Chile", timezone: "America/Santiago"
+    )
+    section = root_section(configured, "Torre A")
+
+    result = PropertySections::Destroy.call(actor: @actor, section: section)
+
+    assert result.success?
+    assert_not_nil section.reload.deleted_at
+  end
+
+  test "rejects deletion when the property is inactive or archived" do
+    inactive = ResidentialProperty.create!(
+      organization: @organization, name: "Inactive Property",
+      property_type: PropertyTypes::BUILDING, status: PropertyStatuses::INACTIVE,
+      country: "Chile", timezone: "America/Santiago"
+    )
+    section = root_section(inactive, "Torre A")
 
     result = PropertySections::Destroy.call(actor: @actor, section: section)
 
     assert result.invalid?
-    assert result.errors.of_kind?(:base, :property_not_draft)
+    assert result.errors.of_kind?(:base, :property_not_operative)
     assert_nil section.reload.deleted_at
   end
 

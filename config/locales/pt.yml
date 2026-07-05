@@ -1210,6 +1210,7 @@ pt:
           other: "Outro"
         statuses:
           draft: "Rascunho"
+          created: "Configuração editável"
           configured: "Configurado"
           active: "Ativa"
           inactive: "Inativa"
@@ -1228,6 +1229,7 @@ pt:
               status: "Estado"
           actions:
             create: "Nova propriedade"
+            setup_wizard: "Configuração"
             structure: "Gerenciar estrutura"
             archive: "Arquivar propriedade"
             archive_description: "Arquivar a propriedade {name}? Ela será preservada para histórico e consulta."
@@ -1548,10 +1550,20 @@ pt:
             continue: "Continuar"
             continue_to_confirm: "Continuar para confirmação"
             confirm: "Confirmar configuração"
+            save_created: "Salvar como editável"
+            save: "Salvar"
           cancel:
             draft_confirm: "Excluir o rascunho do imóvel? Todos os dados inseridos serão perdidos. Você também pode mantê-lo e retomar depois."
+          reset_confirm:
+            title: "Isso excluirá a estrutura existente"
+            description: "Alterar o tipo de imóvel ou o modo de estrutura excluirá as seções e unidades já criadas. Imóveis já configurados arquivarão em vez de excluir o que tiver histórico operacional."
+            cancel: "Cancelar"
+            confirm: "Sim, continuar"
         errors:
           invalid_step: "Etapa inválida"
+          not_editable: "Este imóvel não pode ser editado pelo assistente de configuração."
+          confirmation_required: "Esta seção ou unidade possui histórico operacional. Confirme para arquivá-la em vez de excluí-la."
+          reset_confirmation_required: "Essa alteração excluirá a estrutura e as unidades existentes. Confirme para continuar."
         step1:
           title: "Dados do imóvel"
           fields:
@@ -1607,7 +1619,15 @@ pt:
               menu: "Ações da seção"
               edit: "Editar seção"
               add_child: "Adicionar seção filha"
+              move: "Mover seção"
               delete: "Excluir seção"
+            move:
+              title: "Mover seção"
+              description: "Escolha o novo pai para \"{name}\"."
+              parent_label: "Novo pai"
+              root_option: "Sem pai (raiz)"
+              cancel: "Cancelar"
+              submit: "Mover"
             create:
               title_root: "Adicionar seção raiz"
               title_child: "Adicionar seções filhas"
@@ -1731,6 +1751,7 @@ pt:
             actions:
               menu: "Ações"
               edit: "Editar"
+              manage_unit: "Gerenciar unidade"
               delete: "Excluir"
             create:
               title: "Adicionar unidade"
@@ -1859,6 +1880,10 @@ pt:
                 title: "Ver detalhe do imóvel"
                 description: "Revise a ficha completa do imóvel recém-configurado."
                 action: "Ver detalhe"
+              reopen_setup:
+                title: "Reabrir configuração"
+                description: "Volte ao assistente para continuar editando dados, estrutura ou unidades."
+                action: "Reabrir configuração"
               manage_units:
                 title: "Administrar unidades"
                 description: "Edite identificadores, tipos e seções das unidades criadas."
@@ -2187,6 +2212,7 @@ pt:
           attributes:
             name:
               taken: "Já existe uma propriedade com este nome na organização"
+              code_collision: "Essa alteração geraria um código já usado por outra propriedade. Altere o nome da propriedade."
             code:
               taken: "Já existe uma propriedade com este código na organização"
             status:

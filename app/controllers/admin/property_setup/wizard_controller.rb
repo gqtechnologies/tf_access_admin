@@ -3,8 +3,9 @@
 class Admin::PropertySetup::WizardController < AdminController
   include RespondsToPropertyResult
 
-  before_action :authorize_setup!
+  before_action :authorize_setup!, only: %i[new create]
   before_action :set_property, except: %i[new create]
+  before_action :ensure_wizard_editable!, except: %i[new create]
 
   def new
     render inertia: "admin/property_setup/Wizard", props: wizard_props(step: 1), status: :ok
@@ -43,6 +44,11 @@ class Admin::PropertySetup::WizardController < AdminController
   end
 
   def advance
+    # Captured before merge_wizard_state! mutates the in-memory metadata, so
+    # the reset check below compares against the pre-request value
+    # (enable-wizard-editing-created-state).
+    old_structure_mode = Properties::Setup::WizardState.structure_mode(@property)
+
     merge_wizard_state!
     validation = Properties::Setup::ValidateStep.new(
       property: @property,
@@ -56,10 +62,18 @@ class Admin::PropertySetup::WizardController < AdminController
       return
     end
 
-    side_effect = apply_step_side_effects!
+    side_effect = apply_step_side_effects!(old_structure_mode)
+    if side_effect.respond_to?(:needs_confirmation?) && side_effect.needs_confirmation?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: {
+                    errors: { base: [ I18n.t("frontend.admin.property_setup.errors.reset_confirmation_required") ] },
+                    needs_confirmation: true
+                  }
+      return
+    end
     if side_effect&.invalid?
       redirect_to admin_property_setup_wizard_path(@property),
-                  inertia: { errors: side_effect.property.errors.messages }
+                  inertia: { errors: side_effect.errors.messages }
       return
     end
 
@@ -146,15 +160,39 @@ class Admin::PropertySetup::WizardController < AdminController
     end
   end
 
-  def destroy_section
+  def move_section
     section = @property.property_sections.find_by(id: params[:section_id])
     return section_not_found if section.nil?
 
-    result = PropertySections::Destroy.call(actor: current_user, section: section)
+    result = PropertySections::Move.call(
+      actor: current_user,
+      section: section,
+      parent_id: move_section_params.fetch(:parent_id, PropertySections::Base::PARENT_UNCHANGED),
+      position: move_section_params[:position]
+    )
 
     if result.invalid?
       redirect_to admin_property_setup_wizard_path(@property),
                   inertia: { errors: serialize_inertia_errors(result.section) }
+    else
+      redirect_to admin_property_setup_wizard_path(@property)
+    end
+  end
+
+  def destroy_section
+    section = @property.property_sections.find_by(id: params[:section_id])
+    return section_not_found if section.nil?
+
+    outcome = Properties::Setup::RemoveSection.call(
+      actor: current_user, section: section, confirmed: params[:confirmed] == "true"
+    )
+
+    if outcome.needs_confirmation?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: { base: [ I18n.t("frontend.admin.property_setup.errors.confirmation_required") ] }, needs_confirmation: true }
+    elsif outcome.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(outcome.record) }
     else
       redirect_to admin_property_setup_wizard_path(@property)
     end
@@ -215,11 +253,16 @@ class Admin::PropertySetup::WizardController < AdminController
     unit = find_unit
     return unit_not_found if unit.nil?
 
-    result = Units::SoftDelete.call(actor: current_user, unit: unit)
+    outcome = Properties::Setup::RemoveUnit.call(
+      actor: current_user, unit: unit, confirmed: params[:confirmed] == "true"
+    )
 
-    if result.invalid?
+    if outcome.needs_confirmation?
       redirect_to admin_property_setup_wizard_path(@property),
-                  inertia: { errors: serialize_inertia_errors(result.unit) }
+                  inertia: { errors: { base: [ I18n.t("frontend.admin.property_setup.errors.confirmation_required") ] }, needs_confirmation: true }
+    elsif outcome.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(outcome.record) }
     else
       redirect_to admin_property_setup_wizard_path(@property)
     end
@@ -227,6 +270,17 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def confirm
     result = Properties::Setup::Confirm.call(actor: current_user, property: @property)
+
+    if result.invalid?
+      redirect_to admin_property_setup_wizard_path(@property),
+                  inertia: { errors: serialize_inertia_errors(result.property) }
+    else
+      redirect_to admin_property_setup_wizard_path(result.property, completed: true)
+    end
+  end
+
+  def complete
+    result = Properties::Setup::Complete.call(actor: current_user, property: @property)
 
     if result.invalid?
       redirect_to admin_property_setup_wizard_path(@property),
@@ -271,19 +325,32 @@ class Admin::PropertySetup::WizardController < AdminController
                 inertia: { errors: { base: [ I18n.t("frontend.admin.residential_properties.not_found") ] } }
   end
 
+  # Wizard editing is only available while a property is in one of the
+  # OPERABLE statuses (draft/created/configured/active); inactive and
+  # archived properties reject wizard mutations (enable-wizard-editing-created-state).
+  def ensure_wizard_editable!
+    return if PropertyStatuses::OPERABLE.include?(@property.status)
+
+    redirect_to admin_residential_properties_path,
+                inertia: { errors: { base: [ I18n.t("frontend.admin.property_setup.errors.not_editable") ] } }
+  end
+
   def current_step
-    if params[:completed] == "true"
-      5
-    else
-      Properties::Setup::WizardState.current_step(@property)
-    end
+    return 5 if params[:completed] == "true"
+
+    # Reopening a created/configured/active property always starts at step 1,
+    # regardless of the step stored from a prior session (enable-wizard-editing-created-state).
+    return 1 if PropertyStatuses::WIZARD_EDITABLE.include?(@property.status)
+
+    Properties::Setup::WizardState.current_step(@property)
   end
 
   def wizard_props(step:)
     Admin::PropertySetup::WizardSerializer.new(
       property: @property,
       current_user: current_user,
-      step: step
+      step: step,
+      completed: params[:completed] == "true"
     ).as_json
   end
 
@@ -319,20 +386,31 @@ class Admin::PropertySetup::WizardController < AdminController
     Properties::Setup::WizardState.merge!(@property, unit_generation: step_params[:unit_generation]) if step_params[:unit_generation].present?
   end
 
+  # For created/configured/active properties, identity edits (name/type) go
+  # through UpdateIdentity so normalized_name/code regenerate and a code
+  # collision is rejected outright (enable-wizard-editing-created-state).
+  # Draft properties keep the plain assign+save behavior.
   def update_property_descriptive!
     attrs = step_params.slice(:name, :property_type, :address_line, :city, :region, :country, :timezone)
     return if attrs.blank?
 
+    if PropertyStatuses::WIZARD_EDITABLE.include?(@property.status)
+      result = Properties::Setup::UpdateIdentity.call(actor: current_user, property: @property, attributes: attrs)
+      @property = result.property
+      return result
+    end
+
     @property.assign_attributes(attrs)
     @property.save
+    nil
   end
 
-  def apply_step_side_effects!
+  def apply_step_side_effects!(old_structure_mode)
     case current_step
     when 1
       apply_property_step!
     when 2
-      apply_structure_step!
+      apply_structure_step!(old_structure_mode)
     when 3
       apply_units_step!
     end
@@ -340,8 +418,20 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def apply_property_step!
     old_type = @property.property_type
-    update_property_descriptive!
-    return if @property.property_type == old_type
+    new_type = step_params[:property_type].presence
+    type_will_change = new_type.present? && new_type != old_type
+
+    if type_will_change
+      reset_outcome = Properties::Setup::ResetStructure.call(
+        actor: current_user, property: @property,
+        new_property_type: new_type, confirmed: params[:confirmed] == "true"
+      )
+      return reset_outcome unless reset_outcome.success?
+    end
+
+    result = update_property_descriptive!
+    return result if result&.invalid?
+    return unless type_will_change
 
     Properties::Setup::WizardState.merge!(
       @property,
@@ -349,11 +439,21 @@ class Admin::PropertySetup::WizardController < AdminController
       quick_structure_confirmed: nil,
       property_type_changed: true
     )
+    nil
   end
 
-  def apply_structure_step!
+  def apply_structure_step!(old_structure_mode)
     Properties::Setup::WizardState.merge!(@property, property_type_changed: false)
-    mode = step_params[:structure_mode].presence || Properties::Setup::WizardState.structure_mode(@property)
+    mode = step_params[:structure_mode].presence || old_structure_mode
+
+    if mode.present? && mode != old_structure_mode
+      reset_outcome = Properties::Setup::ResetStructure.call(
+        actor: current_user, property: @property,
+        new_structure_mode: mode, confirmed: params[:confirmed] == "true"
+      )
+      return reset_outcome unless reset_outcome.success?
+    end
+
     Properties::Setup::WizardState.merge!(@property, structure_mode: mode)
 
     return unless mode == "quick" && step_params[:quick_structure].present?
@@ -398,6 +498,10 @@ class Admin::PropertySetup::WizardController < AdminController
 
   def section_update_params
     params.require(:property_section).permit(:name, :section_type, :status)
+  end
+
+  def move_section_params
+    params.require(:property_section).permit(:parent_id, :position)
   end
 
   def section_not_found

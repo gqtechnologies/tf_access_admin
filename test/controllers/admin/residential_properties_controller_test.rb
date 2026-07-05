@@ -70,29 +70,6 @@ class Admin::ResidentialPropertiesControllerTest < ActionDispatch::IntegrationTe
     assert_response :redirect
   end
 
-  test "tenant_admin update delegates to Properties::Update" do
-    sign_in_as @tenant_admin
-
-    patch admin_residential_property_path(@property), params: {
-      residential_property: { name: "Controller Updated Property", status: PropertyStatuses::INACTIVE }
-    }
-
-    assert_redirected_to edit_admin_residential_property_path(@property)
-    assert_equal "Controller Updated Property", @property.reload.name
-    assert_equal PropertyStatuses::INACTIVE, @property.status
-  end
-
-  test "update rejects archive status through ordinary update" do
-    sign_in_as @tenant_admin
-
-    patch admin_residential_property_path(@property), params: {
-      residential_property: { status: PropertyStatuses::ARCHIVED }
-    }
-
-    assert_redirected_to edit_admin_residential_property_path(@property)
-    assert_equal PropertyStatuses::ACTIVE, @property.reload.status
-  end
-
   test "tenant_admin archive delegates to Properties::Archive" do
     sign_in_as @tenant_admin
 
@@ -128,12 +105,10 @@ class Admin::ResidentialPropertiesControllerTest < ActionDispatch::IntegrationTe
       create_property(@other_organization, "Other Org Controller Property")
     end
 
-    patch admin_residential_property_path(other_org_property), params: {
-      residential_property: { name: "Cross Org Attempt" }
-    }
+    post archive_admin_residential_property_path(other_org_property)
 
     assert_redirected_to admin_residential_properties_path
-    assert_not_equal "Cross Org Attempt", other_org_property.reload.name
+    assert_equal PropertyStatuses::ACTIVE, other_org_property.reload.status
   end
 
   private

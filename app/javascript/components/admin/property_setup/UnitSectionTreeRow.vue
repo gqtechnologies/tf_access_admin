@@ -42,7 +42,12 @@
     <CollapsibleContent>
       <ul class="space-y-0.5 pt-0.5">
         <li v-for="unit in section.units" :key="unit.id">
-          <UnitTreeRow :unit="unit" @edit="emit('edit', $event)" @delete="emit('delete', $event)" />
+          <UnitTreeRow
+            :unit="unit"
+            :property-id="propertyId"
+            @edit="emit('edit', $event)"
+            @delete="emit('delete', $event)"
+          />
         </li>
       </ul>
     </CollapsibleContent>
@@ -98,6 +103,7 @@ type SectionNode = {
 const props = defineProps<{
   section: SectionNode
   eligible: boolean
+  propertyId?: string
 }>()
 
 const emit = defineEmits<{

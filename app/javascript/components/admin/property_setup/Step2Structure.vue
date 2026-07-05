@@ -83,12 +83,17 @@ const props = defineProps<{
   preview: Record<string, any>
   structureFormat: PropertyStructureFormat | null
   propertyType: string
+  manualOnly?: boolean
 }>()
 
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 const { fieldError, validateStep2 } = usePropertySetupStepValidation()
-const selectedMode = ref((props.wizard.structure_mode as string) || 'none')
+const initialMode = (props.wizard.structure_mode as string) || 'none'
+// A created/configured/active property may have been originally built with
+// quick mode; manual-only editing sessions fall back to manual since the
+// quick option is no longer offered (enable-wizard-editing-created-state).
+const selectedMode = ref(props.manualOnly && initialMode === 'quick' ? 'manual' : initialMode)
 
 // Hydrate from the persisted wizard state so a full page reload restores the
 // quick-structure form instead of falling back to blank defaults.
@@ -153,7 +158,7 @@ const modes = computed(() => {
     },
   ]
 
-  if (props.structureFormat) {
+  if (props.structureFormat && !props.manualOnly) {
     base.push({
       id: 'quick',
       icon: Zap,

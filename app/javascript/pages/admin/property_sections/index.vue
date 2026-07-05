@@ -27,7 +27,7 @@
         <ListItem
           v-if="row.residential_property_id"
           as="link"
-          :href="admin_residential_property_structure_path(row.residential_property_id as string)"
+          :href="admin_property_setup_wizard_path(row.residential_property_id as string)"
         >
           <span class="flex items-center gap-2">
             <PencilIcon class="w-4 h-4" />
@@ -63,7 +63,7 @@ import { SearchIcon, PencilIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import {
   admin_residential_properties_path,
-  admin_residential_property_structure_path,
+  admin_property_setup_wizard_path,
 } from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'

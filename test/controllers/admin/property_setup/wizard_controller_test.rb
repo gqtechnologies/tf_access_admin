@@ -159,6 +159,38 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     assert_redirected_to admin_property_setup_wizard_path(@draft, completed: true)
   end
 
+  test "complete transitions draft to created" do
+    sign_in_as(@tenant_admin)
+    Units::Create.call(
+      actor: @tenant_admin,
+      property: @draft,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    )
+    Properties::Setup::WizardState.merge!(@draft, current_step: 5)
+    @draft.save!
+
+    post admin_property_setup_complete_wizard_path(@draft)
+
+    assert_equal PropertyStatuses::CREATED, @draft.reload.status
+    assert_redirected_to admin_property_setup_wizard_path(@draft, completed: true)
+  end
+
+  test "confirm transitions a created property to configured" do
+    sign_in_as(@tenant_admin)
+    @draft.update!(status: PropertyStatuses::CREATED)
+    Units::Create.call(
+      actor: @tenant_admin,
+      property: @draft,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    )
+    Properties::Setup::WizardState.merge!(@draft, current_step: 5)
+    @draft.save!
+
+    post admin_property_setup_confirm_wizard_path(@draft)
+
+    assert_equal PropertyStatuses::CONFIGURED, @draft.reload.status
+  end
+
   test "step 5 confirmation reloads the current persisted unit total instead of a stale step 4 count" do
     sign_in_as(@tenant_admin)
     section = @draft.property_sections.create!(
@@ -205,6 +237,127 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
     completed_preview = Properties::Setup::BuildPreview.call(property: @draft.reload)
 
     assert_equal 1, completed_preview.dig(:counts, :units)
+  end
+
+  test "advance requests confirmation when a property type change would reset existing structure" do
+    sign_in_as(@tenant_admin)
+    section = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    Properties::Setup::WizardState.merge!(@draft, current_step: 1)
+    @draft.save!
+
+    post admin_property_setup_advance_wizard_path(@draft), params: {
+      setup: { name: @draft.name, property_type: PropertyTypes::TOWER, address_line: "Main 123" }
+    }
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_not_nil section.reload
+    assert_equal PropertyTypes::BUILDING, @draft.reload.property_type
+    assert_equal 1, Properties::Setup::WizardState.current_step(@draft)
+  end
+
+  test "advance with confirmed=true applies the reset and the property type change" do
+    sign_in_as(@tenant_admin)
+    section = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    Properties::Setup::WizardState.merge!(@draft, current_step: 1)
+    @draft.save!
+
+    post admin_property_setup_advance_wizard_path(@draft), params: {
+      setup: { name: @draft.name, property_type: PropertyTypes::TOWER, address_line: "Main 123" },
+      confirmed: "true"
+    }
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_raises(ActiveRecord::RecordNotFound) { PropertySection.unscoped.find(section.id) }
+    assert_equal PropertyTypes::TOWER, @draft.reload.property_type
+  end
+
+  test "reopening a configured property starts at step 1" do
+    configured = ResidentialProperty.create!(
+      organization: @organization, name: "Configured Reopen", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::CONFIGURED, country: "Chile", timezone: "America/Santiago",
+      metadata: { "setup_wizard" => { "current_step" => 5 } }
+    )
+
+    sign_in_as(@tenant_admin)
+    get admin_property_setup_wizard_path(configured)
+
+    assert_response :success
+  end
+
+  test "reopening an active property starts at step 1" do
+    active = ResidentialProperty.create!(
+      organization: @organization, name: "Active Reopen", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::ACTIVE, country: "Chile", timezone: "America/Santiago"
+    )
+
+    sign_in_as(@tenant_admin)
+    get admin_property_setup_wizard_path(active)
+
+    assert_response :success
+  end
+
+  test "wizard rejects editing an inactive property" do
+    inactive = ResidentialProperty.create!(
+      organization: @organization, name: "Inactive Property", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::INACTIVE, country: "Chile", timezone: "America/Santiago"
+    )
+
+    sign_in_as(@tenant_admin)
+    get admin_property_setup_wizard_path(inactive)
+
+    assert_redirected_to admin_residential_properties_path
+  end
+
+  test "wizard rejects editing an archived property" do
+    archived = ResidentialProperty.create!(
+      organization: @organization, name: "Archived Property", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::ARCHIVED, country: "Chile", timezone: "America/Santiago"
+    )
+
+    sign_in_as(@tenant_admin)
+    get admin_property_setup_wizard_path(archived)
+
+    assert_redirected_to admin_residential_properties_path
+  end
+
+  test "editing name on a created property to a colliding value is rejected" do
+    ResidentialProperty.create!(
+      organization: @organization, name: "Rival Name", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::ACTIVE, country: "Chile", timezone: "America/Santiago", code: "bld-taken-name"
+    )
+    created = ResidentialProperty.create!(
+      organization: @organization, name: "Created Property", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::CREATED, country: "Chile", timezone: "America/Santiago",
+      address_line: "Main 1", code: "bld-created-property"
+    )
+
+    sign_in_as(@tenant_admin)
+    post admin_property_setup_advance_wizard_path(created), params: {
+      setup: { name: "Taken Name", property_type: PropertyTypes::BUILDING, address_line: "Main 1" }
+    }
+
+    assert_equal "bld-created-property", created.reload.code
+    assert_equal "Created Property", created.name
+  end
+
+  test "editing name on a created property regenerates the code" do
+    created = ResidentialProperty.create!(
+      organization: @organization, name: "Created Property", property_type: PropertyTypes::BUILDING,
+      status: PropertyStatuses::CREATED, country: "Chile", timezone: "America/Santiago",
+      address_line: "Main 1", code: "bld-created-property"
+    )
+
+    sign_in_as(@tenant_admin)
+    post admin_property_setup_advance_wizard_path(created), params: {
+      setup: { name: "Renamed Property", property_type: PropertyTypes::BUILDING, address_line: "Main 1" }
+    }
+
+    assert_equal "bld-renamed-property", created.reload.code
+    assert_equal "Renamed Property", created.name
   end
 
   test "cancel with delete removes draft property" do
@@ -273,6 +426,62 @@ class Admin::PropertySetup::WizardControllerTest < ActionDispatch::IntegrationTe
 
     assert_equal "Torre Norte", section.reload.name
     assert_redirected_to admin_property_setup_wizard_path(@draft)
+  end
+
+  test "move section reparents a section under a different root" do
+    sign_in_as(@tenant_admin)
+    root_a = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    root_b = @draft.property_sections.create!(
+      organization: @organization, name: "Torre B", section_type: SectionTypes::TOWER
+    )
+    subsection = @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1", section_type: SectionTypes::FLOOR, parent: root_a
+    )
+
+    patch admin_property_setup_move_section_wizard_path(@draft, section_id: subsection.id), params: {
+      property_section: { parent_id: root_b.id }
+    }
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_equal root_b.id, subsection.reload.parent_id
+  end
+
+  test "move section to root clears its parent" do
+    sign_in_as(@tenant_admin)
+    root = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    subsection = @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1", section_type: SectionTypes::FLOOR, parent: root
+    )
+
+    patch admin_property_setup_move_section_wizard_path(@draft, section_id: subsection.id), params: {
+      property_section: { parent_id: "" }
+    }
+
+    assert_redirected_to admin_property_setup_wizard_path(@draft)
+    assert_nil subsection.reload.parent_id
+  end
+
+  test "move section rejects moving under a subsection" do
+    sign_in_as(@tenant_admin)
+    root_a = @draft.property_sections.create!(
+      organization: @organization, name: "Torre A", section_type: SectionTypes::TOWER
+    )
+    root_b = @draft.property_sections.create!(
+      organization: @organization, name: "Torre B", section_type: SectionTypes::TOWER
+    )
+    subsection = @draft.property_sections.create!(
+      organization: @organization, name: "Piso 1", section_type: SectionTypes::FLOOR, parent: root_a
+    )
+
+    patch admin_property_setup_move_section_wizard_path(@draft, section_id: root_b.id), params: {
+      property_section: { parent_id: subsection.id }
+    }
+
+    assert_nil root_b.reload.parent_id
   end
 
   test "destroy section soft-deletes an empty section" do

@@ -38,7 +38,7 @@
         </div>
       </section>
 
-      <label class="flex items-center gap-2 text-sm">
+      <label v-if="requiresAcknowledgement" class="flex items-center gap-2 text-sm">
         <Checkbox
           :model-value="ackModel"
           @update:model-value="(value: boolean | 'indeterminate') => { ackModel = value === true }"
@@ -61,6 +61,7 @@ const props = defineProps<{
   nextActions: string[]
   propertyId?: string
   acknowledged: boolean
+  requiresAcknowledgement?: boolean
 }>()
 
 const emit = defineEmits<{

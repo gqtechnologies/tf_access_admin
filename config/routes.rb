@@ -51,15 +51,12 @@ Rails.application.routes.draw do
     resources :people, only: [:index, :show, :new, :create, :edit, :update, :destroy]
     resources :profile, only: [:edit, :update]
     resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
-    resources :residential_properties, only: [:index, :new, :create, :edit, :update] do
+    resources :residential_properties, only: [:index, :new, :create] do
       member do
         post :archive
       end
-      resource :structure, only: [:show], module: :residential_properties
-    resources :units, only: [:index, :show, :create, :update], module: :residential_properties do
+    resources :units, only: [:index, :show, :update], module: :residential_properties do
         member do
-          post :move
-          post :archive
           post :restore
         end
         resources :ownerships, only: [:create, :update, :destroy], controller: "unit_ownerships"
@@ -67,12 +64,6 @@ Rails.application.routes.draw do
           collection do
             get :active_elsewhere
           end
-        end
-      end
-      resources :property_sections, only: [:create, :update], module: :residential_properties do
-        member do
-          post :move
-          post :archive
         end
       end
       resources :bulk_imports, only: %i[create update], module: :residential_properties do
@@ -93,9 +84,11 @@ Rails.application.routes.draw do
       post "wizard/:id/back",           to: "wizard#back",           as: :back_wizard
       post "wizard/:id/cancel",         to: "wizard#cancel",         as: :cancel_wizard
       post "wizard/:id/confirm",        to: "wizard#confirm",        as: :confirm_wizard
+      post "wizard/:id/complete",       to: "wizard#complete",       as: :complete_wizard
       post "wizard/:id/create_section", to: "wizard#create_section", as: :create_section_wizard
       post   "wizard/:id/sections",             to: "wizard#create_sections",  as: :create_sections_wizard
       patch  "wizard/:id/sections/:section_id", to: "wizard#update_section",    as: :update_section_wizard
+      patch  "wizard/:id/sections/:section_id/move", to: "wizard#move_section", as: :move_section_wizard
       delete "wizard/:id/sections/:section_id", to: "wizard#destroy_section",   as: :destroy_section_wizard
       post "wizard/:id/create_unit",    to: "wizard#create_unit",    as: :create_unit_wizard
       post   "wizard/:id/units",           to: "wizard#create_units",  as: :create_units_wizard

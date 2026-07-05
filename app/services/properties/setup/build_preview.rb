@@ -14,7 +14,7 @@ module Properties
       end
 
       def call
-        sections = @property.property_sections.includes(:parent)
+        sections = visible_sections
         units = visible_units
         wizard = WizardState.read(@property)
 
@@ -41,12 +41,38 @@ module Properties
       # paranoid default scope applies to the eager-loaded preload query), but a
       # plain `@property.units.count` still counts the row itself, so section
       # membership must be checked explicitly (fix-wizard-summary-persisted-data).
+      # Also excludes units that are effectively archived — their own status, or
+      # their section's (self or nearest archived ancestor, capped at the
+      # two-level hierarchy) — from the wizard specifically
+      # (enable-wizard-editing-created-state).
       def visible_units
         deleted_section_ids = PropertySection.only_deleted
           .where(residential_property_id: @property.id)
           .pluck(:id)
+        excluded_section_ids = deleted_section_ids | archived_section_ids
         scope = @property.units.includes(:property_section)
-        deleted_section_ids.any? ? scope.where.not(property_section_id: deleted_section_ids) : scope
+        scope = scope.where.not(property_section_id: excluded_section_ids) if excluded_section_ids.any?
+        scope.where.not(status: UnitStatuses::ARCHIVED)
+      end
+
+      # Sections visible to the wizard: not soft-deleted (default scope) and not
+      # effectively archived (self or parent archived).
+      def visible_sections
+        ids = archived_section_ids
+        scope = @property.property_sections.includes(:parent)
+        ids.any? ? scope.where.not(id: ids) : scope
+      end
+
+      # A section's own archived status, plus any root section's children when
+      # the root is archived (the hierarchy is capped at two levels, so this
+      # covers the full "self or nearest archived ancestor" rule without a
+      # recursive query).
+      def archived_section_ids
+        return @archived_section_ids if defined?(@archived_section_ids)
+
+        own_archived = @property.property_sections.where(status: SectionStatuses::ARCHIVED).pluck(:id)
+        children_of_archived = own_archived.any? ? @property.property_sections.where(parent_id: own_archived).pluck(:id) : []
+        @archived_section_ids = (own_archived + children_of_archived).uniq
       end
 
       # fix-automatic-unit-generation §8: structure counts are resolved from the
@@ -83,17 +109,28 @@ module Properties
       # +include_units+ is always on so step 3 manual unit management can render
       # persisted units under their section without a second tree fetch
       # (add-manual-section-units). Step 2 consumers ignore the extra `units` key.
+      #
+      # Archived sections are pruned from the wizard's tree specifically (their
+      # subtree comes with them, since an archived root's children already
+      # report `effective_status: archived`); `TreeBuilder` itself is unchanged
+      # and still shows archived sections (disabled) to non-wizard callers
+      # (enable-wizard-editing-created-state).
       def structure_summary(sections, wizard)
         {
           mode: wizard[:structure_mode],
-          tree: PropertySections::TreeBuilder.new(
+          tree: prune_archived(PropertySections::TreeBuilder.new(
             actor: @actor,
             property: @property,
             include_units: true
-          ).tree
+          ).tree)
         }
       rescue StandardError
         { mode: wizard[:structure_mode], tree: [] }
+      end
+
+      def prune_archived(nodes)
+        nodes.reject { |node| node[:effective_status] == SectionStatuses::ARCHIVED }
+          .map { |node| node.merge(children: prune_archived(node[:children] || [])) }
       end
 
       def units_summary(units)

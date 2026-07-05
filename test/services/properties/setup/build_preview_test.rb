@@ -232,6 +232,62 @@ class Properties::Setup::BuildPreviewTest < ActiveSupport::TestCase
     refute_includes preview[:units].map { |row| row[:id] }, orphaned_unit.id
   end
 
+  test "excludes an archived section and its units from counts and the tree" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-archived-section@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    kept_section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    kept_unit = Units::Create.call(
+      actor: admin, property: @property, section_id: kept_section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+
+    archived_section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre B", section_type: SectionTypes::TOWER }
+    ).section
+    Units::Create.call(
+      actor: admin, property: @property, section_id: archived_section.id,
+      attributes: { identifier: "201", unit_type: UnitTypes::APARTMENT }
+    )
+    PropertySections::Archive.call(actor: admin, section: archived_section)
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 1, preview.dig(:counts, :units)
+    assert_equal 1, preview.dig(:counts, :sections)
+    assert_equal [ kept_unit.id ], preview[:units].map { |row| row[:id] }
+    assert_equal [ "Torre A" ], preview.dig(:structure, :tree).map { |node| node[:name] }
+  end
+
+  test "excludes a directly archived unit under a non-archived section" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "counts-archived-unit@example.test", role: AvailableRoles::TENANT_ADMIN
+    )
+    section = PropertySections::Create.call(
+      actor: admin, property: @property, parent: nil,
+      attributes: { name: "Torre A", section_type: SectionTypes::TOWER }
+    ).section
+    kept_unit = Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "101", unit_type: UnitTypes::APARTMENT }
+    ).unit
+    archived_unit = Units::Create.call(
+      actor: admin, property: @property, section_id: section.id,
+      attributes: { identifier: "102", unit_type: UnitTypes::APARTMENT }
+    ).unit
+    Units::Archive.call(actor: admin, unit: archived_unit)
+
+    preview = Properties::Setup::BuildPreview.call(property: @property.reload, actor: admin)
+
+    assert_equal 1, preview.dig(:counts, :units)
+    assert_equal [ kept_unit.id ], preview[:units].map { |row| row[:id] }
+    assert_equal 1, preview.dig(:counts, :sections)
+  end
+
   test "excludes units and sections belonging to another property" do
     admin = create_user_for_organization(
       organization: @organization, email: "counts-other-property@example.test", role: AvailableRoles::TENANT_ADMIN

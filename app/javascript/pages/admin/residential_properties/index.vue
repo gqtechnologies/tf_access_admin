@@ -25,20 +25,14 @@
         </div>
       </template>
       <template #actions="{ row }">
-        <ListItem as="link" :href="admin_residential_property_structure_path(row.id as string)">
-          <span class="flex items-center gap-2">
-            <Layers class="w-4 h-4" />
-            {{ t('admin.residential_properties.index.actions.structure') }}
-          </span>
-        </ListItem>
         <ListItem
-          v-if="row.permissions?.update"
+          v-if="row.permissions?.update && wizardEditableStatuses.includes(row.status)"
           as="link"
-          :href="edit_admin_residential_property_path(row.id as string)"
+          :href="admin_property_setup_wizard_path(row.id as string)"
         >
           <span class="flex items-center gap-2">
-            <PencilIcon class="w-4 h-4" />
-            {{ t('common.actions.edit') }}
+            <Layers class="w-4 h-4" />
+            {{ t('admin.residential_properties.index.actions.setup_wizard') }}
           </span>
         </ListItem>
         <ListItem
@@ -82,12 +76,11 @@ import { useTable } from '@/lib/composables/useTable'
 import { useI18n } from 'vue-i18n'
 import type { ColumnDef } from '@/types/table'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, SearchIcon, PencilIcon, ArchiveIcon, Layers, Loader2 } from 'lucide-vue-next'
+import { PlusIcon, SearchIcon, ArchiveIcon, Layers, Loader2 } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import {
   admin_property_setup_new_wizard_path,
-  edit_admin_residential_property_path,
-  admin_residential_property_structure_path,
+  admin_property_setup_wizard_path,
 } from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'
@@ -111,6 +104,8 @@ const props = defineProps<{
 
 const archivingId = ref<string | null>(null)
 const canCreate = computed(() => Boolean((page.props.capabilities as Record<string, boolean>)?.manage_properties))
+// Statuses the setup wizard can reopen for editing (enable-wizard-editing-created-state).
+const wizardEditableStatuses = ['draft', 'created', 'configured', 'active']
 
 const fetchData = (search: string, pageNumber: number, itemsPerPage: number) => {
   router.get(

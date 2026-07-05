@@ -34,6 +34,7 @@
           :is-root="true"
           @edit="openEdit"
           @add-child="openAddChild"
+          @move="openMove"
           @delete="openDelete"
         />
 
@@ -46,6 +47,7 @@
               :section="child"
               :is-root="false"
               @edit="openEdit"
+              @move="openMove"
               @delete="openDelete"
             />
           </li>
@@ -270,6 +272,40 @@
               {{ t('admin.property_setup.step2.manual.edit.submit') }}
             </Button>
           </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <!-- Move dialog -->
+    <Dialog :open="moveOpen" @update:open="onMoveOpenChange">
+      <DialogContent class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{{ t('admin.property_setup.step2.manual.move.title') }}</DialogTitle>
+          <DialogDescription>
+            {{ t('admin.property_setup.step2.manual.move.description', { name: moveTarget?.name }) }}
+          </DialogDescription>
+        </DialogHeader>
+
+        <Field>
+          <FieldLabel>{{ t('admin.property_setup.step2.manual.move.parent_label') }}</FieldLabel>
+          <select
+            v-model="moveParentId"
+            class="border-input bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm"
+          >
+            <option value="">{{ t('admin.property_setup.step2.manual.move.root_option') }}</option>
+            <option v-for="option in moveParentOptions" :key="option.id" :value="option.id">
+              {{ option.name }}
+            </option>
+          </select>
+        </Field>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" @click="moveOpen = false">
+            {{ t('admin.property_setup.step2.manual.move.cancel') }}
+          </Button>
+          <Button type="button" :disabled="submitting" @click="submitMove">
+            {{ t('admin.property_setup.step2.manual.move.submit') }}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -626,6 +662,53 @@ function submitEdit() {
       },
       onError: (errors) => {
         editErrors.value = mapServerErrorsToForm(errors)
+      },
+      onFinish: () => {
+        submitting.value = false
+      },
+    },
+  )
+}
+
+// --- Move -------------------------------------------------------------------
+const moveOpen = ref(false)
+const moveTarget = ref<SectionNode | null>(null)
+const moveParentId = ref('')
+
+// A section may only move under a root section (never a subsection), and
+// never under itself (enable-wizard-editing-created-state).
+const moveParentOptions = computed(() =>
+  props.tree.filter((root) => root.id !== moveTarget.value?.id),
+)
+
+function openMove(section: SectionNode) {
+  moveTarget.value = section
+  moveParentId.value = findParentName(section.id)
+    ? (props.tree.find((root) => root.children?.some((child) => child.id === section.id))?.id ?? '')
+    : ''
+  moveOpen.value = true
+}
+
+function onMoveOpenChange(value: boolean) {
+  moveOpen.value = value
+  if (!value) moveTarget.value = null
+}
+
+function submitMove() {
+  if (!moveTarget.value) return
+  submitting.value = true
+  router.patch(
+    `/admin/property_setup/wizard/${props.propertyId}/sections/${moveTarget.value.id}/move`,
+    { property_section: { parent_id: moveParentId.value || null } },
+    {
+      preserveScroll: true,
+      onSuccess: () => {
+        moveOpen.value = false
+        moveTarget.value = null
+      },
+      onError: (errors) => {
+        const message = Object.values(errors).flat()[0]
+        if (message) toast.error(String(message))
       },
       onFinish: () => {
         submitting.value = false

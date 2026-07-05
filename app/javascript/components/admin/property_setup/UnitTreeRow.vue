@@ -26,6 +26,10 @@
           <Pencil class="size-4" />
           {{ t('admin.property_setup.step3.manual.actions.edit') }}
         </DropdownMenuItem>
+        <DropdownMenuItem v-if="propertyId" @select="onManageUnit">
+          <ExternalLink class="size-4" />
+          {{ t('admin.property_setup.step3.manual.actions.manage_unit') }}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" @select="emit('delete', unit)">
           <Trash2 class="size-4" />
@@ -38,8 +42,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
-import { Home, MoreHorizontal, Pencil, Trash2 } from 'lucide-vue-next'
+import { ExternalLink, Home, MoreHorizontal, Pencil, Trash2 } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -60,6 +65,7 @@ export type UnitNode = {
 
 const props = defineProps<{
   unit: UnitNode
+  propertyId?: string
 }>()
 
 const emit = defineEmits<{
@@ -70,4 +76,11 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const typeLabel = computed(() => t(`admin.units.unit_types.${props.unit.unit_type}`))
+
+// Navigates to the existing, non-wizard unit detail page
+// (enable-wizard-editing-created-state).
+function onManageUnit() {
+  if (!props.propertyId) return
+  router.visit(`/admin/residential_properties/${props.propertyId}/units/${props.unit.id}`)
+}
 </script>

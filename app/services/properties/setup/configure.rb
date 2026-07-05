@@ -2,8 +2,10 @@
 
 module Properties
   module Setup
-    # Transitions a property from draft to configured after wizard confirmation.
+    # Transitions a property from draft or created to configured after wizard confirmation.
     class Configure < Base
+      TRANSITIONABLE_FROM = [ PropertyStatuses::DRAFT, PropertyStatuses::CREATED ].freeze
+
       def initialize(actor:, property:)
         super(actor: actor)
         @property = property
@@ -12,7 +14,7 @@ module Properties
       def call
         authorize_setup_property!(@property)
 
-        unless @property.status == PropertyStatuses::DRAFT
+        unless TRANSITIONABLE_FROM.include?(@property.status)
           @property.errors.add(:status, :invalid_transition)
           return Result.invalid(@property)
         end

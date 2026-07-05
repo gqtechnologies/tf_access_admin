@@ -101,7 +101,7 @@ class Admin::ResidentialProperties::UnitOwnershipsController < AdminController
       .where(residential_property: @residential_property)
       .find(params[:unit_id])
   rescue ActiveRecord::RecordNotFound
-    redirect_to admin_residential_property_structure_path(@residential_property),
+    redirect_to admin_residential_properties_path,
                 inertia: { errors: [ I18n.t("frontend.admin.units.not_found") ] }
   end
 

@@ -1221,6 +1221,7 @@ en:
           other: "Other"
         statuses:
           draft: "Draft"
+          created: "Editable setup"
           configured: "Configured"
           active: "Active"
           inactive: "Inactive"
@@ -1239,6 +1240,7 @@ en:
               status: "Status"
           actions:
             create: "New property"
+            setup_wizard: "Setup"
             structure: "Manage structure"
             archive: "Archive property"
             archive_description: "Archive property {name}? It will be preserved for history and consultation."
@@ -1600,10 +1602,20 @@ en:
             continue: "Continue"
             continue_to_confirm: "Continue to confirmation"
             confirm: "Confirm setup"
+            save_created: "Save as editable"
+            save: "Save"
           cancel:
             draft_confirm: "Delete the property draft? All entered data will be lost. You can also keep it and come back later."
+          reset_confirm:
+            title: "This will delete the existing structure"
+            description: "Changing the property type or structure mode will delete the sections and units already created. Already-configured properties will archive instead of delete anything with operational history."
+            cancel: "Cancel"
+            confirm: "Yes, continue"
         errors:
           invalid_step: "Invalid step"
+          not_editable: "This property cannot be edited from the setup wizard."
+          confirmation_required: "This section or unit has operational history. Confirm to archive it instead of deleting it."
+          reset_confirmation_required: "This change will delete the existing structure and units. Confirm to continue."
         step1:
           title: "Property data"
           fields:
@@ -1659,7 +1671,15 @@ en:
               menu: "Section actions"
               edit: "Edit section"
               add_child: "Add child section"
+              move: "Move section"
               delete: "Delete section"
+            move:
+              title: "Move section"
+              description: "Choose a new parent for \"{name}\"."
+              parent_label: "New parent"
+              root_option: "No parent (root)"
+              cancel: "Cancel"
+              submit: "Move"
             create:
               title_root: "Add root section"
               title_child: "Add child sections"
@@ -1783,6 +1803,7 @@ en:
             actions:
               menu: "Actions"
               edit: "Edit"
+              manage_unit: "Manage unit"
               delete: "Delete"
             create:
               title: "Add unit"
@@ -1911,6 +1932,10 @@ en:
                 title: "View property detail"
                 description: "Review the full profile of the newly configured property."
                 action: "View detail"
+              reopen_setup:
+                title: "Reopen setup"
+                description: "Go back to the wizard to keep editing property data, structure, or units."
+                action: "Reopen setup"
               manage_units:
                 title: "Manage units"
                 description: "Edit identifiers, types, and sections for the created units."
@@ -2243,6 +2268,7 @@ en:
           attributes:
             name:
               taken: "A property with this name already exists in the organization"
+              code_collision: "This change would generate a code already used by another property. Change the property name."
             code:
               taken: "A property with this code already exists in the organization"
             status:

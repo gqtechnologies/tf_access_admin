@@ -85,6 +85,7 @@ import {
   DoorOpen,
   Layers,
   Search,
+  Settings2,
   ShieldCheck,
   UserRound,
   Users,
@@ -166,6 +167,18 @@ const nextStepActions = computed(() => {
         ? `/admin/residential_properties/${propertyId}/edit`
         : undefined,
       disabled: !showAction('property_detail'),
+    },
+    {
+      key: 'reopen_setup',
+      recommended: false,
+      icon: Settings2,
+      title: t('admin.property_setup.step5.completed.next_steps.reopen_setup.title'),
+      description: t('admin.property_setup.step5.completed.next_steps.reopen_setup.description'),
+      buttonLabel: t('admin.property_setup.step5.completed.next_steps.reopen_setup.action'),
+      href: propertyId && showAction('reopen_setup')
+        ? `/admin/property_setup/wizard/${propertyId}`
+        : undefined,
+      disabled: !showAction('reopen_setup'),
     },
     {
       key: 'manage_units',
