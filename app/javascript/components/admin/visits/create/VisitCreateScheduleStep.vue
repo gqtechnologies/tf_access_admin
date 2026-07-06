@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -60,4 +60,22 @@ const props = defineProps<{
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
 const fieldErrors = computed(() => props.fieldErrors ?? {})
+
+function pad(value: number) {
+  return String(value).padStart(2, '0')
+}
+
+// Defaults blank date/time to the browser's exact current local date/time on
+// first render of a new empty form (improve-admin-visit-form-inputs, design.md
+// Decision 5). Restored session state or user-entered values are never blank
+// here, so they are never overwritten. `end_time` is intentionally left as-is.
+onMounted(() => {
+  const now = new Date()
+  if (!form.value.visit_date) {
+    form.value.visit_date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+  }
+  if (!form.value.start_time) {
+    form.value.start_time = `${pad(now.getHours())}:${pad(now.getMinutes())}`
+  }
+})
 </script>

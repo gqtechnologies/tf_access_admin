@@ -106,6 +106,7 @@ Rails.application.routes.draw do
 
     resources :visits, only: %i[index show new create edit update] do
       collection do
+        get :form_properties
         get :form_units
         get :form_hosts
         get :initial_status_preview

@@ -56,17 +56,12 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { VisitInitialStatusPreview, VisitTypeOption } from '@/lib/schemas/visit_create'
-import type { PropertySummary, UnitFilterOption } from '@/types/visit'
-import type { VisitHostOption } from '@/lib/schemas/visit_create'
 
 const props = defineProps<{
-  properties: PropertySummary[]
-  units: UnitFilterOption[]
-  hosts: VisitHostOption[]
   visitTypes: VisitTypeOption[]
-  propertyId: string
-  unitId: string
-  hostPersonId: string
+  propertyName?: string
+  unitLabel?: string
+  hostName?: string
   visitorName?: string | null
   visitType: string
   visitDate: string
@@ -80,19 +75,6 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const emptyLabel = computed(() => t('admin.visits.new.summary.empty'))
-
-const propertyName = computed(
-  () => props.properties.find((property) => property.id === props.propertyId)?.name,
-)
-
-const unitLabel = computed(() => {
-  const unit = props.units.find((item) => item.id === props.unitId)
-  return unit ? (unit.display_name ?? unit.identifier) : undefined
-})
-
-const hostName = computed(
-  () => props.hosts.find((host) => host.id === props.hostPersonId)?.display_name,
-)
 
 const reasonLabel = computed(
   () => props.visitTypes.find((type) => type.value === props.visitType)?.label,

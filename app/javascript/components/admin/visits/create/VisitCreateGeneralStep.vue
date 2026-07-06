@@ -8,20 +8,17 @@
     <FieldGroup class="grid gap-4 md:grid-cols-2">
       <Field>
         <FieldLabel for="visit-property">{{ t('admin.visits.new.general.fields.property') }}</FieldLabel>
-        <NativeSelect
+        <AsyncSearchableSelect
           id="visit-property"
+          :key="`property-${lockPropertyUnit}`"
           v-model="form.residential_property_id"
-          class="w-full"
+          :load-options="loadProperties"
+          :selected-option="propertySelectedOption"
+          :placeholder="t('admin.visits.new.general.placeholders.property')"
           :disabled="lockPropertyUnit"
-          :aria-invalid="!!fieldErrors.residential_property_id"
-        >
-          <NativeSelectOption value="">
-            {{ t('admin.visits.new.general.placeholders.property') }}
-          </NativeSelectOption>
-          <NativeSelectOption v-for="property in properties" :key="property.id" :value="property.id">
-            {{ property.name }}
-          </NativeSelectOption>
-        </NativeSelect>
+          :invalid="!!fieldErrors.residential_property_id"
+          @option-selected="onPropertySelected"
+        />
         <FieldError
           v-if="fieldErrors.residential_property_id"
           :errors="translateErrors([fieldErrors.residential_property_id])"
@@ -30,64 +27,39 @@
 
       <Field>
         <FieldLabel for="visit-unit">{{ t('admin.visits.new.general.fields.unit') }}</FieldLabel>
-        <NativeSelect
+        <AsyncSearchableSelect
           id="visit-unit"
+          :key="`unit-${lockPropertyUnit}-${form.residential_property_id}`"
           v-model="form.unit_id"
-          class="w-full"
-          :disabled="lockPropertyUnit || !form.residential_property_id || unitsLoading"
-          :aria-invalid="!!fieldErrors.unit_id"
-        >
-          <NativeSelectOption value="">
-            {{
-              unitsLoading
-                ? t('admin.visits.new.general.loading.units')
-                : t('admin.visits.new.general.placeholders.unit')
-            }}
-          </NativeSelectOption>
-          <NativeSelectOption v-for="unit in units" :key="unit.id" :value="unit.id">
-            {{ unit.display_name ?? unit.identifier }}
-          </NativeSelectOption>
-        </NativeSelect>
+          :load-options="loadUnits"
+          :selected-option="unitSelectedOption"
+          :placeholder="t('admin.visits.new.general.placeholders.unit')"
+          :empty-text="t('admin.visits.new.general.empty.units')"
+          :disabled="lockPropertyUnit || !form.residential_property_id"
+          :invalid="!!fieldErrors.unit_id"
+          @option-selected="onUnitSelected"
+        />
         <FieldError v-if="fieldErrors.unit_id" :errors="translateErrors([fieldErrors.unit_id])" />
-        <p
-          v-else-if="form.residential_property_id && !unitsLoading && units.length === 0"
-          class="text-xs text-muted-foreground"
-        >
-          {{ t('admin.visits.new.general.empty.units') }}
-        </p>
       </Field>
 
       <Field class="md:col-span-2">
         <FieldLabel for="visit-host">{{ t('admin.visits.new.general.fields.host') }}</FieldLabel>
-        <NativeSelect
+        <AsyncSearchableSelect
           id="visit-host"
+          :key="`host-${form.unit_id}`"
           v-model="form.host_person_id"
-          class="w-full"
-          :disabled="!form.unit_id || hostsLoading"
-          :aria-invalid="!!fieldErrors.host_person_id"
-        >
-          <NativeSelectOption value="">
-            {{
-              hostsLoading
-                ? t('admin.visits.new.general.loading.hosts')
-                : t('admin.visits.new.general.placeholders.host')
-            }}
-          </NativeSelectOption>
-          <NativeSelectOption v-for="host in hosts" :key="host.id" :value="host.id">
-            {{ host.display_name }}
-            <template v-if="host.document_number"> · {{ host.document_number }}</template>
-          </NativeSelectOption>
-        </NativeSelect>
+          :load-options="loadHosts"
+          :selected-option="hostSelectedOption"
+          :placeholder="t('admin.visits.new.general.placeholders.host')"
+          :empty-text="t('admin.visits.new.general.empty.hosts')"
+          :disabled="!form.unit_id"
+          :invalid="!!fieldErrors.host_person_id"
+          @option-selected="onHostSelected"
+        />
         <FieldError
           v-if="fieldErrors.host_person_id"
           :errors="translateErrors([fieldErrors.host_person_id])"
         />
-        <p
-          v-else-if="form.unit_id && !hostsLoading && hosts.length === 0"
-          class="text-xs text-muted-foreground"
-        >
-          {{ t('admin.visits.new.general.empty.hosts') }}
-        </p>
       </Field>
     </FieldGroup>
   </div>
@@ -97,19 +69,15 @@
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select'
+import { AsyncSearchableSelect } from '@/components/ui/searchable-select'
+import type { SearchableSelectLoader, SearchableSelectOption } from '@/components/ui/searchable-select'
+import { useRailsFetch } from '@/lib/composables/useRailsFetch'
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
-import type { VisitCreateForm, VisitHostOption } from '@/lib/schemas/visit_create'
-import type { PropertySummary, UnitFilterOption } from '@/types/visit'
+import type { VisitCreateForm } from '@/lib/schemas/visit_create'
 
 const form = defineModel<VisitCreateForm>('form', { required: true })
 
 const props = defineProps<{
-  properties: PropertySummary[]
-  units: UnitFilterOption[]
-  hosts: VisitHostOption[]
-  unitsLoading?: boolean
-  hostsLoading?: boolean
   fieldErrors?: Record<string, string | undefined>
   lockPropertyUnit?: boolean
 }>()
@@ -121,8 +89,102 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const { translateErrors } = useTranslateErrors()
+const { railsFetchJson } = useRailsFetch()
 const fieldErrors = computed(() => props.fieldErrors ?? {})
 const lockPropertyUnit = computed(() => props.lockPropertyUnit ?? false)
+
+const propertySelectedOption = computed<SearchableSelectOption | null>(() =>
+  form.value.residential_property_id
+    ? { value: form.value.residential_property_id, label: form.value.residential_property_name }
+    : null,
+)
+
+const unitSelectedOption = computed<SearchableSelectOption | null>(() =>
+  form.value.unit_id ? { value: form.value.unit_id, label: form.value.unit_label } : null,
+)
+
+const hostSelectedOption = computed<SearchableSelectOption | null>(() =>
+  form.value.host_person_id
+    ? { value: form.value.host_person_id, label: form.value.host_display_name }
+    : null,
+)
+
+const loadProperties: SearchableSelectLoader = async ({ query, page }) => {
+  const params = new URLSearchParams({ page: String(page) })
+  if (query) params.set('search', query)
+
+  const { res, data } = await railsFetchJson<{
+    properties: { id: string; name: string }[]
+    pagination: { has_more: boolean }
+  }>('GET', `/admin/visits/form_properties?${params.toString()}`)
+
+  if (!res.ok) throw new Error('form_properties_failed')
+
+  return {
+    options: data.properties.map((property) => ({ value: property.id, label: property.name })),
+    hasMore: data.pagination.has_more,
+  }
+}
+
+const loadUnits: SearchableSelectLoader = async ({ query, page }) => {
+  if (!form.value.residential_property_id) return { options: [], hasMore: false }
+
+  const params = new URLSearchParams({
+    page: String(page),
+    residential_property_id: form.value.residential_property_id,
+  })
+  if (query) params.set('search', query)
+
+  const { res, data } = await railsFetchJson<{
+    units: { id: string; identifier: string; display_name: string | null }[]
+    pagination: { has_more: boolean }
+  }>('GET', `/admin/visits/form_units?${params.toString()}`)
+
+  if (!res.ok) throw new Error('form_units_failed')
+
+  return {
+    options: data.units.map((unit) => ({
+      value: unit.id,
+      label: unit.display_name ?? unit.identifier,
+    })),
+    hasMore: data.pagination.has_more,
+  }
+}
+
+const loadHosts: SearchableSelectLoader = async ({ query, page }) => {
+  if (!form.value.unit_id) return { options: [], hasMore: false }
+
+  const params = new URLSearchParams({ page: String(page), unit_id: form.value.unit_id })
+  if (query) params.set('search', query)
+
+  const { res, data } = await railsFetchJson<{
+    hosts: { id: string; display_name: string; document_number?: string | null }[]
+    pagination: { has_more: boolean }
+  }>('GET', `/admin/visits/form_hosts?${params.toString()}`)
+
+  if (!res.ok) throw new Error('form_hosts_failed')
+
+  return {
+    options: data.hosts.map((host) => ({
+      value: host.id,
+      label: host.display_name,
+      description: host.document_number ?? undefined,
+    })),
+    hasMore: data.pagination.has_more,
+  }
+}
+
+function onPropertySelected(option: SearchableSelectOption | null) {
+  form.value.residential_property_name = option?.label ?? ''
+}
+
+function onUnitSelected(option: SearchableSelectOption | null) {
+  form.value.unit_label = option?.label ?? ''
+}
+
+function onHostSelected(option: SearchableSelectOption | null) {
+  form.value.host_display_name = option?.label ?? ''
+}
 
 watch(
   () => form.value.residential_property_id,
@@ -130,7 +192,9 @@ watch(
     if (lockPropertyUnit.value) return
     if (propertyId === previousPropertyId) return
     form.value.unit_id = ''
+    form.value.unit_label = ''
     form.value.host_person_id = ''
+    form.value.host_display_name = ''
     emit('property-change', String(propertyId ?? ''))
   },
 )
@@ -141,6 +205,7 @@ watch(
     if (lockPropertyUnit.value) return
     if (unitId === previousUnitId) return
     form.value.host_person_id = ''
+    form.value.host_display_name = ''
     emit('unit-change', String(unitId ?? ''))
   },
 )

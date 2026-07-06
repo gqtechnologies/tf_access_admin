@@ -214,7 +214,7 @@ npm install
 foreman start -f Procfile.dev
 ```
 
-ingresar a 
+ingresar a
 - http://demo-pro.localhost:5100/home
 
 ### To install shadcn modules

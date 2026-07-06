@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_04_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+  enable_extension "unaccent"
 
   create_table "access_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -809,7 +810,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_04_220000) do
     t.index ["organization_id", "property_type"], name: "idx_on_organization_id_property_type_d2e2ee8ca6"
     t.index ["organization_id", "status"], name: "index_residential_properties_on_organization_id_and_status"
     t.index ["organization_id"], name: "index_residential_properties_on_organization_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'created'::character varying, 'configured'::character varying, 'active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "residential_properties_status_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'created'::character varying::text, 'configured'::character varying::text, 'active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "residential_properties_status_allowed"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

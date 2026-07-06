@@ -38,6 +38,11 @@ es:
       back: "Volver"
       clear: "Limpiar"
       back: "Volver"
+      searchable_select:
+        loading: "Cargando opciones…"
+        empty: "No se encontraron resultados"
+        error: "No se pudieron cargar las opciones. Intenta de nuevo."
+        clear: "Limpiar selección"
       multi_file_upload:
         browse: "Examinar"
         browse_aria: "Seleccionar archivos (hasta {max})"

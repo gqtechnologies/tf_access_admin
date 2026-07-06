@@ -22,7 +22,9 @@ class Admin::VisitsController < AdminController
 
   before_action :set_visit, only: %i[show edit update authorize_visit cancel]
   before_action :require_editable_status!, only: %i[edit update]
-  before_action :authorize_visit_management!, only: %i[form_units form_hosts initial_status_preview]
+  before_action :authorize_visit_management!, only: %i[form_properties form_units form_hosts initial_status_preview]
+
+  FORM_OPTIONS_PER_PAGE = 20
 
   # GET /admin/visits
   # Administrative listing — all org or property-scoped visits (6.1, 6.4).
@@ -66,29 +68,46 @@ class Admin::VisitsController < AdminController
     render inertia: "admin/visits/new", props: new_form_props
   end
 
+  # GET /admin/visits/form_properties
+  def form_properties
+    properties = apply_name_search(policy_scope(ResidentialProperty), columns: [ "residential_properties.name" ])
+      .order(:name)
+      .page(form_options_page)
+      .per(FORM_OPTIONS_PER_PAGE)
+
+    render json: {
+      properties: properties.map { |property| property_option_json(property) },
+      pagination: form_options_pagination(properties)
+    }
+  end
+
   # GET /admin/visits/form_units
   def form_units
     units = Units::Search.apply(
       policy_scope(Unit).includes(:residential_property),
       term: params[:search],
       residential_property_id: params[:residential_property_id].presence
-    ).order(:identifier)
+    ).order(:identifier).page(form_options_page).per(FORM_OPTIONS_PER_PAGE)
 
     render json: {
-      units: units.limit(500).map { |unit| unit_option_json(unit) }
+      units: units.map { |unit| unit_option_json(unit) },
+      pagination: form_options_pagination(units)
     }
   end
 
   # GET /admin/visits/form_hosts
   def form_hosts
     unit = policy_scope(Unit).find(params.require(:unit_id))
-    hosts = Visits::EligibleHosts.call(unit: unit)
+    hosts = apply_name_search(Visits::EligibleHosts.call(unit: unit), columns: [ "people.display_name" ])
+      .page(form_options_page)
+      .per(FORM_OPTIONS_PER_PAGE)
 
     render json: {
-      hosts: hosts.map { |person| host_option_json(person) }
+      hosts: hosts.map { |person| host_option_json(person) },
+      pagination: form_options_pagination(hosts)
     }
   rescue ActiveRecord::RecordNotFound
-    render json: { hosts: [] }, status: :not_found
+    render json: { hosts: [], pagination: { current_page: 1, has_more: false } }, status: :not_found
   end
 
   # GET /admin/visits/initial_status_preview
@@ -221,7 +240,6 @@ class Admin::VisitsController < AdminController
   def new_form_props
     props = {
       visit: Admin::VisitSerializer.new(Visit.new, current_user: current_user).as_json,
-      properties: accessible_properties_for_filters,
       visit_types: VisitTypes::ALL.map { |type| visit_type_option(type) }
     }
 
@@ -240,6 +258,27 @@ class Admin::VisitsController < AdminController
 
   def authorize_visit_management!
     authorize Visit, :index?
+  end
+
+  def form_options_page
+    params[:page].to_i.clamp(1..)
+  end
+
+  def form_options_pagination(collection)
+    {
+      current_page: collection.current_page,
+      has_more: collection.current_page < collection.total_pages
+    }
+  end
+
+  def apply_name_search(scope, columns:)
+    return scope if params[:search].blank?
+
+    scope.where(AccentInsensitiveMatch.where_clause(*columns), term: AccentInsensitiveMatch.term(params[:search]))
+  end
+
+  def property_option_json(property)
+    { id: property.id, name: property.name }
   end
 
   def unit_option_json(unit)

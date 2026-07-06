@@ -262,6 +262,86 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
     assert_equal VisitStatuses::CHECKED_IN, @visit.reload.status
   end
 
+  test "new exposes contextual unit with property_name for locked property/unit display" do
+    sign_in_as(@tenant_admin)
+
+    inertia_get new_admin_visit_path(unit_id: @unit.id)
+
+    assert_response :success
+    contextual = inertia_props["contextual"]
+    assert_equal @unit.id, contextual["unit"]["id"]
+    assert_equal @property.name, contextual["unit"]["property_name"]
+  end
+
+  test "new does not expose a static properties list" do
+    sign_in_as(@tenant_admin)
+
+    inertia_get new_admin_visit_path
+
+    assert_response :success
+    assert_not inertia_props.key?("properties")
+  end
+
+  test "form_properties matches accent-insensitively and excludes other organizations" do
+    create_property(@organization, "Región Sur")
+    sign_in_as(@tenant_admin)
+
+    get form_properties_admin_visits_path, params: { search: "region" }
+
+    assert_response :success
+    names = response.parsed_body.fetch("properties").map { |row| row["name"] }
+    assert_includes names, "Región Sur"
+    assert_not_includes names, "Other Org VC Property"
+  end
+
+  test "form_properties paginates with 20 per page" do
+    21.times { |i| create_property(@organization, "Paginated Property #{i}") }
+    sign_in_as(@tenant_admin)
+
+    get form_properties_admin_visits_path
+
+    assert_response :success
+    body = response.parsed_body
+    assert_equal 20, body.fetch("properties").size
+    assert body.fetch("pagination").fetch("has_more")
+  end
+
+  test "form_units matches accent-insensitively" do
+    create_unit(@property, "Depósito 1")
+    sign_in_as(@tenant_admin)
+
+    get form_units_admin_visits_path, params: { search: "deposito" }
+
+    assert_response :success
+    identifiers = response.parsed_body.fetch("units").map { |row| row["identifier"] }
+    assert_includes identifiers, "Depósito 1"
+  end
+
+  test "form_hosts matches accent-insensitively and excludes ineligible people" do
+    accented_unit = create_unit(@property, "VC-P-ACCENT")
+    host_with_accent = Person.create!(
+      organization: @organization,
+      display_name: "José García",
+      person_type: PersonTypes::NATURAL,
+      status: PersonStatuses::ACTIVE
+    )
+    UnitOwnership.create!(
+      organization: @organization,
+      person: host_with_accent,
+      unit: accented_unit,
+      ownership_percentage: 100,
+      starts_at: Date.current,
+      status: UnitOwnership::STATUS_ACTIVE
+    )
+    sign_in_as(@tenant_admin)
+
+    get form_hosts_admin_visits_path, params: { unit_id: accented_unit.id, search: "jose garcia" }
+
+    assert_response :success
+    names = response.parsed_body.fetch("hosts").map { |row| row["display_name"] }
+    assert_includes names, "José García"
+  end
+
   private
 
   def sign_in_as(user)

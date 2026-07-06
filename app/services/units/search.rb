@@ -46,20 +46,18 @@ module Units
     end
 
     def apply_term(relation)
-      like = "%#{ActiveRecord::Base.sanitize_sql_like(@term)}%"
+      like = AccentInsensitiveMatch.term(@term)
+      name_match = AccentInsensitiveMatch.where_clause("units.identifier", "units.display_name")
       normalized = Units::NormalizeIdentifier.call(@term)&.normalized_identifier
 
       if normalized.present?
         relation.where(
-          "units.normalized_identifier = :normalized OR units.identifier ILIKE :like OR units.display_name ILIKE :like",
+          "units.normalized_identifier = :normalized OR #{name_match}",
           normalized: normalized,
-          like: like
+          term: like
         )
       else
-        relation.where(
-          "units.identifier ILIKE :like OR units.display_name ILIKE :like",
-          like: like
-        )
+        relation.where(name_match, term: like)
       end
     end
   end

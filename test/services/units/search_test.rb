@@ -29,6 +29,14 @@ class Units::SearchTest < ActiveSupport::TestCase
     assert_includes results, @unit
   end
 
+  test "matches display name accent-insensitively" do
+    @unit.update!(display_name: "Depósito Ático")
+
+    results = Units::Search.apply(Unit.all, term: "deposito atico")
+
+    assert_includes results, @unit
+  end
+
   test "scopes to residential property when provided" do
     other_property = create_property(@organization, "Search Property Two")
     other_unit = create_unit(other_property, "Torre A 101")

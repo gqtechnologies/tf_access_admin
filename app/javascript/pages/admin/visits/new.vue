@@ -16,14 +16,8 @@
           <VisitCreateGeneralStep
             v-if="currentStep === 'general'"
             v-model:form="form"
-            :properties="properties"
-            :units="units"
-            :hosts="hosts"
-            :units-loading="unitsLoading"
-            :hosts-loading="hostsLoading"
             :field-errors="fieldErrors"
             :lock-property-unit="isContextualCreate"
-            @property-change="handlePropertyChange"
             @unit-change="handleUnitChange"
           />
 
@@ -69,13 +63,10 @@
       </div>
 
       <VisitAuthorizationSummary
-        :properties="properties"
-        :units="units"
-        :hosts="hosts"
         :visit-types="visitTypes"
-        :property-id="form.residential_property_id"
-        :unit-id="form.unit_id"
-        :host-person-id="form.host_person_id"
+        :property-name="form.residential_property_name"
+        :unit-label="form.unit_label"
+        :host-name="form.host_display_name"
         :visitor-name="resolvedVisitorName"
         :visit-type="form.visit_type"
         :visit-date="form.visit_date"
@@ -114,10 +105,9 @@ import { mapServerErrorsToForm } from '@/lib/forms/map_server_errors'
 import { buildDisplayName } from '@/lib/schemas/unit_ownership'
 import type { VisitTypeOption } from '@/lib/schemas/visit_create'
 import { admin_residential_property_unit_path, admin_visits_path } from '@/routes'
-import type { PropertySummary, VisitContextualCreateContext } from '@/types/visit'
+import type { VisitContextualCreateContext } from '@/types/visit'
 
 const props = defineProps<{
-  properties: PropertySummary[]
   visit_types: VisitTypeOption[]
   contextual?: VisitContextualCreateContext
   errors?: Record<string, string[]>
@@ -142,18 +132,7 @@ const {
   buildSubmitPayload,
 } = useAdminVisitCreate(defaultVisitType)
 
-const {
-  units,
-  hosts,
-  initialStatusPreview,
-  unitsLoading,
-  hostsLoading,
-  statusLoading,
-  fetchUnits,
-  fetchHosts,
-  fetchInitialStatusPreview,
-  refreshLocationData,
-} = useAdminVisitFormData()
+const { initialStatusPreview, statusLoading, fetchInitialStatusPreview } = useAdminVisitFormData()
 
 const isContextualCreate = computed(() => Boolean(props.contextual?.unit))
 
@@ -178,7 +157,6 @@ const itemsBreadcrumb = computed(() => {
 })
 
 const visitTypes = computed(() => props.visit_types)
-const properties = computed(() => props.properties)
 
 const serverFieldErrors = computed(() =>
   props.errors ? mapVisitCreateServerErrors(props.errors) : {},
@@ -206,12 +184,8 @@ const primaryActionLabel = computed(() => {
   return t('admin.visits.new.actions.continue')
 })
 
-async function handlePropertyChange(propertyId: string) {
-  await fetchUnits(propertyId)
-}
-
 async function handleUnitChange(unitId: string) {
-  await Promise.all([fetchHosts(unitId), fetchInitialStatusPreview(unitId)])
+  await fetchInitialStatusPreview(unitId)
 }
 
 function handleBack() {
@@ -277,7 +251,7 @@ function restoreFromServerErrors() {
 
   restoreSnapshot(state)
   currentStep.value = 'confirm'
-  refreshLocationData(state.form.residential_property_id, state.form.unit_id)
+  if (state.form.unit_id) void fetchInitialStatusPreview(state.form.unit_id)
 }
 
 function mapVisitCreateServerErrors(errors: Record<string, string[]>) {
@@ -306,9 +280,10 @@ async function initializeContextualCreate() {
 
   const unit = props.contextual.unit
   form.value.residential_property_id = unit.residential_property_id
+  form.value.residential_property_name = unit.property_name
   form.value.unit_id = unit.id
-  await fetchUnits(unit.residential_property_id)
-  await Promise.all([fetchHosts(unit.id), fetchInitialStatusPreview(unit.id)])
+  form.value.unit_label = unit.display_name ?? unit.identifier
+  await fetchInitialStatusPreview(unit.id)
 }
 
 onMounted(() => {

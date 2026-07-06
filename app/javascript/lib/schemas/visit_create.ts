@@ -27,8 +27,14 @@ export type VisitCreateVehicleForm = {
 
 export type VisitCreateForm = {
   residential_property_id: string
+  // Cached labels for the selected property/unit/host so the searchable
+  // selects and summary panel can render them without a full options list
+  // (improve-admin-visit-form-inputs). Not sent in the submit payload.
+  residential_property_name: string
   unit_id: string
+  unit_label: string
   host_person_id: string
+  host_display_name: string
   visitor_mode: VisitCreateVisitorMode
   visitor_person_id: string
   visitor: VisitCreatePersonForm
@@ -43,8 +49,11 @@ export type VisitCreateForm = {
 export function createEmptyVisitCreateForm(defaultVisitType = 'guest'): VisitCreateForm {
   return {
     residential_property_id: '',
+    residential_property_name: '',
     unit_id: '',
+    unit_label: '',
     host_person_id: '',
+    host_display_name: '',
     visitor_mode: 'search',
     visitor_person_id: '',
     visitor: {

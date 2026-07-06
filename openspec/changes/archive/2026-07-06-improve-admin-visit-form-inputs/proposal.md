@@ -53,7 +53,8 @@ Tenant isolation and authorization impact:
 - Adds a reusable Vue UI component for searchable select behavior.
 - Updates admin visit creation step 1 to use that component for property, unit, and host selection.
 - Updates visit form initialization so new forms default `visit_date` and `start_time` to the user's current local date/time.
-- Adds or updates tenant-scoped search endpoints for property, unit, and host options.
+- Adds or updates tenant-scoped search endpoints for property, unit, and host options, including a brand-new property option endpoint (properties are currently embedded as a static, unpaginated page prop, not served by an endpoint).
+- Adds a migration enabling the Postgres `unaccent` extension so property/unit/host name search can be accent-insensitive (no existing strategy in the project covers this; see design.md Decision 7).
 - Adds frontend tests/type checks where available and targeted Rails/controller tests for changed search endpoints.
 - Adds i18n keys for generic searchable select loading/empty/search affordances if the component displays user-facing text.
 

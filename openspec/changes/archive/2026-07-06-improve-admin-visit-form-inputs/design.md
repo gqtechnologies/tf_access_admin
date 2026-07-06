@@ -38,6 +38,8 @@ Affected models, services, database tables, and integration points:
 
    The component should live under shared UI/component code and accept generic option data (`value`, `label`, optional description/metadata), an async option loader, pagination state, and an optional selected option label/value pair. It searches by asking the caller-provided loader for options, not by knowing visit-specific APIs. Alternative considered: adding bespoke filtering inside `VisitCreateGeneralStep`. That would solve this page only and make future reuse harder.
 
+   Built as `SearchableSelect.vue`, composing the official `components/ui/combobox` primitives (added via the shadcn-vue CLI, matching [ui.shadcn.com's Combobox pattern](https://ui.shadcn.com/docs/components/radix/combobox): a `Button` trigger showing the selected label + chevron, opening a popover with a search input and check-mark item indicators) with the async loader/pagination/debounce/error-recovery logic layered on top in the composing component.
+
 2. Keep option authorization server-side.
 
    The searchable select only renders options returned by authorized endpoints. It must not query global records or infer hidden options. Search endpoints must keep existing policy scopes, tenant scoping, parent filters, and host eligibility rules.
@@ -60,7 +62,11 @@ Affected models, services, database tables, and integration points:
 
 7. Search matching semantics.
 
-   Property search matches property name, unit search matches unit name, and host search matches host name. Matching should trim surrounding whitespace, be case-insensitive, and be accent-insensitive so searches without accents can match names with accents. The backend implementation should choose the simplest Rails/Postgres strategy available in the project and cover it with targeted tests.
+   Property search matches property name, unit search matches unit name, and host search matches host name. Matching should trim surrounding whitespace, be case-insensitive, and be accent-insensitive so searches without accents can match names with accents (e.g. "region" matches "Región").
+
+   No accent-insensitive strategy exists anywhere in the project today: the only established pattern (`Units::Search#apply_term`) uses plain `ILIKE`, which is case-insensitive but not accent-insensitive, and no `unaccent`/`pg_trgm` extension is enabled (`db/schema.rb` only enables `btree_gist`, `plpgsql`, `pgcrypto`). Filtering in Ruby after fetching would defeat the server-side pagination required by Decision 3 for potentially large option sets.
+
+   Decision: enable the Postgres `unaccent` extension via migration and match with `unaccent(column) ILIKE unaccent(:term)` (wrapped in a shared query helper so all three endpoints — property, unit, host — apply it consistently). This is a one-line, reversible `enable_extension` migration with no data changes. Alternative considered: Ruby-side transliteration. Rejected because it cannot be combined with efficient DB-side pagination without also introducing a persisted normalized column, which is more invasive than enabling a stock Postgres extension.
 
 8. Do not auto-select single-option results.
 
@@ -87,16 +93,16 @@ Affected models, services, database tables, and integration points:
 - [Risk] Time defaults may become stale before step 3. -> Mitigate by applying defaults when step 3 first renders, not when the page first opens.
 - [Risk] Restored forms could be overwritten. -> Mitigate by applying defaults only when creating an empty form, and preserving session restore snapshots.
 - [Risk] Searchable select accessibility can regress compared to native select. -> Mitigate with keyboard support, focus management, ARIA labels/states, and tests/manual QA.
-- [Risk] Accent-insensitive backend search can differ by database collation. -> Mitigate with a shared normalization approach or explicit SQL strategy covered by tests.
+- [Risk] Accent-insensitive backend search can differ by database collation. -> Mitigate by using the Postgres `unaccent` extension explicitly (Decision 7) instead of relying on collation, and cover it with targeted tests across property/unit/host endpoints.
 
 ## Migration Plan
 
+- Add a migration enabling the Postgres `unaccent` extension (no data/table changes).
 - Add the shared endpoint-backed searchable select component.
-- Add or update visit form option search endpoints.
+- Add or update visit form option search endpoints, including a new property option endpoint (none exists today — properties are currently embedded as a static, unpaginated prop).
 - Replace the three step 1 native selects in admin visit creation.
 - Add date/time default helpers when the schedule step renders.
-- No database migration is required.
-- Rollback returns step 1 to native selects and restores empty date/start-time defaults.
+- Rollback disables the `unaccent` extension (safe: no data or columns depend on it), returns step 1 to native selects, and restores empty date/start-time defaults.
 
 ## Open Questions
 

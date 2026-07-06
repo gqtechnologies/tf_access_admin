@@ -38,6 +38,11 @@ en:
       back: "Back"
       clear: "Clear"
       back: "Back"
+      searchable_select:
+        loading: "Loading options…"
+        empty: "No results found"
+        error: "Could not load options. Try again."
+        clear: "Clear selection"
       multi_file_upload:
         browse: "Browse"
         browse_aria: "Choose files (up to {max})"
