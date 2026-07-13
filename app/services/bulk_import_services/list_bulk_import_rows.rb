@@ -17,9 +17,9 @@ module BulkImportServices
       @page = [ page.to_i, 1 ].max
       @per_page = if per_page.present?
                     per_page.to_i.clamp(1, MAX_PER_PAGE)
-                  else
+      else
                     PREVIEW_PER_PAGE
-                  end
+      end
       @filter = FILTERS.include?(filter.to_s) ? filter.to_s : "all"
       @search = search.to_s.strip
     end

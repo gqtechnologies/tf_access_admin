@@ -25,7 +25,7 @@ module OperationalRoles
 
       assignment.update!(
         status: StaffAssignment::STATUS_INACTIVE,
-        ends_at: [assignment.ends_at, Date.current].compact.min
+        ends_at: [ assignment.ends_at, Date.current ].compact.min
       )
 
       { success: true, assignment: assignment, errors: [] }

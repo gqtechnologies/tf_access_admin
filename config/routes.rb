@@ -39,7 +39,7 @@ Rails.application.routes.draw do
         # POST /api/v1/private/units/:unit_id/visits creates an authorized visit.
         # A pending-visit flow requires a separate contract.
         resources :units, only: [] do
-          resources :visits, only: [:create], module: :units
+          resources :visits, only: [ :create ], module: :units
         end
       end
     end
@@ -47,8 +47,8 @@ Rails.application.routes.draw do
 
   get "admin/home/index"
   namespace :admin do
-    resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
-    resources :people, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+    resources :users, only: [ :index, :new, :create, :edit, :update, :destroy ]
+    resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
     namespace :people do
       resources :bulk_imports, only: %i[create update] do
         member do
@@ -60,18 +60,18 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :profile, only: [:edit, :update]
-    resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
-    resources :residential_properties, only: [:index, :new, :create, :show] do
+    resources :profile, only: [ :edit, :update ]
+    resources :organizations, only: [ :index, :show, :edit, :update, :new, :create, :destroy ]
+    resources :residential_properties, only: [ :index, :new, :create, :show ] do
       member do
         post :archive
       end
-    resources :units, only: [:index, :show, :update], module: :residential_properties do
+    resources :units, only: [ :index, :show, :update ], module: :residential_properties do
         member do
           post :restore
         end
-        resources :ownerships, only: [:create, :update, :destroy], controller: "unit_ownerships"
-        resources :occupancies, only: [:create, :update, :destroy], controller: "unit_occupancies" do
+        resources :ownerships, only: [ :create, :update, :destroy ], controller: "unit_ownerships"
+        resources :occupancies, only: [ :create, :update, :destroy ], controller: "unit_occupancies" do
           collection do
             get :active_elsewhere
           end
@@ -108,12 +108,12 @@ Rails.application.routes.draw do
       get  "wizard/:id/structure_preview", to: "wizard#structure_preview", as: :structure_preview_wizard
       get  "wizard/:id/units_preview",  to: "wizard#units_preview",  as: :units_preview_wizard
     end
-    resources :property_sections, only: [:index, :edit]
-    resources :units, only: [:index]
+    resources :property_sections, only: [ :index, :edit ]
+    resources :units, only: [ :index ]
     namespace :operational_roles do
-      resources :assignments, only: [:index, :create, :destroy]
+      resources :assignments, only: [ :index, :create, :destroy ]
     end
-    resources :operational_roles, only: [:index, :show], param: :role
+    resources :operational_roles, only: [ :index, :show ], param: :role
 
     resources :visits, only: %i[index show new create edit update] do
       collection do

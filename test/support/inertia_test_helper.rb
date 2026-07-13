@@ -23,7 +23,7 @@ module InertiaTestHelper
 
   def inertia_field_error(model_class, attribute, message)
     label = model_class.human_attribute_name(attribute)
-    { attribute => ["#{label} #{message}"] }
+    { attribute => [ "#{label} #{message}" ] }
   end
 
   def expected_inertia_errors(record)

@@ -29,9 +29,9 @@ module BulkImportServices
       processed = @bulk_import.imported_rows + @bulk_import.skipped_rows + @bulk_import.failed_rows
       percentage = if target.positive?
                      ((processed.to_f / target) * 100).round
-                   else
+      else
                      @bulk_import.progress_percentage
-                   end
+      end
 
       {
         total: target,

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::OperationalRoles::AssignmentsController < AdminController
-  before_action :set_assignment, only: [:destroy]
+  before_action :set_assignment, only: [ :destroy ]
 
   def index
     authorize nil, :index?, policy_class: OperationalRolePolicy
@@ -31,7 +31,7 @@ class Admin::OperationalRoles::AssignmentsController < AdminController
     result = build_and_call_service
     if result.nil?
       redirect_to admin_operational_roles_assignments_path,
-        inertia: { errors: { base: [I18n.t("operational_roles.errors.unknown_role")] } }
+        inertia: { errors: { base: [ I18n.t("operational_roles.errors.unknown_role") ] } }
     elsif result[:success]
       redirect_to admin_operational_roles_assignments_path
     else

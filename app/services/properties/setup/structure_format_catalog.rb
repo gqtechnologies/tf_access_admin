@@ -15,31 +15,31 @@ module Properties
       def all
         @all ||= {
           PropertyTypes::BUILDING => format(
-            [level(SectionTypes::TOWER, :letter), level(SectionTypes::FLOOR, :number)],
+            [ level(SectionTypes::TOWER, :letter), level(SectionTypes::FLOOR, :number) ],
             SectionTypes::FLOOR
           ),
           PropertyTypes::TOWER => format(
-            [level(SectionTypes::FLOOR, :number)],
+            [ level(SectionTypes::FLOOR, :number) ],
             SectionTypes::FLOOR
           ),
           PropertyTypes::CONDOMINIUM => format(
-            [level(SectionTypes::SECTOR, :number), level(SectionTypes::BLOCK, :number)],
+            [ level(SectionTypes::SECTOR, :number), level(SectionTypes::BLOCK, :number) ],
             SectionTypes::BLOCK
           ),
           PropertyTypes::HORIZONTAL => format(
-            [level(SectionTypes::SECTOR, :number), level(SectionTypes::BLOCK, :number)],
+            [ level(SectionTypes::SECTOR, :number), level(SectionTypes::BLOCK, :number) ],
             SectionTypes::BLOCK
           ),
           PropertyTypes::RESIDENTIAL_COMPLEX => format(
-            [level(SectionTypes::TOWER, :letter), level(SectionTypes::FLOOR, :number)],
+            [ level(SectionTypes::TOWER, :letter), level(SectionTypes::FLOOR, :number) ],
             SectionTypes::FLOOR
           ),
           PropertyTypes::SECTOR => format(
-            [level(SectionTypes::BLOCK, :number)],
+            [ level(SectionTypes::BLOCK, :number) ],
             SectionTypes::BLOCK
           ),
           PropertyTypes::MIXED_USE => format(
-            [level(SectionTypes::TOWER, :letter), level(SectionTypes::FLOOR, :number)],
+            [ level(SectionTypes::TOWER, :letter), level(SectionTypes::FLOOR, :number) ],
             SectionTypes::FLOOR
           )
         }.freeze

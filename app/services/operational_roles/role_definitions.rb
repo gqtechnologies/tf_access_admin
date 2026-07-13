@@ -6,25 +6,25 @@ module OperationalRoles
       {
         key: "property_admin",
         scope: "property",
-        staff_types: [StaffTypes::MANAGER],
+        staff_types: [ StaffTypes::MANAGER ],
         capabilities: Authorization::Capabilities::PROPERTY_ADMIN
       },
       {
         key: "concierge",
         scope: "property",
-        staff_types: [StaffTypes::CONCIERGE, StaffTypes::SECURITY],
+        staff_types: [ StaffTypes::CONCIERGE, StaffTypes::SECURITY ],
         capabilities: Authorization::Capabilities::CONCIERGE
       },
       {
         key: "cleaning_staff",
         scope: "property",
-        staff_types: [StaffTypes::CLEANING],
+        staff_types: [ StaffTypes::CLEANING ],
         capabilities: Authorization::Capabilities::CLEANING_STAFF
       },
       {
         key: "internal_staff",
         scope: "property",
-        staff_types: [StaffTypes::MAINTENANCE, StaffTypes::OTHER],
+        staff_types: [ StaffTypes::MAINTENANCE, StaffTypes::OTHER ],
         capabilities: Authorization::Capabilities::INTERNAL_STAFF
       }
     ].freeze
