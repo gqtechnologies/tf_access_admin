@@ -49,6 +49,17 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :users, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :people, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+    namespace :people do
+      resources :bulk_imports, only: %i[create update] do
+        member do
+          post :validate
+          post :confirm
+          get :rows
+          get :status
+          get :report
+        end
+      end
+    end
     resources :profile, only: [:edit, :update]
     resources :organizations, only: [:index, :show, :edit, :update, :new, :create, :destroy]
     resources :residential_properties, only: [:index, :new, :create, :show] do

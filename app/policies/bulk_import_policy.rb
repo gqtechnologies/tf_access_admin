@@ -5,6 +5,13 @@ class BulkImportPolicy < ApplicationPolicy
     allowed?(:manage_properties) || any_accessible_property?(:manage_units)
   end
 
+  # Used by Admin::People::BulkImportsController#create, which is
+  # organization-scoped (not tied to a residential property/section), unlike
+  # the units bulk import (add-bulk-user-import).
+  def create_people_import?
+    allowed?(:manage_people)
+  end
+
   def update?
     bulk_import_allowed?
   end
@@ -44,10 +51,12 @@ class BulkImportPolicy < ApplicationPolicy
 
       return base if resolver.allowed?(:manage_properties)
 
-      property_ids = accessible_property_ids
-      return scope.none if property_ids.empty?
+      people_scope = resolver.allowed?(:manage_people) ? base.where(import_type: BulkImport::IMPORT_TYPES[:users]) : base.none
 
-      base.where(residential_property_id: property_ids)
+      property_ids = accessible_property_ids
+      return people_scope if property_ids.empty?
+
+      base.where(residential_property_id: property_ids).or(people_scope)
     end
   end
 
@@ -55,6 +64,7 @@ class BulkImportPolicy < ApplicationPolicy
 
   def bulk_import_allowed?
     return false unless same_organization?
+    return allowed?(:manage_people) if people_import?
 
     if record.residential_property_id.blank?
       return allowed?(:manage_properties)
@@ -64,5 +74,9 @@ class BulkImportPolicy < ApplicationPolicy
     return false unless property
 
     property_accessible?(property) && allowed?(:manage_units)
+  end
+
+  def people_import?
+    record.import_type == BulkImport::IMPORT_TYPES[:users]
   end
 end

@@ -51,8 +51,12 @@ module Units
       normalized = Units::NormalizeIdentifier.call(@term)&.normalized_identifier
 
       if normalized.present?
+        conditions = [
+          "units.normalized_identifier = :normalized",
+          name_match
+        ].join(" OR ")
         relation.where(
-          "units.normalized_identifier = :normalized OR #{name_match}",
+          conditions,
           normalized: normalized,
           term: like
         )

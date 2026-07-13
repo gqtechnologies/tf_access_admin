@@ -16,12 +16,18 @@
               {{ t('common.actions.search') }}
             </Button>
           </div>
-          <Link :href="new_admin_person_path()">
-            <Button>
-              <PlusIcon class="w-4 h-4" />
-              {{ t('admin.people.index.actions.create') }}
+          <div class="flex shrink-0 gap-2">
+            <Button variant="outline" @click="showBulkImportDrawer = true">
+              <UploadIcon class="w-4 h-4" />
+              {{ t('admin.people.index.actions.bulk_import') }}
             </Button>
-          </Link>
+            <Link :href="new_admin_person_path()">
+              <Button>
+                <PlusIcon class="w-4 h-4" />
+                {{ t('admin.people.index.actions.create') }}
+              </Button>
+            </Link>
+          </div>
         </div>
       </template>
       <template #actions="{ row }">
@@ -63,11 +69,13 @@
         />
       </template>
     </AdminDataTable>
+
+    <BulkPeopleImportDrawer v-model:open="showBulkImportDrawer" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { h, watch, onMounted, computed } from 'vue'
+import { h, watch, onMounted, computed, ref } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import AdminDataTable from '@/components/admin/table/index.vue'
 import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
@@ -75,17 +83,26 @@ import { useTable } from '@/lib/composables/useTable'
 import { useI18n } from 'vue-i18n'
 import type { ColumnDef } from '@/types/table'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, SearchIcon, PencilIcon, TrashIcon, EyeIcon } from 'lucide-vue-next'
+import { PlusIcon, SearchIcon, PencilIcon, TrashIcon, EyeIcon, UploadIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { new_admin_person_path, admin_person_path, edit_admin_person_path } from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'
 import PersonContextualRoleBadges from '@/components/admin/person/PersonContextualRoleBadges.vue'
+import BulkPeopleImportDrawer from '@/components/admin/bulk_people/BulkPeopleImportDrawer.vue'
 import type { Person } from '@/types/person'
 import { toast } from 'vue-sonner'
 import { getPeopleBreadcrumbs } from '@/lib/breadcrumbs/person'
 
 const { t } = useI18n()
+
+const showBulkImportDrawer = ref(false)
+
+watch(showBulkImportDrawer, (isOpen, wasOpen) => {
+  if (!isOpen && wasOpen) {
+    router.reload({ only: ['people', 'pagination'] })
+  }
+})
 
 const props = defineProps<{
   people: Person[]

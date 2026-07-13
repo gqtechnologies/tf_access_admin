@@ -49,6 +49,13 @@ export type BulkImportRowNormalizedPayload = {
   owner_first_name?: string | null
   owner_last_name?: string | null
   ownership_percentage?: number | string | null
+  // Bulk user/person import fields (add-bulk-user-import)
+  first_name?: string | null
+  last_name?: string | null
+  document_number?: string | null
+  phone?: string | null
+  email?: string | null
+  birthdate?: string | null
 }
 
 export type BulkImportRowRecord = {

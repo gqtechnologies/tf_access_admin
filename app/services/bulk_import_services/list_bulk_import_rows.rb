@@ -62,14 +62,26 @@ module BulkImportServices
       return scope if @search.blank?
 
       pattern = "%#{ActiveRecord::Base.sanitize_sql_like(@search)}%"
-      scope.where(
-        <<~SQL.squish,
+      scope.where(search_sql, pattern: pattern)
+    end
+
+    def search_sql
+      if @bulk_import.import_type == BulkImport::IMPORT_TYPES[:users]
+        <<~SQL.squish
+          row_number::text ILIKE :pattern
+          OR normalized_payload->>'first_name' ILIKE :pattern
+          OR normalized_payload->>'last_name' ILIKE :pattern
+          OR normalized_payload->>'document_number' ILIKE :pattern
+          OR normalized_payload->>'email' ILIKE :pattern
+          OR normalized_payload->>'phone' ILIKE :pattern
+        SQL
+      else
+        <<~SQL.squish
           row_number::text ILIKE :pattern
           OR normalized_payload->>'unit_identifier' ILIKE :pattern
           OR normalized_payload->>'owner_document' ILIKE :pattern
         SQL
-        pattern: pattern
-      )
+      end
     end
 
     def pagination_for(collection)
