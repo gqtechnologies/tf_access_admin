@@ -221,3 +221,28 @@ ingresar a
 ```bash
 npm run shadcn -- add hover-card -y
 ```
+
+## Correo local (MailHog)
+
+En desarrollo, los correos se entregan por SMTP a una instancia local de MailHog en vez de enviarse de verdad (nunca llegan a un destinatario real).
+
+```bash
+docker compose up -d mailhog
+```
+
+Luego visita `http://localhost:8025` para ver todos los correos capturados (asunto, destinatarios, contenido renderizado).
+
+Para detenerlo:
+
+```bash
+docker compose down
+```
+
+Si tu instancia de MailHog corre en otro host/puerto, sobrescribe los valores por defecto (`localhost`/`1025`) en tu `.env`:
+
+```bash
+MAILHOG_SMTP_ADDRESS=localhost
+MAILHOG_SMTP_PORT=1025
+```
+
+Ver `.env.example` para los valores de referencia.
