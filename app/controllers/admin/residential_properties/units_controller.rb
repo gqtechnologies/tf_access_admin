@@ -61,7 +61,7 @@ class Admin::ResidentialProperties::UnitsController < AdminController
 
     visits = policy_scope(Visit)
       .where(unit: @unit)
-      .includes(:visitor_person, :host_person, :unit, :residential_property)
+      .includes(:visitor_person, :unit, :residential_property)
       .order(scheduled_at: :desc)
       .page(visits_filters[:page])
       .per(visits_filters[:per_page])

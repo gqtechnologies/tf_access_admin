@@ -6,6 +6,8 @@
 # without issuing additional requests. Permissions and actions are always
 # backend-calculated from the current policy (§7.9).
 class Admin::VisitSerializer < ActiveModel::Serializer
+  include VisitAuthorizersSerialization
+
   attributes :id,
     :status,
     :status_label,
@@ -20,11 +22,10 @@ class Admin::VisitSerializer < ActiveModel::Serializer
     :residential_property_id,
     :unit_id,
     :visitor_person_id,
-    :host_person_id,
     :created_at,
     :updated_at,
     :visitor,
-    :host,
+    :authorizers,
     :unit,
     :residential_property,
     :notification_status,
@@ -55,10 +56,6 @@ class Admin::VisitSerializer < ActiveModel::Serializer
 
   def visitor
     person_summary(object.visitor_person)
-  end
-
-  def host
-    person_summary(object.host_person)
   end
 
   def unit

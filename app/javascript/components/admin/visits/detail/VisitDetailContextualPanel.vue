@@ -18,6 +18,7 @@
           <VisitDetailField :label="t('admin.visits.show.fields.valid_from')" :value="formatDateTime(visit.valid_from)" />
           <VisitDetailField :label="t('admin.visits.show.fields.valid_until')" :value="formatDateTime(visit.valid_until)" />
           <VisitDetailField :label="t('admin.visits.show.fields.authorized_at')" :value="formatDateTime(visit.authorized_at)" />
+          <VisitDetailField :label="t('admin.visits.show.fields.authorizers')" :value="authorizersLabel" />
         </CardContent>
       </Card>
 
@@ -29,17 +30,6 @@
           <VisitDetailField :label="t('admin.visits.show.fields.name')" :value="visit.visitor_detail?.display_name ?? visit.visitor?.display_name ?? '—'" />
           <VisitDetailField :label="t('admin.visits.show.fields.document')" :value="visit.visitor_detail?.document_number ?? '—'" />
           <VisitDetailField :label="t('admin.visits.show.fields.phone')" :value="visit.visitor_detail?.phone ?? '—'" />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{{ t('admin.visits.show.sections.host.title') }}</CardTitle>
-        </CardHeader>
-        <CardContent class="grid gap-4 sm:grid-cols-2">
-          <VisitDetailField :label="t('admin.visits.show.fields.name')" :value="visit.host_detail?.display_name ?? visit.host?.display_name ?? '—'" />
-          <VisitDetailField :label="t('admin.visits.show.fields.document')" :value="visit.host_detail?.document_number ?? '—'" />
-          <VisitDetailField :label="t('admin.visits.show.fields.phone')" :value="visit.host_detail?.phone ?? '—'" />
         </CardContent>
       </Card>
 
@@ -94,6 +84,12 @@ const tabs = computed<TabNavItem[]>(() => [
 const hasVehicle = computed(() => {
   const vehicle = props.visit.metadata?.vehicle
   return Boolean(vehicle?.plate || vehicle?.brand_model || vehicle?.color)
+})
+
+const authorizersLabel = computed(() => {
+  const authorizers = props.visit.authorizers ?? []
+  if (authorizers.length === 0) return '—'
+  return authorizers.map((authorizer) => authorizer.display_name).join(', ')
 })
 
 function formatDateTime(value: string | null | undefined) {

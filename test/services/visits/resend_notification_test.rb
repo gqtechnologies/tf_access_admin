@@ -47,7 +47,6 @@ module Visits
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor,
-        host_person: @resident_person,
         scheduled_at: 1.hour.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::PENDING,

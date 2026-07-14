@@ -39,7 +39,7 @@ class ConciergeVisitSerializerTest < ActiveSupport::TestCase
 
     @visit = ActsAsTenant.with_tenant(@organization) do
       Visit.create!(
-        organization: @organization, unit: @unit, visitor_person: visitor, host_person: @host,
+        organization: @organization, unit: @unit, visitor_person: visitor,
         scheduled_at: 1.hour.from_now, valid_from: 1.hour.ago, valid_until: 3.hours.from_now,
         status: VisitStatuses::CHECKED_IN, checked_in_at: 30.minutes.ago, checked_in_by_id: @concierge.id,
         authorized_at: 2.hours.ago, authorized_by_id: @tenant_admin.id,

@@ -13,7 +13,6 @@ class Admin::VisitDetailSerializer < Admin::VisitSerializer
     :checked_in_by_id,
     :checked_out_by_id,
     :visitor_detail,
-    :host_detail,
     :unit_detail,
     :created_by_actor,
     :authorized_by_actor,
@@ -23,10 +22,6 @@ class Admin::VisitDetailSerializer < Admin::VisitSerializer
 
   def visitor_detail
     full_person(object.visitor_person)
-  end
-
-  def host_detail
-    full_person(object.host_person)
   end
 
   def unit_detail

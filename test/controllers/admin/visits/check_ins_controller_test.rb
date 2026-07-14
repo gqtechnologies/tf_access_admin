@@ -37,7 +37,6 @@ class Admin::Visits::CheckInsControllerTest < ActionDispatch::IntegrationTest
       unit: @unit
     )
 
-    host_person = @owner.person_for(@organization)
     visitor = Person.create!(
       organization: @organization,
       display_name: "CheckIn Ctrl Visitor",
@@ -50,7 +49,6 @@ class Admin::Visits::CheckInsControllerTest < ActionDispatch::IntegrationTest
         organization: @organization,
         unit: @unit,
         visitor_person: visitor,
-        host_person: host_person,
         scheduled_at: 1.hour.from_now,
         valid_from: 30.minutes.ago,
         status: VisitStatuses::AUTHORIZED,

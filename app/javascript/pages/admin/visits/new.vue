@@ -66,7 +66,6 @@
         :visit-types="visitTypes"
         :property-name="form.residential_property_name"
         :unit-label="form.unit_label"
-        :host-name="form.host_display_name"
         :visitor-name="resolvedVisitorName"
         :visit-type="form.visit_type"
         :visit-date="form.visit_date"

@@ -47,7 +47,6 @@ module Visits
 
       @visit_params = {
         visitor_person_id: @visitor.id,
-        host_person_id: @host.id,
         scheduled_at: 1.hour.from_now,
         valid_from: 1.hour.ago,
         valid_until: 2.hours.from_now,

@@ -22,7 +22,6 @@
 #  checked_in_by_id        :uuid
 #  checked_out_by_id       :uuid
 #  created_by_id           :uuid
-#  host_person_id          :uuid             not null
 #  organization_id         :uuid             not null
 #  property_section_id     :uuid
 #  residential_property_id :uuid             not null
@@ -35,7 +34,6 @@
 #  index_visits_on_checked_in_by_id                   (checked_in_by_id)
 #  index_visits_on_checked_out_by_id                  (checked_out_by_id)
 #  index_visits_on_created_by_id                      (created_by_id)
-#  index_visits_on_host_person_id                     (host_person_id)
 #  index_visits_on_metadata                           (metadata) USING gin
 #  index_visits_on_org_property_operational_statuses  (organization_id,residential_property_id,status,checked_out_at) WHERE ((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))
 #  index_visits_on_org_property_pending_scheduled_at  (organization_id,residential_property_id,scheduled_at) WHERE ((status)::text = 'pending'::text)
@@ -53,7 +51,6 @@
 #  fk_rails_...  (checked_in_by_id => users.id)
 #  fk_rails_...  (checked_out_by_id => users.id)
 #  fk_rails_...  (created_by_id => users.id)
-#  fk_rails_...  (host_person_id => people.id)
 #  fk_rails_...  (organization_id => organizations.id)
 #  fk_rails_...  (property_section_id => property_sections.id)
 #  fk_rails_...  (residential_property_id => residential_properties.id)
@@ -72,7 +69,7 @@ class Visit < ApplicationRecord
 
   audited only: %i[
     status visit_type scheduled_at valid_from valid_until notes
-    visitor_person_id host_person_id unit_id residential_property_id property_section_id
+    visitor_person_id unit_id residential_property_id property_section_id
     created_by_id authorized_by_id authorized_at
     checked_in_by_id checked_in_at checked_out_by_id checked_out_at
     notification_status
@@ -85,7 +82,6 @@ class Visit < ApplicationRecord
   belongs_to :property_section, optional: true
   belongs_to :unit
   belongs_to :visitor_person, class_name: "Person"
-  belongs_to :host_person, class_name: "Person"
   belongs_to :created_by, class_name: "User", optional: true
   belongs_to :authorized_by, class_name: "User", optional: true
   belongs_to :checked_in_by, class_name: "User", optional: true
@@ -102,13 +98,12 @@ class Visit < ApplicationRecord
   validates :visit_type, presence: true, inclusion: { in: VisitTypes::ALL }
 
   validates_same_tenant :residential_property, :property_section, :unit,
-                        :visitor_person, :host_person,
+                        :visitor_person,
                         :created_by, :authorized_by, :checked_in_by, :checked_out_by,
                         :staff_shift
 
   validate :validity_range_coherent
   validate :location_coherent_with_unit
-  validate :host_active_on_unit
 
   before_validation :denormalize_location_from_unit
   before_validation :assign_validity_defaults
@@ -204,42 +199,7 @@ class Visit < ApplicationRecord
   end
 
   def self.ransackable_associations(_auth_object = nil)
-    %w[visitor_person host_person unit]
-  end
-
-  def self.host_eligible?(person:, unit:, at: Time.zone.now)
-    return false if person.blank? || unit.blank?
-
-    active_ownership?(person:, unit:, at:) || active_occupancy?(person:, unit:, at:)
-  end
-
-  def self.active_ownership?(person:, unit:, at: Time.zone.now)
-    UnitOwnership
-      .where(
-        unit_id: unit.id,
-        person_id: person.id,
-        organization_id: unit.organization_id,
-        status: UnitOwnership::STATUS_ACTIVE
-      )
-      .where("starts_at <= ?", at.to_date)
-      .where("ends_at IS NULL OR ends_at >= ?", at.to_date)
-      .exists?
-  end
-
-  def self.active_occupancy?(person:, unit:, at: Time.zone.now)
-    day_start = at.in_time_zone.beginning_of_day
-    day_end = at.in_time_zone.end_of_day
-
-    UnitOccupancy
-      .where(
-        unit_id: unit.id,
-        person_id: person.id,
-        organization_id: unit.organization_id,
-        status: OccupancyStatuses::ACTIVE
-      )
-      .where("starts_at <= ?", day_end)
-      .where("ends_at IS NULL OR ends_at >= ?", day_start)
-      .exists?
+    %w[visitor_person unit]
   end
 
   private
@@ -280,13 +240,5 @@ class Visit < ApplicationRecord
     return if section_matches
 
     errors.add(:property_section, :incoherent_with_unit)
-  end
-
-  def host_active_on_unit
-    return if host_person.blank? || unit.blank?
-
-    return if self.class.host_eligible?(person: host_person, unit: unit)
-
-    errors.add(:host_person, :inactive_on_unit)
   end
 end

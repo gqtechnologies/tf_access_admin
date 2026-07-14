@@ -116,7 +116,6 @@ module Visits
           organization: @organization,
           unit: unit,
           visitor_person: visitor,
-          host_person: @host,
           scheduled_at: 1.hour.from_now,
           valid_from: 1.hour.ago,
           status: status

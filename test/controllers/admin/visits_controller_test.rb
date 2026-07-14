@@ -44,7 +44,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
       role: AvailableRoles::CLIENT
     )
 
-    host_person = @owner.person_for(@organization)
     visitor_person = Person.create!(
       organization: @organization,
       display_name: "Visit Controller Visitor",
@@ -57,7 +56,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
         organization: @organization,
         unit: @unit,
         visitor_person: visitor_person,
-        host_person: host_person,
         scheduled_at: 1.day.from_now,
         valid_from: 1.day.from_now,
         status: VisitStatuses::PENDING
@@ -67,20 +65,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
     @other_org_visitor = ActsAsTenant.with_tenant(@other_organization) do
       other_property = create_property(@other_organization, "Other Org VC Property")
       other_unit = create_unit(other_property, "OTHER-VC-101")
-      other_host = Person.create!(
-        organization: @other_organization,
-        display_name: "Other Org Host VC",
-        person_type: PersonTypes::NATURAL,
-        status: PersonStatuses::ACTIVE
-      )
-      UnitOwnership.create!(
-        organization: @other_organization,
-        person: other_host,
-        unit: other_unit,
-        ownership_percentage: 100,
-        starts_at: Date.current,
-        status: UnitOwnership::STATUS_ACTIVE
-      )
       other_visitor = Person.create!(
         organization: @other_organization,
         display_name: "Other Org Visitor VC",
@@ -91,7 +75,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
         organization: @other_organization,
         unit: other_unit,
         visitor_person: other_visitor,
-        host_person: other_host,
         scheduled_at: 1.day.from_now,
         valid_from: 1.day.from_now,
         status: VisitStatuses::PENDING
@@ -150,7 +133,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
 
   test "tenant_admin can create a visit" do
     sign_in_as(@tenant_admin)
-    host_person = @owner.person_for(@organization)
     visitor = Person.create!(
       organization: @organization,
       display_name: "New Visit Visitor",
@@ -163,7 +145,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
         visit: {
           unit_id: @unit.id,
           visitor_person_id: visitor.id,
-          host_person_id: host_person.id,
           scheduled_at: 2.days.from_now.iso8601,
           valid_from: 2.days.from_now.iso8601,
           visit_type: VisitTypes::GUEST
@@ -175,7 +156,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
 
   test "concierge cannot create a visit (6.1, §5.6)" do
     sign_in_as(@concierge)
-    host_person = @owner.person_for(@organization)
     visitor = Person.create!(
       organization: @organization,
       display_name: "Concierge Create Visitor",
@@ -188,7 +168,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
         visit: {
           unit_id: @unit.id,
           visitor_person_id: visitor.id,
-          host_person_id: host_person.id,
           scheduled_at: 2.days.from_now.iso8601,
           valid_from: 2.days.from_now.iso8601,
           visit_type: VisitTypes::GUEST
@@ -358,31 +337,6 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     identifiers = response.parsed_body.fetch("units").map { |row| row["identifier"] }
     assert_includes identifiers, "Depósito 1"
-  end
-
-  test "form_hosts matches accent-insensitively and excludes ineligible people" do
-    accented_unit = create_unit(@property, "VC-P-ACCENT")
-    host_with_accent = Person.create!(
-      organization: @organization,
-      display_name: "José García",
-      person_type: PersonTypes::NATURAL,
-      status: PersonStatuses::ACTIVE
-    )
-    UnitOwnership.create!(
-      organization: @organization,
-      person: host_with_accent,
-      unit: accented_unit,
-      ownership_percentage: 100,
-      starts_at: Date.current,
-      status: UnitOwnership::STATUS_ACTIVE
-    )
-    sign_in_as(@tenant_admin)
-
-    get form_hosts_admin_visits_path, params: { unit_id: accented_unit.id, search: "jose garcia" }
-
-    assert_response :success
-    names = response.parsed_body.fetch("hosts").map { |row| row["display_name"] }
-    assert_includes names, "José García"
   end
 
   private

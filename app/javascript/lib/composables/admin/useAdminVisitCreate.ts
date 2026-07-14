@@ -125,7 +125,6 @@ export function useAdminVisitCreate(defaultVisitType = 'guest') {
 
     const visit: VisitCreateSubmitPayload['visit'] = {
       unit_id: form.value.unit_id,
-      host_person_id: form.value.host_person_id,
       scheduled_at: scheduledAt,
       valid_from: scheduledAt,
       valid_until: validUntil,

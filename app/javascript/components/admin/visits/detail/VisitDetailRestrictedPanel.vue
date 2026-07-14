@@ -3,7 +3,7 @@
     <Card>
       <CardContent class="grid gap-4 p-6 sm:grid-cols-2">
         <VisitDetailField :label="t('admin.visits.show.fields.unit')" :value="unitLabel" />
-        <VisitDetailField :label="t('admin.visits.show.fields.host')" :value="visit.host?.display_name ?? '—'" />
+        <VisitDetailField :label="t('admin.visits.show.fields.authorizers')" :value="authorizersLabel" />
         <VisitDetailField :label="t('admin.visits.show.fields.status')" :value="visit.status_label" />
         <VisitDetailField :label="t('admin.visits.show.fields.authorized_at')" :value="formatDateTime(visit.authorized_at ?? visit.valid_from)" />
         <VisitDetailField :label="t('admin.visits.show.fields.checked_in_at')" :value="formatDateTime(visit.checked_in_at)" />
@@ -33,6 +33,12 @@ const { t } = useI18n()
 const unitLabel = computed(
   () => props.visit.unit?.display_name ?? props.visit.unit?.identifier ?? '—',
 )
+
+const authorizersLabel = computed(() => {
+  const authorizers = props.visit.authorizers ?? []
+  if (authorizers.length === 0) return '—'
+  return authorizers.map((authorizer) => authorizer.display_name).join(', ')
+})
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return '—'

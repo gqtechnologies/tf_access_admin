@@ -299,7 +299,7 @@ watch(propertyFilter, () => {
 })
 
 onMounted(() => {
-  const searchKey = 'visitor_person_display_name_or_host_person_display_name_or_unit_identifier_cont'
+  const searchKey = 'visitor_person_display_name_or_unit_identifier_cont'
   if (props.filters?.[searchKey]) {
     search.value = props.filters[searchKey]
   }
@@ -370,9 +370,10 @@ const columns = computed<ColumnDef<AdminVisitListItem, unknown>[]>(() => [
     cell: ({ row }) => h('span', row.original.residential_property?.name ?? '—'),
   },
   {
-    id: 'host',
-    header: () => t('admin.visits.index.table.headers.host'),
-    cell: ({ row }) => h('span', row.original.host?.display_name ?? '—'),
+    id: 'authorizers',
+    header: () => t('admin.visits.index.table.headers.authorizers'),
+    cell: ({ row }) =>
+      h('span', row.original.authorizers?.map((authorizer) => authorizer.display_name).join(', ') || '—'),
   },
   {
     id: 'status',

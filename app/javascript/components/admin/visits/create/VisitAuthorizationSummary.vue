@@ -15,10 +15,6 @@
         <dd class="text-right font-medium">{{ unitLabel ?? emptyLabel }}</dd>
       </div>
       <div class="flex justify-between gap-3">
-        <dt class="text-muted-foreground">{{ t('admin.visits.new.summary.fields.host') }}</dt>
-        <dd class="text-right font-medium">{{ hostName ?? emptyLabel }}</dd>
-      </div>
-      <div class="flex justify-between gap-3">
         <dt class="text-muted-foreground">{{ t('admin.visits.new.summary.fields.visitor') }}</dt>
         <dd class="text-right font-medium">{{ visitorName ?? emptyLabel }}</dd>
       </div>
@@ -61,7 +57,6 @@ const props = defineProps<{
   visitTypes: VisitTypeOption[]
   propertyName?: string
   unitLabel?: string
-  hostName?: string
   visitorName?: string | null
   visitType: string
   visitDate: string

@@ -173,7 +173,6 @@ class Units::FoundationCoverageTest < ActiveSupport::TestCase
       organization: @organization,
       unit: unit,
       visitor_person: visitor,
-      host_person: owner,
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       status: VisitStatuses::PENDING

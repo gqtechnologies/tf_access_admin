@@ -6,6 +6,8 @@
 # Contains visitor, unit, host, current status, all relevant timestamps,
 # and the allowed actions so the confirmation surface can render correctly.
 class Concierge::VisitSummarySerializer < ActiveModel::Serializer
+  include VisitAuthorizersSerialization
+
   attributes :id,
     :status,
     :status_label,
@@ -23,9 +25,8 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
     :residential_property_id,
     :unit_id,
     :visitor_person_id,
-    :host_person_id,
     :visitor,
-    :host,
+    :authorizers,
     :unit,
     :permissions,
     :actions,
@@ -56,10 +57,6 @@ class Concierge::VisitSummarySerializer < ActiveModel::Serializer
 
   def visitor
     person_summary(object.visitor_person)
-  end
-
-  def host
-    person_summary(object.host_person)
   end
 
   def unit

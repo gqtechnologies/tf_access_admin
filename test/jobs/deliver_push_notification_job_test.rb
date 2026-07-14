@@ -30,7 +30,6 @@ class DeliverPushNotificationJobTest < ActiveSupport::TestCase
       can_authorize_visits: true
     )
 
-    @host = @resident_person
     @visitor = Person.create!(
       organization: @organization,
       display_name: "DPJ Visitor",
@@ -41,7 +40,6 @@ class DeliverPushNotificationJobTest < ActiveSupport::TestCase
       organization: @organization,
       unit: @unit,
       visitor_person: @visitor,
-      host_person: @host,
       scheduled_at: 1.hour.from_now,
       valid_from: 1.hour.ago,
       status: VisitStatuses::PENDING,
@@ -180,7 +178,6 @@ class DeliverPushNotificationJobTest < ActiveSupport::TestCase
         organization: other_organization,
         unit: other_unit,
         visitor_person: other_visitor,
-        host_person: other_person,
         scheduled_at: 1.hour.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::PENDING,

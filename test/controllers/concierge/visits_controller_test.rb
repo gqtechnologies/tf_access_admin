@@ -44,7 +44,6 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
       role: AvailableRoles::CLIENT
     )
 
-    host_person = @owner.person_for(@organization)
     visitor = Person.create!(
       organization: @organization,
       display_name: "Concierge Ctrl Visitor",
@@ -57,7 +56,6 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
         organization: @organization,
         unit: @unit,
         visitor_person: visitor,
-        host_person: host_person,
         scheduled_at: 1.hour.from_now,
         valid_from: 30.minutes.ago,
         status: VisitStatuses::AUTHORIZED,
@@ -77,7 +75,6 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
         organization: @organization,
         unit: @unit,
         visitor_person: visitor2,
-        host_person: host_person,
         scheduled_at: 2.days.from_now,
         valid_from: 2.days.from_now,
         status: VisitStatuses::PENDING
@@ -207,7 +204,6 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
       )
       Residents::CreateAuthorizedVisit.call(
         unit: @unit,
-        host_person: resident.person_for(@organization),
         visitor_params: { name: "Resident Flow Visitor", document: "RF-DOC-1", phone: "+56911112222" },
         scheduled_at: Time.zone.now.change(hour: 12),
         actor: resident
@@ -219,20 +215,12 @@ class Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
     ActsAsTenant.with_tenant(@other_organization) do
       property = create_property(@other_organization, "Other Org Ctrl Property")
       unit = create_unit(property, "OO-CTRL-101")
-      host = Person.create!(
-        organization: @other_organization, display_name: "Other Org Host",
-        person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
-      )
-      UnitOwnership.create!(
-        organization: @other_organization, person: host, unit: unit,
-        ownership_percentage: 100, starts_at: Date.current, status: UnitOwnership::STATUS_ACTIVE
-      )
       visitor = Person.create!(
         organization: @other_organization, display_name: "Other Org Visitor",
         person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
       )
       Visit.create!(
-        organization: @other_organization, unit: unit, visitor_person: visitor, host_person: host,
+        organization: @other_organization, unit: unit, visitor_person: visitor,
         scheduled_at: 1.hour.from_now, valid_from: 30.minutes.ago, status: VisitStatuses::AUTHORIZED,
         authorized_at: 10.minutes.ago
       )

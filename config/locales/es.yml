@@ -131,14 +131,14 @@ es:
             headers:
               visitor: "Visitante"
               unit: "Unidad"
-              host: "Anfitrión"
+              authorizers: "Autorizadores"
               status: "Estado"
               scheduled_at: "Horario programado"
               checked_in_at: "Hora de ingreso"
               duration: "Duración"
         summary:
           unit: "Unidad"
-          host: "Anfitrión"
+          authorizers: "Autorizadores"
           authorized_at: "Visita autorizada"
           authorized_visit: "Visita autorizada"
           checked_in_at: "Ingreso registrado"
@@ -199,7 +199,6 @@ es:
             timeline: "Línea de tiempo"
           fields:
             unit: "Unidad"
-            host: "Anfitrión"
             scheduled_at: "Programada"
             valid_until: "Válida hasta"
             authorized_at: "Autorizada"
@@ -994,7 +993,7 @@ es:
               create: "Crear visita"
             table:
               visitor: "Visitante"
-              host: "Anfitrión"
+              authorizers: "Autorizadores"
               reason: "Motivo"
               scheduled_at: "Programada"
               status: "Estado"
@@ -1110,7 +1109,7 @@ es:
           title: "Gestión de visitas"
           description: "Consulta y administra todas las visitas registradas en la organización. Usa los filtros para encontrar visitas específicas o crear una nueva visita."
           search:
-            placeholder: "Buscar visitante, anfitrión o unidad..."
+            placeholder: "Buscar visitante o unidad..."
           scope:
             organization: "Organización completa"
             assigned: "Propiedad asignada"
@@ -1129,7 +1128,7 @@ es:
               visitor: "Visitante"
               unit: "Unidad"
               property: "Propiedad"
-              host: "Anfitrión"
+              authorizers: "Autorizadores"
               status: "Estado"
               date: "Fecha"
               check_in: "Ingreso"
@@ -1138,7 +1137,7 @@ es:
             create: "Nueva visita"
         new:
           title: "Nueva visita"
-          description: "Registra una visita con el formulario guiado. Propiedad, unidad y anfitrión están vinculados; el estado final lo resuelve el backend."
+          description: "Registra una visita con el formulario guiado. Propiedad y unidad están vinculadas; el estado final lo resuelve el backend."
           steps_nav: "Pasos para crear visita"
           steps:
             general: "Información general"
@@ -1155,7 +1154,6 @@ es:
           validations:
             property_required: "Selecciona una propiedad"
             unit_required: "Selecciona una unidad"
-            host_required: "Selecciona un anfitrión"
             visitor_required: "Selecciona o crea un visitante"
             document_required: "El documento es obligatorio"
             first_name_required: "El nombre es obligatorio"
@@ -1166,21 +1164,17 @@ es:
             visit_type_required: "Selecciona un motivo de visita"
           general:
             title: "Información general"
-            description: "Selecciona la propiedad, unidad y anfitrión de la visita."
+            description: "Selecciona la propiedad y unidad de la visita."
             fields:
               property: "Propiedad"
               unit: "Unidad"
-              host: "Anfitrión"
             placeholders:
               property: "Selecciona una propiedad"
               unit: "Selecciona una unidad"
-              host: "Selecciona un anfitrión"
             loading:
               units: "Cargando unidades..."
-              hosts: "Cargando anfitriones..."
             empty:
               units: "No hay unidades disponibles para esta propiedad."
-              hosts: "No hay propietarios o residentes activos en esta unidad."
           visitor:
             title: "Detalles del visitante"
             description: "Busca una persona existente o crea un nuevo visitante."
@@ -1232,7 +1226,6 @@ es:
             fields:
               property: "Propiedad"
               unit: "Unidad"
-              host: "Anfitrión"
               visitor: "Visitante"
               reason: "Motivo"
               schedule: "Horario"
@@ -1270,8 +1263,6 @@ es:
               title: "Información de la visita"
             visitor:
               title: "Visitante"
-            host:
-              title: "Anfitrión"
             location:
               title: "Ubicación"
             vehicle:
@@ -1295,7 +1286,7 @@ es:
             email: "Email"
             property: "Propiedad"
             unit: "Unidad"
-            host: "Anfitrión"
+            authorizers: "Autorizadores"
             vehicle_plate: "Patente"
             vehicle_model: "Marca / modelo"
             vehicle_color: "Color"
@@ -2531,8 +2522,6 @@ es:
               insufficient_available_identifiers: "No hay suficientes identificadores disponibles para crear %{count} unidades en esta sección. Prueba otro prefijo o reduce la cantidad."
         visit:
           attributes:
-            host_person:
-              inactive_on_unit: "debe tener una relación activa de propiedad u ocupación en la unidad seleccionada"
             residential_property:
               incoherent_with_unit: "debe coincidir con la propiedad de la unidad"
             property_section:

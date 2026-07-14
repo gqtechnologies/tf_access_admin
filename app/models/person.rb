@@ -61,7 +61,6 @@ class Person < ApplicationRecord
   has_many :visitor_profiles, dependent: :destroy
   has_many :staff_assignments, dependent: :destroy
   has_many :visits_as_visitor, class_name: "Visit", foreign_key: :visitor_person_id, dependent: :destroy
-  has_many :visits_as_host, class_name: "Visit", foreign_key: :host_person_id, dependent: :destroy
 
   validates :display_name, presence: true
   validates :person_type, presence: true, inclusion: { in: PersonTypes::ALL }

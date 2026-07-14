@@ -5,7 +5,7 @@
         <TableHeader>
           <TableRow>
             <TableHead>{{ t('admin.units.show.visits.table.visitor') }}</TableHead>
-            <TableHead>{{ t('admin.units.show.visits.table.host') }}</TableHead>
+            <TableHead>{{ t('admin.units.show.visits.table.authorizers') }}</TableHead>
             <TableHead>{{ t('admin.units.show.visits.table.reason') }}</TableHead>
             <TableHead>{{ t('admin.units.show.visits.table.scheduled_at') }}</TableHead>
             <TableHead>{{ t('admin.units.show.visits.table.status') }}</TableHead>
@@ -25,7 +25,7 @@
               </Link>
             </TableCell>
             <TableCell class="text-muted-foreground">
-              {{ visit.host?.display_name ?? '—' }}
+              {{ visit.authorizers?.map((authorizer) => authorizer.display_name).join(', ') || '—' }}
             </TableCell>
             <TableCell class="text-muted-foreground">
               {{ visit.visit_type_label ?? '—' }}

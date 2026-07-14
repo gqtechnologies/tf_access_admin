@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_13_024845) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_14_005758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -1152,7 +1152,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_024845) do
     t.uuid "checked_out_by_id"
     t.datetime "created_at", null: false
     t.uuid "created_by_id"
-    t.uuid "host_person_id", null: false
     t.jsonb "metadata", default: {}, null: false
     t.text "notes"
     t.string "notification_status", default: "pending", null: false
@@ -1171,7 +1170,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_024845) do
     t.index ["checked_in_by_id"], name: "index_visits_on_checked_in_by_id"
     t.index ["checked_out_by_id"], name: "index_visits_on_checked_out_by_id"
     t.index ["created_by_id"], name: "index_visits_on_created_by_id"
-    t.index ["host_person_id"], name: "index_visits_on_host_person_id"
     t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
     t.index ["organization_id", "residential_property_id", "scheduled_at"], name: "index_visits_on_org_property_pending_scheduled_at", where: "((status)::text = 'pending'::text)"
     t.index ["organization_id", "residential_property_id", "status", "checked_out_at"], name: "index_visits_on_org_property_operational_statuses", where: "((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))"
@@ -1320,7 +1318,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_13_024845) do
   add_foreign_key "visitor_profiles", "organizations"
   add_foreign_key "visitor_profiles", "people"
   add_foreign_key "visits", "organizations"
-  add_foreign_key "visits", "people", column: "host_person_id"
   add_foreign_key "visits", "people", column: "visitor_person_id"
   add_foreign_key "visits", "property_sections"
   add_foreign_key "visits", "residential_properties"

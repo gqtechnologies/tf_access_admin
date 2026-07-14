@@ -60,15 +60,11 @@ module Notifications
       Current.reset
     end
 
-    # Visit#host_active_on_unit only requires ANY active ownership/occupancy on
-    # the unit (regardless of can_authorize_visits) — reusing @authorizer_person
-    # as host satisfies that without affecting notification recipient counts.
-    def build_visit(unit, host: @authorizer_person)
+    def build_visit(unit)
       Visit.create!(
         organization: @organization,
         unit: unit,
         visitor_person: @visitor,
-        host_person: host,
         scheduled_at: 1.hour.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::PENDING,
@@ -101,8 +97,8 @@ module Notifications
 
     test "sets notification_status to no_recipients when the unit has no active authorizer" do
       empty_unit = create_unit(@property, "CFV-103")
-      # A resident with can_authorize_visits: false is a valid host but not a
-      # notification recipient, so this unit genuinely has zero authorizers.
+      # A resident with can_authorize_visits: false is not a notification
+      # recipient, so this unit genuinely has zero authorizers.
       non_authorizing_resident = create_user_for_organization(
         organization: @organization,
         email: "cfv-non-authorizing@example.test",
@@ -117,7 +113,7 @@ module Notifications
         status: OccupancyStatuses::ACTIVE,
         can_authorize_visits: false
       )
-      visit = build_visit(empty_unit, host: non_authorizing_resident)
+      visit = build_visit(empty_unit)
 
       assert_no_enqueued_jobs only: DeliverPushNotificationJob do
         CreateForVisit.call(visit: visit)

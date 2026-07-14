@@ -27,14 +27,12 @@ export type VisitCreateVehicleForm = {
 
 export type VisitCreateForm = {
   residential_property_id: string
-  // Cached labels for the selected property/unit/host so the searchable
-  // selects and summary panel can render them without a full options list
+  // Cached labels for the selected property/unit so the searchable selects
+  // and summary panel can render them without a full options list
   // (improve-admin-visit-form-inputs). Not sent in the submit payload.
   residential_property_name: string
   unit_id: string
   unit_label: string
-  host_person_id: string
-  host_display_name: string
   visitor_mode: VisitCreateVisitorMode
   visitor_person_id: string
   visitor: VisitCreatePersonForm
@@ -52,8 +50,6 @@ export function createEmptyVisitCreateForm(defaultVisitType = 'guest'): VisitCre
     residential_property_name: '',
     unit_id: '',
     unit_label: '',
-    host_person_id: '',
-    host_display_name: '',
     visitor_mode: 'search',
     visitor_person_id: '',
     visitor: {
@@ -85,7 +81,6 @@ export const visitCreatePersonSchema = z.object({
 export const visitCreateGeneralSchema = z.object({
   residential_property_id: z.string().trim().min(1, 'admin.visits.new.validations.property_required'),
   unit_id: z.string().trim().min(1, 'admin.visits.new.validations.unit_required'),
-  host_person_id: z.string().trim().min(1, 'admin.visits.new.validations.host_required'),
 })
 
 export const visitCreateScheduleSchema = z.object({
@@ -97,12 +92,6 @@ export const visitCreateScheduleSchema = z.object({
 export const visitCreateAdditionalSchema = z.object({
   visit_type: z.string().trim().min(1, 'admin.visits.new.validations.visit_type_required'),
 })
-
-export type VisitHostOption = {
-  id: string
-  display_name: string
-  document_number?: string | null
-}
 
 export type VisitInitialStatusPreview = {
   initial_status: string
@@ -118,7 +107,6 @@ export type VisitTypeOption = {
 export type VisitCreateSubmitPayload = {
   visit: {
     unit_id: string
-    host_person_id: string
     scheduled_at: string
     valid_from: string
     valid_until?: string

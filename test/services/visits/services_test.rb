@@ -54,7 +54,6 @@ module Visits
 
       @visit_params = {
         visitor_person_id: @visitor.id,
-        host_person_id: @host.id,
         scheduled_at: 1.hour.from_now,
         valid_from: 1.hour.ago,
         valid_until: 2.hours.from_now,
@@ -84,6 +83,19 @@ module Visits
       assert_equal @tenant_admin.id, visit.created_by_id
       assert_equal "SVC123", visit.vehicle_metadata["plate"]
       refute visit.metadata.dig("vehicle", "vin")
+    end
+
+    test "create succeeds without any host-related param" do
+      refute @visit_params.key?(:host_person_id)
+
+      visit = Create.call(
+        unit: @unit,
+        visit_params: @visit_params,
+        actor: @tenant_admin,
+        requested_status: VisitStatuses::AUTHORIZED
+      )
+
+      assert visit.persisted?
     end
 
     test "create enqueues notification delivery for the unit's active authorizer" do

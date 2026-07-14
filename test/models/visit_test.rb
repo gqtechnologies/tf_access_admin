@@ -22,7 +22,6 @@
 #  checked_in_by_id        :uuid
 #  checked_out_by_id       :uuid
 #  created_by_id           :uuid
-#  host_person_id          :uuid             not null
 #  organization_id         :uuid             not null
 #  property_section_id     :uuid
 #  residential_property_id :uuid             not null
@@ -35,7 +34,6 @@
 #  index_visits_on_checked_in_by_id                   (checked_in_by_id)
 #  index_visits_on_checked_out_by_id                  (checked_out_by_id)
 #  index_visits_on_created_by_id                      (created_by_id)
-#  index_visits_on_host_person_id                     (host_person_id)
 #  index_visits_on_metadata                           (metadata) USING gin
 #  index_visits_on_org_property_operational_statuses  (organization_id,residential_property_id,status,checked_out_at) WHERE ((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))
 #  index_visits_on_org_property_pending_scheduled_at  (organization_id,residential_property_id,scheduled_at) WHERE ((status)::text = 'pending'::text)
@@ -53,7 +51,6 @@
 #  fk_rails_...  (checked_in_by_id => users.id)
 #  fk_rails_...  (checked_out_by_id => users.id)
 #  fk_rails_...  (created_by_id => users.id)
-#  fk_rails_...  (host_person_id => people.id)
 #  fk_rails_...  (organization_id => organizations.id)
 #  fk_rails_...  (property_section_id => property_sections.id)
 #  fk_rails_...  (residential_property_id => residential_properties.id)
@@ -82,32 +79,11 @@ class VisitTest < ActiveSupport::TestCase
       unit_type: UnitTypes::APARTMENT,
       status: UnitStatuses::AVAILABLE
     )
-    @host = Person.create!(
-      organization: @organization,
-      display_name: "Visit Host",
-      person_type: PersonTypes::NATURAL,
-      status: PersonStatuses::ACTIVE
-    )
     @visitor = Person.create!(
       organization: @organization,
       display_name: "Visit Visitor",
       person_type: PersonTypes::NATURAL,
       status: PersonStatuses::ACTIVE
-    )
-    @other_person = Person.create!(
-      organization: @organization,
-      display_name: "Unrelated Person",
-      person_type: PersonTypes::NATURAL,
-      status: PersonStatuses::ACTIVE
-    )
-
-    UnitOwnership.create!(
-      organization: @organization,
-      person: @host,
-      unit: @unit,
-      ownership_percentage: 100,
-      starts_at: Date.current,
-      status: UnitOwnership::STATUS_ACTIVE
     )
   end
 
@@ -121,13 +97,6 @@ class VisitTest < ActiveSupport::TestCase
     assert visit.valid?
     assert_equal @property.id, visit.residential_property_id
     assert_nil visit.property_section_id
-  end
-
-  test "visit rejects host without active unit relationship" do
-    visit = build_visit(host_person: @other_person)
-
-    refute visit.valid?
-    assert_includes visit.errors[:host_person], I18n.t("activerecord.errors.models.visit.attributes.host_person.inactive_on_unit")
   end
 
   test "visit derives property from unit even when another property is assigned" do
@@ -175,27 +144,6 @@ class VisitTest < ActiveSupport::TestCase
     assert visit.errors[:visitor_person].present?
   end
 
-  test "visit accepts host with active occupancy" do
-    occupant = Person.create!(
-      organization: @organization,
-      display_name: "Occupant Host",
-      person_type: PersonTypes::NATURAL,
-      status: PersonStatuses::ACTIVE
-    )
-    UnitOccupancy.create!(
-      organization: @organization,
-      person: occupant,
-      unit: @unit,
-      occupancy_type: OccupancyTypes::TENANT,
-      starts_at: Time.zone.now,
-      status: OccupancyStatuses::ACTIVE
-    )
-
-    visit = build_visit(host_person: occupant)
-
-    assert visit.valid?
-  end
-
   test "visit status and visit_type must be allowed values" do
     visit = build_visit(status: "unknown", visit_type: "invalid")
 
@@ -211,7 +159,6 @@ class VisitTest < ActiveSupport::TestCase
       organization: @organization,
       unit: @unit,
       visitor_person: @visitor,
-      host_person: @host,
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       status: VisitStatuses::PENDING,

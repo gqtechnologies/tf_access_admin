@@ -18,9 +18,8 @@ module Residents
   # Usage:
   #   ctx = Residents::VisitContext.new(user: current_user, organization: current_organization, unit: unit)
   #   raise Pundit::NotAuthorizedError unless ctx.authorized?
-  #   ctx.host_person  # => Person of the authenticated resident
   class VisitContext
-    Result = Data.define(:authorized, :host_person, :unit, :denial_reason)
+    Result = Data.define(:authorized, :unit, :denial_reason)
 
     def initialize(user:, organization:, unit:)
       @user         = user
@@ -34,10 +33,6 @@ module Residents
     # can_authorize_visits = false — produces false.
     def authorized?
       result.authorized
-    end
-
-    def host_person
-      result.host_person
     end
 
     def denial_reason
@@ -58,7 +53,6 @@ module Residents
       unless person
         return Result.new(
           authorized: false,
-          host_person: nil,
           unit: unit,
           denial_reason: :no_active_relationship
         )
@@ -74,11 +68,10 @@ module Residents
       can_authorize = resolver.allowed?(Authorization::Capabilities::AUTHORIZE_VISITS)
 
       if can_create && can_authorize
-        Result.new(authorized: true, host_person: person, unit: unit, denial_reason: nil)
+        Result.new(authorized: true, unit: unit, denial_reason: nil)
       else
         Result.new(
           authorized: false,
-          host_person: nil,
           unit: unit,
           denial_reason: :authorization_denied
         )
