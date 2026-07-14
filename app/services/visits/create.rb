@@ -37,6 +37,10 @@ module Visits
         )
 
         visit
+      end.tap do |created_visit|
+        # Outside the transaction: a notification failure must never roll back
+        # the created visit (design.md Decision 5).
+        Notifications::CreateForVisit.call(visit: created_visit)
       end
     end
 

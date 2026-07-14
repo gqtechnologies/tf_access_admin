@@ -130,6 +130,17 @@ class VisitPolicy < ApplicationPolicy
     allowed?(:manage_visits) || allowed?(:authorize_visits)
   end
 
+  # Resend notification: admin-only (operator-facing), and only when the
+  # visit's notification_status is "failed" (see design.md Decision 7 —
+  # resend is deliberately unavailable for "no_recipients"/"delivered").
+  def resend_notification?
+    return false unless same_organization?
+    return false unless allowed?(:manage_visits)
+
+    record.respond_to?(:notification_status) &&
+      record.notification_status == Visit::NotificationStatuses::FAILED
+  end
+
   class Scope < ApplicationPolicy::Scope
     include PolicyScopeAuthorization
 

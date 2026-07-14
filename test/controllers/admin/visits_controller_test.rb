@@ -262,6 +262,49 @@ class Admin::VisitsControllerTest < ActionDispatch::IntegrationTest
     assert_equal VisitStatuses::CHECKED_IN, @visit.reload.status
   end
 
+  # ─── resend_notification ───────────────────────────────────────────────────
+
+  test "tenant_admin can resend a failed notification" do
+    @visit.update!(notification_status: Visit::NotificationStatuses::FAILED)
+    Notification.create!(
+      organization: @organization,
+      recipient_person: @owner.person_for(@organization),
+      unit: @unit,
+      residential_property: @property,
+      notifiable: @visit,
+      notification_type: NotificationTypes::VISIT_REQUEST,
+      channel: NotificationChannels::PUSH,
+      status: NotificationStatuses::FAILED,
+      last_error: "boom"
+    )
+    sign_in_as(@tenant_admin)
+
+    post resend_notification_admin_visit_path(@visit)
+
+    assert_response :redirect
+    assert_equal Visit::NotificationStatuses::PENDING, @visit.reload.notification_status
+  end
+
+  test "resend_notification is denied when notification_status is not failed" do
+    @visit.update!(notification_status: Visit::NotificationStatuses::DELIVERED)
+    sign_in_as(@tenant_admin)
+
+    post resend_notification_admin_visit_path(@visit)
+
+    assert_response :redirect
+    assert_equal Visit::NotificationStatuses::DELIVERED, @visit.reload.notification_status
+  end
+
+  test "concierge cannot resend a notification" do
+    @visit.update!(notification_status: Visit::NotificationStatuses::FAILED)
+    sign_in_as(@concierge)
+
+    post resend_notification_admin_visit_path(@visit)
+
+    assert_response :redirect
+    assert_equal Visit::NotificationStatuses::FAILED, @visit.reload.notification_status
+  end
+
   test "new exposes contextual unit with property_name for locked property/unit display" do
     sign_in_as(@tenant_admin)
 

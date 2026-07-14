@@ -205,6 +205,10 @@ pt:
             checked_out_by: "Saída registrada por"
             duration: "Tempo dentro"
             current_duration: "Duração atual"
+    notifications:
+      visit_request:
+        title: "Nova visita"
+        body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Apenas letras, números e hífens são permitidos"
@@ -1143,6 +1147,11 @@ pt:
           cancelled: "Cancelada"
           rejected: "Rejeitada"
           expired: "Expirada"
+        notification_statuses:
+          pending: "Enviando notificação"
+          delivered: "Notificação entregue"
+          failed: "Falha ao notificar"
+          no_recipients: "Sem destinatários"
         validations:
           invalid_access_type: "O tipo de acesso não é válido"
           invalid_incident_type: "O tipo de incidência não é válido"
@@ -1157,6 +1166,7 @@ pt:
           not_editable: "A visita não pode ser editada no seu estado atual"
           invalid_transition: "A transição de estado não é válida para esta visita"
           unit_not_found: "A unidade indicada não existe ou não está disponível"
+          notification_not_failed: "A notificação só pode ser reenviada quando o envio falhou"
         index:
           title: "Gestão de visitas"
           description: "Consulte e gerencie todas as visitas registradas na organização. Use os filtros para encontrar visitas específicas ou criar uma nova visita."
@@ -1303,6 +1313,9 @@ pt:
           authorize_confirm_description: "A visita passará para o estado autorizada."
           cancel_confirm_title: "Cancelar visita"
           cancel_confirm_description: "A visita será cancelada e deixará de estar disponível operacionalmente."
+          resend_notification: "Reenviar notificação"
+          resend_notification_confirm_title: "Reenviar notificação"
+          resend_notification_confirm_description: "O envio da notificação push será tentado novamente para os mesmos residentes."
           more_actions: "Mais ações"
         show:
           title: "Detalhe da visita"

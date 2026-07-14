@@ -20,7 +20,7 @@ class Admin::VisitsController < AdminController
   # Editable statuses: only pending and authorized may be updated via the admin form.
   EDITABLE_STATUSES = [ VisitStatuses::PENDING, VisitStatuses::AUTHORIZED ].freeze
 
-  before_action :set_visit, only: %i[show edit update authorize_visit cancel]
+  before_action :set_visit, only: %i[show edit update authorize_visit cancel resend_notification]
   before_action :require_editable_status!, only: %i[edit update]
   before_action :authorize_visit_management!, only: %i[form_properties form_units form_hosts initial_status_preview]
 
@@ -191,6 +191,20 @@ class Admin::VisitsController < AdminController
   rescue AASM::InvalidTransition
     redirect_to admin_visit_path(@visit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.invalid_transition") ] } }
+  rescue Pundit::NotAuthorizedError
+    redirect_to admin_visit_path(@visit),
+                inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
+  end
+
+  # POST /admin/visits/:id/resend_notification
+  # Manually retries push delivery for a visit whose notification_status is
+  # "failed" — see openspec/changes/add-fcm-push-notifications.
+  def resend_notification
+    Visits::ResendNotification.call(visit: @visit, actor: current_user)
+    redirect_to admin_visit_path(@visit)
+  rescue Visits::ResendNotification::NotFailedError
+    redirect_to admin_visit_path(@visit),
+                inertia: { errors: { base: [ t("frontend.admin.visits.errors.notification_not_failed") ] } }
   rescue Pundit::NotAuthorizedError
     redirect_to admin_visit_path(@visit),
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }

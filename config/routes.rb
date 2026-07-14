@@ -41,6 +41,9 @@ Rails.application.routes.draw do
         resources :units, only: [] do
           resources :visits, only: [ :create ], module: :units
         end
+
+        # Singular resource: a User has at most one registered device token.
+        resource :device_token, only: %i[create destroy]
       end
     end
   end
@@ -125,6 +128,7 @@ Rails.application.routes.draw do
       member do
         post :authorize_visit, as: :authorize
         delete :cancel
+        post :resend_notification
       end
       resources :check_ins, only: %i[create], module: :visits
       resources :check_outs, only: %i[create], module: :visits

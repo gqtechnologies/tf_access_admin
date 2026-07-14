@@ -246,3 +246,18 @@ MAILHOG_SMTP_PORT=1025
 ```
 
 Ver `.env.example` para los valores de referencia.
+
+## Push notifications locales (PushHog)
+
+En desarrollo, las push notifications (FCM) se envían a un simulador local compatible con la API de Firebase (ej. PushHog) en vez de a Firebase real.
+
+Por defecto, `FCM_BASE_URL` apunta a `https://fcm.googleapis.com` (real). Para redirigir a un simulador local, sobrescribe en tu `.env`:
+
+```bash
+FCM_BASE_URL=http://localhost:8090
+FCM_PROJECT_ID=development
+```
+
+`FCM_PROJECT_ID` no es validado por el simulador local; solo es relevante con credenciales reales de Firebase (autenticación OAuth2 real queda fuera de alcance por ahora).
+
+Ver `.env.example` para los valores de referencia.

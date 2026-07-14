@@ -214,6 +214,10 @@ en:
             checked_out_by: "Exit registered by"
             duration: "Time inside"
             current_duration: "Current duration"
+    notifications:
+      visit_request:
+        title: "New visit"
+        body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Only letters, numbers, and hyphens are allowed"
@@ -1154,6 +1158,11 @@ en:
           cancelled: "Cancelled"
           rejected: "Rejected"
           expired: "Expired"
+        notification_statuses:
+          pending: "Sending notification"
+          delivered: "Notification delivered"
+          failed: "Notification failed"
+          no_recipients: "No recipients"
         validations:
           invalid_access_type: "Access type is not valid"
           invalid_incident_type: "Incident type is not valid"
@@ -1168,6 +1177,7 @@ en:
           not_editable: "Visit cannot be edited in its current state"
           invalid_transition: "State transition is not valid for this visit"
           unit_not_found: "The specified unit does not exist or is not available"
+          notification_not_failed: "The notification can only be resent when delivery failed"
         index:
           title: "Visit management"
           description: "Review and manage all visits registered in the organization. Use filters to find specific visits or create a new one."
@@ -1314,6 +1324,9 @@ en:
           authorize_confirm_description: "The visit will move to authorized status."
           cancel_confirm_title: "Cancel visit"
           cancel_confirm_description: "The visit will be cancelled and removed from operational flows."
+          resend_notification: "Resend notification"
+          resend_notification_confirm_title: "Resend notification"
+          resend_notification_confirm_description: "Push notification delivery will be retried for the same residents."
           more_actions: "More actions"
         show:
           title: "Visit detail"

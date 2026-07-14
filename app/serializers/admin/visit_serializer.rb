@@ -27,11 +27,24 @@ class Admin::VisitSerializer < ActiveModel::Serializer
     :host,
     :unit,
     :residential_property,
+    :notification_status,
+    :notification_status_label,
     :permissions,
     :actions
 
   def status_label
     I18n.t("frontend.admin.visits.statuses.#{object.status}", default: object.status.to_s.humanize)
+  end
+
+  def notification_status
+    object.notification_status
+  end
+
+  def notification_status_label
+    I18n.t(
+      "frontend.admin.visits.notification_statuses.#{object.notification_status}",
+      default: object.notification_status.to_s.humanize
+    )
   end
 
   def visit_type_label
@@ -71,6 +84,7 @@ class Admin::VisitSerializer < ActiveModel::Serializer
         update: policy.update?,
         authorize: policy.authorize?,
         cancel: policy.cancel?,
+        resend_notification: policy.resend_notification?,
         check_in: policy.check_in?,
         check_out: policy.check_out?,
         full_detail: policy.full_detail?,

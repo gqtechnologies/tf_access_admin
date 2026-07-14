@@ -91,10 +91,13 @@ export type AdminVisitPermissions = {
   cancel: boolean
   check_in: boolean
   check_out: boolean
+  resend_notification: boolean
   full_detail: boolean
   restricted_detail: boolean
   contextual_detail?: boolean
 }
+
+export type VisitNotificationStatus = 'pending' | 'delivered' | 'failed' | 'no_recipients'
 
 export type AdminVisitListItem = {
   id: string
@@ -112,6 +115,8 @@ export type AdminVisitListItem = {
   host: VisitPersonSummary | null
   unit: VisitUnitSummary | null
   residential_property: PropertySummary | null
+  notification_status: VisitNotificationStatus
+  notification_status_label: string
   permissions: AdminVisitPermissions
   actions: string[]
   operational_timeline?: VisitTimelineEntry[]

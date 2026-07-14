@@ -10,6 +10,7 @@
 #  checked_out_at          :datetime
 #  metadata                :jsonb            not null
 #  notes                   :text
+#  notification_status     :string           default("pending"), not null
 #  scheduled_at            :datetime         not null
 #  status                  :string           default("pending"), not null
 #  valid_from              :datetime         not null

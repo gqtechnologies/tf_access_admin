@@ -49,6 +49,7 @@ class User < ApplicationRecord
   has_many :authorized_visits, class_name: "Visit", foreign_key: :authorized_by_id, dependent: :nullify
   has_many :checked_in_visits, class_name: "Visit", foreign_key: :checked_in_by_id, dependent: :nullify
   has_many :checked_out_visits, class_name: "Visit", foreign_key: :checked_out_by_id, dependent: :nullify
+  has_one :device_token, dependent: :destroy
   has_one_attached :avatar
 
   after_create :provision_tenant_identity

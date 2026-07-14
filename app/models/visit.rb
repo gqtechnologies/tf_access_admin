@@ -10,6 +10,7 @@
 #  checked_out_at          :datetime
 #  metadata                :jsonb            not null
 #  notes                   :text
+#  notification_status     :string           default("pending"), not null
 #  scheduled_at            :datetime         not null
 #  status                  :string           default("pending"), not null
 #  valid_from              :datetime         not null
@@ -63,6 +64,7 @@ class Visit < ApplicationRecord
   include TenantScopedAssociations
   include VisitStatuses
   include VisitTypes
+  include Visit::NotificationStatuses
   include Visit::OperationalMetadata
   include Visit::StateMachine
 
@@ -73,7 +75,10 @@ class Visit < ApplicationRecord
     visitor_person_id host_person_id unit_id residential_property_id property_section_id
     created_by_id authorized_by_id authorized_at
     checked_in_by_id checked_in_at checked_out_by_id checked_out_at
+    notification_status
   ]
+
+  validates :notification_status, presence: true, inclusion: { in: Visit::NotificationStatuses::ALL }
 
   belongs_to :organization
   belongs_to :residential_property
@@ -89,6 +94,7 @@ class Visit < ApplicationRecord
 
   has_many :visit_status_histories, -> { chronological }, dependent: :destroy
   has_many :visit_participants
+  has_many :notifications, as: :notifiable, dependent: :destroy
   has_one  :visit_recurrence, dependent: :destroy
 
   validates :scheduled_at, :valid_from, presence: true
