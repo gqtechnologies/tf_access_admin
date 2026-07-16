@@ -21,7 +21,12 @@ module Memberships
 
         link_account
         ensure_active_membership
-        confirm_operational_roles if operational?
+
+        if operational?
+          confirm_operational_roles
+        else
+          grant_client_role
+        end
 
         @request
       end
@@ -45,6 +50,11 @@ module Memberships
         OrganizationMembership.create!(organization: @request.organization, person: person)
       membership.accept! if membership.may_accept?
       membership
+    end
+
+    def grant_client_role
+      person = @request.person
+      person.add_role(AvailableRoles::CLIENT) unless person.has_role?(AvailableRoles::CLIENT)
     end
 
     def confirm_operational_roles

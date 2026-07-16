@@ -39,9 +39,11 @@
 
 ## 6. Diseño de invitaciones
 
-- [ ] 6.1 Especificar invitación a persona sin cuenta (token, expiración, aceptación) dentro de `property-onboarding`.
-  - Tests: emisión, aceptación crea/vincula `User`, expiración no concede acceso.
-  - Done: ciclo de vida de invitación definido.
+- [x] 6.1 Invitación de cuenta con token implementada (`app/services/accounts/{invite_person,accept_invitation}.rb`, `app/services/people/create.rb`):
+  - `Accounts::InvitePerson` — resuelve identidad (conflicto→sin token; matched_person→reutiliza; matched_account→crea Person + referencia cuenta; none→crea Person), emite `OnboardingRequest` pendiente con **token de un solo uso** (solo se persiste el digest SHA-256); devuelve el token para el mailer.
+  - `Accounts::AcceptInvitation` — verifica digest + expiración + estado pendiente (posesión del link no basta), consume el token (un solo uso), y para **cuenta existente** (Flujo C) vincula e incorpora vía `LinkUserToPerson` + `AcceptOnboarding`.
+  - Tests: `test/services/accounts/invitation_test.rb` (emisión, digest no-plano, incorporación, single-use, token inválido, expirado, cuenta-requerida). ✅ 9/9.
+  - **Pendiente/diferido:** aceptación que **crea cuenta nueva** (Flujo A/B) → depende de retirar `provision_tenant_identity` (§18/§21); entrega por **email** (mailer + i18n es/en/pt).
 
 ## 7. Diseño de solicitudes de incorporación
 
@@ -58,10 +60,9 @@
 
 ## 9. Vinculación entre Person y User
 
-- [ ] 9.1 Especificar creación de `User` y vinculación `User`↔`Person` con confirmación del titular (`user-account-linking`).
-  - Archivos: `Admin::UsersController`, `Admin::PeopleController` (`linkable_users`).
-  - Tests: no crear `User` si la persona ya tiene cuenta válida; vinculación errónea bloqueada.
-  - Done: reglas de vinculación y desvinculación con trazabilidad.
+- [~] 9.1 Vinculación `User`↔`Person` implementada como primitivo (`app/services/accounts/link_user_to_person.rb`): guardas de cardinalidad (persona↔≤1 user; user↔≤1 person/org), idempotente, auditada vía `Person.user_id`. Desvinculación en `Memberships::Revoke(unlink_user:)`. Aceptación por titular vía `AcceptInvitation`/`AcceptOnboarding`.
+  - Tests: vinculación, idempotencia, conflicto (persona ya vinculada) en `onboarding_lifecycle_test.rb`.
+  - **Pendiente (§18):** repuntar `Admin::UsersController`/`Admin::PeopleController` (quitar `linkable_users` que expone emails) a estos servicios.
 
 ## 10. Integración con propiedades y unidades
 
