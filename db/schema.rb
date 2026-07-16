@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_14_005758) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_16_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -590,6 +590,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_005758) do
     t.check_constraint "recipient_person_id IS NOT NULL", name: "notifications_recipient_person_required"
   end
 
+  create_table "onboarding_requests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "conflict_reason"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "expires_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.uuid "person_id"
+    t.uuid "requested_by_person_id"
+    t.string "requested_relationship", null: false
+    t.jsonb "requested_roles", default: [], null: false
+    t.uuid "residential_property_id"
+    t.string "status", default: "pending", null: false
+    t.string "token_digest"
+    t.uuid "unit_id"
+    t.datetime "updated_at", null: false
+    t.uuid "user_id"
+    t.index ["deleted_at"], name: "index_onboarding_requests_on_deleted_at"
+    t.index ["organization_id", "person_id", "requested_relationship", "residential_property_id", "unit_id"], name: "idx_onboarding_requests_unique_pending_scope", unique: true, where: "(((status)::text = 'pending'::text) AND (deleted_at IS NULL))"
+    t.index ["organization_id"], name: "index_onboarding_requests_on_organization_id"
+    t.index ["person_id"], name: "index_onboarding_requests_on_person_id"
+    t.index ["requested_by_person_id"], name: "index_onboarding_requests_on_requested_by_person_id"
+    t.index ["residential_property_id"], name: "index_onboarding_requests_on_residential_property_id"
+    t.index ["status"], name: "index_onboarding_requests_on_status"
+    t.index ["token_digest"], name: "idx_onboarding_requests_unique_token_digest", unique: true, where: "(token_digest IS NOT NULL)"
+    t.index ["unit_id"], name: "index_onboarding_requests_on_unit_id"
+    t.index ["user_id"], name: "index_onboarding_requests_on_user_id"
+  end
+
   create_table "organization_memberships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
@@ -837,6 +866,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_005758) do
   end
 
   create_table "staff_assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "confirmation_state", default: "confirmed", null: false
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.date "ends_at"
     t.jsonb "metadata", default: {}, null: false
@@ -847,6 +878,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_005758) do
     t.date "starts_at"
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["confirmation_state"], name: "index_staff_assignments_on_confirmation_state"
     t.index ["metadata"], name: "index_staff_assignments_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "idx_on_organization_id_person_id_status_36b5c5bfed"
     t.index ["organization_id", "residential_property_id", "staff_type", "status"], name: "index_staff_assignments_on_org_property_type_status"
@@ -1252,6 +1284,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_14_005758) do
   add_foreign_key "notifications", "people", column: "recipient_person_id"
   add_foreign_key "notifications", "residential_properties"
   add_foreign_key "notifications", "units"
+  add_foreign_key "onboarding_requests", "organizations"
+  add_foreign_key "onboarding_requests", "people"
+  add_foreign_key "onboarding_requests", "people", column: "requested_by_person_id"
+  add_foreign_key "onboarding_requests", "residential_properties"
+  add_foreign_key "onboarding_requests", "units"
+  add_foreign_key "onboarding_requests", "users"
   add_foreign_key "organization_memberships", "organizations"
   add_foreign_key "organization_memberships", "people"
   add_foreign_key "parcel_deliveries", "organizations"

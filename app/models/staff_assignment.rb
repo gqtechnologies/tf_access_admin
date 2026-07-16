@@ -27,6 +27,8 @@
 # Table name: staff_assignments
 #
 #  id                      :uuid             not null, primary key
+#  confirmation_state      :string           default("confirmed"), not null
+#  confirmed_at            :datetime
 #  ends_at                 :date
 #  metadata                :jsonb            not null
 #  staff_type              :string           not null
@@ -41,6 +43,7 @@
 # Indexes
 #
 #  idx_on_organization_id_person_id_status_36b5c5bfed   (organization_id,person_id,status)
+#  index_staff_assignments_on_confirmation_state        (confirmation_state)
 #  index_staff_assignments_on_metadata                  (metadata) USING gin
 #  index_staff_assignments_on_org_property_type_status  (organization_id,residential_property_id,staff_type,status)
 #  index_staff_assignments_on_organization_id           (organization_id)
@@ -66,12 +69,22 @@ class StaffAssignment < ApplicationRecord
   STATUS_INACTIVE = "inactive"
   STATUSES = [ STATUS_ACTIVE, STATUS_INACTIVE ].freeze
 
+  # Operational roles are confirmable: an assignment created through onboarding
+  # starts +pending+ and grants no access until the holder confirms it. The DB
+  # column defaults to +confirmed+ so legacy and non-onboarding rows keep working;
+  # Authorization::Resolver enforcement of confirmed-only roles is deferred
+  # (tasks §16.2/§17).
+  CONFIRMATION_PENDING = "pending"
+  CONFIRMATION_CONFIRMED = "confirmed"
+  CONFIRMATION_STATES = [ CONFIRMATION_PENDING, CONFIRMATION_CONFIRMED ].freeze
+
   belongs_to :organization
   belongs_to :person
   belongs_to :residential_property
 
   validates :staff_type, presence: true, inclusion: { in: StaffTypes::ALL }
   validates :status, presence: true, inclusion: { in: STATUSES }
+  validates :confirmation_state, presence: true, inclusion: { in: CONFIRMATION_STATES }
   validate :ends_at_not_before_starts_at
 
   validates_same_tenant :person, :residential_property
@@ -86,6 +99,16 @@ class StaffAssignment < ApplicationRecord
   }
   scope :for_property, ->(property) { where(residential_property: property) }
   scope :for_person, ->(person) { where(person: person) }
+  scope :confirmed, -> { where(confirmation_state: CONFIRMATION_CONFIRMED) }
+  scope :pending_confirmation, -> { where(confirmation_state: CONFIRMATION_PENDING) }
+
+  def confirmed?
+    confirmation_state == CONFIRMATION_CONFIRMED
+  end
+
+  def confirm!
+    update!(confirmation_state: CONFIRMATION_CONFIRMED, confirmed_at: Time.current)
+  end
 
   private
 
