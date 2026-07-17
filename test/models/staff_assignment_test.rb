@@ -482,6 +482,7 @@ class StaffAssignmentTest < ActiveSupport::TestCase
         language: Languages::ES,
         confirmed_at: Time.current
       )
+      Accounts::ProvisionTenantIdentity.call(user: user, organization: organization)
       user.person_for(organization)
     end
   end
@@ -510,6 +511,7 @@ class StaffAssignmentTest < ActiveSupport::TestCase
         language: Languages::ES,
         confirmed_at: Time.current
       )
+      Accounts::ProvisionTenantIdentity.call(user: user, organization: @organization)
       person = user.person_for(@organization)
       StaffAssignment.create!(
         organization: @organization,

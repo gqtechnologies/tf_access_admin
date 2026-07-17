@@ -40,8 +40,6 @@ class User < ApplicationRecord
   acts_as_paranoid
   include Users::Features
 
-  attr_accessor :pending_tenant_role
-
   has_many :people, dependent: :destroy
   has_many :organization_memberships, through: :people
   has_many :organizations, through: :people
@@ -52,8 +50,9 @@ class User < ApplicationRecord
   has_one :device_token, dependent: :destroy
   has_one_attached :avatar
 
-  after_create :provision_tenant_identity
-  after_create :apply_pending_tenant_role_if_any
+  # Identity provisioning is explicit (Accounts::ProvisionTenantIdentity), invoked
+  # by admin account creation. Creating a User no longer auto-creates a Person:
+  # a bare User (e.g. self-registration) is a valid, org-less account.
 
   validates :name, presence: true
   validates :dni, presence: true
@@ -163,32 +162,5 @@ class User < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[people]
-  end
-
-  private
-
-  def provision_tenant_identity
-    org = ActsAsTenant.current_tenant
-    return unless org
-    return if people.exists?(organization_id: org.id)
-
-    person = people.create!(
-      organization: org,
-      user: self,
-      display_name: name.presence || email,
-      status: "active"
-    )
-    membership = OrganizationMembership.create!(organization: org, person: person)
-    membership.accept!
-    person.add_role(AvailableRoles::CLIENT) unless person.has_role?(AvailableRoles::CLIENT)
-  end
-
-  def apply_pending_tenant_role_if_any
-    return if pending_tenant_role.blank?
-
-    org = ActsAsTenant.current_tenant
-    person = person_for(org)
-    person&.set_tenant_role(pending_tenant_role)
-    self.pending_tenant_role = nil
   end
 end

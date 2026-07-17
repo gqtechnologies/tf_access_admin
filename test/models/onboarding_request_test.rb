@@ -107,6 +107,7 @@ class OnboardingRequestTest < ActiveSupport::TestCase
         language: Languages::ES,
         confirmed_at: Time.current
       )
+      Accounts::ProvisionTenantIdentity.call(user: user, organization: organization)
       user.person_for(organization)
     end
   end

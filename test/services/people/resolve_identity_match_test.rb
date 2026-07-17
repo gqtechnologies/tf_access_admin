@@ -126,7 +126,7 @@ module People
 
     def create_user!(email:, organization:)
       ActsAsTenant.with_tenant(organization) do
-        User.create!(
+        user = User.create!(
           email: email,
           password: "password1",
           password_confirmation: "password1",
@@ -135,6 +135,8 @@ module People
           language: Languages::ES,
           confirmed_at: Time.current
         )
+        Accounts::ProvisionTenantIdentity.call(user: user, organization: organization)
+        user
       end
     end
   end

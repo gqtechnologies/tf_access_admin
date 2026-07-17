@@ -103,9 +103,11 @@ module BulkImportServices
 
     def create_org_user!(email:)
       ActsAsTenant.with_tenant(@organization) do
-        User.create!(email: email, password: "password1", password_confirmation: "password1",
-                     name: "Org", dni: SecureRandom.hex(4), language: Languages::ES,
-                     confirmed_at: Time.current)
+        user = User.create!(email: email, password: "password1", password_confirmation: "password1",
+                            name: "Org", dni: SecureRandom.hex(4), language: Languages::ES,
+                            confirmed_at: Time.current)
+        Accounts::ProvisionTenantIdentity.call(user: user, organization: @organization)
+        user
       end
     end
   end

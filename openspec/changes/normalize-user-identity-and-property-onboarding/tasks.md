@@ -131,8 +131,8 @@
 
 ## 18. Controllers y contratos de entrada
 
-- [ ] 18.1 Especificar endpoints y strong params; tenant derivado del contexto, no del cliente.
-  - Done: contratos de entrada definidos.
+- [~] 18.1 `Admin::UsersController#create` repuntado a provisión explícita: crea `User` y luego `Accounts::ProvisionTenantIdentity` (Person + membresía + rol) en el tenant del contexto; se elimina el mecanismo `pending_tenant_role`. Tenant derivado del contexto, no del cliente.
+  - **Pendiente:** cablear `ClassifyPeopleRow` en el import (§13), repuntar `Admin::PeopleController` (quitar `linkable_users` que expone emails, §9), y exponer endpoints de invitación/incorporación/aceptación por token.
 
 ## 19. Flujos frontend
 
@@ -146,15 +146,14 @@
 
 ## 21. Migración y compatibilidad
 
-- [ ] 21.1 **Eliminar `provision_tenant_identity`** — ⚠️ **BLOCKED-BY §17 (servicios) + §18 (controllers).** NO borrar el método en aislamiento: `Admin::UsersController#create`, el registro y muchos tests/fixtures dependen de la auto-provisión. Borrarlo antes rompe la creación de usuarios y la suite.
-  - **Receta de transición no-rompiente (verde en cada commit):**
-    1. §17: construir los servicios de onboarding que crean `Person`/membresía/rol explícitamente.
-    2. §18: repuntar `Admin::UsersController#create` + registro a esos servicios.
-    3. Volver `provision_tenant_identity` **no-op / guardado** (no borrar aún).
-    4. Migrar tests/fixtures que asumen auto-`Person` (p.ej. `create_person_in_org` en `staff_assignment_test.rb`/`onboarding_request_test.rb` usa `User.create! → person_for`).
-    5. **Recién entonces** eliminar el método. Nunca un `git rm` directo.
-  - Comportamiento objetivo: `User` sin `Person` es estado válido; `Person`/membresía/rol solo vía onboarding.
-  - Grandfathering: cuentas existentes con `Person`+membresía se conservan; no se borran datos. Remediación histórica (duplicados, dos `User` por humano) diferida a change separado.
+- [x] 21.1 **`provision_tenant_identity` eliminado** siguiendo la receta no-rompiente (suite verde en cada paso):
+    1. Extraído a `Accounts::ProvisionTenantIdentity` (Person + membresía aceptada + rol cliente + rol tenant opcional; idempotente).
+    2. Repuntado `Admin::UsersController#create` a la provisión explícita.
+    3. Eliminados los `after_create :provision_tenant_identity` / `:apply_pending_tenant_role_if_any` y el `attr_accessor :pending_tenant_role`.
+    4. Migrados el helper central `create_user_for_organization` (84 tests) + ~7 helpers locales de tests que hacían `User.create! → person_for`.
+    5. Verificado: **`User` sin `Person` es estado válido**; el auto-registro (Devise, sin tenant) ya crea cuenta sin identidad; la provisión ocurre solo en el alta admin.
+  - Radio real: 1 sitio de app (`Admin::UsersController`) + helper central + ~7 tests. Suite completa **1118 runs, 0 fallos**.
+  - Grandfathering: datos existentes intactos; remediación histórica (duplicados, dos `User` por humano) diferida a change separado.
 
 ## 22. Validación final de OpenSpec
 

@@ -186,10 +186,10 @@ module Memberships
       end
     end
 
-    # A user whose auto-provisioned person lives in @organization.
+    # A user whose provisioned person lives in @organization.
     def create_bare_user_with_person!(email:)
       ActsAsTenant.with_tenant(@organization) do
-        User.create!(
+        user = User.create!(
           email: email,
           password: "password1",
           password_confirmation: "password1",
@@ -198,6 +198,8 @@ module Memberships
           language: Languages::ES,
           confirmed_at: Time.current
         )
+        Accounts::ProvisionTenantIdentity.call(user: user, organization: @organization)
+        user
       end
     end
   end
