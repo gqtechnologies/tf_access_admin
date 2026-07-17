@@ -79,10 +79,9 @@
 
 ## 12. Manejo de conflictos
 
-- [ ] 12.1 Especificar `IdentityConflicts::Resolve` y los 18 casos de conflicto (`identity-resolution`).
-  - Comportamiento: registrar conflicto sin cambiar asociaciones; requiere resolución explícita.
-  - Tests: cada caso produce el estado esperado.
-  - Done: casos 1–18 cubiertos por escenarios.
+- [~] 12.1 `IdentityConflicts::Resolve` implementado (`app/services/identity_conflicts/resolve.rb`): resuelve un `OnboardingRequest` en conflicto con decisión explícita — `dismiss` (revoca, sin cambiar asociaciones) o `link` (vinculación manual verificada + revoca), con sello de auditoría (`resolution` en metadata). El registro del conflicto sin cambiar asociaciones ya lo hace `People::ResolveIdentityMatch` + `RequestOnboarding`/`InvitePerson`.
+  - Tests: `test/services/identity_conflicts/resolve_test.rb` (dismiss, link, link sin target, no-conflicto). ✅ 4/4.
+  - **Pendiente:** cablear la capacidad `resolve_identity_conflicts` en `Authorization::Capabilities`/policy (→ §14, con cuidado del ripple en `ORGANIZATION_ADMIN`/contadores de `operational_roles`); ampliar cobertura de los 18 casos como escenarios (varios ya cubiertos en `resolve_identity_match_test`).
 
 ## 13. Integración con bulk import
 
