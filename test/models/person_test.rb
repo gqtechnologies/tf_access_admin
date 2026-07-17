@@ -120,8 +120,8 @@ class PersonTest < ActiveSupport::TestCase
     user = ActsAsTenant.without_tenant do
       User.create!(
         email: "linked-duplicate@example.test",
-        password: "password1",
-        password_confirmation: "password1",
+        password: "Password1@",
+        password_confirmation: "Password1@",
         name: "Linked Duplicate",
         dni: SecureRandom.hex(4),
         language: Languages::ES,

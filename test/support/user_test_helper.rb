@@ -4,8 +4,8 @@ module UserTestHelper
   def create_confirmed_user(email:, name: "Test User")
     User.create!(
       email: email,
-      password: "password1",
-      password_confirmation: "password1",
+      password: "Password1@",
+      password_confirmation: "Password1@",
       name: name,
       dni: SecureRandom.hex(4),
       language: Languages::ES,

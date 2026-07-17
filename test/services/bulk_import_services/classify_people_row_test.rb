@@ -95,7 +95,7 @@ module BulkImportServices
 
     def create_bare_user!(email:)
       ActsAsTenant.without_tenant do
-        User.create!(email: email, password: "password1", password_confirmation: "password1",
+        User.create!(email: email, password: "Password1@", password_confirmation: "Password1@",
                      name: "Bare", dni: SecureRandom.hex(4), language: Languages::ES,
                      confirmed_at: Time.current)
       end
@@ -103,7 +103,7 @@ module BulkImportServices
 
     def create_org_user!(email:)
       ActsAsTenant.with_tenant(@organization) do
-        user = User.create!(email: email, password: "password1", password_confirmation: "password1",
+        user = User.create!(email: email, password: "Password1@", password_confirmation: "Password1@",
                             name: "Org", dni: SecureRandom.hex(4), language: Languages::ES,
                             confirmed_at: Time.current)
         Accounts::ProvisionTenantIdentity.call(user: user, organization: @organization)

@@ -54,10 +54,17 @@ class User < ApplicationRecord
   # by admin account creation. Creating a User no longer auto-creates a Person:
   # a bare User (e.g. self-registration) is a valid, org-less account.
 
+  # Server-side password policy (mirrors the frontend Zod rule, plus a digit):
+  # min 8 chars with at least one lowercase, uppercase, digit and special char
+  # from the shared set. Applies to every path that sets a password (invitation
+  # acceptance, admin creation, password change).
+  PASSWORD_COMPLEXITY = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$%@.\-_]).{8,}\z/
+
   validates :name, presence: true
   validates :dni, presence: true
   validates :language, presence: true, inclusion: { in: Languages::ALL }
   validates :email, uniqueness: { message: "admin.users.validations.email_taken" }
+  validate :password_meets_complexity
 
   devise :database_authenticatable,
          :recoverable, :rememberable, :validatable,
@@ -162,5 +169,14 @@ class User < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[people]
+  end
+
+  private
+
+  def password_meets_complexity
+    return if password.blank?
+    return if password.match?(PASSWORD_COMPLEXITY)
+
+    errors.add(:password, "admin.users.validations.password_complexity")
   end
 end

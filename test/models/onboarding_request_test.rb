@@ -100,8 +100,8 @@ class OnboardingRequestTest < ActiveSupport::TestCase
     ActsAsTenant.with_tenant(organization) do
       user = User.create!(
         email: email,
-        password: "password1",
-        password_confirmation: "password1",
+        password: "Password1@",
+        password_confirmation: "Password1@",
         name: "Test Person",
         dni: SecureRandom.hex(4),
         language: Languages::ES,

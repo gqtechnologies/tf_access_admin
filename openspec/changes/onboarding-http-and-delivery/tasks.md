@@ -28,8 +28,8 @@
 
 ## 4b. Política de contraseña (D6)
 
-- [ ] 4b.1 Validación en `User` (junto a Devise `:validatable`): mínimo 8 caracteres con al menos 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial; mensaje i18n `es`/`en`/`pt`. Aplica a alta por invitación (Flujo A/B), alta admin y cambio de contraseña.
-  - Tests: contraseñas que fallan cada clase/longitud rechazadas; una compuesta aceptada.
+- [x] 4b.1 Validación `User#password_meets_complexity` (`PASSWORD_COMPLEXITY`): min 8 + minúscula + mayúscula + dígito + símbolo `[$%@.\-_]`; mensaje `admin.users.validations.password_complexity` en es/en/pt. Frontend Zod (`schemas/user.ts`) alineado: **añadido el dígito** que faltaba (`password_number`). Migrados los tests (`password1` → `Password1@`).
+  - Tests: `test/models/user_password_policy_test.rb` (7/7); suite completa 1118, 0 fallos; type-check sin errores nuevos.
 
 ## 5. Cableado del clasificador en bulk import (§13→§18)
 

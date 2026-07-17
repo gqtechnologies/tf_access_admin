@@ -155,7 +155,7 @@ class Admin::ResidentialPropertiesControllerTest < ActionDispatch::IntegrationTe
 
   def sign_in_as(user)
     host! "#{@organization.subdomain}.example.com"
-    post user_session_path, params: { user: { email: user.email, password: "password1" } }
+    post user_session_path, params: { user: { email: user.email, password: "Password1@" } }
   end
 
   def valid_property_params(name:)

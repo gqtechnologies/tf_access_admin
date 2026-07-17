@@ -176,8 +176,8 @@ module Memberships
       ActsAsTenant.without_tenant do
         User.create!(
           email: email,
-          password: "password1",
-          password_confirmation: "password1",
+          password: "Password1@",
+          password_confirmation: "Password1@",
           name: "Bare User",
           dni: SecureRandom.hex(4),
           language: Languages::ES,
@@ -191,8 +191,8 @@ module Memberships
       ActsAsTenant.with_tenant(@organization) do
         user = User.create!(
           email: email,
-          password: "password1",
-          password_confirmation: "password1",
+          password: "Password1@",
+          password_confirmation: "Password1@",
           name: "Org User",
           dni: SecureRandom.hex(4),
           language: Languages::ES,
