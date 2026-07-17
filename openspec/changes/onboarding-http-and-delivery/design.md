@@ -15,14 +15,19 @@ Un controller admin de onboarding con acciones para: crear invitación/incorpora
 
 **Canal de aceptación = ambos (decidido).** El link abre una página web que, si detecta la app móvil instalada (universal link/scheme), hace deep-link a la app (auth JWT); si no, permite aceptar en web (Inertia, incluyendo fijar contraseña en Flujo A/B). ⚠️ **Dependencia externa:** requiere que la app móvil (repo aparte) soporte universal links / un scheme acordado — a coordinar antes de implementar el deep-link.
 
+**Índice de solicitudes (decidido).** El gestor con `manage_people` puede **listar** las solicitudes pendientes de su organización y **revocarlas**; se implementa `OnboardingRequestPolicy::Scope` org-scoped (hoy devuelve `none`). Revocar lo puede hacer **cualquier** actor con `manage_people`, no solo quien emitió la invitación.
+
 ### D2 — Entrega por email
-`OnboardingMailer` + job Sidekiq. El correo lleva solo un **link de un solo uso con expiración** (token en la URL, digest en BD); **sin** datos personales sensibles, documento ni el token fuera del link. **Identifica a la organización que invita** por su nombre ("La organización X te invita a…") — auto-revelación permitida; nunca revela otras orgs del titular. i18n en `es`/`en`/`pt` (una clave por locale). `InvitePerson` ya devuelve el token en claro para que el mailer lo envíe una sola vez.
+`OnboardingMailer` + job Sidekiq. El correo lleva solo un **link de un solo uso** (token en la URL, digest en BD; consumido al aceptar) con **expiración de 14 días**; **sin** datos personales sensibles, documento ni el token fuera del link. **Identifica a la organización que invita** por su nombre ("La organización X te invita a…") — auto-revelación permitida; nunca revela otras orgs del titular. i18n en `es`/`en`/`pt` (una clave por locale). `InvitePerson` ya devuelve el token en claro para que el mailer lo envíe una sola vez.
 
 ### D3 — Flujo A/B (crear cuenta al aceptar) + auto-confirmación
 Ampliar `Accounts::AcceptInvitation`: cuando no hay cuenta resuelta, crear el `User` (contraseña que fija el titular) y **vincularlo explícitamente** vía `Accounts::LinkUserToPerson` + `Memberships::AcceptOnboarding`, sin hooks. **Aceptar por token auto-confirma el email (decidido):** abrir el link de un solo uso prueba posesión del correo, así que la cuenta queda `confirmed_at` al aceptar — sin segundo correo de confirmación.
 
 ### D4 — Gate de confirmación
 Devise `config.allow_unconfirmed_access_for = 0` (o verificación explícita en sesión) para que un `User` no confirmado no use la app. Con D3, los invitados quedan confirmados al aceptar, por lo que el gate aplica sobre todo al **auto-registro** (cuenta creada sin pasar por un token de invitación).
+
+### D6 — Política de contraseña
+Al fijar contraseña (alta por invitación, Flujo A/B, y cualquier alta/cambio de `User`) el sistema exige **mínimo 8 caracteres con al menos una minúscula, una mayúscula, un número y un carácter especial**. Se implementa como validación en `User` (junto a Devise `:validatable`), con mensaje i18n en `es`/`en`/`pt`. Aplica de forma consistente a todos los caminos de creación/cambio de contraseña.
 
 ### D5 — Cableado del clasificador en bulk import (clasificar; el gestor decide)
 `ImportPeopleRow`/validadores consultan `ClassifyPeopleRow` y **clasifican** cada fila; el import **no** envía invitaciones ni crea solicitudes automáticamente. `ready_to_create_person` crea la persona; `requires_invitation`/`requires_incorporation`/`requires_review`/`conflict` se **muestran como estado** para que el gestor dispare la acción (por fila o en lote) explícitamente; `duplicate` es idempotente; `invalid` se rechaza. Nunca se fusiona identidad. La UI de bulk import muestra el estado por fila.

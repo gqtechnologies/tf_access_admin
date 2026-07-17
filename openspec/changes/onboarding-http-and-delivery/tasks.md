@@ -8,7 +8,9 @@
   - Autorización vía `OnboardingRequestPolicy`; tenant desde contexto; strong params sin `organization_id`.
   - Tests: controller/request specs por acción y por rol (gestor no resuelve conflictos).
 - [ ] 1.2 Endpoint de aceptación por token (autenticado): valida token → `Accounts::AcceptInvitation`.
-  - Tests: token válido/inválido/expirado/consumido; incorporación de cuenta existente.
+  - Tests: token válido/inválido/expirado/consumido (un solo uso); incorporación de cuenta existente.
+- [ ] 1.3 Índice de solicitudes: `OnboardingRequestPolicy::Scope` org-scoped (hoy `none`) + acción index; `manage_people` lista y revoca (cualquier actor con la capacidad, no solo el emisor).
+  - Tests: gestor solo ve solicitudes de su org; revocación por otro `manage_people`.
 
 ## 2. Entrega por email (mailer + i18n)
 
@@ -22,7 +24,12 @@
 
 ## 4. Gate de confirmación (§14.2)
 
-- [ ] 4.1 Devise `allow_unconfirmed_access_for = 0` (o verificación en sesión). Tests: no confirmado bloqueado; incorporación vincula pero no da acceso.
+- [ ] 4.1 Devise `allow_unconfirmed_access_for = 0` (o verificación en sesión). Con auto-confirmación al aceptar (D3), el gate aplica sobre todo al auto-registro. Tests: no confirmado bloqueado; invitado auto-confirmado accede.
+
+## 4b. Política de contraseña (D6)
+
+- [ ] 4b.1 Validación en `User` (junto a Devise `:validatable`): mínimo 8 caracteres con al menos 1 minúscula, 1 mayúscula, 1 número y 1 carácter especial; mensaje i18n `es`/`en`/`pt`. Aplica a alta por invitación (Flujo A/B), alta admin y cambio de contraseña.
+  - Tests: contraseñas que fallan cada clase/longitud rechazadas; una compuesta aceptada.
 
 ## 5. Cableado del clasificador en bulk import (§13→§18)
 

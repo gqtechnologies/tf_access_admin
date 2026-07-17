@@ -51,3 +51,19 @@ The system SHALL expose onboarding actions (invite/incorporate, revoke, resolve 
 - **GIVEN** an actor without `resolve_identity_conflicts`
 - **WHEN** the actor calls the conflict-resolution endpoint
 - **THEN** the system denies the request
+
+### Requirement: Managers can list and revoke pending requests
+
+A manager with `manage_people` SHALL be able to list the onboarding requests of their own organization and revoke a pending one. The listing MUST be organization-scoped and MUST NOT expose other organizations' requests. Any actor with `manage_people` may revoke (not only the issuer).
+
+#### Scenario: Manager lists only their organization's requests
+
+- **GIVEN** onboarding requests exist in organizations O1 and O2
+- **WHEN** a manager of O1 lists onboarding requests
+- **THEN** the system returns only O1 requests
+
+#### Scenario: Any manage_people actor can revoke a pending request
+
+- **GIVEN** a pending request issued by another manager
+- **WHEN** a different actor with `manage_people` revokes it
+- **THEN** the system revokes the request
