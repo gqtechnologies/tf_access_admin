@@ -11,19 +11,21 @@ Puntos de anclaje ya implementados:
 ## Decisiones
 
 ### D1 — Endpoints y contrato de entrada
-Un controller admin de onboarding con acciones para: crear invitación/incorporación, revocar, resolver conflicto; y un endpoint público (autenticado) de aceptación por token. Tenant siempre desde `Current.organization`/contexto; el cliente nunca envía `organization_id`. Cada acción `authorize`-a vía `OnboardingRequestPolicy`.
+Un controller admin de onboarding con acciones para: crear invitación/incorporación, revocar, resolver conflicto; y un endpoint (autenticado) de aceptación por token. Tenant siempre desde `Current.organization`/contexto; el cliente nunca envía `organization_id`. Cada acción `authorize`-a vía `OnboardingRequestPolicy`.
+
+**Canal de aceptación = ambos (decidido).** El link abre una página web que, si detecta la app móvil instalada (universal link/scheme), hace deep-link a la app (auth JWT); si no, permite aceptar en web (Inertia, incluyendo fijar contraseña en Flujo A/B). ⚠️ **Dependencia externa:** requiere que la app móvil (repo aparte) soporte universal links / un scheme acordado — a coordinar antes de implementar el deep-link.
 
 ### D2 — Entrega por email
-`OnboardingMailer` + job Sidekiq. El correo lleva solo un **link de un solo uso con expiración** (token en la URL, digest en BD); **sin** datos personales sensibles, documento ni el token fuera del link. i18n en `es`/`en`/`pt` (una clave por locale). `InvitePerson` ya devuelve el token en claro para que el mailer lo envíe una sola vez.
+`OnboardingMailer` + job Sidekiq. El correo lleva solo un **link de un solo uso con expiración** (token en la URL, digest en BD); **sin** datos personales sensibles, documento ni el token fuera del link. **Identifica a la organización que invita** por su nombre ("La organización X te invita a…") — auto-revelación permitida; nunca revela otras orgs del titular. i18n en `es`/`en`/`pt` (una clave por locale). `InvitePerson` ya devuelve el token en claro para que el mailer lo envíe una sola vez.
 
-### D3 — Flujo A/B (crear cuenta al aceptar)
-Ampliar `Accounts::AcceptInvitation`: cuando no hay cuenta resuelta, crear el `User` (con contraseña que fija el titular) y **vincularlo explícitamente** vía `Accounts::LinkUserToPerson` + `Memberships::AcceptOnboarding`. No se apoya en ningún hook. El `User` recién creado queda sin confirmar hasta que confirme su email (gate D4).
+### D3 — Flujo A/B (crear cuenta al aceptar) + auto-confirmación
+Ampliar `Accounts::AcceptInvitation`: cuando no hay cuenta resuelta, crear el `User` (contraseña que fija el titular) y **vincularlo explícitamente** vía `Accounts::LinkUserToPerson` + `Memberships::AcceptOnboarding`, sin hooks. **Aceptar por token auto-confirma el email (decidido):** abrir el link de un solo uso prueba posesión del correo, así que la cuenta queda `confirmed_at` al aceptar — sin segundo correo de confirmación.
 
 ### D4 — Gate de confirmación
-Devise `config.allow_unconfirmed_access_for = 0` (o verificación explícita en el flujo de sesión) para que un `User` no confirmado no use la app, aunque esté vinculado/incorporado. Cubre `user-account-linking` "Unconfirmed accounts cannot use the application".
+Devise `config.allow_unconfirmed_access_for = 0` (o verificación explícita en sesión) para que un `User` no confirmado no use la app. Con D3, los invitados quedan confirmados al aceptar, por lo que el gate aplica sobre todo al **auto-registro** (cuenta creada sin pasar por un token de invitación).
 
-### D5 — Cableado del clasificador en bulk import
-`ImportPeopleRow`/validadores consultan `ClassifyPeopleRow` y actúan por estado: `ready_to_create_person` crea; `requires_invitation`/`requires_incorporation` generan la solicitud correspondiente; `conflict`/`requires_review` no fusionan y se marcan para revisión; `duplicate` es idempotente; `invalid` se rechaza. La UI de bulk import muestra el estado por fila.
+### D5 — Cableado del clasificador en bulk import (clasificar; el gestor decide)
+`ImportPeopleRow`/validadores consultan `ClassifyPeopleRow` y **clasifican** cada fila; el import **no** envía invitaciones ni crea solicitudes automáticamente. `ready_to_create_person` crea la persona; `requires_invitation`/`requires_incorporation`/`requires_review`/`conflict` se **muestran como estado** para que el gestor dispare la acción (por fila o en lote) explícitamente; `duplicate` es idempotente; `invalid` se rechaza. Nunca se fusiona identidad. La UI de bulk import muestra el estado por fila.
 
 ### D6 — Privacidad en la UI
 Las pantallas del gestor muestran solo información **neutral** (email-blind): nunca revelan si el correo ya tiene cuenta ni otras organizaciones del titular. La aceptación ocurre del lado del titular tras autenticarse.

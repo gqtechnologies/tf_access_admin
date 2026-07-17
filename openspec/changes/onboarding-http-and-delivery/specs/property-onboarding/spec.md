@@ -4,13 +4,14 @@
 
 ### Requirement: Invitation token is delivered by email
 
-The system SHALL deliver an onboarding invitation to the destination email as a single-use, time-limited link. The email MUST NOT contain the raw token outside the link, nor sensitive personal data (document, other emails, other organizations).
+The system SHALL deliver an onboarding invitation to the destination email as a single-use, time-limited link. The email SHALL identify the inviting organization by name, and MUST NOT contain the raw token outside the link, sensitive personal data (document), the holder's other emails, or any other organization the holder belongs to.
 
-#### Scenario: Invitation email carries only a single-use link
+#### Scenario: Invitation email carries only a single-use link and the inviting org
 
 - **WHEN** an invitation is issued
 - **THEN** the system sends an email containing a single-use, expiring link
-- **AND** the email contains no document, no other-organization data, and no token beyond the link
+- **AND** the email names the inviting organization
+- **AND** contains no document, no other-organization data, and no token beyond the link
 
 #### Scenario: Delivery does not block issuance
 
@@ -28,11 +29,12 @@ When an invitation has no resolved account, the system SHALL create a new `User`
 - **WHEN** the holder accepts and sets a password
 - **THEN** the system creates a `User`, links it to the person, and activates the membership per the join rules
 
-#### Scenario: Newly created account must confirm before use
+#### Scenario: Accepting by token confirms the email
 
-- **GIVEN** a new account created at acceptance
-- **WHEN** the account has not confirmed its email
-- **THEN** the system does not allow it to use the application
+- **GIVEN** a pending invitation
+- **WHEN** the holder opens the single-use link and accepts
+- **THEN** the system marks the account's email as confirmed
+- **AND** does not require a separate confirmation email
 
 ### Requirement: Onboarding endpoints derive tenant from context
 
