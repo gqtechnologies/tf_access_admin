@@ -19,8 +19,8 @@
 
 ## 3. Aceptación que crea cuenta nueva (Flujo A/B)
 
-- [ ] 3.1 Ampliar `Accounts::AcceptInvitation`: si no hay cuenta resuelta, crear `User` (contraseña del titular) + `LinkUserToPerson` + `AcceptOnboarding`, y **auto-confirmar el email** (`confirmed_at` al aceptar). Quitar el `raise AccountRequired`.
-  - Tests: aceptación crea cuenta, vincula, activa membresía y queda confirmada; token consumido (un solo uso).
+- [x] 3.1 `Accounts::AcceptInvitation` ampliado: sin cuenta resuelta crea `User` (password del titular + name/dni/language con fallback a datos de la `Person`, `skip_confirmation!`) + `LinkUserToPerson` + `AcceptOnboarding`; **auto-confirma el email** en ambos ramos (existente sin confirmar también). `AccountRequired` ahora exige password.
+  - Tests: `invitation_test.rb` (9/9) — Flujo A/B crea cuenta confirmada+vinculada+membresía activa; incorporación; single-use/inválido/expirado.
 
 ## 4. Gate de confirmación (§14.2)
 

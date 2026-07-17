@@ -100,12 +100,36 @@ module Accounts
       end
     end
 
-    test "accepting an invitation without a resolved account is deferred" do
+    test "accepting without a resolved account and without a password is rejected" do
       result = InvitePerson.call(organization: @organization, email: "noaccount@example.test")
 
       assert_raises(AcceptInvitation::AccountRequired) do
         AcceptInvitation.call(token: result.token, organization: @organization)
       end
+    end
+
+    test "accepting without a resolved account creates a confirmed, linked account (Flow A/B)" do
+      result = InvitePerson.call(
+        organization: @organization,
+        email: "newaccount@example.test",
+        first_name: "New",
+        last_name: "Account",
+        document_number: "70.707.070-7"
+      )
+
+      AcceptInvitation.call(
+        token: result.token,
+        organization: @organization,
+        password: "Password1@"
+      )
+
+      person = result.person.reload
+      assert person.user_id.present?
+      user = person.user
+      assert_equal "newaccount@example.test", user.email
+      assert user.confirmed?
+      assert person.has_role?(AvailableRoles::CLIENT)
+      assert_equal OrganizationMembership::STATUS_ACTIVE, person.organization_membership.status
     end
 
     private

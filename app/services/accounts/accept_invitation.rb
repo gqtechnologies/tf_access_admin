@@ -5,10 +5,12 @@ module Accounts
   # digest, expiration, and pending state before granting anything (possession
   # of the link alone is insufficient — the holder must be the resolved account).
   #
-  # This slice supports incorporation of an EXISTING account (Flow C): it links
-  # the account to the person and finalizes onboarding. Creating a NEW account on
-  # accept is deferred to the controllers slice, because it depends on removing
-  # +User#provision_tenant_identity+ (tasks §18/§21) to avoid a duplicate Person.
+  # - Existing account (Flow C): links the account to the person.
+  # - No account (Flow A/B): creates the `User` from the holder-provided password
+  #   (and optional name/dni/language, falling back to the person's data).
+  #
+  # Accepting by token confirms the email in both cases (opening the single-use
+  # link proves possession), so no separate confirmation email is required.
   class AcceptInvitation
     class InvalidToken < StandardError; end
     class Expired < StandardError; end
@@ -18,18 +20,23 @@ module Accounts
       new(**kwargs).call
     end
 
-    def initialize(token:, organization:)
+    def initialize(token:, organization:, password: nil, name: nil, dni: nil, language: nil)
       @token = token
       @organization = organization
+      @password = password
+      @name = name
+      @dni = dni
+      @language = language
     end
 
     def call
       request = find_pending_request!
       raise Expired if request.expires_at.past?
-      raise AccountRequired, "new-account creation on accept is deferred (§18/§21)" if request.user.blank?
 
       OnboardingRequest.transaction do
-        Accounts::LinkUserToPerson.call(person: request.person, user: request.user)
+        user = request.user || create_account!(request)
+        confirm_email(user)
+        Accounts::LinkUserToPerson.call(person: request.person, user: user)
         consume_token(request)
         Memberships::AcceptOnboarding.call(onboarding_request: request)
       end
@@ -43,6 +50,30 @@ module Accounts
       raise InvalidToken if request.blank? || !request.pending?
 
       request
+    end
+
+    def create_account!(request)
+      raise AccountRequired, "password is required to create an account" if @password.blank?
+
+      person = request.person
+      user = User.new(
+        email: person.contact_email,
+        password: @password,
+        password_confirmation: @password,
+        name: @name.presence || person.display_name,
+        dni: @dni.presence || person.document_number,
+        language: @language.presence || I18n.default_locale.to_s
+      )
+      user.skip_confirmation!
+      user.save!
+      user
+    end
+
+    # Opening the single-use link proves email possession → confirm the account.
+    def confirm_email(user)
+      return if user.confirmed_at.present?
+
+      user.update!(confirmed_at: Time.current)
     end
 
     def consume_token(request)
