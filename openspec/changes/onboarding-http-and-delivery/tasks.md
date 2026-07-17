@@ -24,7 +24,8 @@
 
 ## 4. Gate de confirmación (§14.2)
 
-- [ ] 4.1 Devise `allow_unconfirmed_access_for = 0` (o verificación en sesión). Con auto-confirmación al aceptar (D3), el gate aplica sobre todo al auto-registro. Tests: no confirmado bloqueado; invitado auto-confirmado accede.
+- [x] 4.1 `config.allow_unconfirmed_access_for = 0.days` en `config/initializers/devise.rb` (sin periodo de gracia). Con auto-confirmación al aceptar (D3), el gate aplica sobre todo al auto-registro.
+  - Tests: `test/models/user_confirmation_gate_test.rb` — no confirmado no `active_for_authentication?`; confirmado sí. Suite completa 1128, 0 fallos.
 
 ## 4b. Política de contraseña (D6)
 
