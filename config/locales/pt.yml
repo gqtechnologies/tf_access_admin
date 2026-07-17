@@ -28,6 +28,16 @@
 #       enabled: "ON"
 
 pt:
+  onboarding:
+    accept:
+      success: "Convite aceito. Faça login para continuar."
+  onboarding_mailer:
+    invitation:
+      subject: "%{organization} convida você"
+      greeting: "Olá"
+      body: "%{organization} convidou você. Confirme seu acesso com o link abaixo."
+      cta: "Aceitar convite"
+      expiration: "Este link é de uso único e expira em 14 dias."
   frontend:
     name: "Admin Base"
     description: "bem-vindo de volta"

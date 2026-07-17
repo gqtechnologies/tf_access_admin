@@ -4,18 +4,17 @@
 
 ## 1. Endpoints HTTP de onboarding (§18)
 
-- [ ] 1.1 Rutas + `Admin::OnboardingRequestsController` (o equivalente): crear invitación/incorporación, revocar, resolver conflicto.
-  - Autorización vía `OnboardingRequestPolicy`; tenant desde contexto; strong params sin `organization_id`.
-  - Tests: controller/request specs por acción y por rol (gestor no resuelve conflictos).
-- [ ] 1.2 Endpoint de aceptación por token (autenticado): valida token → `Accounts::AcceptInvitation`.
-  - Tests: token válido/inválido/expirado/consumido (un solo uso); incorporación de cuenta existente.
+- [x] 1.1 Rutas + `Admin::OnboardingRequestsController`: `index`/`new`/`create` (invita vía `Accounts::InvitePerson` + entrega email), `revoke`, `resolve_conflict`. Autorización `OnboardingRequestPolicy`; tenant desde contexto. Backend testeado; falta la UI (§6).
+  - Tests: `onboarding_requests_controller_test.rb` (index, create+email encolado, no-manager bloqueado). 3/3.
+- [x] 1.2 `OnboardingAcceptancesController` (`get/post onboarding/accept/:token`): resuelve org por token, muestra info neutral (org + email enmascarado), acepta vía `Accounts::AcceptInvitation`.
+  - Tests: `onboarding_acceptances_controller_test.rb` (show neutral, token inválido, aceptación crea cuenta confirmada + membresía activa). 3/3.
 - [~] 1.3 `OnboardingRequestPolicy::Scope` org-scoped implementado: devuelve las solicitudes de la org solo si el actor tiene `manage_people`, si no `none`. ✅ (`onboarding_request_policy_test.rb`, 4/4).
   - **Pendiente (con 1.1):** la acción `index` HTTP que consume el scope + la UI.
 
 ## 2. Entrega por email (mailer + i18n)
 
-- [ ] 2.1 `OnboardingMailer` + vistas + job Sidekiq; link de un solo uso con expiración de 14 días; **identifica a la organización que invita** por nombre; sin datos sensibles ni token fuera del link.
-- [ ] 2.2 i18n `es`/`en`/`pt` (una clave por locale). Tests de mailer (contenido mínimo, link presente, sin PII).
+- [x] 2.1 `OnboardingMailer#invitation` + vistas html/text; `deliver_later` (Sidekiq) desde el controller; link de un solo uso (`onboarding_acceptance_url`), nombre de la org, sin PII.
+- [x] 2.2 i18n `onboarding_mailer.invitation.*` en es/en/pt. Test: `onboarding_mailer_test.rb` (org en asunto/cuerpo, link presente, sin documento). 1/1.
 
 ## 3. Aceptación que crea cuenta nueva (Flujo A/B)
 

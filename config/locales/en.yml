@@ -28,6 +28,16 @@
 #       enabled: "ON"
 
 en:
+  onboarding:
+    accept:
+      success: "Invitation accepted. Sign in to continue."
+  onboarding_mailer:
+    invitation:
+      subject: "%{organization} invites you"
+      greeting: "Hello"
+      body: "%{organization} has invited you. Confirm your access with the link below."
+      cta: "Accept invitation"
+      expiration: "This link is single-use and expires in 14 days."
   frontend:
     name: "Admin Base"
     description: "welcome again"

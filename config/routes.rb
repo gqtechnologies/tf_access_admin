@@ -49,9 +49,19 @@ Rails.application.routes.draw do
   end
 
   get "admin/home/index"
+  # Onboarding invitation acceptance by single-use token (holder-facing).
+  get "onboarding/accept/:token", to: "onboarding_acceptances#show", as: :onboarding_acceptance
+  post "onboarding/accept/:token", to: "onboarding_acceptances#create"
+
   namespace :admin do
     resources :users, only: [ :index, :new, :create, :edit, :update, :destroy ]
     resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
+    resources :onboarding_requests, only: [ :index, :new, :create ] do
+      member do
+        post :revoke
+        post :resolve_conflict
+      end
+    end
     namespace :people do
       resources :bulk_imports, only: %i[create update] do
         member do
