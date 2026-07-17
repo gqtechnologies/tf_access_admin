@@ -156,15 +156,8 @@ class Admin::PeopleController < AdminController
       person: person,
       roles: AvailableRoles::TENANT,
       person_types: PersonTypes::ALL,
-      statuses: PersonStatuses::ALL,
-      linkable_users: linkable_users
+      statuses: PersonStatuses::ALL
     }
-  end
-
-  def linkable_users
-    policy_scope(User)
-      .order(:name)
-      .map { |user| { id: user.id, name: user.name, email: user.email } }
   end
 
   def set_person

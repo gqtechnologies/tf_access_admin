@@ -62,7 +62,7 @@
 
 - [~] 9.1 Vinculación `User`↔`Person` implementada como primitivo (`app/services/accounts/link_user_to_person.rb`): guardas de cardinalidad (persona↔≤1 user; user↔≤1 person/org), idempotente, auditada vía `Person.user_id`. Desvinculación en `Memberships::Revoke(unlink_user:)`. Aceptación por titular vía `AcceptInvitation`/`AcceptOnboarding`.
   - Tests: vinculación, idempotencia, conflicto (persona ya vinculada) en `onboarding_lifecycle_test.rb`.
-  - **Pendiente (§18):** repuntar `Admin::UsersController`/`Admin::PeopleController` (quitar `linkable_users` que expone emails) a estos servicios.
+  - **§18 hecho (privacidad):** `linkable_users` eliminado de `Admin::PeopleController` + páginas `new.vue`/`edit.vue` + tipo `LinkableUser` (era prop muerto que exponía todos los emails de cuentas al gestor; `Form.vue` no lo consumía). Type-check sin errores nuevos; people controller 10/10.
 
 ## 10. Integración con propiedades y unidades
 

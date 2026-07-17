@@ -19,9 +19,3 @@ export type Person = {
   tenant_role?: string
   contextual_roles?: PersonContextualRole[]
 }
-
-export type LinkableUser = {
-  id: string
-  name: string
-  email: string
-}
