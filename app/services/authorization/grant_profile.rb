@@ -65,7 +65,11 @@ module Authorization
     def apply_organization_roles
       return unless member_of_organization?
 
-      if user.super_admin? || tenant_admin?
+      if user.super_admin?
+        grant_organization_capabilities(Capabilities::ORGANIZATION_ADMIN)
+        grant_organization_capabilities([ Capabilities::RESOLVE_IDENTITY_CONFLICTS ])
+        @organization_wide = true
+      elsif tenant_admin?
         grant_organization_capabilities(Capabilities::ORGANIZATION_ADMIN)
         @organization_wide = true
       elsif content_manager?

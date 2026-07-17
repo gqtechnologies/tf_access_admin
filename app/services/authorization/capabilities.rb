@@ -24,6 +24,10 @@ module Authorization
     VIEW_MINIMAL_ACCESS_CONTROL_DATA = :view_minimal_access_control_data
     VIEW_OWN_UNIT_CONTEXT = :view_own_unit_context
     MANAGE_STAFF_ASSIGNMENTS = :manage_staff_assignments
+    # Global identity-conflict resolution. Deliberately super-admin-only by
+    # default (see ORGANIZATION_ADMIN below); a property/organization manager
+    # must NOT resolve global identity conflicts.
+    RESOLVE_IDENTITY_CONFLICTS = :resolve_identity_conflicts
 
     ALL = [
       MANAGE_ORGANIZATION,
@@ -47,10 +51,14 @@ module Authorization
       REGISTER_VISIT_EXIT,
       VIEW_MINIMAL_ACCESS_CONTROL_DATA,
       VIEW_OWN_UNIT_CONTEXT,
-      MANAGE_STAFF_ASSIGNMENTS
+      MANAGE_STAFF_ASSIGNMENTS,
+      RESOLVE_IDENTITY_CONFLICTS
     ].freeze
 
-    ORGANIZATION_ADMIN = ALL.freeze
+    # Organization admins (tenant_admin) get every capability EXCEPT global
+    # identity-conflict resolution, which stays super-admin-only and delegable
+    # (granted explicitly in +GrantProfile+).
+    ORGANIZATION_ADMIN = (ALL - [ RESOLVE_IDENTITY_CONFLICTS ]).freeze
 
     CONTENT_MANAGER = [
       MANAGE_PROPERTIES,

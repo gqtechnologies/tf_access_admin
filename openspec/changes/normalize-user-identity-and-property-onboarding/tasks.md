@@ -91,11 +91,11 @@
 
 ## 14. Autorización
 
-- [ ] 14.1 Especificar capacidades por actor (buscar, ver coincidencias, crear, invitar, incorporar, revocar, resolver conflictos, editar datos globales).
-  - Archivos: `PersonPolicy`, `UserPolicy`, nueva `OnboardingRequestPolicy`.
-  - Comportamiento: **asignar/revocar roles = solo rol manager**; gestor de propiedad no resuelve conflictos globales (`resolve_identity_conflicts`).
-  - Tests: policy specs por capacidad; no-manager no asigna roles.
-  - Done: matriz de autorización especificada.
+- [x] 14.1 Autorización implementada:
+  - Capacidad dedicada `Authorization::Capabilities::RESOLVE_IDENTITY_CONFLICTS`, añadida a `ALL` pero **excluida de `ORGANIZATION_ADMIN`**; `GrantProfile` la otorga **solo a super_admin** (tenant_admin no la obtiene) — honra "por defecto super_admin, delegable".
+  - `OnboardingRequestPolicy`: invitar/crear/revocar → `manage_people`; asignar rol operativo → `manage_staff_assignments` (rol manager); resolver conflicto → `resolve_identity_conflicts`.
+  - Tests: `test/policies/onboarding_request_policy_test.rb` — tenant_admin **no** resuelve conflictos; content_manager **no** asigna roles; client nada. ✅ 3/3.
+  - Suite completa **1118 runs, 0 fallos** (sin regresión por el cambio de catálogo).
 
 - [ ] 14.2 Gate de confirmación: `User` no confirmado no puede usar la app (Devise `:confirmable`, `allow_unconfirmed_access_for = 0`), aunque esté vinculado/incorporado.
   - Tests: usuario no confirmado bloqueado; incorporación de cuenta no confirmada vincula pero no da acceso.
