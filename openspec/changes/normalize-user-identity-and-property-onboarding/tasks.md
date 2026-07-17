@@ -1,6 +1,10 @@
 # Tasks
 
-> Este change **define contrato** (specs/design). Las tareas de implementación quedan sin marcar; la implementación de código está fuera del alcance de este paso.
+> **CERRADO como hito fundacional.** Implementados y verdes (suite 1118, 0 fallos): identidad canónica, entidad `OnboardingRequest`, `StaffAssignment` confirmable, todos los servicios canónicos (`ResolveIdentityMatch`, `ProvisionTenantIdentity`, `Create`, `InvitePerson`, `AcceptInvitation`, `LinkUserToPerson`, `Memberships::*`, `IdentityConflicts::Resolve`, `ClassifyPeopleRow`), autorización (`resolve_identity_conflicts` + `OnboardingRequestPolicy`), eliminación de `provision_tenant_identity`, y cierre de la fuga `linkable_users`.
+>
+> **Movido al change siguiente** (`onboarding-http-and-delivery`): endpoints HTTP + contratos de entrada (resto §18), entrega por email del token (mailer + i18n), aceptación que **crea cuenta nueva** (Flujo A/B, ya desbloqueado), cableado de `ClassifyPeopleRow` en el pipeline + UI de estados, gate de confirmación (§14.2), pantallas frontend (§19), auditoría (§15), enumeración de tests (§20), verificación de specs §5/§8/§10/§11, y validación final (§22).
+>
+> El contrato original (specs/design) se mantiene como referencia; los delta specs se sincronizan a `openspec/specs/` al archivar.
 
 ## 1. Análisis del modelo actual
 
