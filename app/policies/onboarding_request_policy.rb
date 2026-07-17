@@ -38,8 +38,15 @@ class OnboardingRequestPolicy < ApplicationPolicy
   end
 
   class Scope < ApplicationPolicy::Scope
+    include PolicyScopeAuthorization
+
     def resolve
-      scope.none
+      return scope.none unless user
+
+      resolver = authorization_resolver
+      return scope.none unless resolver&.allowed?(Authorization::Capabilities::MANAGE_PEOPLE)
+
+      organization_scoped
     end
   end
 end

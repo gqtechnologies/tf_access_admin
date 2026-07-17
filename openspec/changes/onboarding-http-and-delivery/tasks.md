@@ -9,8 +9,8 @@
   - Tests: controller/request specs por acción y por rol (gestor no resuelve conflictos).
 - [ ] 1.2 Endpoint de aceptación por token (autenticado): valida token → `Accounts::AcceptInvitation`.
   - Tests: token válido/inválido/expirado/consumido (un solo uso); incorporación de cuenta existente.
-- [ ] 1.3 Índice de solicitudes: `OnboardingRequestPolicy::Scope` org-scoped (hoy `none`) + acción index; `manage_people` lista y revoca (cualquier actor con la capacidad, no solo el emisor).
-  - Tests: gestor solo ve solicitudes de su org; revocación por otro `manage_people`.
+- [~] 1.3 `OnboardingRequestPolicy::Scope` org-scoped implementado: devuelve las solicitudes de la org solo si el actor tiene `manage_people`, si no `none`. ✅ (`onboarding_request_policy_test.rb`, 4/4).
+  - **Pendiente (con 1.1):** la acción `index` HTTP que consume el scope + la UI.
 
 ## 2. Entrega por email (mailer + i18n)
 

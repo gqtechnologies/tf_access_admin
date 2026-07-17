@@ -45,4 +45,20 @@ class OnboardingRequestPolicyTest < ActiveSupport::TestCase
     refute OnboardingRequestPolicy.new(@content_manager, OnboardingRequest).resolve_conflict?
     refute OnboardingRequestPolicy.new(@client, OnboardingRequest).resolve_conflict?
   end
+
+  test "scope returns only the org's requests for manage_people, none otherwise" do
+    person = Person.create!(organization: @organization, display_name: "Scoped",
+                            person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE)
+    request = OnboardingRequest.create!(
+      organization: @organization, person: person,
+      requested_relationship: OnboardingRequest::RELATIONSHIP_MEMBERSHIP,
+      status: OnboardingRequest::STATUS_PENDING, expires_at: 7.days.from_now
+    )
+
+    admin_scope = OnboardingRequestPolicy::Scope.new(@tenant_admin, OnboardingRequest.all).resolve
+    assert_includes admin_scope, request
+
+    client_scope = OnboardingRequestPolicy::Scope.new(@client, OnboardingRequest.all).resolve
+    assert_empty client_scope
+  end
 end
