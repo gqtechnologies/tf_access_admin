@@ -14,13 +14,13 @@
 
 ## 2. Entrega por email (mailer + i18n)
 
-- [ ] 2.1 `OnboardingMailer` + vistas + job Sidekiq; link de un solo uso con expiración; sin datos sensibles ni token fuera del link.
+- [ ] 2.1 `OnboardingMailer` + vistas + job Sidekiq; link de un solo uso con expiración de 14 días; **identifica a la organización que invita** por nombre; sin datos sensibles ni token fuera del link.
 - [ ] 2.2 i18n `es`/`en`/`pt` (una clave por locale). Tests de mailer (contenido mínimo, link presente, sin PII).
 
 ## 3. Aceptación que crea cuenta nueva (Flujo A/B)
 
-- [ ] 3.1 Ampliar `Accounts::AcceptInvitation`: si no hay cuenta resuelta, crear `User` (contraseña del titular) + `LinkUserToPerson` + `AcceptOnboarding`. Quitar el `raise AccountRequired`.
-  - Tests: aceptación crea cuenta, vincula, activa membresía; cuenta nueva sin confirmar no accede.
+- [ ] 3.1 Ampliar `Accounts::AcceptInvitation`: si no hay cuenta resuelta, crear `User` (contraseña del titular) + `LinkUserToPerson` + `AcceptOnboarding`, y **auto-confirmar el email** (`confirmed_at` al aceptar). Quitar el `raise AccountRequired`.
+  - Tests: aceptación crea cuenta, vincula, activa membresía y queda confirmada; token consumido (un solo uso).
 
 ## 4. Gate de confirmación (§14.2)
 
@@ -33,8 +33,8 @@
 
 ## 5. Cableado del clasificador en bulk import (§13→§18)
 
-- [ ] 5.1 `ImportPeopleRow`/validadores usan `ClassifyPeopleRow` y actúan por estado sin fusionar.
-  - Tests: batch mixto (crear/incorporar/conflicto/duplicado/invalid) con idempotencia.
+- [ ] 5.1 `ImportPeopleRow`/validadores usan `ClassifyPeopleRow` para **clasificar**: crear solo las filas `ready_to_create_person`; el resto (invitación/incorporación/revisión/conflicto) se registra con su estado para que **el gestor** dispare la acción; `duplicate` idempotente; `invalid` rechazada. **No** auto-envía invitaciones ni crea solicitudes.
+  - Tests: batch mixto (crear/incorporar/conflicto/duplicado/invalid); no se auto-envían correos; idempotencia.
 - [ ] 5.2 UI de bulk import muestra el estado por fila (i18n).
 
 ## 6. Frontend (§19)

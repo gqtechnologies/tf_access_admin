@@ -6,21 +6,23 @@ Falta la **capa de exposición y entrega** que conecta esos servicios con la apl
 
 ## What Changes
 
-- **Endpoints HTTP de onboarding** (resto de §18): rutas + controllers + contratos de entrada para invitar/incorporar, aceptar/rechazar por token, revocar y resolver conflictos. Tenant derivado del contexto, nunca del cliente; autorización vía `OnboardingRequestPolicy`.
-- **Entrega por email del token**: mailer + i18n (`es`/`en`/`pt`) con link de un solo uso y expiración, **sin datos sensibles ni el token en claro** más allá del link.
-- **Aceptación que crea cuenta nueva (Flujo A/B)**: `Accounts::AcceptInvitation` deja de lanzar `AccountRequired` y crea el `User` + vincula la `Person` explícitamente (ya viable sin `provision_tenant_identity`); el `User` sin confirmar no puede usar la app.
-- **Gate de confirmación (§14.2)**: `User` no confirmado no accede (Devise `allow_unconfirmed_access_for = 0`).
-- **Cableado de `ClassifyPeopleRow`** en el pipeline de bulk import y exposición de los estados de fila en la UI de importación.
-- **Frontend (§19)**: pantallas mínimas de resolución/invitación/incorporación con información **neutral** para el gestor (email-blind), aceptación por link, y estados de bulk import.
+- **Endpoints HTTP de onboarding** (resto de §18): rutas + controllers + contratos de entrada para invitar/incorporar, aceptar/rechazar por token, revocar y resolver conflictos. Tenant derivado del contexto, nunca del cliente; autorización vía `OnboardingRequestPolicy`. **Índice** de solicitudes org-scoped: cualquier actor con `manage_people` lista y revoca (no solo el emisor).
+- **Entrega por email del token**: mailer + i18n (`es`/`en`/`pt`) con link **de un solo uso** y **expiración de 14 días**, que **identifica a la organización que invita** por su nombre, **sin datos sensibles ni el token en claro** más allá del link.
+- **Aceptación que crea cuenta nueva (Flujo A/B)**: `Accounts::AcceptInvitation` deja de lanzar `AccountRequired` y crea el `User` + vincula la `Person` explícitamente (ya viable sin `provision_tenant_identity`). **Aceptar por token auto-confirma el email** (la posesión del link lo prueba), sin segundo correo.
+- **Canal de aceptación = web + móvil**: página web que hace deep-link a la app móvil si está instalada (⚠️ depende de universal links de la app móvil, repo aparte) o permite aceptar en web.
+- **Gate de confirmación (§14.2)**: `User` no confirmado no accede (Devise `allow_unconfirmed_access_for = 0`); con la auto-confirmación, aplica sobre todo al auto-registro.
+- **Política de contraseña**: mínimo 8 caracteres con minúscula + mayúscula + número + carácter especial, en todo camino de alta/cambio (invitación, alta admin, cambio).
+- **Bulk import — clasificar; el gestor decide**: `ClassifyPeopleRow` cableado para **clasificar** cada fila y mostrar el estado en la UI; el import **no** envía invitaciones ni crea solicitudes automáticamente — el gestor las dispara explícitamente (por fila o en lote).
+- **Frontend (§19)**: pantallas mínimas de invitación/incorporación con información **neutral** para el gestor (email-blind), índice de solicitudes, aceptación por link, y estados de clasificación en bulk import.
 - **Auditoría (§15)** de las operaciones sensibles vía endpoints; **enumeración de tests (§20)**; verificación de specs §5/§8/§10/§11; **validación final (§22)**.
 
 ## Capabilities
 
 ### Modified Capabilities
 
-- `property-onboarding`: añade la **entrega por email** del token y la **creación de cuenta nueva en la aceptación** (Flujo A/B), completando el ciclo ya especificado.
-- `bulk-import-people`: añade la **aplicación de la clasificación** en el pipeline de importación y su reflejo en la UI.
-- `user-account-linking`: añade el **contrato de los endpoints** (tenant desde contexto; el gestor nunca selecciona cuentas) a nivel HTTP.
+- `property-onboarding`: añade la **entrega por email** (con nombre de la org que invita), la **creación de cuenta nueva con auto-confirmación** en la aceptación (Flujo A/B), y el **índice/revocación** de solicitudes por gestores `manage_people`.
+- `bulk-import-people`: añade la **clasificación por fila** en la importación (sin auto-enviar) y su reflejo en la UI; el gestor dispara las acciones.
+- `user-account-linking`: añade el **gate de confirmación** a nivel de sesión y la **política de complejidad de contraseña**.
 
 ## Impact
 
