@@ -85,10 +85,9 @@
 
 ## 13. Integración con bulk import
 
-- [ ] 13.1 Especificar clasificación de filas y manejo de conflictos sin fusión automática (`bulk-import-people`).
-  - Archivos: `BulkImportServices::ImportPeopleRow`, validadores de fila.
-  - Tests: persona nueva/existente-sin-cuenta/existente-con-cuenta/ambigua/conflicto.
-  - Done: estados de fila especificados.
+- [~] 13.1 `BulkImportServices::ClassifyPeopleRow` implementado (`app/services/bulk_import_services/classify_people_row.rb`): clasifica cada fila vía `ResolveIdentityMatch` sin fusionar — `ready_to_create_person` / `requires_invitation` (persona sin cuenta) / `requires_incorporation` (cuenta existente sin persona en org, o persona con cuenta) / `conflict` / `duplicate` (membresía activa o request pendiente) / `invalid` (sin email ni documento).
+  - Tests: `test/services/bulk_import_services/classify_people_row_test.rb` (7/7). ✅
+  - **Pendiente (§18):** cablear el clasificador en el pipeline (`ImportPeopleRow`/validadores) — no toca el importador actual todavía.
 
 ## 14. Autorización
 
