@@ -41,6 +41,34 @@ pt:
   frontend:
     name: "Admin Base"
     description: "bem-vindo de volta"
+    onboarding:
+      accept:
+        title: "Você foi convidado"
+        subtitle: "{organization} convidou você para participar."
+        needs_account_description: "Defina uma senha para criar sua conta e aceitar o convite."
+        no_account_description: "Faça login para aceitar este convite."
+        email_label: "Email"
+        submit: "Aceitar convite"
+        sign_in: "Entrar"
+        input:
+          password:
+            label: "Senha"
+            placeholder: "Escolha uma senha"
+          password_confirmation:
+            label: "Confirmar senha"
+            placeholder: "Repita sua senha"
+          name:
+            label: "Nome completo"
+            placeholder: "Seu nome completo"
+          dni:
+            label: "Documento"
+            placeholder: "Seu número de documento"
+        errors:
+          accept_failed: "Não foi possível aceitar o convite. Verifique os campos e tente novamente."
+      invalid:
+        title: "Convite não disponível"
+        description: "Este link é inválido, expirou ou já foi utilizado."
+        sign_in: "Ir para login"
     common:
       yes: "Sim"
       no: "Não"
@@ -445,6 +473,9 @@ pt:
         updated_successfully: "Pessoa atualizada com sucesso"
         update_failed: "Falha ao atualizar a pessoa"
         not_found: "Pessoa não encontrada"
+        errors:
+          already_invited: "Esta pessoa já tem uma conta ou um convite pendente."
+          missing_email: "Esta pessoa não tem um email cadastrado — adicione um antes de enviar o convite."
         profile:
           change_history:
             actor_fallback: "Sistema"
@@ -559,6 +590,12 @@ pt:
               contextual_roles: "Papéis"
               unit_ownerships_count: "Propriedades"
               status: "Status"
+              invitation_status: "Convite"
+          invitation_statuses:
+            linked: "Conta vinculada"
+            pending: "Convite enviado"
+            not_invited: "Não convidada"
+            no_email_hint: "Adicione um email para convidar"
           actions:
             create: "Criar pessoa"
             bulk_import: "Importar pessoas"
@@ -567,6 +604,13 @@ pt:
             delete_description: "Excluir {name}?"
             delete_success: "Pessoa excluída com sucesso"
             delete_error: "Erro ao excluir a pessoa"
+            invite: "Enviar convite"
+            invite_description: "Enviar um convite de criação de conta para {name}?"
+            invite_error: "Não foi possível enviar o convite"
+            revoke_invite: "Revogar convite"
+            revoke_invite_description: "Tem certeza que deseja revogar o convite pendente de {name}?"
+            revoke_invite_success: "Convite revogado"
+            revoke_invite_error: "Não foi possível revogar o convite"
         bulk_import:
           title: "Importar pessoas"
           steps_nav: "Etapas de importação"
@@ -733,6 +777,30 @@ pt:
               duplicate_skipped: "Ignorada por duplicidade"
               skipped: "Linha ignorada"
               failed: "Erro ao importar"
+            row_states:
+              title: "Estados das linhas"
+              subtitle: "Classificação de cada linha para você decidir a próxima ação."
+              classification: "Classificação"
+              empty: "Nenhuma linha para mostrar."
+              triggered_label: "Enviada"
+              classifications:
+                ready_to_create_person: "Pessoa criada"
+                requires_invitation: "Requer convite"
+                requires_incorporation: "Requer incorporação"
+                review: "Requer revisão"
+                conflict: "Conflito — não aplicada"
+                duplicate: "Duplicada"
+                invalid: "Inválida"
+              actions:
+                invite: "Convidar"
+                incorporate: "Incorporar"
+                invite_all: "Convidar todas as pendentes"
+                confirm_one_title: "Enviar convite?"
+                confirm_one_description: "Isso cria uma solicitação de incorporação e envia por email um link de convite de uso único para esta pessoa."
+                confirm_all_title: "Convidar todas as linhas pendentes?"
+                confirm_all_description: "Isso cria solicitações de incorporação e envia links de convite por email para cada linha que aguarda convite ou incorporação."
+                trigger_success: "{triggered} enviadas, {conflicted} conflitos, {skipped} ignoradas, {failed} falharam"
+                trigger_error: "Não foi possível processar os convites. Tente novamente."
         new:
           title: "Nova pessoa"
           description: "Registre uma pessoa na organização"
@@ -772,6 +840,12 @@ pt:
             none: "Sem usuário"
           role:
             label: "Cargo"
+          send_invitation:
+            label: "Enviar um convite de criação de conta por email"
+      onboarding_requests:
+        errors:
+          not_found: "Solicitação de incorporação não encontrada"
+          not_authorized: "Você não tem permissão para realizar esta ação"
       units:
         not_found: "Unidade não encontrada"
         validations:
@@ -2181,6 +2255,12 @@ pt:
             not_authorized: "Importação não autorizada"
             skipped: "Linha omitida"
             failed: "Falha na importação"
+            requires_invitation: "Requer convite — ação pendente do gestor"
+            requires_incorporation: "Requer incorporação — ação pendente do gestor"
+            conflict: "Conflito de identidade — não aplicada"
+            invalid: "Linha inválida — rejeitada"
+            already_pending: "Já existe outro convite em andamento para esta pessoa"
+            reclassified_skipped: "O estado da linha mudou desde a importação (%{classification}); ignorada"
       property_sections:
         title: "Seções"
         created_successfully: "Seção criada com sucesso"

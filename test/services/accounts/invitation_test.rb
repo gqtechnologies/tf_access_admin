@@ -43,6 +43,17 @@ module Accounts
       assert result.person.present?
     end
 
+    test "call_for_person references an existing account by contact email" do
+      user = create_bare_user!(email: "known-holder@example.test")
+      person = create_person!(display_name: "Known Holder")
+      person.contact_email = "known-holder@example.test"
+      person.save!
+
+      result = InvitePerson.call_for_person(person: person)
+
+      assert_equal user.id, result.onboarding_request.user_id
+    end
+
     test "records a conflict without a token" do
       create_org_user!(email: "taken@example.test")
       person_a = create_person!(display_name: "A", document_number: "88.888.888-8")
@@ -70,6 +81,28 @@ module Accounts
       person = result.person.reload
       assert_equal user.id, person.user_id
       assert person.has_role?(AvailableRoles::CLIENT)
+      assert_equal OrganizationMembership::STATUS_ACTIVE, person.organization_membership.status
+    end
+
+    test "accepting a legacy request without user_id uses the existing account by contact email" do
+      user = create_bare_user!(email: "legacy-incorporate@example.test")
+      person = create_person!(display_name: "Legacy Incorporate")
+      person.contact_email = "legacy-incorporate@example.test"
+      person.save!
+      raw_token = SecureRandom.urlsafe_base64(32)
+      request = OnboardingRequest.create!(
+        organization: @organization,
+        person: person,
+        requested_relationship: OnboardingRequest::RELATIONSHIP_MEMBERSHIP,
+        status: OnboardingRequest::STATUS_PENDING,
+        token_digest: InvitePerson.token_digest(raw_token),
+        expires_at: 7.days.from_now
+      )
+
+      AcceptInvitation.call(token: raw_token, organization: @organization)
+
+      assert_equal user.id, person.reload.user_id
+      assert request.reload.accepted?
       assert_equal OrganizationMembership::STATUS_ACTIVE, person.organization_membership.status
     end
 

@@ -12,7 +12,7 @@ class OnboardingAcceptancesController < ApplicationController
     render inertia: "onboarding/accept", props: {
       token: params[:token],
       organization_name: request.organization.name,
-      needs_account: request.user_id.blank?,
+      needs_account: existing_account_for(request).blank?,
       email: masked_email(request)
     }
   end
@@ -31,7 +31,8 @@ class OnboardingAcceptancesController < ApplicationController
       )
     end
 
-    redirect_to new_user_session_path, notice: I18n.t("onboarding.accept.success")
+    flash[:notice] = I18n.t("onboarding.accept.success")
+    inertia_location(new_user_session_path)
   rescue Accounts::AcceptInvitation::AccountRequired, ActiveRecord::RecordInvalid => e
     redirect_to onboarding_acceptance_path(params[:token]),
                 inertia: { errors: { base: [ e.message ] } }
@@ -48,6 +49,12 @@ class OnboardingAcceptancesController < ApplicationController
 
   def acceptable?(request)
     request.present? && request.pending? && request.expires_at.future?
+  end
+
+  def existing_account_for(request)
+    request.user || Accounts::InvitePerson.user_for_contact_email(request.person)
+  rescue Accounts::InvitePerson::AlreadyInvited
+    nil
   end
 
   def masked_email(request)

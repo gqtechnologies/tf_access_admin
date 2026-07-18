@@ -48,6 +48,7 @@ function onSubmit(data: PersonSchema) {
         email: data.email,
         phone: data.phone,
         birthdate: data.birthdate,
+        send_invitation: data.send_invitation,
       },
     },
     {

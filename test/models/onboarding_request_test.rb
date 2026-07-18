@@ -1,5 +1,49 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: onboarding_requests
+#
+#  id                      :uuid             not null, primary key
+#  conflict_reason         :string
+#  deleted_at              :datetime
+#  expires_at              :datetime         not null
+#  metadata                :jsonb            not null
+#  requested_relationship  :string           not null
+#  requested_roles         :jsonb            not null
+#  status                  :string           default("pending"), not null
+#  token_digest            :string
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  organization_id         :uuid             not null
+#  person_id               :uuid
+#  requested_by_person_id  :uuid
+#  residential_property_id :uuid
+#  unit_id                 :uuid
+#  user_id                 :uuid
+#
+# Indexes
+#
+#  idx_onboarding_requests_unique_pending_scope          (organization_id,person_id,requested_relationship,residential_property_id,unit_id) UNIQUE WHERE (((status)::text = 'pending'::text) AND (deleted_at IS NULL))
+#  idx_onboarding_requests_unique_token_digest           (token_digest) UNIQUE WHERE (token_digest IS NOT NULL)
+#  index_onboarding_requests_on_deleted_at               (deleted_at)
+#  index_onboarding_requests_on_organization_id          (organization_id)
+#  index_onboarding_requests_on_person_id                (person_id)
+#  index_onboarding_requests_on_requested_by_person_id   (requested_by_person_id)
+#  index_onboarding_requests_on_residential_property_id  (residential_property_id)
+#  index_onboarding_requests_on_status                   (status)
+#  index_onboarding_requests_on_unit_id                  (unit_id)
+#  index_onboarding_requests_on_user_id                  (user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organization_id => organizations.id)
+#  fk_rails_...  (person_id => people.id)
+#  fk_rails_...  (requested_by_person_id => people.id)
+#  fk_rails_...  (residential_property_id => residential_properties.id)
+#  fk_rails_...  (unit_id => units.id)
+#  fk_rails_...  (user_id => users.id)
+#
 require "test_helper"
 
 class OnboardingRequestTest < ActiveSupport::TestCase

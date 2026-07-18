@@ -23,6 +23,10 @@ class PersonPolicy < ApplicationPolicy
     allowed?(:manage_people) || any_accessible_property?(:manage_people)
   end
 
+  def invite?
+    same_organization? && allowed?(:manage_people)
+  end
+
   def edit?
     update?
   end

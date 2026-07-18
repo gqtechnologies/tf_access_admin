@@ -41,6 +41,34 @@ en:
   frontend:
     name: "Admin Base"
     description: "welcome again"
+    onboarding:
+      accept:
+        title: "You've been invited"
+        subtitle: "{organization} has invited you to join."
+        needs_account_description: "Set a password to create your account and accept the invitation."
+        no_account_description: "Sign in to accept this invitation."
+        email_label: "Email"
+        submit: "Accept invitation"
+        sign_in: "Sign in"
+        input:
+          password:
+            label: "Password"
+            placeholder: "Choose a password"
+          password_confirmation:
+            label: "Confirm password"
+            placeholder: "Repeat your password"
+          name:
+            label: "Full name"
+            placeholder: "Your full name"
+          dni:
+            label: "Document"
+            placeholder: "Your document number"
+        errors:
+          accept_failed: "Could not accept the invitation. Check the fields and try again."
+      invalid:
+        title: "Invitation not available"
+        description: "This link is invalid, has expired, or has already been used."
+        sign_in: "Go to sign in"
     common:
       yes: "Yes"
       no: "No"
@@ -456,6 +484,9 @@ en:
         updated_successfully: "Person updated successfully"
         update_failed: "Failed to update person"
         not_found: "Person not found"
+        errors:
+          already_invited: "This person already has an account or a pending invitation."
+          missing_email: "This person has no email on file — add one before sending an invitation."
         profile:
           change_history:
             actor_fallback: "System"
@@ -570,6 +601,12 @@ en:
               contextual_roles: "Roles"
               unit_ownerships_count: "Properties"
               status: "Status"
+              invitation_status: "Invitation"
+          invitation_statuses:
+            linked: "Account linked"
+            pending: "Invitation sent"
+            not_invited: "Not invited"
+            no_email_hint: "Add an email to invite"
           actions:
             create: "Create person"
             bulk_import: "Import people"
@@ -578,6 +615,13 @@ en:
             delete_description: "Are you sure you want to delete {name}?"
             delete_success: "Person deleted successfully"
             delete_error: "Failed to delete person"
+            invite: "Send invitation"
+            invite_description: "Send an account-creation invitation to {name}?"
+            invite_error: "Could not send the invitation"
+            revoke_invite: "Revoke invitation"
+            revoke_invite_description: "Are you sure you want to revoke the pending invitation for {name}?"
+            revoke_invite_success: "Invitation revoked"
+            revoke_invite_error: "Could not revoke the invitation"
         bulk_import:
           title: "Import people"
           steps_nav: "Import steps"
@@ -744,6 +788,30 @@ en:
               duplicate_skipped: "Skipped as duplicate"
               skipped: "Row skipped"
               failed: "Failed to import"
+            row_states:
+              title: "Row states"
+              subtitle: "Classification of each row so you can decide the next action."
+              classification: "Classification"
+              empty: "No rows to show."
+              triggered_label: "Sent"
+              classifications:
+                ready_to_create_person: "Person created"
+                requires_invitation: "Requires invitation"
+                requires_incorporation: "Requires incorporation"
+                review: "Needs review"
+                conflict: "Conflict — not applied"
+                duplicate: "Duplicate"
+                invalid: "Invalid"
+              actions:
+                invite: "Invite"
+                incorporate: "Incorporate"
+                invite_all: "Invite all pending"
+                confirm_one_title: "Send invitation?"
+                confirm_one_description: "This creates an onboarding request and emails a single-use invitation link to this person."
+                confirm_all_title: "Invite all pending rows?"
+                confirm_all_description: "This creates onboarding requests and emails invitation links for every row awaiting invitation or incorporation."
+                trigger_success: "{triggered} sent, {conflicted} conflicts, {skipped} skipped, {failed} failed"
+                trigger_error: "Could not process the invitations. Try again."
         new:
           title: "New person"
           description: "Register a person in the organization"
@@ -783,6 +851,12 @@ en:
             none: "No user"
           role:
             label: "Role"
+          send_invitation:
+            label: "Send an account-creation invitation by email"
+      onboarding_requests:
+        errors:
+          not_found: "Onboarding request not found"
+          not_authorized: "You are not authorized to perform this action"
       units:
         not_found: "Unit not found"
         validations:
@@ -2233,6 +2307,12 @@ en:
             not_authorized: "Import not authorized"
             skipped: "Row skipped"
             failed: "Import failed"
+            requires_invitation: "Requires invitation — pending manager action"
+            requires_incorporation: "Requires incorporation — pending manager action"
+            conflict: "Identity conflict — not applied"
+            invalid: "Invalid row — rejected"
+            already_pending: "Another invitation is already in flight for this person"
+            reclassified_skipped: "Row state changed since import (%{classification}); skipped"
       property_sections:
         title: "Sections"
         created_successfully: "Section created successfully"

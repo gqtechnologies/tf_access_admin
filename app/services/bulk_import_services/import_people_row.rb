@@ -19,10 +19,18 @@ module BulkImportServices
       return skip_duplicate! if duplicate_row?
       return skip_pending! if @row.import_status == BulkImportRow::IMPORT_STATUSES[:skipped]
 
-      person = create_person!
-      ensure_membership!(person)
-      mark_imported!(person)
-      :imported
+      classification = classify.classification
+
+      case classification
+      when ClassifyPeopleRow::READY_TO_CREATE_PERSON then create_ready_person!
+      when ClassifyPeopleRow::DUPLICATE             then skip_duplicate!(classification)
+      when ClassifyPeopleRow::INVALID               then reject_invalid!
+      else
+        # requires_invitation / requires_incorporation / conflict: the importer
+        # never auto-sends invitations nor creates onboarding requests. The row
+        # is recorded with its classification for the manager to act on.
+        record_action_required!(classification)
+      end
     rescue ActiveRecord::RecordInvalid => e
       mark_failed!(e.record.errors.full_messages.join(", "))
       :failed
@@ -33,12 +41,46 @@ module BulkImportServices
 
     private
 
+    def classify
+      ClassifyPeopleRow.call(
+        organization: @bulk_import.organization,
+        email: @payload["email"],
+        document_number: @payload["document_number"]
+      )
+    end
+
+    def create_ready_person!
+      person = create_person!
+      ensure_membership!(person)
+      mark_imported!(person)
+      :imported
+    end
+
+    def record_action_required!(classification)
+      mark_skipped!(
+        I18n.t("frontend.admin.bulk_imports.import.logs.#{classification}"),
+        classification: classification.to_s
+      )
+      :skipped
+    end
+
+    def reject_invalid!
+      mark_failed!(
+        I18n.t("frontend.admin.bulk_imports.import.logs.invalid"),
+        classification: ClassifyPeopleRow::INVALID.to_s
+      )
+      :failed
+    end
+
     def duplicate_row?
       @row.validation_status == BulkImportRow::VALIDATION_STATUSES[:duplicate]
     end
 
-    def skip_duplicate!
-      mark_skipped!(I18n.t("frontend.admin.bulk_imports.import.logs.duplicate_skipped"))
+    def skip_duplicate!(classification = ClassifyPeopleRow::DUPLICATE)
+      mark_skipped!(
+        I18n.t("frontend.admin.bulk_imports.import.logs.duplicate_skipped"),
+        classification: classification.to_s
+      )
       :skipped
     end
 
@@ -84,22 +126,25 @@ module BulkImportServices
         imported_at: Time.current,
         target_record: person,
         operation: "create",
+        onboarding_classification: ClassifyPeopleRow::READY_TO_CREATE_PERSON.to_s,
         failure_message: nil
       )
     end
 
-    def mark_skipped!(message)
+    def mark_skipped!(message, classification: nil)
       @row.update!(
         import_status: BulkImportRow::IMPORT_STATUSES[:skipped],
         skipped_at: Time.current,
+        onboarding_classification: classification,
         failure_message: message
       )
     end
 
-    def mark_failed!(message)
+    def mark_failed!(message, classification: nil)
       @row.update!(
         import_status: BulkImportRow::IMPORT_STATUSES[:failed],
         failed_at: Time.current,
+        onboarding_classification: classification,
         failure_message: message
       )
     end

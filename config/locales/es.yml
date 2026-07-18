@@ -41,6 +41,34 @@ es:
   frontend:
     name: "Admin Base"
     description: "bienvenido nuevamente"
+    onboarding:
+      accept:
+        title: "Fuiste invitado"
+        subtitle: "{organization} te invitó a unirte."
+        needs_account_description: "Define una contraseña para crear tu cuenta y aceptar la invitación."
+        no_account_description: "Inicia sesión para aceptar esta invitación."
+        email_label: "Correo electrónico"
+        submit: "Aceptar invitación"
+        sign_in: "Iniciar sesión"
+        input:
+          password:
+            label: "Contraseña"
+            placeholder: "Elige una contraseña"
+          password_confirmation:
+            label: "Confirmar contraseña"
+            placeholder: "Repite tu contraseña"
+          name:
+            label: "Nombre completo"
+            placeholder: "Tu nombre completo"
+          dni:
+            label: "Documento"
+            placeholder: "Tu número de documento"
+        errors:
+          accept_failed: "No se pudo aceptar la invitación. Revisa los campos e intenta nuevamente."
+      invalid:
+        title: "Invitación no disponible"
+        description: "Este enlace es inválido, expiró o ya fue utilizado."
+        sign_in: "Ir a iniciar sesión"
     common:
       yes: "Sí"
       no: "No"
@@ -384,6 +412,9 @@ es:
         updated_successfully: "Persona actualizada correctamente"
         update_failed: "Error al actualizar la persona"
         not_found: "Persona no encontrada"
+        errors:
+          already_invited: "Esta persona ya tiene una cuenta o una invitación pendiente."
+          missing_email: "Esta persona no tiene un correo registrado — agrega uno antes de enviar la invitación."
         profile:
           change_history:
             actor_fallback: "Sistema"
@@ -498,6 +529,12 @@ es:
               contextual_roles: "Roles"
               unit_ownerships_count: "Propiedades"
               status: "Estado"
+              invitation_status: "Invitación"
+          invitation_statuses:
+            linked: "Cuenta vinculada"
+            pending: "Invitación enviada"
+            not_invited: "No invitada"
+            no_email_hint: "Agrega un correo para invitar"
           actions:
             create: "Crear persona"
             bulk_import: "Importar personas"
@@ -506,6 +543,13 @@ es:
             delete_description: "¿Eliminar a {name}?"
             delete_success: "Persona eliminada correctamente"
             delete_error: "Error al eliminar la persona"
+            invite: "Enviar invitación"
+            invite_description: "¿Enviar una invitación de creación de cuenta a {name}?"
+            invite_error: "No se pudo enviar la invitación"
+            revoke_invite: "Revocar invitación"
+            revoke_invite_description: "¿Seguro que deseas revocar la invitación pendiente de {name}?"
+            revoke_invite_success: "Invitación revocada"
+            revoke_invite_error: "No se pudo revocar la invitación"
         bulk_import:
           title: "Importar personas"
           steps_nav: "Pasos de importación"
@@ -672,6 +716,30 @@ es:
               duplicate_skipped: "Omitida por duplicado"
               skipped: "Fila omitida"
               failed: "Error al importar"
+            row_states:
+              title: "Estados de las filas"
+              subtitle: "Clasificación de cada fila para que decidas la próxima acción."
+              classification: "Clasificación"
+              empty: "No hay filas para mostrar."
+              triggered_label: "Enviada"
+              classifications:
+                ready_to_create_person: "Persona creada"
+                requires_invitation: "Requiere invitación"
+                requires_incorporation: "Requiere incorporación"
+                review: "Requiere revisión"
+                conflict: "Conflicto — no aplicada"
+                duplicate: "Duplicada"
+                invalid: "Inválida"
+              actions:
+                invite: "Invitar"
+                incorporate: "Incorporar"
+                invite_all: "Invitar todas las pendientes"
+                confirm_one_title: "¿Enviar invitación?"
+                confirm_one_description: "Esto crea una solicitud de incorporación y envía por correo un link de invitación de un solo uso a esta persona."
+                confirm_all_title: "¿Invitar todas las filas pendientes?"
+                confirm_all_description: "Esto crea solicitudes de incorporación y envía links de invitación por correo para cada fila que espera invitación o incorporación."
+                trigger_success: "{triggered} enviadas, {conflicted} conflictos, {skipped} omitidas, {failed} fallidas"
+                trigger_error: "No se pudieron procesar las invitaciones. Intenta nuevamente."
         new:
           title: "Nueva persona"
           description: "Registra una persona en la organización"
@@ -711,6 +779,12 @@ es:
             none: "Sin usuario"
           role:
             label: "Rol"
+          send_invitation:
+            label: "Enviar una invitación de creación de cuenta por correo"
+      onboarding_requests:
+        errors:
+          not_found: "Solicitud de incorporación no encontrada"
+          not_authorized: "No tienes permiso para realizar esta acción"
       units:
         not_found: "Unidad no encontrada"
         validations:
@@ -2160,6 +2234,12 @@ es:
             not_authorized: "Importación no autorizada"
             skipped: "Fila omitida"
             failed: "Error al importar"
+            requires_invitation: "Requiere invitación — acción pendiente del gestor"
+            requires_incorporation: "Requiere incorporación — acción pendiente del gestor"
+            conflict: "Conflicto de identidad — no aplicada"
+            invalid: "Fila inválida — rechazada"
+            already_pending: "Ya hay otra invitación en curso para esta persona"
+            reclassified_skipped: "El estado de la fila cambió desde el import (%{classification}); omitida"
       property_sections:
         title: "Secciones"
         created_successfully: "Sección creada correctamente"

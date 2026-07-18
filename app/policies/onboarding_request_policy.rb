@@ -13,16 +13,8 @@
 # Holder-side acceptance (accept/reject an invitation) is authenticated via the
 # single-use token flow (+Accounts::AcceptInvitation+), not this policy.
 class OnboardingRequestPolicy < ApplicationPolicy
-  def index?
-    same_organization? && allowed?(Authorization::Capabilities::MANAGE_PEOPLE)
-  end
-
   def create?
     same_organization? && allowed?(Authorization::Capabilities::MANAGE_PEOPLE)
-  end
-
-  def invite?
-    create?
   end
 
   def revoke?

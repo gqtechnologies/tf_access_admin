@@ -36,6 +36,13 @@ When an invitation has no resolved account, the system SHALL create a new `User`
 - **THEN** the system marks the account's email as confirmed
 - **AND** does not require a separate confirmation email
 
+#### Scenario: Successful acceptance navigates the holder to sign in
+
+- **GIVEN** the holder successfully accepts an invitation
+- **WHEN** the acceptance page is served by the SPA (Inertia)
+- **THEN** the system performs a real browser navigation to the sign-in page
+- **AND** does not render the sign-in page's response inside the SPA
+
 ### Requirement: Onboarding endpoints derive tenant from context
 
 The system SHALL expose onboarding actions (invite/incorporate, revoke, resolve conflict, accept) as endpoints that derive the organization from the request context and authorize via the onboarding policy. Endpoints MUST NOT accept a tenant identifier from the client.
@@ -52,15 +59,15 @@ The system SHALL expose onboarding actions (invite/incorporate, revoke, resolve 
 - **WHEN** the actor calls the conflict-resolution endpoint
 - **THEN** the system denies the request
 
-### Requirement: Managers can list and revoke pending requests
+### Requirement: Managers can see invitation status and revoke pending requests
 
-A manager with `manage_people` SHALL be able to list the onboarding requests of their own organization and revoke a pending one. The listing MUST be organization-scoped and MUST NOT expose other organizations' requests. Any actor with `manage_people` may revoke (not only the issuer).
+A manager with `manage_people` SHALL be able to see the invitation status (linked / pending / not invited) of the people in their own organization and revoke a pending invitation. This status MUST be organization-scoped and MUST NOT expose other organizations' requests. Any actor with `manage_people` may revoke (not only the issuer). The status and the revoke action are surfaced as part of the people directory, not a separate onboarding-requests screen.
 
-#### Scenario: Manager lists only their organization's requests
+#### Scenario: Manager sees invitation status scoped to their organization
 
 - **GIVEN** onboarding requests exist in organizations O1 and O2
-- **WHEN** a manager of O1 lists onboarding requests
-- **THEN** the system returns only O1 requests
+- **WHEN** a manager of O1 views their people directory
+- **THEN** the system reports invitation status only for O1's own people
 
 #### Scenario: Any manage_people actor can revoke a pending request
 

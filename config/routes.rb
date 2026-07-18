@@ -55,8 +55,12 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :users, only: [ :index, :new, :create, :edit, :update, :destroy ]
-    resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
-    resources :onboarding_requests, only: [ :index, :new, :create ] do
+    resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
+      member do
+        post :invite
+      end
+    end
+    resources :onboarding_requests, only: [] do
       member do
         post :revoke
         post :resolve_conflict
@@ -70,6 +74,7 @@ Rails.application.routes.draw do
           get :rows
           get :status
           get :report
+          post :trigger_invitations
         end
       end
     end

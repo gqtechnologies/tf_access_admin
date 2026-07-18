@@ -5,6 +5,7 @@ require "test_helper"
 class Admin::People::BulkImportsControllerTest < ActionDispatch::IntegrationTest
   include InertiaTestHelper
   include UserTestHelper
+  include ActionMailer::TestHelper
 
   setup do
     @organization = organizations(:one)
@@ -72,7 +73,66 @@ class Admin::People::BulkImportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "authorized admin can trigger invitations for classified rows" do
+    sign_in_as(@tenant_admin)
+    row = build_requires_invitation_row!(document_number: "16.101.010-1")
+
+    assert_enqueued_emails 1 do
+      post trigger_invitations_admin_people_bulk_import_path(@bulk_import)
+    end
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal 1, body["counts"]["triggered"]
+    assert row.reload.target_record.present?
+  end
+
+  test "trigger_invitations scopes to the given row_ids" do
+    sign_in_as(@tenant_admin)
+    row1 = build_requires_invitation_row!(document_number: "17.101.010-1", row_number: 1)
+    row2 = build_requires_invitation_row!(document_number: "18.101.010-1", row_number: 2)
+
+    post trigger_invitations_admin_people_bulk_import_path(@bulk_import), params: { row_ids: [ row1.id ] }
+
+    assert_response :success
+    assert row1.reload.target_record.present?
+    assert_nil row2.reload.target_record
+  end
+
+  test "user without manage_people cannot trigger invitations" do
+    sign_in_as(@client)
+    build_requires_invitation_row!(document_number: "19.101.010-1")
+
+    post trigger_invitations_admin_people_bulk_import_path(@bulk_import)
+
+    assert_response :not_found
+  end
+
+  test "trigger_invitations on another organization's bulk import is not found" do
+    sign_in_as(@tenant_admin)
+
+    post trigger_invitations_admin_people_bulk_import_path(@other_bulk_import)
+
+    assert_response :not_found
+  end
+
   private
+
+  def build_requires_invitation_row!(document_number:, row_number: 1)
+    Person.new(
+      organization: @organization, display_name: "Pending Trigger",
+      person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
+    ).tap { |p| p.document_number = document_number }.save!
+
+    @bulk_import.rows.create!(
+      row_number: row_number,
+      raw_payload: { "first_name" => "Pending", "last_name" => "Trigger", "document_number" => document_number },
+      normalized_payload: { "first_name" => "Pending", "last_name" => "Trigger", "document_number" => document_number },
+      validation_status: BulkImportRow::VALIDATION_STATUSES[:valid],
+      import_status: BulkImportRow::IMPORT_STATUSES[:skipped],
+      onboarding_classification: BulkImportRow::ONBOARDING_CLASSIFICATIONS[:requires_invitation]
+    )
+  end
 
   def sign_in_as(user)
     host! "#{@organization.subdomain}.example.com"

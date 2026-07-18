@@ -2,7 +2,7 @@
 
 class Admin::PeopleController < AdminController
   before_action :set_person, only: [ :create ]
-  before_action :get_person, only: [ :show, :edit, :update, :destroy ]
+  before_action :get_person, only: [ :show, :edit, :update, :destroy, :invite ]
   before_action :set_profile_filters, only: [ :show ]
   before_action :validate_role, only: [ :create, :update ]
 
@@ -10,7 +10,7 @@ class Admin::PeopleController < AdminController
     authorize Person
     @q = policy_scope(Person).ransack(params[:q])
     people = @q.result(distinct: true)
-      .includes(:user)
+      .includes(:user, :onboarding_requests)
       .order(created_at: :desc)
       .page(@filters[:page])
       .per(@filters[:per_page])
@@ -62,8 +62,26 @@ class Admin::PeopleController < AdminController
     if @validation_errors || !save_person_with_membership(@person)
       redirect_to new_admin_person_path, inertia: { errors: @person.errors }
     else
+      send_invitation_if_requested(@person)
       redirect_to admin_people_path
     end
+  end
+
+  def invite
+    authorize @person, :invite?
+
+    result = Accounts::InvitePerson.call_for_person(
+      person: @person,
+      requested_by_person: current_user.person_for(ActsAsTenant.current_tenant)
+    )
+    Accounts::InvitePerson.deliver(result)
+    redirect_to admin_people_path
+  rescue Accounts::InvitePerson::AlreadyInvited
+    redirect_to admin_people_path,
+                inertia: { errors: { base: [ "admin.people.errors.already_invited" ] } }
+  rescue Accounts::InvitePerson::MissingEmail
+    redirect_to admin_people_path,
+                inertia: { errors: { base: [ "admin.people.errors.missing_email" ] } }
   end
 
   def edit
@@ -192,6 +210,19 @@ class Admin::PeopleController < AdminController
     true
   rescue ActiveRecord::RecordInvalid
     false
+  end
+
+  def send_invitation_if_requested(person)
+    return unless ActiveModel::Type::Boolean.new.cast(params.dig(:person, :send_invitation))
+    return if person.contact_email.blank?
+
+    result = Accounts::InvitePerson.call_for_person(
+      person: person,
+      requested_by_person: current_user.person_for(ActsAsTenant.current_tenant)
+    )
+    Accounts::InvitePerson.deliver(result)
+  rescue Accounts::InvitePerson::AlreadyInvited
+    nil
   end
 
   def ensure_membership!(person)

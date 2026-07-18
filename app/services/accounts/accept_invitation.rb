@@ -34,7 +34,7 @@ module Accounts
       raise Expired if request.expires_at.past?
 
       OnboardingRequest.transaction do
-        user = request.user || create_account!(request)
+        user = request.user || existing_account_for(request) || create_account!(request)
         confirm_email(user)
         Accounts::LinkUserToPerson.call(person: request.person, user: user)
         consume_token(request)
@@ -50,6 +50,12 @@ module Accounts
       raise InvalidToken if request.blank? || !request.pending?
 
       request
+    end
+
+    def existing_account_for(request)
+      Accounts::InvitePerson.user_for_contact_email(request.person)
+    rescue Accounts::InvitePerson::AlreadyInvited
+      nil
     end
 
     def create_account!(request)
