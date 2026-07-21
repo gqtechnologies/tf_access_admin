@@ -107,6 +107,11 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
+      - name: Generate JS routes
+        env:
+          RAILS_ENV: test
+        run: bin/rails js:routes
+
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -159,6 +164,11 @@ jobs:
 
       - name: Install JS dependencies
         run: npm ci
+
+      - name: Generate JS routes
+        env:
+          RAILS_ENV: test
+        run: bin/rails js:routes
 
       - name: Run System Tests
         env:
