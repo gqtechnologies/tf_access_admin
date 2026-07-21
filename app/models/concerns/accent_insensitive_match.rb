@@ -5,7 +5,11 @@
 # Postgres `unaccent` extension (see db/migrate/20260706120000).
 module AccentInsensitiveMatch
   def self.where_clause(*columns)
-    columns.map { |column| "unaccent(#{column}) ILIKE unaccent(:term)" }.join(" OR ")
+    columns.map { |column| "unaccent(#{quote_column(column)}) ILIKE unaccent(:term)" }.join(" OR ")
+  end
+
+  def self.quote_column(column)
+    ActiveRecord::Base.connection.quote_table_name(column)
   end
 
   def self.term(value)
