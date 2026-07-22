@@ -231,7 +231,7 @@ class Api::V1::Private::Units::VisitsControllerTest < ActionDispatch::Integratio
     assert_response :created
   end
 
-  # ─── 6.9 created_by_id, authorized_by_id, visitor_person_id, host_person_id ──
+  # ─── 6.9 created_by_id, authorized_by_id, visitor_person_id ──────────────────
 
   test "visit records correct actor and person references (6.9)" do
     post_visit(user: @resident, unit: @unit)
@@ -240,7 +240,6 @@ class Api::V1::Private::Units::VisitsControllerTest < ActionDispatch::Integratio
     visit = Visit.last
     assert_equal @resident.id,                     visit.created_by_id
     assert_equal @resident.id,                     visit.authorized_by_id
-    assert_equal @resident_person.id,              visit.host_person_id
     assert_not_nil visit.visitor_person_id
     assert_not_equal @resident_person.id,          visit.visitor_person_id
   end

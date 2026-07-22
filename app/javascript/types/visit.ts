@@ -3,6 +3,14 @@ export type VisitPersonSummary = {
   display_name: string
 }
 
+// The unit's current active residents with can_authorize_visits: true,
+// computed live (not a per-visit snapshot). Replaces the removed "host"
+// concept — see openspec/changes/remove-visit-host-use-unit-authorizers.
+export type VisitAuthorizerSummary = {
+  id: string
+  display_name: string
+}
+
 export type VisitUnitSummary = {
   id: string
   identifier: string
@@ -31,7 +39,7 @@ export type ConciergeVisitListItem = {
   checked_out_at: string | null
   duration_seconds?: number | null
   visitor: VisitPersonSummary | null
-  host: VisitPersonSummary | null
+  authorizers: VisitAuthorizerSummary[]
   unit: VisitUnitSummary | null
   permissions: ConciergeVisitPermissions
   actions: string[]
@@ -91,10 +99,13 @@ export type AdminVisitPermissions = {
   cancel: boolean
   check_in: boolean
   check_out: boolean
+  resend_notification: boolean
   full_detail: boolean
   restricted_detail: boolean
   contextual_detail?: boolean
 }
+
+export type VisitNotificationStatus = 'pending' | 'delivered' | 'failed' | 'no_recipients'
 
 export type AdminVisitListItem = {
   id: string
@@ -109,9 +120,11 @@ export type AdminVisitListItem = {
   checked_in_at: string | null
   checked_out_at: string | null
   visitor: VisitPersonSummary | null
-  host: VisitPersonSummary | null
+  authorizers: VisitAuthorizerSummary[]
   unit: VisitUnitSummary | null
   residential_property: PropertySummary | null
+  notification_status: VisitNotificationStatus
+  notification_status_label: string
   permissions: AdminVisitPermissions
   actions: string[]
   operational_timeline?: VisitTimelineEntry[]
@@ -168,7 +181,6 @@ export type AdminVisitDetail = AdminVisitListItem & {
   notes?: string | null
   metadata?: VisitMetadata
   visitor_detail?: VisitPersonDetail | null
-  host_detail?: VisitPersonDetail | null
   unit_detail?: (VisitUnitSummary & {
     residential_property_id?: string
     property_section_id?: string | null
@@ -195,9 +207,8 @@ export type AdminVisitRestrictedDetail = {
   residential_property_id?: string
   unit_id?: string
   visitor_person_id?: string
-  host_person_id?: string
   visitor: VisitPersonSummary | null
-  host: VisitPersonSummary | null
+  authorizers: VisitAuthorizerSummary[]
   unit: VisitUnitSummary | null
   residential_property: PropertySummary | null
   permissions: {
@@ -226,7 +237,6 @@ export type AdminVisitContextualDetail = AdminVisitListItem & {
   notes?: string | null
   metadata?: VisitMetadata
   visitor_detail?: Pick<VisitPersonDetail, 'id' | 'display_name' | 'document_number' | 'phone'> | null
-  host_detail?: Pick<VisitPersonDetail, 'id' | 'display_name' | 'document_number' | 'phone'> | null
   history?: VisitHistoryEntry[]
   contextual_detail: true
   permissions: AdminVisitContextualPermissions

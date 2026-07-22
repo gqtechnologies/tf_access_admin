@@ -69,8 +69,8 @@ module People
       user = ActsAsTenant.without_tenant do
         User.create!(
           email: "system-user@example.test",
-          password: "password1",
-          password_confirmation: "password1",
+          password: "Password1@",
+          password_confirmation: "Password1@",
           name: "System User",
           dni: SecureRandom.hex(4),
           language: Languages::ES,
@@ -88,8 +88,8 @@ module People
       user = ActsAsTenant.without_tenant do
         User.create!(
           email: "multi-role@example.test",
-          password: "password1",
-          password_confirmation: "password1",
+          password: "Password1@",
+          password_confirmation: "Password1@",
           name: "Multi Role",
           dni: SecureRandom.hex(4),
           language: Languages::ES,

@@ -201,18 +201,10 @@ class Units::LifecycleTest < ActiveSupport::TestCase
 
   test "soft delete preserves visits" do
     unit = create_unit(@property, "SD-VISIT-1")
-    # Host person must have an occupancy on the unit
-    unit.unit_occupancies.create!(
-      person: @host_person,
-      occupancy_type: OccupancyTypes::OWNER_RESIDENT,
-      status: OccupancyStatuses::ACTIVE,
-      starts_at: 1.day.ago
-    )
 
     visit = unit.visits.create!(
       residential_property: @property,
       visitor_person: @person,
-      host_person: @host_person,
       visit_type: VisitTypes::GUEST,
       status: VisitStatuses::AUTHORIZED,
       scheduled_at: 1.day.from_now,

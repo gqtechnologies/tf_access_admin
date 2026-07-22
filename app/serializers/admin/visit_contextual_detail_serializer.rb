@@ -8,16 +8,11 @@ class Admin::VisitContextualDetailSerializer < Admin::VisitSerializer
   attributes :notes,
     :metadata,
     :visitor_detail,
-    :host_detail,
     :history,
     :contextual_detail
 
   def visitor_detail
     limited_person(object.visitor_person)
-  end
-
-  def host_detail
-    limited_person(object.host_person)
   end
 
   def history

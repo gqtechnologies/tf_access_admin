@@ -232,8 +232,8 @@ module UnitOwnerships
       user = ActsAsTenant.without_tenant do
         User.create!(
           email: "linked-owner@example.test",
-          password: "password1",
-          password_confirmation: "password1",
+          password: "Password1@",
+          password_confirmation: "Password1@",
           name: "Linked Owner",
           dni: SecureRandom.hex(4),
           language: Languages::ES,

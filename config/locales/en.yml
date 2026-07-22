@@ -28,9 +28,47 @@
 #       enabled: "ON"
 
 en:
+  onboarding:
+    accept:
+      success: "Invitation accepted. Sign in to continue."
+  onboarding_mailer:
+    invitation:
+      subject: "%{organization} invites you"
+      greeting: "Hello"
+      body: "%{organization} has invited you. Confirm your access with the link below."
+      cta: "Accept invitation"
+      expiration: "This link is single-use and expires in 14 days."
   frontend:
     name: "Admin Base"
     description: "welcome again"
+    onboarding:
+      accept:
+        title: "You've been invited"
+        subtitle: "{organization} has invited you to join."
+        needs_account_description: "Set a password to create your account and accept the invitation."
+        no_account_description: "Sign in to accept this invitation."
+        email_label: "Email"
+        submit: "Accept invitation"
+        sign_in: "Sign in"
+        input:
+          password:
+            label: "Password"
+            placeholder: "Choose a password"
+          password_confirmation:
+            label: "Confirm password"
+            placeholder: "Repeat your password"
+          name:
+            label: "Full name"
+            placeholder: "Your full name"
+          dni:
+            label: "Document"
+            placeholder: "Your document number"
+        errors:
+          accept_failed: "Could not accept the invitation. Check the fields and try again."
+      invalid:
+        title: "Invitation not available"
+        description: "This link is invalid, has expired, or has already been used."
+        sign_in: "Go to sign in"
     common:
       yes: "Yes"
       no: "No"
@@ -135,14 +173,14 @@ en:
             headers:
               visitor: "Visitor"
               unit: "Unit"
-              host: "Host"
+              authorizers: "Authorizers"
               status: "Status"
               scheduled_at: "Scheduled time"
               checked_in_at: "Entry time"
               duration: "Duration"
         summary:
           unit: "Unit"
-          host: "Host"
+          authorizers: "Authorizers"
           authorized_at: "Authorized visit"
           authorized_visit: "Authorized visit"
           checked_in_at: "Registered entry"
@@ -203,7 +241,6 @@ en:
             timeline: "Timeline"
           fields:
             unit: "Unit"
-            host: "Host"
             scheduled_at: "Scheduled at"
             valid_until: "Valid until"
             authorized_at: "Authorized at"
@@ -214,6 +251,10 @@ en:
             checked_out_by: "Exit registered by"
             duration: "Time inside"
             current_duration: "Current duration"
+    notifications:
+      visit_request:
+        title: "New visit"
+        body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Only letters, numbers, and hyphens are allowed"
@@ -374,7 +415,9 @@ en:
           language_required: "Language is required"
           password_lowercase: "Must include at least 1 lowercase letter"
           password_uppercase: "Must include at least 1 uppercase letter"
+          password_number: "Must include at least 1 number"
           password_symbol: "Must include at least 1 symbol: $ % {'@'} . - _"
+          password_complexity: "Password must be at least 8 characters and include lowercase, uppercase, a number and a symbol ($ % {'@'} . - _)"
           email_taken: "Email has already been taken"
           language_invalid: "Invalid language"
           role_invalid: "Invalid role"
@@ -441,6 +484,9 @@ en:
         updated_successfully: "Person updated successfully"
         update_failed: "Failed to update person"
         not_found: "Person not found"
+        errors:
+          already_invited: "This person already has an account or a pending invitation."
+          missing_email: "This person has no email on file — add one before sending an invitation."
         profile:
           change_history:
             actor_fallback: "System"
@@ -555,6 +601,12 @@ en:
               contextual_roles: "Roles"
               unit_ownerships_count: "Properties"
               status: "Status"
+              invitation_status: "Invitation"
+          invitation_statuses:
+            linked: "Account linked"
+            pending: "Invitation sent"
+            not_invited: "Not invited"
+            no_email_hint: "Add an email to invite"
           actions:
             create: "Create person"
             bulk_import: "Import people"
@@ -563,6 +615,13 @@ en:
             delete_description: "Are you sure you want to delete {name}?"
             delete_success: "Person deleted successfully"
             delete_error: "Failed to delete person"
+            invite: "Send invitation"
+            invite_description: "Send an account-creation invitation to {name}?"
+            invite_error: "Could not send the invitation"
+            revoke_invite: "Revoke invitation"
+            revoke_invite_description: "Are you sure you want to revoke the pending invitation for {name}?"
+            revoke_invite_success: "Invitation revoked"
+            revoke_invite_error: "Could not revoke the invitation"
         bulk_import:
           title: "Import people"
           steps_nav: "Import steps"
@@ -729,6 +788,30 @@ en:
               duplicate_skipped: "Skipped as duplicate"
               skipped: "Row skipped"
               failed: "Failed to import"
+            row_states:
+              title: "Row states"
+              subtitle: "Classification of each row so you can decide the next action."
+              classification: "Classification"
+              empty: "No rows to show."
+              triggered_label: "Sent"
+              classifications:
+                ready_to_create_person: "Person created"
+                requires_invitation: "Requires invitation"
+                requires_incorporation: "Requires incorporation"
+                review: "Needs review"
+                conflict: "Conflict — not applied"
+                duplicate: "Duplicate"
+                invalid: "Invalid"
+              actions:
+                invite: "Invite"
+                incorporate: "Incorporate"
+                invite_all: "Invite all pending"
+                confirm_one_title: "Send invitation?"
+                confirm_one_description: "This creates an onboarding request and emails a single-use invitation link to this person."
+                confirm_all_title: "Invite all pending rows?"
+                confirm_all_description: "This creates onboarding requests and emails invitation links for every row awaiting invitation or incorporation."
+                trigger_success: "{triggered} sent, {conflicted} conflicts, {skipped} skipped, {failed} failed"
+                trigger_error: "Could not process the invitations. Try again."
         new:
           title: "New person"
           description: "Register a person in the organization"
@@ -768,6 +851,12 @@ en:
             none: "No user"
           role:
             label: "Role"
+          send_invitation:
+            label: "Send an account-creation invitation by email"
+      onboarding_requests:
+        errors:
+          not_found: "Onboarding request not found"
+          not_authorized: "You are not authorized to perform this action"
       units:
         not_found: "Unit not found"
         validations:
@@ -1062,7 +1151,7 @@ en:
               create: "Create visit"
             table:
               visitor: "Visitor"
-              host: "Host"
+              authorizers: "Authorizers"
               reason: "Reason"
               scheduled_at: "Scheduled"
               status: "Status"
@@ -1154,6 +1243,11 @@ en:
           cancelled: "Cancelled"
           rejected: "Rejected"
           expired: "Expired"
+        notification_statuses:
+          pending: "Sending notification"
+          delivered: "Notification delivered"
+          failed: "Notification failed"
+          no_recipients: "No recipients"
         validations:
           invalid_access_type: "Access type is not valid"
           invalid_incident_type: "Incident type is not valid"
@@ -1168,11 +1262,12 @@ en:
           not_editable: "Visit cannot be edited in its current state"
           invalid_transition: "State transition is not valid for this visit"
           unit_not_found: "The specified unit does not exist or is not available"
+          notification_not_failed: "The notification can only be resent when delivery failed"
         index:
           title: "Visit management"
           description: "Review and manage all visits registered in the organization. Use filters to find specific visits or create a new one."
           search:
-            placeholder: "Search visitor, host or unit..."
+            placeholder: "Search visitor or unit..."
           scope:
             organization: "Full organization"
             assigned: "Assigned properties"
@@ -1191,7 +1286,7 @@ en:
               visitor: "Visitor"
               unit: "Unit"
               property: "Property"
-              host: "Host"
+              authorizers: "Authorizers"
               status: "Status"
               date: "Date"
               check_in: "Check-in"
@@ -1200,7 +1295,7 @@ en:
             create: "New visit"
         new:
           title: "New visit"
-          description: "Register a visit using the guided form. Property, unit and host fields are linked; the final status is resolved by the backend."
+          description: "Register a visit using the guided form. Property and unit fields are linked; the final status is resolved by the backend."
           steps_nav: "Visit creation steps"
           steps:
             general: "General info"
@@ -1217,7 +1312,6 @@ en:
           validations:
             property_required: "Select a property"
             unit_required: "Select a unit"
-            host_required: "Select a host"
             visitor_required: "Select or create a visitor"
             document_required: "Document is required"
             first_name_required: "First name is required"
@@ -1228,21 +1322,17 @@ en:
             visit_type_required: "Select a visit reason"
           general:
             title: "General information"
-            description: "Select the property, unit and host for this visit."
+            description: "Select the property and unit for this visit."
             fields:
               property: "Property"
               unit: "Unit"
-              host: "Host"
             placeholders:
               property: "Select a property"
               unit: "Select a unit"
-              host: "Select a host"
             loading:
               units: "Loading units..."
-              hosts: "Loading hosts..."
             empty:
               units: "No units available for this property."
-              hosts: "No active owners or residents on this unit."
           visitor:
             title: "Visitor details"
             description: "Search for an existing person or create a new visitor."
@@ -1294,7 +1384,6 @@ en:
             fields:
               property: "Property"
               unit: "Unit"
-              host: "Host"
               visitor: "Visitor"
               reason: "Reason"
               schedule: "Schedule"
@@ -1314,6 +1403,9 @@ en:
           authorize_confirm_description: "The visit will move to authorized status."
           cancel_confirm_title: "Cancel visit"
           cancel_confirm_description: "The visit will be cancelled and removed from operational flows."
+          resend_notification: "Resend notification"
+          resend_notification_confirm_title: "Resend notification"
+          resend_notification_confirm_description: "Push notification delivery will be retried for the same residents."
           more_actions: "More actions"
         show:
           title: "Visit detail"
@@ -1329,8 +1421,6 @@ en:
               title: "Visit information"
             visitor:
               title: "Visitor"
-            host:
-              title: "Host"
             location:
               title: "Location"
             vehicle:
@@ -1354,7 +1444,7 @@ en:
             email: "Email"
             property: "Property"
             unit: "Unit"
-            host: "Host"
+            authorizers: "Authorizers"
             vehicle_plate: "License plate"
             vehicle_model: "Brand / model"
             vehicle_color: "Color"
@@ -2217,6 +2307,12 @@ en:
             not_authorized: "Import not authorized"
             skipped: "Row skipped"
             failed: "Import failed"
+            requires_invitation: "Requires invitation — pending manager action"
+            requires_incorporation: "Requires incorporation — pending manager action"
+            conflict: "Identity conflict — not applied"
+            invalid: "Invalid row — rejected"
+            already_pending: "Another invitation is already in flight for this person"
+            reclassified_skipped: "Row state changed since import (%{classification}); skipped"
       property_sections:
         title: "Sections"
         created_successfully: "Section created successfully"
@@ -2527,8 +2623,6 @@ en:
               insufficient_available_identifiers: "Not enough available identifiers to create %{count} units in this section. Try a different prefix or reduce the quantity."
         visit:
           attributes:
-            host_person:
-              inactive_on_unit: "must have an active ownership or occupancy on the selected unit"
             residential_property:
               incoherent_with_unit: "must match the unit property"
             property_section:

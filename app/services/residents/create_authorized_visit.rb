@@ -8,7 +8,6 @@ module Residents
   #
   # Delegates to the canonical Visits::Create service, which handles:
   #   4.1 — associates the visit with the validated unit and resolved visitor
-  #   4.2 — receives host_person from the caller (resolved from Current.user.person_for)
   #   4.3 — residential_property_id and property_section_id are derived from unit
   #           via Visit#denormalize_location_from_unit (before_validation callback)
   #   4.4 — requests VisitStatuses::AUTHORIZED; Visit::InitialStatus.resolve grants
@@ -24,9 +23,8 @@ module Residents
       new(**kwargs).call
     end
 
-    def initialize(unit:, host_person:, visitor_params:, scheduled_at:, actor:)
+    def initialize(unit:, visitor_params:, scheduled_at:, actor:)
       @unit           = unit
-      @host_person    = host_person
       @visitor_params = visitor_params
       @scheduled_at   = scheduled_at
       @actor          = actor
@@ -44,7 +42,6 @@ module Residents
           unit: @unit,
           visit_params: {
             visitor_person_id: visitor_person.id,
-            host_person_id:    @host_person.id,
             scheduled_at:      @scheduled_at,
             visit_type:        VisitTypes::GUEST
           },

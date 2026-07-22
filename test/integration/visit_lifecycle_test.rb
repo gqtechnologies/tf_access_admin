@@ -47,7 +47,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
       unit: @unit
     )
 
-    @host_person = @owner.person_for(@organization)
     @visitor_person = Person.create!(
       organization: @organization,
       display_name: "Lifecycle Visitor",
@@ -71,7 +70,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
       unit: @unit,
       visit_params: {
         visitor_person_id: @visitor_person.id,
-        host_person_id: @host_person.id,
         scheduled_at: 2.hours.from_now,
         valid_from: 1.hour.ago,
         visit_type: VisitTypes::GUEST
@@ -119,7 +117,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.hours.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::PENDING,
@@ -151,7 +148,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.days.from_now,
         valid_from: 2.days.from_now,
         status: VisitStatuses::PENDING,
@@ -179,7 +175,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.days.from_now,
         valid_from: 2.days.from_now,
         status: VisitStatuses::AUTHORIZED,
@@ -201,7 +196,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.hours.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::CHECKED_IN,
@@ -227,7 +221,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 3.hours.ago,
         valid_from: 3.hours.ago,
         status: VisitStatuses::CHECKED_OUT,
@@ -254,7 +247,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.days.from_now,
         valid_from: 2.days.from_now,
         status: VisitStatuses::AUTHORIZED,
@@ -280,7 +272,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         unit: @unit,
         visit_params: {
           visitor_person_id: @visitor_person.id,
-          host_person_id: @host_person.id,
           scheduled_at: 2.hours.from_now,
           valid_from: 1.hour.ago,
           visit_type: VisitTypes::GUEST
@@ -298,7 +289,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.days.from_now,
         valid_from: 2.days.from_now,
         status: VisitStatuses::PENDING,
@@ -320,7 +310,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.hours.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::AUTHORIZED,
@@ -342,7 +331,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.hours.from_now,
         valid_from: 1.hour.ago,
         status: VisitStatuses::AUTHORIZED,
@@ -366,7 +354,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 3.hours.ago,
         valid_from: 3.hours.ago,
         status: VisitStatuses::CHECKED_IN,
@@ -390,7 +377,6 @@ class VisitLifecycleTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: @visitor_person,
-        host_person: @host_person,
         scheduled_at: 2.hours.from_now,
         valid_from: 1.hour.from_now,
         status: VisitStatuses::PENDING,

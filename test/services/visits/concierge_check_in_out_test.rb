@@ -186,7 +186,7 @@ module Visits
           person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
         )
         Visit.create!(
-          organization: @organization, unit: @unit, visitor_person: visitor, host_person: @host,
+          organization: @organization, unit: @unit, visitor_person: visitor,
           scheduled_at: scheduled_at, valid_from: valid_from || scheduled_at, valid_until: valid_until,
           status: status
         )

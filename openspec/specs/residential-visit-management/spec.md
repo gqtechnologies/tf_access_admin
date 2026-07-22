@@ -123,22 +123,20 @@ The system SHALL resolve the visitor as a canonical `Person` within the current 
 
 ### Requirement: Resident and visitor references preserve Person and User semantics
 
-The system SHALL use `Person` references for visitor and host identity and `User` references for authenticated action actors.
+The system SHALL use `Person` references for visitor identity and `User` references for authenticated action actors. This flow SHALL NOT persist a host person.
 
 #### Scenario: Resident visit records identity and actors
 
 - **GIVEN** authenticated user R is authorized to register a visit for unit U
-- **AND** R resolves to resident person H in the current organization
 - **WHEN** the visit is created successfully
 - **THEN** `visitor_person_id` references the resolved visitor `Person`
-- **AND** `host_person_id` references H
 - **AND** `created_by_id` references user R
 - **AND** `authorized_by_id` references user R
 - **AND** neither actor column references a `Person`
 
 ### Requirement: Visit location is derived from the resident unit
 
-The system SHALL derive visit organization, residential property, and optional property section from the authenticated context and submitted `unit_id`. Client-supplied organization, property, section, host, actor, or status values SHALL NOT override backend resolution.
+The system SHALL derive visit organization, residential property, and optional property section from the authenticated context and submitted `unit_id`. Client-supplied organization, property, section, actor, or status values SHALL NOT override backend resolution.
 
 #### Scenario: Location is derived consistently
 

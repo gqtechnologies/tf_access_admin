@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -253,6 +253,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.string "import_status", default: "pending", null: false
     t.datetime "imported_at"
     t.jsonb "normalized_payload", default: {}, null: false
+    t.string "onboarding_classification"
     t.string "operation"
     t.jsonb "raw_payload", default: {}, null: false
     t.integer "row_number", null: false
@@ -407,6 +408,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.index ["organization_id", "residential_property_id", "status"], name: "idx_on_organization_id_residential_property_id_stat_8348429f7a"
     t.index ["organization_id"], name: "index_common_areas_on_organization_id"
     t.index ["residential_property_id"], name: "index_common_areas_on_residential_property_id"
+  end
+
+  create_table "device_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "last_seen_at"
+    t.string "platform", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["user_id"], name: "index_device_tokens_on_user_id", unique: true
   end
 
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -580,6 +591,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.check_constraint "recipient_person_id IS NOT NULL", name: "notifications_recipient_person_required"
   end
 
+  create_table "onboarding_requests", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "conflict_reason"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "expires_at", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.uuid "organization_id", null: false
+    t.uuid "person_id"
+    t.uuid "requested_by_person_id"
+    t.string "requested_relationship", null: false
+    t.jsonb "requested_roles", default: [], null: false
+    t.uuid "residential_property_id"
+    t.string "status", default: "pending", null: false
+    t.string "token_digest"
+    t.uuid "unit_id"
+    t.datetime "updated_at", null: false
+    t.uuid "user_id"
+    t.index ["deleted_at"], name: "index_onboarding_requests_on_deleted_at"
+    t.index ["organization_id", "person_id", "requested_relationship", "residential_property_id", "unit_id"], name: "idx_onboarding_requests_unique_pending_scope", unique: true, where: "(((status)::text = 'pending'::text) AND (deleted_at IS NULL))"
+    t.index ["organization_id"], name: "index_onboarding_requests_on_organization_id"
+    t.index ["person_id"], name: "index_onboarding_requests_on_person_id"
+    t.index ["requested_by_person_id"], name: "index_onboarding_requests_on_requested_by_person_id"
+    t.index ["residential_property_id"], name: "index_onboarding_requests_on_residential_property_id"
+    t.index ["status"], name: "index_onboarding_requests_on_status"
+    t.index ["token_digest"], name: "idx_onboarding_requests_unique_token_digest", unique: true, where: "(token_digest IS NOT NULL)"
+    t.index ["unit_id"], name: "index_onboarding_requests_on_unit_id"
+    t.index ["user_id"], name: "index_onboarding_requests_on_user_id"
+  end
+
   create_table "organization_memberships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
@@ -736,8 +776,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.index ["parent_id"], name: "index_property_sections_on_parent_id"
     t.index ["residential_property_id", "parent_id", "position"], name: "idx_property_sections_property_parent_position"
     t.index ["residential_property_id"], name: "index_property_sections_on_residential_property_id"
-    t.check_constraint "section_type::text = ANY (ARRAY['building'::character varying::text, 'tower'::character varying::text, 'floor'::character varying::text, 'block'::character varying::text, 'stage'::character varying::text, 'sector'::character varying::text, 'parking_area'::character varying::text, 'storage_area'::character varying::text, 'other'::character varying::text, 'parking'::character varying::text, 'storage'::character varying::text, 'commercial'::character varying::text, 'amenities'::character varying::text, 'entrance'::character varying::text, 'garden'::character varying::text])", name: "property_sections_section_type_allowed"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "property_sections_status_allowed"
+    t.check_constraint "section_type::text = ANY (ARRAY['building'::character varying, 'tower'::character varying, 'floor'::character varying, 'block'::character varying, 'stage'::character varying, 'sector'::character varying, 'parking_area'::character varying, 'storage_area'::character varying, 'other'::character varying, 'parking'::character varying, 'storage'::character varying, 'commercial'::character varying, 'amenities'::character varying, 'entrance'::character varying, 'garden'::character varying]::text[])", name: "property_sections_section_type_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "property_sections_status_allowed"
   end
 
   create_table "property_setting_versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -810,7 +850,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.index ["organization_id", "property_type"], name: "idx_on_organization_id_property_type_d2e2ee8ca6"
     t.index ["organization_id", "status"], name: "index_residential_properties_on_organization_id_and_status"
     t.index ["organization_id"], name: "index_residential_properties_on_organization_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'created'::character varying::text, 'configured'::character varying::text, 'active'::character varying::text, 'inactive'::character varying::text, 'archived'::character varying::text])", name: "residential_properties_status_allowed"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'created'::character varying, 'configured'::character varying, 'active'::character varying, 'inactive'::character varying, 'archived'::character varying]::text[])", name: "residential_properties_status_allowed"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -827,6 +867,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
   end
 
   create_table "staff_assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "confirmation_state", default: "confirmed", null: false
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.date "ends_at"
     t.jsonb "metadata", default: {}, null: false
@@ -837,6 +879,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.date "starts_at"
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["confirmation_state"], name: "index_staff_assignments_on_confirmation_state"
     t.index ["metadata"], name: "index_staff_assignments_on_metadata", using: :gin
     t.index ["organization_id", "person_id", "status"], name: "idx_on_organization_id_person_id_status_36b5c5bfed"
     t.index ["organization_id", "residential_property_id", "staff_type", "status"], name: "index_staff_assignments_on_org_property_type_status"
@@ -1142,9 +1185,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.uuid "checked_out_by_id"
     t.datetime "created_at", null: false
     t.uuid "created_by_id"
-    t.uuid "host_person_id", null: false
     t.jsonb "metadata", default: {}, null: false
     t.text "notes"
+    t.string "notification_status", default: "pending", null: false
     t.uuid "organization_id", null: false
     t.uuid "property_section_id"
     t.uuid "residential_property_id", null: false
@@ -1160,7 +1203,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
     t.index ["checked_in_by_id"], name: "index_visits_on_checked_in_by_id"
     t.index ["checked_out_by_id"], name: "index_visits_on_checked_out_by_id"
     t.index ["created_by_id"], name: "index_visits_on_created_by_id"
-    t.index ["host_person_id"], name: "index_visits_on_host_person_id"
     t.index ["metadata"], name: "index_visits_on_metadata", using: :gin
     t.index ["organization_id", "residential_property_id", "scheduled_at"], name: "index_visits_on_org_property_pending_scheduled_at", where: "((status)::text = 'pending'::text)"
     t.index ["organization_id", "residential_property_id", "status", "checked_out_at"], name: "index_visits_on_org_property_operational_statuses", where: "((status)::text = ANY (ARRAY[('authorized'::character varying)::text, ('checked_in'::character varying)::text, ('checked_out'::character varying)::text]))"
@@ -1218,6 +1260,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
   add_foreign_key "common_area_rules", "organizations"
   add_foreign_key "common_areas", "organizations"
   add_foreign_key "common_areas", "residential_properties"
+  add_foreign_key "device_tokens", "users"
   add_foreign_key "documents", "organizations"
   add_foreign_key "documents", "people", column: "uploaded_by_person_id"
   add_foreign_key "incident_status_histories", "incidents"
@@ -1242,6 +1285,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
   add_foreign_key "notifications", "people", column: "recipient_person_id"
   add_foreign_key "notifications", "residential_properties"
   add_foreign_key "notifications", "units"
+  add_foreign_key "onboarding_requests", "organizations"
+  add_foreign_key "onboarding_requests", "people"
+  add_foreign_key "onboarding_requests", "people", column: "requested_by_person_id"
+  add_foreign_key "onboarding_requests", "residential_properties"
+  add_foreign_key "onboarding_requests", "units"
+  add_foreign_key "onboarding_requests", "users"
   add_foreign_key "organization_memberships", "organizations"
   add_foreign_key "organization_memberships", "people"
   add_foreign_key "parcel_deliveries", "organizations"
@@ -1308,7 +1357,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_06_120000) do
   add_foreign_key "visitor_profiles", "organizations"
   add_foreign_key "visitor_profiles", "people"
   add_foreign_key "visits", "organizations"
-  add_foreign_key "visits", "people", column: "host_person_id"
   add_foreign_key "visits", "people", column: "visitor_person_id"
   add_foreign_key "visits", "property_sections"
   add_foreign_key "visits", "residential_properties"

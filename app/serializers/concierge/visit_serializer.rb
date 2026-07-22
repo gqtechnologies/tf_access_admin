@@ -5,6 +5,8 @@
 # visitor identity, unit, host, status labels, relevant timestamps, and backend-computed actions.
 # Administrative data (notes, metadata, full person profiles, actor stamps, history) are omitted.
 class Concierge::VisitSerializer < ActiveModel::Serializer
+  include VisitAuthorizersSerialization
+
   attributes :id,
     :status,
     :status_label,
@@ -21,9 +23,8 @@ class Concierge::VisitSerializer < ActiveModel::Serializer
     :residential_property_id,
     :unit_id,
     :visitor_person_id,
-    :host_person_id,
     :visitor,
-    :host,
+    :authorizers,
     :unit,
     :permissions,
     :actions,
@@ -54,10 +55,6 @@ class Concierge::VisitSerializer < ActiveModel::Serializer
 
   def visitor
     person_summary(object.visitor_person)
-  end
-
-  def host
-    person_summary(object.host_person)
   end
 
   def unit

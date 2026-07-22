@@ -20,8 +20,8 @@
         <p class="text-sm font-medium">{{ unitLabel }}</p>
       </div>
       <div>
-        <p class="text-muted-foreground text-xs">{{ t('concierge.visits.summary.host') }}</p>
-        <p class="text-sm font-medium">{{ visit.host?.display_name ?? '—' }}</p>
+        <p class="text-muted-foreground text-xs">{{ t('concierge.visits.summary.authorizers') }}</p>
+        <p class="text-sm font-medium">{{ authorizersLabel }}</p>
       </div>
       <div>
         <p class="text-muted-foreground text-xs">{{ authorizedLabel }}</p>
@@ -67,6 +67,11 @@ const unitLabel = computed(
 )
 const authorizedLabel = computed(() => t(props.authorizedLabelKey))
 const authorizedTime = computed(() => formatDateTime(visitAuthorizedTime(props.visit)))
+const authorizersLabel = computed(() => {
+  const authorizers = props.visit.authorizers ?? []
+  if (authorizers.length === 0) return '—'
+  return authorizers.map((authorizer) => authorizer.display_name).join(', ')
+})
 
 function formatDateTime(value: string | null | undefined) {
   if (!value) return '—'

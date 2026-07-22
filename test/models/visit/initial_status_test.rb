@@ -104,7 +104,6 @@ class Visit::InitialStatusTest < ActiveSupport::TestCase
       organization: @organization,
       unit: @unit,
       visitor_person: @visitor,
-      host_person: @host,
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       visit_type: VisitTypes::GUEST

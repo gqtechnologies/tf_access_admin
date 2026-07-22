@@ -21,7 +21,7 @@ class Concierge::VisitsController < AdminController
     scoped    = property_scoped_visits
     tab_scope = apply_operational_tab(scoped, params[:tab])
     visits    = apply_concierge_search(tab_scope)
-                  .includes(:visitor_person, :host_person, :unit, :checked_in_by, :visit_status_histories)
+                  .includes(:visitor_person, :unit, :checked_in_by, :visit_status_histories)
                   .page(@filters[:page])
                   .per(@filters[:per_page])
 
@@ -88,7 +88,7 @@ class Concierge::VisitsController < AdminController
 
   def set_visit
     @visit = policy_scope(Visit)
-               .includes(:visitor_person, :host_person, :unit, :checked_in_by, :visit_status_histories)
+               .includes(:visitor_person, :unit, :checked_in_by, :visit_status_histories)
                .find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to concierge_visits_path,

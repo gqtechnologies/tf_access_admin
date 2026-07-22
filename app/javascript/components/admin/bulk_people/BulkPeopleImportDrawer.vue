@@ -52,6 +52,7 @@
         <BulkPeopleImportImportStep
           v-else-if="currentStep === 'import' && bulkImport && configureForm && importSummary"
           v-model:import-valid-rows-only="importValidRowsOnly"
+          :bulk-import-id="bulkImport.id"
           :summary="importSummary"
           :phase="importPhase"
           :progress="importProgress"

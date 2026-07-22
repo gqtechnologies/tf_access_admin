@@ -28,9 +28,47 @@
 #       enabled: "ON"
 
 es:
+  onboarding:
+    accept:
+      success: "Invitación aceptada. Inicia sesión para continuar."
+  onboarding_mailer:
+    invitation:
+      subject: "%{organization} te invita"
+      greeting: "Hola"
+      body: "%{organization} te ha invitado. Confirma tu acceso con el siguiente enlace."
+      cta: "Aceptar invitación"
+      expiration: "Este enlace es de un solo uso y caduca en 14 días."
   frontend:
     name: "Admin Base"
     description: "bienvenido nuevamente"
+    onboarding:
+      accept:
+        title: "Fuiste invitado"
+        subtitle: "{organization} te invitó a unirte."
+        needs_account_description: "Define una contraseña para crear tu cuenta y aceptar la invitación."
+        no_account_description: "Inicia sesión para aceptar esta invitación."
+        email_label: "Correo electrónico"
+        submit: "Aceptar invitación"
+        sign_in: "Iniciar sesión"
+        input:
+          password:
+            label: "Contraseña"
+            placeholder: "Elige una contraseña"
+          password_confirmation:
+            label: "Confirmar contraseña"
+            placeholder: "Repite tu contraseña"
+          name:
+            label: "Nombre completo"
+            placeholder: "Tu nombre completo"
+          dni:
+            label: "Documento"
+            placeholder: "Tu número de documento"
+        errors:
+          accept_failed: "No se pudo aceptar la invitación. Revisa los campos e intenta nuevamente."
+      invalid:
+        title: "Invitación no disponible"
+        description: "Este enlace es inválido, expiró o ya fue utilizado."
+        sign_in: "Ir a iniciar sesión"
     common:
       yes: "Sí"
       no: "No"
@@ -131,14 +169,14 @@ es:
             headers:
               visitor: "Visitante"
               unit: "Unidad"
-              host: "Anfitrión"
+              authorizers: "Autorizadores"
               status: "Estado"
               scheduled_at: "Horario programado"
               checked_in_at: "Hora de ingreso"
               duration: "Duración"
         summary:
           unit: "Unidad"
-          host: "Anfitrión"
+          authorizers: "Autorizadores"
           authorized_at: "Visita autorizada"
           authorized_visit: "Visita autorizada"
           checked_in_at: "Ingreso registrado"
@@ -199,7 +237,6 @@ es:
             timeline: "Línea de tiempo"
           fields:
             unit: "Unidad"
-            host: "Anfitrión"
             scheduled_at: "Programada"
             valid_until: "Válida hasta"
             authorized_at: "Autorizada"
@@ -210,6 +247,10 @@ es:
             checked_out_by: "Salida registrada por"
             duration: "Tiempo dentro"
             current_duration: "Duración actual"
+    notifications:
+      visit_request:
+        title: "Nueva visita"
+        body: "%{visitor_name} llegará a la unidad %{unit_identifier}"
     admin:
       validations:
         alphanumeric_hyphen_code_invalid: "Solo se permiten letras, números y guiones medios"
@@ -303,7 +344,9 @@ es:
           language_required: "El idioma es obligatorio"
           password_lowercase: "Debe incluir al menos 1 letra minúscula"
           password_uppercase: "Debe incluir al menos 1 letra mayúscula"
+          password_number: "Debe incluir al menos 1 número"
           password_symbol: "Debe incluir al menos 1 símbolo: $ % {'@'} . - _"
+          password_complexity: "La contraseña debe tener al menos 8 caracteres e incluir minúscula, mayúscula, número y un símbolo ($ % {'@'} . - _)"
           email_taken: "El email ya ha sido tomado"
           language_invalid: "Idioma no válido"
           role_invalid: "Rol no válido"
@@ -369,6 +412,9 @@ es:
         updated_successfully: "Persona actualizada correctamente"
         update_failed: "Error al actualizar la persona"
         not_found: "Persona no encontrada"
+        errors:
+          already_invited: "Esta persona ya tiene una cuenta o una invitación pendiente."
+          missing_email: "Esta persona no tiene un correo registrado — agrega uno antes de enviar la invitación."
         profile:
           change_history:
             actor_fallback: "Sistema"
@@ -483,6 +529,12 @@ es:
               contextual_roles: "Roles"
               unit_ownerships_count: "Propiedades"
               status: "Estado"
+              invitation_status: "Invitación"
+          invitation_statuses:
+            linked: "Cuenta vinculada"
+            pending: "Invitación enviada"
+            not_invited: "No invitada"
+            no_email_hint: "Agrega un correo para invitar"
           actions:
             create: "Crear persona"
             bulk_import: "Importar personas"
@@ -491,6 +543,13 @@ es:
             delete_description: "¿Eliminar a {name}?"
             delete_success: "Persona eliminada correctamente"
             delete_error: "Error al eliminar la persona"
+            invite: "Enviar invitación"
+            invite_description: "¿Enviar una invitación de creación de cuenta a {name}?"
+            invite_error: "No se pudo enviar la invitación"
+            revoke_invite: "Revocar invitación"
+            revoke_invite_description: "¿Seguro que deseas revocar la invitación pendiente de {name}?"
+            revoke_invite_success: "Invitación revocada"
+            revoke_invite_error: "No se pudo revocar la invitación"
         bulk_import:
           title: "Importar personas"
           steps_nav: "Pasos de importación"
@@ -657,6 +716,30 @@ es:
               duplicate_skipped: "Omitida por duplicado"
               skipped: "Fila omitida"
               failed: "Error al importar"
+            row_states:
+              title: "Estados de las filas"
+              subtitle: "Clasificación de cada fila para que decidas la próxima acción."
+              classification: "Clasificación"
+              empty: "No hay filas para mostrar."
+              triggered_label: "Enviada"
+              classifications:
+                ready_to_create_person: "Persona creada"
+                requires_invitation: "Requiere invitación"
+                requires_incorporation: "Requiere incorporación"
+                review: "Requiere revisión"
+                conflict: "Conflicto — no aplicada"
+                duplicate: "Duplicada"
+                invalid: "Inválida"
+              actions:
+                invite: "Invitar"
+                incorporate: "Incorporar"
+                invite_all: "Invitar todas las pendientes"
+                confirm_one_title: "¿Enviar invitación?"
+                confirm_one_description: "Esto crea una solicitud de incorporación y envía por correo un link de invitación de un solo uso a esta persona."
+                confirm_all_title: "¿Invitar todas las filas pendientes?"
+                confirm_all_description: "Esto crea solicitudes de incorporación y envía links de invitación por correo para cada fila que espera invitación o incorporación."
+                trigger_success: "{triggered} enviadas, {conflicted} conflictos, {skipped} omitidas, {failed} fallidas"
+                trigger_error: "No se pudieron procesar las invitaciones. Intenta nuevamente."
         new:
           title: "Nueva persona"
           description: "Registra una persona en la organización"
@@ -696,6 +779,12 @@ es:
             none: "Sin usuario"
           role:
             label: "Rol"
+          send_invitation:
+            label: "Enviar una invitación de creación de cuenta por correo"
+      onboarding_requests:
+        errors:
+          not_found: "Solicitud de incorporación no encontrada"
+          not_authorized: "No tienes permiso para realizar esta acción"
       units:
         not_found: "Unidad no encontrada"
         validations:
@@ -990,7 +1079,7 @@ es:
               create: "Crear visita"
             table:
               visitor: "Visitante"
-              host: "Anfitrión"
+              authorizers: "Autorizadores"
               reason: "Motivo"
               scheduled_at: "Programada"
               status: "Estado"
@@ -1082,6 +1171,11 @@ es:
           cancelled: "Cancelada"
           rejected: "Rechazada"
           expired: "Expirada"
+        notification_statuses:
+          pending: "Enviando notificación"
+          delivered: "Notificación entregada"
+          failed: "Error al notificar"
+          no_recipients: "Sin destinatarios"
         validations:
           invalid_access_type: "El tipo de acceso no es válido"
           invalid_incident_type: "El tipo de incidencia no es válido"
@@ -1096,11 +1190,12 @@ es:
           not_editable: "La visita no puede editarse en su estado actual"
           invalid_transition: "La transición de estado no es válida para esta visita"
           unit_not_found: "La unidad indicada no existe o no está disponible"
+          notification_not_failed: "Solo se puede reenviar la notificación cuando el envío falló"
         index:
           title: "Gestión de visitas"
           description: "Consulta y administra todas las visitas registradas en la organización. Usa los filtros para encontrar visitas específicas o crear una nueva visita."
           search:
-            placeholder: "Buscar visitante, anfitrión o unidad..."
+            placeholder: "Buscar visitante o unidad..."
           scope:
             organization: "Organización completa"
             assigned: "Propiedad asignada"
@@ -1119,7 +1214,7 @@ es:
               visitor: "Visitante"
               unit: "Unidad"
               property: "Propiedad"
-              host: "Anfitrión"
+              authorizers: "Autorizadores"
               status: "Estado"
               date: "Fecha"
               check_in: "Ingreso"
@@ -1128,7 +1223,7 @@ es:
             create: "Nueva visita"
         new:
           title: "Nueva visita"
-          description: "Registra una visita con el formulario guiado. Propiedad, unidad y anfitrión están vinculados; el estado final lo resuelve el backend."
+          description: "Registra una visita con el formulario guiado. Propiedad y unidad están vinculadas; el estado final lo resuelve el backend."
           steps_nav: "Pasos para crear visita"
           steps:
             general: "Información general"
@@ -1145,7 +1240,6 @@ es:
           validations:
             property_required: "Selecciona una propiedad"
             unit_required: "Selecciona una unidad"
-            host_required: "Selecciona un anfitrión"
             visitor_required: "Selecciona o crea un visitante"
             document_required: "El documento es obligatorio"
             first_name_required: "El nombre es obligatorio"
@@ -1156,21 +1250,17 @@ es:
             visit_type_required: "Selecciona un motivo de visita"
           general:
             title: "Información general"
-            description: "Selecciona la propiedad, unidad y anfitrión de la visita."
+            description: "Selecciona la propiedad y unidad de la visita."
             fields:
               property: "Propiedad"
               unit: "Unidad"
-              host: "Anfitrión"
             placeholders:
               property: "Selecciona una propiedad"
               unit: "Selecciona una unidad"
-              host: "Selecciona un anfitrión"
             loading:
               units: "Cargando unidades..."
-              hosts: "Cargando anfitriones..."
             empty:
               units: "No hay unidades disponibles para esta propiedad."
-              hosts: "No hay propietarios o residentes activos en esta unidad."
           visitor:
             title: "Detalles del visitante"
             description: "Busca una persona existente o crea un nuevo visitante."
@@ -1222,7 +1312,6 @@ es:
             fields:
               property: "Propiedad"
               unit: "Unidad"
-              host: "Anfitrión"
               visitor: "Visitante"
               reason: "Motivo"
               schedule: "Horario"
@@ -1242,6 +1331,9 @@ es:
           authorize_confirm_description: "La visita pasará a estado autorizada."
           cancel_confirm_title: "Cancelar visita"
           cancel_confirm_description: "La visita será cancelada y dejará de estar disponible operativamente."
+          resend_notification: "Reenviar notificación"
+          resend_notification_confirm_title: "Reenviar notificación"
+          resend_notification_confirm_description: "Se reintentará el envío de la notificación push a los mismos residentes."
           more_actions: "Más acciones"
         show:
           title: "Detalle de visita"
@@ -1257,8 +1349,6 @@ es:
               title: "Información de la visita"
             visitor:
               title: "Visitante"
-            host:
-              title: "Anfitrión"
             location:
               title: "Ubicación"
             vehicle:
@@ -1282,7 +1372,7 @@ es:
             email: "Email"
             property: "Propiedad"
             unit: "Unidad"
-            host: "Anfitrión"
+            authorizers: "Autorizadores"
             vehicle_plate: "Patente"
             vehicle_model: "Marca / modelo"
             vehicle_color: "Color"
@@ -2144,6 +2234,12 @@ es:
             not_authorized: "Importación no autorizada"
             skipped: "Fila omitida"
             failed: "Error al importar"
+            requires_invitation: "Requiere invitación — acción pendiente del gestor"
+            requires_incorporation: "Requiere incorporación — acción pendiente del gestor"
+            conflict: "Conflicto de identidad — no aplicada"
+            invalid: "Fila inválida — rechazada"
+            already_pending: "Ya hay otra invitación en curso para esta persona"
+            reclassified_skipped: "El estado de la fila cambió desde el import (%{classification}); omitida"
       property_sections:
         title: "Secciones"
         created_successfully: "Sección creada correctamente"
@@ -2518,8 +2614,6 @@ es:
               insufficient_available_identifiers: "No hay suficientes identificadores disponibles para crear %{count} unidades en esta sección. Prueba otro prefijo o reduce la cantidad."
         visit:
           attributes:
-            host_person:
-              inactive_on_unit: "debe tener una relación activa de propiedad u ocupación en la unidad seleccionada"
             residential_property:
               incoherent_with_unit: "debe coincidir con la propiedad de la unidad"
             property_section:

@@ -5,7 +5,7 @@ module Visits
     include ServiceAuthorization
 
     VISIT_ASSIGNMENT_KEYS = %i[
-      visitor_person_id host_person_id scheduled_at valid_from valid_until
+      visitor_person_id scheduled_at valid_from valid_until
       visit_type notes metadata
     ].freeze
 
@@ -37,6 +37,10 @@ module Visits
         )
 
         visit
+      end.tap do |created_visit|
+        # Outside the transaction: a notification failure must never roll back
+        # the created visit (design.md Decision 5).
+        Notifications::CreateForVisit.call(visit: created_visit)
       end
     end
 
@@ -44,13 +48,11 @@ module Visits
 
     def build_visit
       visitor = @unit.organization.people.find(@visit_params.fetch(:visitor_person_id))
-      host = @unit.organization.people.find(@visit_params.fetch(:host_person_id))
 
       Visit.new(
         organization: @unit.organization,
         unit: @unit,
         visitor_person: visitor,
-        host_person: host,
         scheduled_at: @visit_params[:scheduled_at],
         valid_from: @visit_params[:valid_from],
         valid_until: @visit_params[:valid_until],

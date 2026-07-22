@@ -57,7 +57,6 @@ class Properties::ArchiveTest < ActiveSupport::TestCase
       organization: @organization,
       unit: @unit,
       visitor_person: visitor,
-      host_person: @owner.person_for(@organization),
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       status: VisitStatuses::PENDING

@@ -136,7 +136,6 @@ class VisitOperationalScopesTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit,
         visitor_person: visitor,
-        host_person: @host,
         scheduled_at: scheduled_at,
         valid_from: valid_from || scheduled_at,
         valid_until: valid_until,

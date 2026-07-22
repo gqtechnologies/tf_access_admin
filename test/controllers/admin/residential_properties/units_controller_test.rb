@@ -68,7 +68,6 @@ class Admin::ResidentialProperties::UnitsControllerTest < ActionDispatch::Integr
       unit: @unit
     )
 
-    host_person = @owner.person_for(@organization)
     visitor_person = Person.create!(
       organization: @organization,
       display_name: "Units Show Visit Visitor",
@@ -79,7 +78,6 @@ class Admin::ResidentialProperties::UnitsControllerTest < ActionDispatch::Integr
       organization: @organization,
       unit: @unit,
       visitor_person: visitor_person,
-      host_person: host_person,
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       status: VisitStatuses::PENDING
@@ -209,7 +207,7 @@ class Admin::ResidentialProperties::UnitsControllerTest < ActionDispatch::Integr
   def sign_in_as(user)
     host! "#{@organization.subdomain}.example.com"
     post user_session_path, params: {
-      user: { email: user.email, password: "password1" }
+      user: { email: user.email, password: "Password1@" }
     }
   end
 end

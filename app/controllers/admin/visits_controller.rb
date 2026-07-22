@@ -20,9 +20,9 @@ class Admin::VisitsController < AdminController
   # Editable statuses: only pending and authorized may be updated via the admin form.
   EDITABLE_STATUSES = [ VisitStatuses::PENDING, VisitStatuses::AUTHORIZED ].freeze
 
-  before_action :set_visit, only: %i[show edit update authorize_visit cancel]
+  before_action :set_visit, only: %i[show edit update authorize_visit cancel resend_notification]
   before_action :require_editable_status!, only: %i[edit update]
-  before_action :authorize_visit_management!, only: %i[form_properties form_units form_hosts initial_status_preview]
+  before_action :authorize_visit_management!, only: %i[form_properties form_units initial_status_preview]
 
   FORM_OPTIONS_PER_PAGE = 20
 
@@ -33,7 +33,7 @@ class Admin::VisitsController < AdminController
     scoped = apply_admin_scope(policy_scope(Visit))
     @q = scoped.ransack(params[:q])
     visits = @q.result(distinct: true)
-               .includes(:visitor_person, :host_person, :unit, :residential_property, :checked_in_by, :visit_status_histories)
+               .includes(:visitor_person, :unit, :residential_property, :checked_in_by, :visit_status_histories)
                .order(scheduled_at: :desc)
                .page(@filters[:page])
                .per(@filters[:per_page])
@@ -93,21 +93,6 @@ class Admin::VisitsController < AdminController
       units: units.map { |unit| unit_option_json(unit) },
       pagination: form_options_pagination(units)
     }
-  end
-
-  # GET /admin/visits/form_hosts
-  def form_hosts
-    unit = policy_scope(Unit).find(params.require(:unit_id))
-    hosts = apply_name_search(Visits::EligibleHosts.call(unit: unit), columns: [ "people.display_name" ])
-      .page(form_options_page)
-      .per(FORM_OPTIONS_PER_PAGE)
-
-    render json: {
-      hosts: hosts.map { |person| host_option_json(person) },
-      pagination: form_options_pagination(hosts)
-    }
-  rescue ActiveRecord::RecordNotFound
-    render json: { hosts: [], pagination: { current_page: 1, has_more: false } }, status: :not_found
   end
 
   # GET /admin/visits/initial_status_preview
@@ -196,12 +181,26 @@ class Admin::VisitsController < AdminController
                 inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
   end
 
+  # POST /admin/visits/:id/resend_notification
+  # Manually retries push delivery for a visit whose notification_status is
+  # "failed" — see openspec/changes/add-fcm-push-notifications.
+  def resend_notification
+    Visits::ResendNotification.call(visit: @visit, actor: current_user)
+    redirect_to admin_visit_path(@visit)
+  rescue Visits::ResendNotification::NotFailedError
+    redirect_to admin_visit_path(@visit),
+                inertia: { errors: { base: [ t("frontend.admin.visits.errors.notification_not_failed") ] } }
+  rescue Pundit::NotAuthorizedError
+    redirect_to admin_visit_path(@visit),
+                inertia: { errors: { base: [ t("frontend.admin.visits.errors.not_authorized") ] } }
+  end
+
   private
 
   def set_visit
     @visit = policy_scope(Visit)
                .includes(
-                 :visitor_person, :host_person, :unit, :residential_property,
+                 :visitor_person, :unit, :residential_property,
                  :created_by, :authorized_by, :checked_in_by, :checked_out_by,
                  visit_status_histories: :actor_user
                )
@@ -221,7 +220,7 @@ class Admin::VisitsController < AdminController
 
   def visit_params
     params.require(:visit).permit(
-      :unit_id, :visitor_person_id, :host_person_id,
+      :unit_id, :visitor_person_id,
       :scheduled_at, :valid_from, :valid_until,
       :visit_type, :notes,
       metadata: { vehicle: %i[plate brand_model color] }
@@ -290,14 +289,6 @@ class Admin::VisitsController < AdminController
     }
   end
 
-  def host_option_json(person)
-    {
-      id: person.id,
-      display_name: person.display_name,
-      document_number: person.document_number
-    }
-  end
-
   def visit_type_option(type)
     {
       value: type,
@@ -315,7 +306,7 @@ class Admin::VisitsController < AdminController
 
   def update_params
     params.require(:visit).permit(
-      :visitor_person_id, :host_person_id,
+      :visitor_person_id,
       :scheduled_at, :valid_from, :valid_until,
       :visit_type, :notes,
       metadata: {}

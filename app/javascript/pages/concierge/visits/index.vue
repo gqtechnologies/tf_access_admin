@@ -309,11 +309,14 @@ const columns = computed<ColumnDef<ConciergeVisitListItem, unknown>[]>(() => {
       },
     },
     {
-      id: 'host',
-      header: () => t('concierge.visits.index.table.headers.host'),
+      id: 'authorizers',
+      header: () => t('concierge.visits.index.table.headers.authorizers'),
       cell: ({ row }) => {
         if (row.original.denial_explanation) return h('span', '—')
-        return h('span', row.original.host?.display_name ?? '—')
+        return h(
+          'span',
+          row.original.authorizers?.map((authorizer) => authorizer.display_name).join(', ') || '—',
+        )
       },
     },
     {

@@ -53,6 +53,91 @@
       </div>
     </div>
 
+    <Card v-if="isCompleted" class="gap-0 overflow-hidden py-0">
+      <CardHeader class="flex flex-row items-start justify-between gap-3 border-b px-4 py-3">
+        <div>
+          <CardTitle class="text-sm font-semibold">{{ t('admin.people.bulk_import.import.row_states.title') }}</CardTitle>
+          <p class="text-xs text-muted-foreground">{{ t('admin.people.bulk_import.import.row_states.subtitle') }}</p>
+        </div>
+        <ListItem
+          v-if="hasPendingTriggerableRows"
+          as="confirm"
+          :onClick="triggerAll"
+          :confirmTitle="t('admin.people.bulk_import.import.row_states.actions.confirm_all_title')"
+          :confirmDescription="t('admin.people.bulk_import.import.row_states.actions.confirm_all_description')"
+        >
+          <Button type="button" size="sm" variant="outline" :disabled="isTriggering">
+            <Send class="size-4" />
+            {{ t('admin.people.bulk_import.import.row_states.actions.invite_all') }}
+          </Button>
+        </ListItem>
+      </CardHeader>
+      <CardContent class="space-y-3 px-4 py-4">
+        <div v-if="isLoadingRows" class="space-y-2">
+          <Skeleton v-for="index in 4" :key="index" class="h-9 w-full" />
+        </div>
+        <div v-else-if="rowStates.length === 0" class="py-6 text-center text-sm text-muted-foreground">
+          {{ t('admin.people.bulk_import.import.row_states.empty') }}
+        </div>
+        <template v-else>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead class="w-16 text-xs">{{ t('admin.people.bulk_import.preview.table.row') }}</TableHead>
+                <TableHead class="text-xs">{{ t('admin.people.bulk_import.preview.table.name') }}</TableHead>
+                <TableHead class="text-xs">{{ t('admin.people.bulk_import.import.row_states.classification') }}</TableHead>
+                <TableHead class="w-32 text-right text-xs">{{ t('common.table.actions') }}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="row in rowStates" :key="row.id">
+                <TableCell class="text-sm tabular-nums text-muted-foreground">{{ row.row_number }}</TableCell>
+                <TableCell class="text-sm font-medium">
+                  {{ [row.normalized_payload.first_name, row.normalized_payload.last_name].filter(Boolean).join(' ') || '—' }}
+                </TableCell>
+                <TableCell>
+                  <Badge :variant="classificationBadgeVariant(row.onboarding_classification)" class="text-xs">
+                    {{ formatClassification(row.onboarding_classification) }}
+                  </Badge>
+                </TableCell>
+                <TableCell class="text-right">
+                  <span v-if="isTriggered(row)" class="text-xs text-muted-foreground">
+                    {{ t('admin.people.bulk_import.import.row_states.triggered_label') }}
+                  </span>
+                  <ListItem
+                    v-else-if="isTriggerable(row)"
+                    as="confirm"
+                    :onClick="() => triggerOne(row)"
+                    :confirmTitle="t('admin.people.bulk_import.import.row_states.actions.confirm_one_title')"
+                    :confirmDescription="t('admin.people.bulk_import.import.row_states.actions.confirm_one_description')"
+                  >
+                    <Button type="button" size="sm" variant="ghost" :disabled="isTriggering">
+                      {{
+                        row.onboarding_classification === 'requires_incorporation'
+                          ? t('admin.people.bulk_import.import.row_states.actions.incorporate')
+                          : t('admin.people.bulk_import.import.row_states.actions.invite')
+                      }}
+                    </Button>
+                  </ListItem>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+
+          <DataTablePagination
+            v-if="pagination.total_count > 0"
+            :current-page="pagination.current_page"
+            :total-pages="pagination.total_pages"
+            :total-items="pagination.total_count"
+            :items-per-page="pagination.per_page"
+            :items-per-page-options="[...BULK_IMPORT_PREVIEW_PER_PAGE_OPTIONS]"
+            :on-page-change="onRowStatesPageChange"
+            :on-items-per-page-change="onRowStatesItemsPerPageChange"
+          />
+        </template>
+      </CardContent>
+    </Card>
+
     <Card class="gap-0 overflow-hidden py-0" :class="progressCardBorderClass">
       <CardHeader class="border-b px-4 py-3">
         <CardTitle class="text-sm font-semibold">{{ t('admin.people.bulk_import.import.progress.title') }}</CardTitle>
@@ -106,20 +191,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { AlertTriangle, CheckCircle2, CircleAlert, CircleCheck, Copy, UserPlus } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
+import { AlertTriangle, CheckCircle2, CircleAlert, CircleCheck, Copy, Send, UserPlus } from 'lucide-vue-next'
+import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
+import ListItem from '@/components/custom/list/ListItem.vue'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { BULK_IMPORT_PREVIEW_PER_PAGE_OPTIONS } from '@/lib/constants/bulk_import'
+import { useBulkPeoplePreviewRows } from '@/lib/composables/bulk_people/useBulkPeoplePreviewRows'
+import { useBulkUnitsPreviewRowsQuery } from '@/lib/composables/bulk_units/useBulkUnitsPreviewRows'
+import { useTriggerRowInvitations } from '@/lib/composables/bulk_people/useTriggerRowInvitations'
 import type {
   BulkImportImportLog,
   BulkImportImportLogStatus,
   BulkImportImportPhase,
   BulkImportImportProgress,
   BulkImportImportSummary,
+  BulkImportOnboardingClassification,
+  BulkImportRowRecord,
+  BulkImportTriggerInvitationsResult,
 } from '@/types/bulk_import'
 
 const props = defineProps<{
+  bulkImportId: string | null
   summary: BulkImportImportSummary | null
   phase: BulkImportImportPhase
   importValidRowsOnly: boolean
@@ -138,6 +238,95 @@ const { t } = useI18n()
 const isProcessing = computed(() => props.phase === 'processing')
 const isCompleted = computed(() => props.phase === 'completed')
 const isFailed = computed(() => props.phase === 'failed')
+
+const {
+  rows: rowStates,
+  summary: rowStatesSummary,
+  pagination,
+  isLoadingRows,
+  fetchRows,
+} = useBulkPeoplePreviewRows(() => props.bulkImportId)
+
+const { onPageChange: onRowStatesPageChange, onItemsPerPageChange: onRowStatesItemsPerPageChange } =
+  useBulkUnitsPreviewRowsQuery(() => 'all', () => '', fetchRows)
+
+watch(
+  isCompleted,
+  (completed) => {
+    if (completed) void fetchRows({ page: 1 })
+  },
+  { immediate: true },
+)
+
+const { isTriggering, triggerInvitations } = useTriggerRowInvitations(() => props.bulkImportId)
+
+const hasPendingTriggerableRows = computed(() => {
+  const current = rowStatesSummary.value
+  if (!current) return false
+  return (current.pending_invitation_rows ?? 0) + (current.pending_incorporation_rows ?? 0) > 0
+})
+
+const TRIGGERABLE_CLASSIFICATIONS: BulkImportOnboardingClassification[] = [
+  'requires_invitation',
+  'requires_incorporation',
+]
+
+function isTriggerable(row: BulkImportRowRecord) {
+  return (
+    row.onboarding_classification !== null &&
+    TRIGGERABLE_CLASSIFICATIONS.includes(row.onboarding_classification) &&
+    row.target_record_type !== 'OnboardingRequest'
+  )
+}
+
+function isTriggered(row: BulkImportRowRecord) {
+  return (
+    row.onboarding_classification !== null &&
+    TRIGGERABLE_CLASSIFICATIONS.includes(row.onboarding_classification) &&
+    row.target_record_type === 'OnboardingRequest'
+  )
+}
+
+async function triggerOne(row: BulkImportRowRecord) {
+  const result = await triggerInvitations([ row.id ])
+  handleTriggerResult(result)
+}
+
+async function triggerAll() {
+  const result = await triggerInvitations()
+  handleTriggerResult(result)
+}
+
+function handleTriggerResult(result: BulkImportTriggerInvitationsResult | null) {
+  if (!result) {
+    toast.error(t('admin.people.bulk_import.import.row_states.actions.trigger_error'))
+    return
+  }
+
+  toast.success(
+    t('admin.people.bulk_import.import.row_states.actions.trigger_success', {
+      triggered: result.counts.triggered,
+      conflicted: result.counts.conflicted,
+      skipped: result.counts.skipped,
+      failed: result.counts.failed,
+    }),
+  )
+  void fetchRows({ page: pagination.value.current_page })
+}
+
+function formatClassification(classification: BulkImportOnboardingClassification | null) {
+  if (!classification) return '—'
+  const key = `admin.people.bulk_import.import.row_states.classifications.${classification}`
+  const translated = t(key)
+  return translated === key ? classification : translated
+}
+
+function classificationBadgeVariant(classification: BulkImportOnboardingClassification | null) {
+  if (classification === 'ready_to_create_person') return 'success'
+  if (classification === 'conflict' || classification === 'invalid') return 'destructive'
+  if (classification === 'duplicate') return 'secondary'
+  return 'outline'
+}
 
 const summaryStatCards = computed(() => {
   const current = props.summary

@@ -70,7 +70,6 @@ class VisitPolicyTest < ActiveSupport::TestCase
       organization: @organization,
       unit: @unit_p,
       visitor_person: person_p,
-      host_person: host_p,
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       status: VisitStatuses::PENDING
@@ -101,7 +100,6 @@ class VisitPolicyTest < ActiveSupport::TestCase
         organization: @organization,
         unit: @unit_q,
         visitor_person: person_q,
-        host_person: host_q,
         scheduled_at: 1.day.from_now,
         valid_from: 1.day.from_now,
         status: VisitStatuses::PENDING
@@ -135,7 +133,6 @@ class VisitPolicyTest < ActiveSupport::TestCase
         organization: @other_organization,
         unit: other_unit,
         visitor_person: other_person,
-        host_person: other_host,
         scheduled_at: 1.day.from_now,
         valid_from: 1.day.from_now,
         status: VisitStatuses::PENDING
@@ -163,7 +160,6 @@ class VisitPolicyTest < ActiveSupport::TestCase
         organization: @organization,
         unit: unit,
         visitor_person: visitor,
-        host_person: @owner.person_for(@organization),
         scheduled_at: 1.day.from_now,
         valid_from: 1.day.from_now,
         status: status,

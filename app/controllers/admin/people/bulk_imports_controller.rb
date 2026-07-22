@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::People::BulkImportsController < AdminController
-  before_action :set_bulk_import, only: %i[update validate rows confirm status report]
+  before_action :set_bulk_import, only: %i[update validate rows confirm status report trigger_invitations]
 
   def create
     authorize BulkImport, :create_people_import?
@@ -90,6 +90,26 @@ class Admin::People::BulkImportsController < AdminController
               filename: filename
   end
 
+  def trigger_invitations
+    authorize @bulk_import, :trigger_invitations?
+
+    result = BulkImportServices::TriggerRowInvitations.call(
+      bulk_import: @bulk_import,
+      row_ids: trigger_invitations_params[:row_ids],
+      requested_by_person: current_user.person_for(ActsAsTenant.current_tenant)
+    )
+
+    render json: {
+      counts: {
+        triggered: result.counts[:triggered] || 0,
+        conflicted: result.counts[:conflicted] || 0,
+        skipped: result.counts[:skipped] || 0,
+        failed: result.counts[:failed] || 0
+      },
+      results: result.results
+    }
+  end
+
   private
 
   def preview_rows_result(bulk_import)
@@ -112,6 +132,10 @@ class Admin::People::BulkImportsController < AdminController
 
   def status_params
     params.permit(:logs_after)
+  end
+
+  def trigger_invitations_params
+    params.permit(row_ids: [])
   end
 
   def preview_response(bulk_import, preview)

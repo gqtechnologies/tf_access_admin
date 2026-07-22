@@ -73,7 +73,6 @@ class PropertySectionDestroyProtectionTest < ActiveSupport::TestCase
       property_section: @tower,
       unit: unit,
       visitor_person: visitor,
-      host_person: host.person_for(@organization),
       scheduled_at: 1.day.from_now,
       valid_from: 1.day.from_now,
       status: VisitStatuses::PENDING

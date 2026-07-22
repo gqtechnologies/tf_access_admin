@@ -5,6 +5,8 @@
 # Table name: staff_assignments
 #
 #  id                      :uuid             not null, primary key
+#  confirmation_state      :string           default("confirmed"), not null
+#  confirmed_at            :datetime
 #  ends_at                 :date
 #  metadata                :jsonb            not null
 #  staff_type              :string           not null
@@ -19,6 +21,7 @@
 # Indexes
 #
 #  idx_on_organization_id_person_id_status_36b5c5bfed   (organization_id,person_id,status)
+#  index_staff_assignments_on_confirmation_state        (confirmation_state)
 #  index_staff_assignments_on_metadata                  (metadata) USING gin
 #  index_staff_assignments_on_org_property_type_status  (organization_id,residential_property_id,staff_type,status)
 #  index_staff_assignments_on_organization_id           (organization_id)
@@ -401,19 +404,85 @@ class StaffAssignmentTest < ActiveSupport::TestCase
     assert assignment.errors[:status].any?
   end
 
+  # ---------------------------------------------------------------------------
+  # Operational roles are confirmable (normalize-user-identity-and-property-onboarding §16.2)
+  # ---------------------------------------------------------------------------
+
+  test "confirmation_state defaults to confirmed" do
+    assignment = create_assignment(@person, @property, staff_type: StaffTypes::CONCIERGE)
+
+    assert_equal StaffAssignment::CONFIRMATION_CONFIRMED, assignment.confirmation_state
+    assert_predicate assignment, :confirmed?
+  end
+
+  test "confirmation_state must be pending or confirmed" do
+    assignment = StaffAssignment.new(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::MANAGER,
+      status: StaffAssignment::STATUS_ACTIVE,
+      confirmation_state: "bogus"
+    )
+
+    refute assignment.valid?
+    assert assignment.errors[:confirmation_state].any?
+  end
+
+  test "confirm! stamps confirmed_at and marks confirmed" do
+    assignment = StaffAssignment.create!(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::CONCIERGE,
+      status: StaffAssignment::STATUS_ACTIVE,
+      confirmation_state: StaffAssignment::CONFIRMATION_PENDING
+    )
+
+    assert_nil assignment.confirmed_at
+    refute_predicate assignment, :confirmed?
+
+    assignment.confirm!
+
+    assert_predicate assignment, :confirmed?
+    assert_not_nil assignment.confirmed_at
+  end
+
+  test "confirmed and pending_confirmation scopes partition assignments" do
+    pending = StaffAssignment.create!(
+      organization: @organization,
+      person: @person,
+      residential_property: @property,
+      staff_type: StaffTypes::CONCIERGE,
+      status: StaffAssignment::STATUS_ACTIVE,
+      confirmation_state: StaffAssignment::CONFIRMATION_PENDING
+    )
+    confirmed = create_assignment(
+      create_person_in_org(@organization, email: "confirmed@example.test"),
+      @property,
+      staff_type: StaffTypes::CLEANING
+    )
+
+    assert_includes StaffAssignment.pending_confirmation.to_a, pending
+    refute_includes StaffAssignment.pending_confirmation.to_a, confirmed
+    assert_includes StaffAssignment.confirmed.to_a, confirmed
+    refute_includes StaffAssignment.confirmed.to_a, pending
+  end
+
   private
 
   def create_person_in_org(organization, email: "staff-test-person@example.test")
     ActsAsTenant.with_tenant(organization) do
       user = User.create!(
         email: email,
-        password: "password1",
-        password_confirmation: "password1",
+        password: "Password1@",
+        password_confirmation: "Password1@",
         name: "Test Person",
         dni: SecureRandom.hex(4),
         language: Languages::ES,
         confirmed_at: Time.current
       )
+      Accounts::ProvisionTenantIdentity.call(user: user, organization: organization)
       user.person_for(organization)
     end
   end
@@ -435,13 +504,14 @@ class StaffAssignmentTest < ActiveSupport::TestCase
     ActsAsTenant.with_tenant(@organization) do
       user = User.create!(
         email: email,
-        password: "password1",
-        password_confirmation: "password1",
+        password: "Password1@",
+        password_confirmation: "Password1@",
         name: "Staff User",
         dni: SecureRandom.hex(4),
         language: Languages::ES,
         confirmed_at: Time.current
       )
+      Accounts::ProvisionTenantIdentity.call(user: user, organization: @organization)
       person = user.person_for(@organization)
       StaffAssignment.create!(
         organization: @organization,

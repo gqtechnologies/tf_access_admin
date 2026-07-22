@@ -30,18 +30,6 @@
 
     <Card>
       <CardHeader>
-        <CardTitle>{{ t('admin.visits.show.sections.host.title') }}</CardTitle>
-      </CardHeader>
-      <CardContent class="grid gap-4 sm:grid-cols-2">
-        <VisitDetailField :label="t('admin.visits.show.fields.name')" :value="visit.host_detail?.display_name ?? '—'" />
-        <VisitDetailField :label="t('admin.visits.show.fields.document')" :value="visit.host_detail?.document_number ?? '—'" />
-        <VisitDetailField :label="t('admin.visits.show.fields.phone')" :value="visit.host_detail?.phone ?? '—'" />
-        <VisitDetailField :label="t('admin.visits.show.fields.email')" :value="visit.host_detail?.email ?? '—'" />
-      </CardContent>
-    </Card>
-
-    <Card>
-      <CardHeader>
         <CardTitle>{{ t('admin.visits.show.sections.location.title') }}</CardTitle>
       </CardHeader>
       <CardContent class="grid gap-4 sm:grid-cols-2">
@@ -50,6 +38,7 @@
           :label="t('admin.visits.show.fields.unit')"
           :value="visit.unit?.display_name ?? visit.unit?.identifier ?? '—'"
         />
+        <VisitDetailField :label="t('admin.visits.show.fields.authorizers')" :value="authorizersLabel" />
       </CardContent>
     </Card>
 
@@ -104,6 +93,12 @@ const { t } = useI18n()
 const hasVehicle = computed(() => {
   const vehicle = props.visit.metadata?.vehicle
   return Boolean(vehicle?.plate || vehicle?.brand_model || vehicle?.color)
+})
+
+const authorizersLabel = computed(() => {
+  const authorizers = props.visit.authorizers ?? []
+  if (authorizers.length === 0) return '—'
+  return authorizers.map((authorizer) => authorizer.display_name).join(', ')
 })
 
 function formatDateTime(value: string | null | undefined) {

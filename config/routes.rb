@@ -41,14 +41,31 @@ Rails.application.routes.draw do
         resources :units, only: [] do
           resources :visits, only: [ :create ], module: :units
         end
+
+        # Singular resource: a User has at most one registered device token.
+        resource :device_token, only: %i[create destroy]
       end
     end
   end
 
   get "admin/home/index"
+  # Onboarding invitation acceptance by single-use token (holder-facing).
+  get "onboarding/accept/:token", to: "onboarding_acceptances#show", as: :onboarding_acceptance
+  post "onboarding/accept/:token", to: "onboarding_acceptances#create"
+
   namespace :admin do
     resources :users, only: [ :index, :new, :create, :edit, :update, :destroy ]
-    resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
+    resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
+      member do
+        post :invite
+      end
+    end
+    resources :onboarding_requests, only: [] do
+      member do
+        post :revoke
+        post :resolve_conflict
+      end
+    end
     namespace :people do
       resources :bulk_imports, only: %i[create update] do
         member do
@@ -57,6 +74,7 @@ Rails.application.routes.draw do
           get :rows
           get :status
           get :report
+          post :trigger_invitations
         end
       end
     end
@@ -119,12 +137,12 @@ Rails.application.routes.draw do
       collection do
         get :form_properties
         get :form_units
-        get :form_hosts
         get :initial_status_preview
       end
       member do
         post :authorize_visit, as: :authorize
         delete :cancel
+        post :resend_notification
       end
       resources :check_ins, only: %i[create], module: :visits
       resources :check_outs, only: %i[create], module: :visits

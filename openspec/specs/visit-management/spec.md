@@ -2,27 +2,20 @@
 
 ## Purpose
 
-Enable visit creation and administration, plus operational check-in/check-out, within strict organization, property, unit, state, and capability boundaries. Visitors and hosts are canonical `Person` records; authenticated actors are `User` records.
+Enable visit creation and administration, plus operational check-in/check-out, within strict organization, property, unit, state, and capability boundaries. Visitors are canonical `Person` records; authenticated actors are `User` records.
 
 ## Requirements
 
 ### Requirement: Visit location and identities are tenant-consistent
 
-The system SHALL persist each visit with organization, property, optional section, unit, visitor person, and host person belonging to the same organization. Property and section SHALL be derived from the selected unit.
+The system SHALL persist each visit with organization, property, optional section, unit, and visitor person belonging to the same organization. Property and section SHALL be derived from the selected unit. The visit SHALL NOT require or store a host person.
 
 #### Scenario: Coherent visit location is persisted
 
 - **GIVEN** unit U belongs to property P and optional section S in organization O
 - **WHEN** an authorized actor creates a visit for U
 - **THEN** the visit stores O, P, S, and U consistently
-- **AND** the visitor and host are `Person` records in O
-
-#### Scenario: Host without active unit relationship is rejected
-
-- **GIVEN** a person has no active ownership or occupancy on unit U
-- **WHEN** that person is submitted as host for U
-- **THEN** the visit is rejected
-- **AND** no record is persisted
+- **AND** the visitor is a `Person` record in O
 
 ### Requirement: Authenticated action actors are Users
 
@@ -33,7 +26,7 @@ The system SHALL use `User` references for `created_by`, `authorized_by`, `check
 - **GIVEN** an authorized user submits a valid visit
 - **WHEN** creation succeeds
 - **THEN** `created_by_id` references that `User`
-- **AND** visitor and host remain `Person` references
+- **AND** the visitor remains a `Person` reference
 
 ### Requirement: Backend resolves initial visit status
 
@@ -275,7 +268,7 @@ The system SHALL provide full detail for `manage_visits` and restricted detail f
 
 - **GIVEN** a user has `view_authorized_visits` but not `manage_visits`
 - **WHEN** operational detail is requested
-- **THEN** the payload includes only visitor, unit, host, status, authorized time, entry/exit, operational actions, and minimal timeline
+- **THEN** the payload includes only visitor, unit, the unit's current authorizers, status, authorized time, entry/exit, operational actions, and minimal timeline
 - **AND** full person profiles and administrative data are omitted
 
 ### Requirement: Backend exposes allowed actions per visit
@@ -310,7 +303,7 @@ The system SHALL provide operational list, admin list, full detail, restricted d
 
 - **GIVEN** check-in or check-out is allowed
 - **WHEN** the confirmation surface opens
-- **THEN** the summary includes visitor, unit, host, current status, relevant timestamps, and allowed actions
+- **THEN** the summary includes visitor, unit, the unit's current authorizers, current status, relevant timestamps, and allowed actions
 
 ### Requirement: Concierge Authorized Visits provides operational workflow
 
@@ -345,18 +338,18 @@ The system SHALL provide scope selection where applicable, filters, search, pagi
 
 ### Requirement: Visit creation includes a live authorization summary
 
-The system SHALL provide the administrative visit form with dependent property/unit/host fields, visitor data, schedule, optional vehicle, notes, and `VisitAuthorizationSummary`.
+The system SHALL provide the administrative visit form with dependent property/unit fields, visitor data, schedule, optional vehicle, notes, and `VisitAuthorizationSummary`.
 
 #### Scenario: Summary mirrors form without persisting
 
 - **GIVEN** an admin is filling the visit form
 - **WHEN** fields change
-- **THEN** the summary updates property, unit, host, visitor, reason, schedule, optional vehicle, and informational status
+- **THEN** the summary updates property, unit, visitor, reason, schedule, optional vehicle, and informational status
 - **AND** the summary does not persist data or determine final status
 
 ### Requirement: Admin visit location step uses searchable selects
 
-The admin visit creation form SHALL use endpoint-backed searchable select controls for the step 1 property, unit, and host fields. These controls SHALL preserve existing selection dependencies: selecting a property loads authorized units, selecting a unit loads eligible hosts and the initial status preview, and changing a parent selection clears dependent selections.
+The admin visit creation form SHALL use endpoint-backed searchable select controls for the step 1 property and unit fields. These controls SHALL preserve existing selection dependencies: selecting a property loads authorized units and changing a parent selection clears dependent selections.
 
 The searchable selects SHALL display only tenant-scoped and authorized options returned by visit form endpoints. Each select SHALL use 20 options as the default page size, support lazy loading more options on scroll, and keep a default selected value visible in the input. The controls SHALL preserve current disabled, loading, empty, validation, clear, and contextual-lock behavior.
 
@@ -387,7 +380,7 @@ The searchable selects SHALL display only tenant-scoped and authorized options r
 
 - **GIVEN** an authorized admin is on step 1 of the admin visit creation form
 - **WHEN** the admin selects property P from the searchable select
-- **THEN** the form clears any previously selected unit and host
+- **THEN** the form clears any previously selected unit
 - **AND** the form loads authorized units for P through the existing unit-loading behavior
 
 #### Scenario: Unit select searches property units
@@ -411,46 +404,24 @@ The searchable selects SHALL display only tenant-scoped and authorized options r
 - **WHEN** the admin opens the unit searchable select without filtering and scrolls near the end
 - **THEN** the next authorized unit page for property P is loaded
 
-#### Scenario: Selecting unit loads hosts and status preview
+#### Scenario: Selecting unit loads status preview
 
 - **GIVEN** an authorized admin is on step 1 with property P selected
 - **WHEN** the admin selects unit U from the searchable select
-- **THEN** the form clears any previously selected host
-- **AND** the form loads eligible hosts for U through the existing host-loading behavior
-- **AND** the form refreshes the initial status preview for U
-
-#### Scenario: Host select searches eligible hosts
-
-- **GIVEN** unit U has loaded eligible host options
-- **WHEN** the admin types into the host searchable select
-- **THEN** the host options are searched by trimmed, case-insensitive, accent-insensitive host name
-- **AND** no ineligible host is shown
-
-#### Scenario: Duplicate host names remain distinguishable
-
-- **GIVEN** two eligible hosts share the same name
-- **AND** the endpoint returns secondary descriptive text for them
-- **WHEN** the host searchable select renders those options
-- **THEN** the options can display secondary text to help the admin distinguish them
-- **AND** searching still matches host name
+- **THEN** the form refreshes the initial status preview for U
 
 #### Scenario: Single option is not auto-selected
 
-- **GIVEN** a property, unit, or host searchable select has exactly one available option
+- **GIVEN** a property or unit searchable select has exactly one available option
 - **WHEN** the options are loaded
 - **THEN** the form does not automatically select that option
 - **AND** the user must explicitly select it
 
 #### Scenario: Clearing parent selections clears dependent values
 
-- **GIVEN** an authorized admin has selected property P, unit U, and host H
+- **GIVEN** an authorized admin has selected property P and unit U
 - **WHEN** the admin clears the property select
-- **THEN** the form clears unit U and host H
-- **AND** the dependent status preview is cleared or reset
-
-- **GIVEN** an authorized admin has selected unit U and host H
-- **WHEN** the admin clears the unit select
-- **THEN** the form clears host H
+- **THEN** the form clears unit U
 - **AND** the dependent status preview is cleared or reset
 
 #### Scenario: Contextual creation keeps property and unit locked
@@ -459,11 +430,10 @@ The searchable selects SHALL display only tenant-scoped and authorized options r
 - **WHEN** step 1 renders
 - **THEN** the property and unit searchable selects show the contextual values
 - **AND** those controls remain locked according to the existing contextual create behavior
-- **AND** the host searchable select remains usable after eligible hosts load
 
 #### Scenario: Default values remain visible before their option page loads
 
-- **GIVEN** the visit form opens with a contextual or restored property, unit, or host value
+- **GIVEN** the visit form opens with a contextual or restored property or unit value
 - **WHEN** the corresponding searchable select renders before that value appears in the loaded option page
 - **THEN** the selected value's label is still visible in the input
 - **AND** the selected value is not cleared
@@ -544,3 +514,116 @@ The system SHALL source visible labels, statuses, actions, validation feedback, 
 - **GIVEN** a supported locale is active
 - **WHEN** a visit page, drawer, modal, dropdown, or error is rendered
 - **THEN** visible text uses the locale catalog
+
+### Requirement: Visit creation notifies unit authorizers
+
+When an administrative visit is created for a unit, the system SHALL create a push `Notification` for each active resident authorizer of that unit (an active `UnitOccupancy` with `can_authorize_visits` true), so that residents who can authorize entry are informed a visit was scheduled for their unit.
+
+#### Scenario: Visit creation notifies the unit's active authorizers
+
+- **GIVEN** unit U has one or more active `UnitOccupancy` records with `can_authorize_visits: true`
+- **WHEN** an authorized admin creates a visit for U
+- **THEN** the system creates one push `Notification` per active authorizing resident of U
+- **AND** each `Notification` references the created visit as its notifiable record
+
+#### Scenario: Residents of other units are not notified
+
+- **GIVEN** unit U belongs to residential property P, which contains other units
+- **AND** those other units have their own active resident authorizers
+- **WHEN** an authorized admin creates a visit for U
+- **THEN** residents of units other than U do not receive a notification for this visit
+
+#### Scenario: Unit with no active authorizer produces no notification
+
+- **GIVEN** unit U has no active `UnitOccupancy` with `can_authorize_visits: true`
+- **WHEN** an authorized admin creates a visit for U
+- **THEN** the system creates no `Notification` records for this visit
+
+#### Scenario: Notification delivery does not affect visit creation outcome
+
+- **GIVEN** an authorized admin creates a valid visit for a unit with active authorizers
+- **WHEN** push delivery to those authorizers' devices fails or is delayed
+- **THEN** the visit is still created and returned as successful
+
+### Requirement: Visit tracks aggregate notification delivery status
+
+The system SHALL track, on the visit itself, whether its resident-notification attempt succeeded, failed, or had no one to reach, so an admin can see the outcome without inspecting individual `Notification` records.
+
+#### Scenario: No active authorizer for the unit
+
+- **GIVEN** a visit is created for a unit with no active resident authorizer
+- **WHEN** notification processing completes
+- **THEN** the visit's notification status is `no_recipients`
+
+#### Scenario: Authorizers exist but none has a registered device
+
+- **GIVEN** a visit is created for a unit whose active authorizers have no registered device token
+- **WHEN** notification processing completes
+- **THEN** the visit's notification status is `no_recipients`
+- **AND** no push delivery attempt is recorded as having been made
+
+#### Scenario: At least one delivery succeeds
+
+- **GIVEN** a visit's unit has multiple active authorizers with registered device tokens
+- **WHEN** at least one of those deliveries succeeds, regardless of the others
+- **THEN** the visit's notification status is `delivered`
+
+#### Scenario: All delivery attempts fail
+
+- **GIVEN** a visit's unit has one or more active authorizers with registered device tokens
+- **WHEN** every delivery attempt to those tokens fails
+- **THEN** the visit's notification status is `failed`
+
+### Requirement: Admin can manually resend a failed visit notification
+
+The system SHALL allow an authorized admin to manually resend the notification for a visit whose notification status is `failed`, retrying delivery to the same residents originally targeted. The resend action SHALL NOT be available for any other notification status.
+
+#### Scenario: Admin resends a failed notification
+
+- **GIVEN** a visit's notification status is `failed`
+- **WHEN** an authorized admin triggers the resend action
+- **THEN** the system retries delivery to the same residents from the original notification attempt
+- **AND** the visit's notification status returns to `pending` while the retry is in flight
+
+#### Scenario: Resend targets the original residents, not currently active ones
+
+- **GIVEN** a visit's notification status is `failed`
+- **AND** the unit's active resident authorizers have changed since the visit was created
+- **WHEN** an authorized admin triggers the resend action
+- **THEN** the system retries delivery only to the residents from the original notification attempt
+
+#### Scenario: Resend is unavailable when there was no one to notify
+
+- **GIVEN** a visit's notification status is `no_recipients`
+- **WHEN** an admin views the visit
+- **THEN** the resend action is not available
+
+#### Scenario: Resend is unavailable once delivered
+
+- **GIVEN** a visit's notification status is `delivered`
+- **WHEN** an admin views the visit
+- **THEN** the resend action is not available
+
+### Requirement: Visit views display the unit's current authorizers instead of a single host
+
+The system SHALL display, wherever a visit's "host" was previously shown, the unit's current list of active residents with `can_authorize_visits: true` ("authorizers"), computed live from `UnitOccupancy.active_authorizers_for(unit)` — not a value persisted on the visit itself.
+
+#### Scenario: Admin visit detail shows current unit authorizers
+
+- **GIVEN** unit U has one or more active residents with `can_authorize_visits: true`
+- **WHEN** an admin views a visit for U
+- **THEN** the detail payload includes the current list of U's authorizers (id and display name)
+
+#### Scenario: Unit with no active authorizer shows an empty list, not an error
+
+- **GIVEN** unit U has no active resident with `can_authorize_visits: true`
+- **WHEN** a visit for U is serialized for admin or concierge views
+- **THEN** the authorizers list is empty
+- **AND** serialization does not fail
+
+#### Scenario: Authorizers list reflects current occupancy, not a historical snapshot
+
+- **GIVEN** a visit was created for unit U when resident A was its only authorizer
+- **AND** resident A's authorization has since ended and resident B's has begun
+- **WHEN** that visit is viewed today
+- **THEN** the displayed authorizers list shows resident B, not resident A

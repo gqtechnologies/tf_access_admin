@@ -4,6 +4,7 @@ require "test_helper"
 
 class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
   include InertiaTestHelper
+  include ActionMailer::TestHelper
 
   setup do
     @organization = organizations(:one)
@@ -269,10 +270,131 @@ class Admin::PeopleControllerTest < ActionDispatch::IntegrationTest
     assert inertia_props["ownerships"].all? { |row| row["unit_identifier"].present? }
   end
 
+  test "index exposes invitation_status per person" do
+    sign_in_as(@tenant_admin)
+
+    inertia_get admin_people_path
+
+    person_row = inertia_props["people"].find { |row| row["id"] == @person.id }
+    assert_equal "not_invited", person_row["invitation_status"]
+  end
+
+  test "index reports pending invitation status" do
+    OnboardingRequest.create!(
+      organization: @organization, person: @person,
+      requested_relationship: OnboardingRequest::RELATIONSHIP_MEMBERSHIP,
+      status: OnboardingRequest::STATUS_PENDING, expires_at: 7.days.from_now
+    )
+
+    sign_in_as(@tenant_admin)
+    inertia_get admin_people_path
+
+    person_row = inertia_props["people"].find { |row| row["id"] == @person.id }
+    assert_equal "pending", person_row["invitation_status"]
+  end
+
+  test "create with send_invitation sends an invitation for the new person" do
+    sign_in_as(@tenant_admin)
+
+    assert_enqueued_emails 1 do
+      post admin_people_path, params: {
+        person: {
+          first_name: "Invite", last_name: "Me", document_number: "22.222.222-2",
+          email: "invite-on-create@example.test", send_invitation: true
+        }
+      }
+    end
+
+    person = Person.find_by(document_number_digest: Person.document_digest("22222222-2"))
+    assert person.present?
+    assert_equal 1, person.onboarding_requests.pending.count
+  end
+
+  test "create without send_invitation does not send an invitation" do
+    sign_in_as(@tenant_admin)
+
+    assert_no_enqueued_emails do
+      post admin_people_path, params: {
+        person: { first_name: "No", last_name: "Invite", email: "no-invite-on-create@example.test" }
+      }
+    end
+  end
+
+  test "invite sends an invitation to an existing not-yet-invited person" do
+    sign_in_as(@tenant_admin)
+    @person.contact_email = "invite-existing@example.test"
+    @person.save!
+
+    assert_enqueued_emails 1 do
+      post invite_admin_person_path(@person)
+    end
+
+    assert_redirected_to admin_people_path
+    assert_equal 1, @person.reload.onboarding_requests.pending.count
+  end
+
+  test "invite audits the actor and does not leak the token or document" do
+    sign_in_as(@tenant_admin)
+    @person.contact_email = "invite-audited@example.test"
+    @person.save!
+
+    post invite_admin_person_path(@person)
+
+    onboarding_request = @person.reload.onboarding_requests.pending.last
+    audit = onboarding_request.audits.last
+
+    assert_equal @tenant_admin, audit.user
+    assert_equal "create", audit.action
+    assert_equal @organization.id, audit.organization_id
+    assert_equal OnboardingRequest::STATUS_PENDING, audit.audited_changes["status"]
+    refute audit.audited_changes.key?("token_digest")
+    refute audit.audited_changes.to_s.include?(@person.document_number)
+  end
+
+  test "invite on an already-invited person redirects with a renderable error and sends no email" do
+    OnboardingRequest.create!(
+      organization: @organization, person: @person,
+      requested_relationship: OnboardingRequest::RELATIONSHIP_MEMBERSHIP,
+      status: OnboardingRequest::STATUS_PENDING, expires_at: 7.days.from_now
+    )
+
+    sign_in_as(@tenant_admin)
+
+    assert_no_enqueued_emails do
+      post invite_admin_person_path(@person)
+    end
+
+    assert_redirected_to admin_people_path
+    error_text = I18n.t("frontend.admin.people.errors.already_invited")
+    refute_match(/translation missing/, error_text)
+  end
+
+  test "invite on a person without an email redirects with a renderable error and sends no email" do
+    sign_in_as(@tenant_admin)
+    assert_nil @person.contact_email
+
+    assert_no_enqueued_emails do
+      post invite_admin_person_path(@person)
+    end
+
+    assert_redirected_to admin_people_path
+    assert_equal 0, @person.reload.onboarding_requests.count
+    error_text = I18n.t("frontend.admin.people.errors.missing_email")
+    refute_match(/translation missing/, error_text)
+  end
+
+  test "non-manager cannot invite a person" do
+    sign_in_as(@non_admin)
+
+    assert_no_enqueued_emails do
+      post invite_admin_person_path(@person)
+    end
+  end
+
   private
 
   def sign_in_as(user)
     host! "#{@organization.subdomain}.example.com"
-    post user_session_path, params: { user: { email: user.email, password: "password1" } }
+    post user_session_path, params: { user: { email: user.email, password: "Password1@" } }
   end
 end

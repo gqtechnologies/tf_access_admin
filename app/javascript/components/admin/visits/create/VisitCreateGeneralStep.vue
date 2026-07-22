@@ -41,26 +41,6 @@
         />
         <FieldError v-if="fieldErrors.unit_id" :errors="translateErrors([fieldErrors.unit_id])" />
       </Field>
-
-      <Field class="md:col-span-2">
-        <FieldLabel for="visit-host">{{ t('admin.visits.new.general.fields.host') }}</FieldLabel>
-        <AsyncSearchableSelect
-          id="visit-host"
-          :key="`host-${form.unit_id}`"
-          v-model="form.host_person_id"
-          :load-options="loadHosts"
-          :selected-option="hostSelectedOption"
-          :placeholder="t('admin.visits.new.general.placeholders.host')"
-          :empty-text="t('admin.visits.new.general.empty.hosts')"
-          :disabled="!form.unit_id"
-          :invalid="!!fieldErrors.host_person_id"
-          @option-selected="onHostSelected"
-        />
-        <FieldError
-          v-if="fieldErrors.host_person_id"
-          :errors="translateErrors([fieldErrors.host_person_id])"
-        />
-      </Field>
     </FieldGroup>
   </div>
 </template>
@@ -101,12 +81,6 @@ const propertySelectedOption = computed<SearchableSelectOption | null>(() =>
 
 const unitSelectedOption = computed<SearchableSelectOption | null>(() =>
   form.value.unit_id ? { value: form.value.unit_id, label: form.value.unit_label } : null,
-)
-
-const hostSelectedOption = computed<SearchableSelectOption | null>(() =>
-  form.value.host_person_id
-    ? { value: form.value.host_person_id, label: form.value.host_display_name }
-    : null,
 )
 
 const loadProperties: SearchableSelectLoader = async ({ query, page }) => {
@@ -151,39 +125,12 @@ const loadUnits: SearchableSelectLoader = async ({ query, page }) => {
   }
 }
 
-const loadHosts: SearchableSelectLoader = async ({ query, page }) => {
-  if (!form.value.unit_id) return { options: [], hasMore: false }
-
-  const params = new URLSearchParams({ page: String(page), unit_id: form.value.unit_id })
-  if (query) params.set('search', query)
-
-  const { res, data } = await railsFetchJson<{
-    hosts: { id: string; display_name: string; document_number?: string | null }[]
-    pagination: { has_more: boolean }
-  }>('GET', `/admin/visits/form_hosts?${params.toString()}`)
-
-  if (!res.ok) throw new Error('form_hosts_failed')
-
-  return {
-    options: data.hosts.map((host) => ({
-      value: host.id,
-      label: host.display_name,
-      description: host.document_number ?? undefined,
-    })),
-    hasMore: data.pagination.has_more,
-  }
-}
-
 function onPropertySelected(option: SearchableSelectOption | null) {
   form.value.residential_property_name = option?.label ?? ''
 }
 
 function onUnitSelected(option: SearchableSelectOption | null) {
   form.value.unit_label = option?.label ?? ''
-}
-
-function onHostSelected(option: SearchableSelectOption | null) {
-  form.value.host_display_name = option?.label ?? ''
 }
 
 watch(
@@ -193,8 +140,6 @@ watch(
     if (propertyId === previousPropertyId) return
     form.value.unit_id = ''
     form.value.unit_label = ''
-    form.value.host_person_id = ''
-    form.value.host_display_name = ''
     emit('property-change', String(propertyId ?? ''))
   },
 )
@@ -204,8 +149,6 @@ watch(
   (unitId, previousUnitId) => {
     if (lockPropertyUnit.value) return
     if (unitId === previousUnitId) return
-    form.value.host_person_id = ''
-    form.value.host_display_name = ''
     emit('unit-change', String(unitId ?? ''))
   },
 )

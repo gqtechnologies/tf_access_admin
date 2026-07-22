@@ -27,7 +27,7 @@ export function useAdminVisitsList(initialScope: AdminVisitScope = 'organization
     const q: Record<string, string> = {}
 
     if (query.search.trim()) {
-      q.visitor_person_display_name_or_host_person_display_name_or_unit_identifier_cont = query.search.trim()
+      q.visitor_person_display_name_or_unit_identifier_cont = query.search.trim()
     }
     if (query.propertyId) q.residential_property_id_eq = query.propertyId
     if (query.unitId) q.unit_id_eq = query.unitId

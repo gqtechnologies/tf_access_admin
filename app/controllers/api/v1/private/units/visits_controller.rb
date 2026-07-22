@@ -18,7 +18,7 @@
 #
 # NOT accepted from client (resolved in backend):
 #   organization_id, residential_property_id, property_section_id,
-#   host_person_id, created_by_id, authorized_by_id, status
+#   created_by_id, authorized_by_id, status
 class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseController
   before_action :load_unit
   before_action :authorize_resident!
@@ -26,7 +26,6 @@ class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseControll
   def create
     visit = Residents::CreateAuthorizedVisit.call(
       unit:           @unit,
-      host_person:    @visit_context.host_person,
       visitor_params: visit_params[:visitor],
       scheduled_at:   visit_params[:scheduled_at],
       actor:          current_user

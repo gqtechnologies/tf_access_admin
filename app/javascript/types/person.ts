@@ -18,10 +18,6 @@ export type Person = {
   role?: string
   tenant_role?: string
   contextual_roles?: PersonContextualRole[]
-}
-
-export type LinkableUser = {
-  id: string
-  name: string
-  email: string
+  invitation_status?: 'linked' | 'pending' | 'not_invited'
+  pending_onboarding_request_id?: string | null
 }

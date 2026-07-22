@@ -44,6 +44,34 @@
           </span>
         </ListItem>
         <ListItem
+          v-if="row.invitation_status === 'not_invited' && row.email"
+          as="confirm"
+          :onClick="() => invitePerson(row.id as string)"
+          :confirmTitle="t('admin.people.index.actions.invite')"
+          :confirmDescription="
+            t('admin.people.index.actions.invite_description', { name: row.display_name })
+          "
+        >
+          <span class="flex items-center gap-2">
+            <SendIcon class="w-4 h-4" />
+            {{ t('admin.people.index.actions.invite') }}
+          </span>
+        </ListItem>
+        <ListItem
+          v-else-if="row.invitation_status === 'pending' && row.pending_onboarding_request_id"
+          as="confirm"
+          :onClick="() => revokeInvitation(row.pending_onboarding_request_id as string)"
+          :confirmTitle="t('admin.people.index.actions.revoke_invite')"
+          :confirmDescription="
+            t('admin.people.index.actions.revoke_invite_description', { name: row.display_name })
+          "
+        >
+          <span class="flex items-center gap-2 text-destructive">
+            <BanIcon class="w-4 h-4" />
+            {{ t('admin.people.index.actions.revoke_invite') }}
+          </span>
+        </ListItem>
+        <ListItem
           as="confirm"
           :onClick="() => deletePerson(row.id as string)"
           :confirmTitle="t('admin.people.index.actions.delete')"
@@ -83,9 +111,15 @@ import { useTable } from '@/lib/composables/useTable'
 import { useI18n } from 'vue-i18n'
 import type { ColumnDef } from '@/types/table'
 import { Button } from '@/components/ui/button'
-import { PlusIcon, SearchIcon, PencilIcon, TrashIcon, EyeIcon, UploadIcon } from 'lucide-vue-next'
+import { PlusIcon, SearchIcon, PencilIcon, TrashIcon, EyeIcon, UploadIcon, SendIcon, BanIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
-import { new_admin_person_path, admin_person_path, edit_admin_person_path } from '@/routes'
+import {
+  new_admin_person_path,
+  admin_person_path,
+  edit_admin_person_path,
+  invite_admin_person_path,
+  revoke_admin_onboarding_request_path,
+} from '@/routes'
 import ListItem from '@/components/custom/list/ListItem.vue'
 import Header from '@/components/admin/layout/Header.vue'
 import PersonContextualRoleBadges from '@/components/admin/person/PersonContextualRoleBadges.vue'
@@ -150,10 +184,8 @@ watch(
 )
 
 onMounted(() => {
-  if (props.errors) {
-    const firstError = props.errors[0]
-    if (firstError) toast.error(firstError)
-  }
+  const baseError = props.errors?.base?.[0]
+  if (baseError) toast.error(t(baseError))
 })
 
 const columns: ColumnDef<Person, unknown>[] = [
@@ -202,12 +234,50 @@ const columns: ColumnDef<Person, unknown>[] = [
     header: () => t('admin.people.index.table.headers.unit_ownerships_count'),
     cell: ({ getValue }) => h('span', (getValue() as number).toString()),
   },
+  {
+    accessorKey: 'invitation_status',
+    header: () => t('admin.people.index.table.headers.invitation_status'),
+    cell: ({ row }) => {
+      const status = row.original.invitation_status
+      if (!status) return h('span', '—')
+
+      const label = t(`admin.people.index.invitation_statuses.${status}`)
+      if (status === 'not_invited' && !row.original.email) {
+        return h('span', [
+          label,
+          h('span', { class: 'block text-xs text-muted-foreground' }, t('admin.people.index.invitation_statuses.no_email_hint')),
+        ])
+      }
+      return h('span', label)
+    },
+  },
 ]
 
 const deletePerson = (id: string) => {
   router.delete(admin_person_path(id), {
     onSuccess: () => toast.success(t('admin.people.index.actions.delete_success')),
     onError: () => toast.error(t('admin.people.index.actions.delete_error')),
+  })
+}
+
+const invitePerson = (id: string) => {
+  // The controller redirects here even when the invite fails (AlreadyInvited),
+  // sharing the error via `errors.base` (shown by the onMounted handler above)
+  // rather than a validation re-render — so onSuccess always fires and must
+  // not unconditionally claim success (same reasoning as onboarding invite
+  // conflicts). The updated "Invitation sent" status in the table is the
+  // real success signal.
+  router.post(invite_admin_person_path(id), undefined, {
+    preserveScroll: true,
+    onError: () => toast.error(t('admin.people.index.actions.invite_error')),
+  })
+}
+
+const revokeInvitation = (onboardingRequestId: string) => {
+  router.post(revoke_admin_onboarding_request_path(onboardingRequestId), undefined, {
+    preserveScroll: true,
+    onSuccess: () => toast.success(t('admin.people.index.actions.revoke_invite_success')),
+    onError: () => toast.error(t('admin.people.index.actions.revoke_invite_error')),
   })
 }
 

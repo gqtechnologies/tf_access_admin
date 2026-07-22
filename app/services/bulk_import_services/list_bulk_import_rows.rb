@@ -102,6 +102,14 @@ module BulkImportServices
         skipped_rows: bulk_import.skipped_rows,
         duplicate_rows: bulk_import.rows.where(
           validation_status: BulkImportRow::VALIDATION_STATUSES[:duplicate]
+        ).count,
+        pending_invitation_rows: bulk_import.rows.where(
+          onboarding_classification: BulkImportRow::ONBOARDING_CLASSIFICATIONS[:requires_invitation],
+          target_record_id: nil
+        ).count,
+        pending_incorporation_rows: bulk_import.rows.where(
+          onboarding_classification: BulkImportRow::ONBOARDING_CLASSIFICATIONS[:requires_incorporation],
+          target_record_id: nil
         ).count
       }
     end

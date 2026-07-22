@@ -36,6 +36,10 @@ class BulkImportPolicy < ApplicationPolicy
     update?
   end
 
+  def trigger_invitations?
+    update?
+  end
+
   class Scope < ApplicationPolicy::Scope
     include PolicyScopeAuthorization
 

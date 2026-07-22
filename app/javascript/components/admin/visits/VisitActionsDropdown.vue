@@ -60,6 +60,21 @@
           </div>
         </ConfirmDialog>
       </DropdownMenuItem>
+      <DropdownMenuItem
+        v-if="'resend_notification' in visit.permissions && visit.permissions.resend_notification"
+        @select.prevent
+      >
+        <ConfirmDialog
+          :title="t('admin.visits.actions.resend_notification_confirm_title')"
+          :description="t('admin.visits.actions.resend_notification_confirm_description')"
+          :on-confirm="resendNotification"
+        >
+          <div class="flex w-full cursor-pointer items-center gap-2">
+            <BellRing class="size-4" />
+            {{ t('admin.visits.actions.resend_notification') }}
+          </div>
+        </ConfirmDialog>
+      </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
@@ -67,7 +82,7 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3'
 import { useI18n } from 'vue-i18n'
-import { Ban, EllipsisVertical, Eye, LogIn, LogOut, Pencil, ShieldCheck } from 'lucide-vue-next'
+import { Ban, BellRing, EllipsisVertical, Eye, LogIn, LogOut, Pencil, ShieldCheck } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/custom/dialogs/ConfirmDialog.vue'
 import { Button } from '@/components/ui/button'
 import {
@@ -76,7 +91,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { admin_visit_path, authorize_admin_visit_path, cancel_admin_visit_path, edit_admin_visit_path } from '@/routes'
+import {
+  admin_visit_path,
+  authorize_admin_visit_path,
+  cancel_admin_visit_path,
+  edit_admin_visit_path,
+  resend_notification_admin_visit_path,
+} from '@/routes'
 import type { AdminVisitListItem, AdminVisitShowItem } from '@/types/visit'
 
 const props = withDefaults(
@@ -107,6 +128,12 @@ function authorizeVisit() {
 
 function cancelVisit() {
   router.delete(cancel_admin_visit_path(props.visit.id), {
+    onSuccess: () => emit('success'),
+  })
+}
+
+function resendNotification() {
+  router.post(resend_notification_admin_visit_path(props.visit.id), {}, {
     onSuccess: () => emit('success'),
   })
 }
