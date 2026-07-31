@@ -38,6 +38,6 @@
   "scripts": {
     "check": "vue-tsc -p tsconfig.app.json && tsc -p tsconfig.node.json",
     "shadcn": "npx shadcn-vue@latest",
-    "build": "vite build"
+    "build:vite": "vite build"
   }
 }
