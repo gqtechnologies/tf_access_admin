@@ -2504,6 +2504,7 @@ pt:
       token_dispatch_failed: "Erro ao enviar o token"
       invalid_credentials: "Credenciais inválidas"
       unconfirmed_account: "Conta não confirmada"
+      account_deactivated: "Conta desativada"
       token_expired: "Token expirado"
       token_invalid: "Token inválido"
     visits:

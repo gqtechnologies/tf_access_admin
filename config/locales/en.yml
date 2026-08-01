@@ -2560,6 +2560,7 @@ en:
       token_dispatch_failed: "Failed to dispatch token"
       invalid_credentials: "Invalid credentials"
       unconfirmed_account: "Account not confirmed"
+      account_deactivated: "Account deactivated"
       token_expired: "Token expired"
       token_invalid: "Token invalid"
     visits:

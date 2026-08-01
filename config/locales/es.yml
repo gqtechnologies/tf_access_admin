@@ -2551,6 +2551,7 @@ es:
       token_dispatch_failed: "Error al generar el token"
       invalid_credentials: "Credenciales inválidas"
       unconfirmed_account: "Cuenta no confirmada"
+      account_deactivated: "Cuenta desactivada"
       token_expired: "Token expirado"
       token_invalid: "Token inválido"
     visits:
