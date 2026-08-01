@@ -73,6 +73,7 @@ class ApplicationController < ActionController::Base
       path.start_with?("/rails/") || # ActiveStorage, etc.
       path.start_with?("/assets/") ||
       path.start_with?("/vite-dev/") ||
+      path.start_with?("/admin") ||
       path == home_path
     # path == "/up" ||
     # path.start_with?("#{home_path}/") ||
