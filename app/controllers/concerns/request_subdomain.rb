@@ -6,7 +6,7 @@ module RequestSubdomain
     if Rails.env.development? && host.end_with?(".localhost")
       host.remove(".localhost")
     else
-      request.subdomain.presence
+      request.subdomains.first.presence
     end
   end
 
