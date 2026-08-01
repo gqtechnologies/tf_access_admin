@@ -37,6 +37,7 @@ Rails.application.routes.draw do
         end
 
         get :me, to: "me#show"
+        patch :me, to: "me#update"
 
         resources :units, only: [ :index ] do
           resources :visits, only: [ :create ], module: :units

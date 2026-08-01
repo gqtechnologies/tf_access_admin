@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_17_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_01_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -1013,14 +1013,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_17_000001) do
     t.datetime "created_at", null: false
     t.datetime "deactivated_at"
     t.datetime "deleted_at"
+    t.date "date_of_birth"
     t.string "dni"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.string "gender"
     t.string "global_status", default: "active", null: false
     t.string "language"
     t.datetime "last_active_at"
     t.jsonb "metadata", default: {}, null: false
     t.string "name"
+    t.string "phone_country_code"
+    t.string "phone_number"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"

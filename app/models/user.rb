@@ -8,16 +8,20 @@
 #  confirmation_sent_at   :datetime
 #  confirmation_token     :string
 #  confirmed_at           :datetime
+#  date_of_birth          :date
 #  deactivated_at         :datetime
 #  deleted_at             :datetime
 #  dni                    :string
 #  email                  :string           default(""), not null
 #  encrypted_password     :string           default(""), not null
+#  gender                 :string
 #  global_status          :string           default("active"), not null
 #  language               :string
 #  last_active_at         :datetime
 #  metadata               :jsonb            not null
 #  name                   :string
+#  phone_country_code     :string
+#  phone_number           :string
 #  remember_created_at    :datetime
 #  reset_password_sent_at :datetime
 #  reset_password_token   :string
@@ -64,6 +68,7 @@ class User < ApplicationRecord
   validates :dni, presence: true
   validates :language, presence: true, inclusion: { in: Languages::ALL }
   validates :email, uniqueness: { message: "admin.users.validations.email_taken" }
+  validates :gender, inclusion: { in: %w[female male other prefer_not_to_say] }, allow_nil: true
   validate :password_meets_complexity
 
   devise :database_authenticatable,
