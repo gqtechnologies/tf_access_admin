@@ -26,7 +26,8 @@ class Api::V1::Mobile::MeController < Api::V1::Mobile::BaseController
       dni: current_user.dni,
       phone: phone,
       dateOfBirth: current_user.date_of_birth&.iso8601,
-      gender: current_user.gender
+      gender: current_user.gender,
+      avatarUrl: current_user.avatar_path
     }
   end
 
