@@ -75,8 +75,10 @@ class Api::V1::Mobile::UnitsControllerTest < ActionDispatch::IntegrationTest
     other_unit = ActsAsTenant.with_tenant(@other_org) do
       other_property = create_property(@other_org, "Mobile Units Other Org Property")
       unit = create_unit(other_property, "MU-OO-201")
+      # The resolver only grants resident capabilities to organization members,
+      # so provision the identity (Person + accepted membership) like the app does.
       person = @resident.person_for(@other_org) ||
-        Person.create!(organization: @other_org, display_name: @resident.name, user: @resident, person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE)
+        Accounts::ProvisionTenantIdentity.call(user: @resident, organization: @other_org)
       UnitOccupancy.create!(
         organization: @other_org,
         person: person,
