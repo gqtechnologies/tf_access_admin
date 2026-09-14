@@ -9,12 +9,15 @@ local:
 # Credentials, region, and bucket all come from ENV — not Rails credentials,
 # not hardcoded, since they differ per deploy target (see .env.example:
 # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, AWS_S3_BUCKET).
+# Outside the test environment a missing variable fails fast at boot; tests use
+# the :test service and never touch S3, so they boot without these variables.
+<% aws = ->(key) { Rails.env.test? ? ENV.fetch(key, nil) : ENV.fetch(key) } %>
 amazon:
   service: S3
-  access_key_id: <%= ENV.fetch("AWS_ACCESS_KEY_ID", nil) %>
-  secret_access_key: <%= ENV.fetch("AWS_SECRET_ACCESS_KEY", nil) %>
-  region: <%= ENV.fetch("AWS_REGION", nil) %>
-  bucket: <%= ENV.fetch("AWS_S3_BUCKET", nil) %>
+  access_key_id: <%= aws.("AWS_ACCESS_KEY_ID") %>
+  secret_access_key: <%= aws.("AWS_SECRET_ACCESS_KEY") %>
+  region: <%= aws.("AWS_REGION") %>
+  bucket: <%= aws.("AWS_S3_BUCKET") %>
 
 # Remember not to checkin your GCS keyfile to a repository
 # google:
