@@ -287,3 +287,47 @@ expo:
 ```
 
 Si no está definido, las peticiones se envían sin `Authorization`.
+
+## Despliegue en Dokploy (imagen desde GHCR)
+
+El servidor de Dokploy **no construye la imagen**: la construye GitHub Actions
+(`.github/workflows/deploy-production.yml`) en cada push a `main` o tag `v*`,
+la publica en `ghcr.io/gqtechnologies/tf_access_admin` (`:production` y
+`:main-<sha>` o `:vX.Y.Z`) y luego llama a la API de Dokploy para desplegar.
+Construir en el servidor con "Build Type: Dockerfile" requiere más de 4 GB de
+RAM (Vite + `assets:precompile` + gems nativas) y tumba el host.
+
+### Secrets del repositorio (GitHub → Settings → Secrets)
+
+| Secret | Uso |
+|---|---|
+| `DOKPLOY_URL` | URL base del panel, p. ej. `https://dokploy.midominio.cl` |
+| `DOKPLOY_API_KEY` | Token de API generado en Dokploy (perfil → API keys) |
+| `DOKPLOY_APPLICATION_ID` | Id de la aplicación web en Dokploy |
+| `GHCR_DELETE_TOKEN` | PAT con `delete:packages` para limpiar versiones viejas |
+
+### Aplicación web en Dokploy
+
+1. Provider: pestaña **Docker**, imagen `ghcr.io/gqtechnologies/tf_access_admin:production`.
+   Si el paquete es privado, registrar `ghcr.io` con un PAT `read:packages`.
+2. Variables de entorno mínimas: `RAILS_MASTER_KEY` (o `SECRET_KEY_BASE`),
+   `DATABASE_URL`, `REDIS_URL`, `APP_HOST`, `APP_PROTOCOL=https`,
+   `RAILS_SERVE_STATIC_FILES=true`, `RAILS_LOG_TO_STDOUT=true`,
+   `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`,
+   `MAILGUN_FROM_ADDRESS` más las credenciales SMTP del proveedor de correo.
+   Opcionales: `FCM_PROJECT_ID`, `EXPO_PUSH_BASE_URL` (dejar sin definir en producción).
+3. Puerto expuesto por el contenedor: `80` (Thruster).
+
+### Redis y worker de Sidekiq (obligatorios para correos y push)
+
+`config/environments/production.rb` usa `queue_adapter = :sidekiq`, así que
+todo `deliver_later` / `perform_later` necesita un proceso worker:
+
+1. Crear en Dokploy un servicio **Redis** (Databases → Redis) y copiar su URL
+   interna a `REDIS_URL` de la aplicación web y del worker.
+2. Crear una segunda aplicación **worker** con la misma imagen
+   `ghcr.io/gqtechnologies/tf_access_admin:production`, las mismas variables y
+   el comando de arranque `bundle exec sidekiq`. Sin puerto ni dominio.
+3. El workflow solo redespliega la aplicación web; para que el worker tome la
+   imagen nueva, agregar un segundo `curl` al workflow con su `applicationId`
+   (o activar "auto deploy" por webhook de registro en Dokploy).
