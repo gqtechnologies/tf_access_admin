@@ -11,4 +11,14 @@ export default defineConfig({
     RubyPlugin(),
     tsconfigPaths(),
   ],
+  build: {
+    // Keep the production build lean in memory: no sourcemaps, no gzip size
+    // report (it re-reads every chunk), and let Rollup process fewer files in
+    // parallel. Rendering chunks was the step that OOM-killed small builders.
+    sourcemap: false,
+    reportCompressedSize: false,
+    rollupOptions: {
+      maxParallelFileOps: 2,
+    },
+  },
 })
