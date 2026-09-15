@@ -2,6 +2,8 @@ name: Deploy production
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
 
@@ -24,7 +26,12 @@ jobs:
         id: image
         run: |
           IMAGE_NAME_LOWER=$(echo "${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')
-          VERSION="${GITHUB_REF_NAME}"
+          # Tags deploy as their name (v1.2.0); pushes to main as main-<short sha>.
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME}"
+          else
+            VERSION="main-${GITHUB_SHA::7}"
+          fi
 
           echo "name=${IMAGE_NAME_LOWER}" >> "$GITHUB_OUTPUT"
           echo "package=$(basename "${IMAGE_NAME_LOWER}")" >> "$GITHUB_OUTPUT"
