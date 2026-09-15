@@ -10,6 +10,7 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.6
 ARG NODE_VERSION=22
+ARG NODE_MAX_OLD_SPACE_SIZE=1536
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -33,6 +34,7 @@ ENV RAILS_ENV="production" \
 FROM base AS build
 
 ARG NODE_VERSION
+ARG NODE_MAX_OLD_SPACE_SIZE
 # Install packages needed to build gems
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libyaml-dev libpq-dev pkg-config && \
@@ -76,7 +78,10 @@ RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
 # js-routes is gitignored; generate it before Vite compiles (assets:precompile).
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+# NODE_OPTIONS caps the V8 heap so Vite fails fast instead of being OOM-killed
+# on small builders; raise the value if the host has more RAM.
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails js:routes && \
+    NODE_OPTIONS="--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE:-1536}" \
     SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 
