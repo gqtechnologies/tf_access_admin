@@ -2,10 +2,11 @@
 
 # Idempotent seed data. Safe to run repeatedly with `bin/rails db:seed`.
 #
-# Creates (or updates) one organization with a tenant admin, one resident who
-# can invite visitors to unit 101 of a demo building, one concierge assigned to
-# that building, and a set of demo visits for today in every status the mobile
-# app handles (pending, authorized, inside, exited). Everything can be
+# Creates (or updates) one organization with a tenant admin, a demo building
+# with unit 101, an owner and a tenant resident who can both invite visitors to
+# that unit, one concierge assigned to the building, one visitor with an
+# account, and a set of demo visits for today in every status the mobile app
+# handles (pending, authorized, inside, exited). Everything can be
 # overridden through environment variables so the same seed serves local
 # development and a manual smoke test in staging/production:
 #
@@ -37,13 +38,20 @@ admin_password     = ENV["SEED_ADMIN_PASSWORD"].presence || (development ? "Admi
 resident_password  = ENV["SEED_RESIDENT_PASSWORD"].presence || (development ? "Resident1@" : nil)
 concierge_email    = ENV.fetch("SEED_CONCIERGE_EMAIL", "conserje.prueba@gmail.com")
 concierge_password = ENV["SEED_CONCIERGE_PASSWORD"].presence || (development ? "Conserje1@" : nil)
-# Receives the real invitation emails (authorize / resend from the app): point
-# it at an inbox you can read.
+owner_email        = ENV.fetch("SEED_OWNER_EMAIL", "dueno.prueba@gmail.com")
+owner_password     = ENV["SEED_OWNER_PASSWORD"].presence || (development ? "Dueno1234@" : nil)
+# The visitor account also receives the real invitation emails (authorize /
+# resend from the app): point it at an inbox you can read.
 visitor_email      = ENV.fetch("SEED_VISITOR_EMAIL", "visitante.prueba@gmail.com")
+visitor_password   = ENV["SEED_VISITOR_PASSWORD"].presence || (development ? "Visita1234@" : nil)
 
-if admin_password.blank? || resident_password.blank? || concierge_password.blank?
-  abort "Seeds aborted: set SEED_ADMIN_PASSWORD, SEED_RESIDENT_PASSWORD and SEED_CONCIERGE_PASSWORD outside development."
-end
+passwords = {
+  "SEED_ADMIN_PASSWORD" => admin_password, "SEED_RESIDENT_PASSWORD" => resident_password,
+  "SEED_CONCIERGE_PASSWORD" => concierge_password, "SEED_OWNER_PASSWORD" => owner_password,
+  "SEED_VISITOR_PASSWORD" => visitor_password
+}
+missing = passwords.select { |_, value| value.blank? }.keys
+abort "Seeds aborted: set #{missing.join(", ")} outside development." if missing.any?
 
 organization = Organization.find_or_initialize_by(subdomain: subdomain)
 organization.name = organization.name.presence || organization_name
@@ -99,6 +107,29 @@ ActsAsTenant.with_tenant(organization) do
     puts "Resident #{resident.email} already exists: left untouched."
   end
 
+  # --- Owner of the unit, who can also invite visitors (mobile app) --------
+  owner, owner_created = find_or_create_user.call(email: owner_email, name: "Dueño Prueba", dni: "SEED-OWN-1", password: owner_password)
+  if owner_created
+    owner_person = Accounts::ProvisionTenantIdentity.call(user: owner, organization: organization)
+    UnitOwnership.find_or_create_by!(organization: organization, person: owner_person, unit: unit) do |o|
+      o.ownership_percentage = 100
+      o.starts_at            = Date.current
+      o.status               = UnitOwnership::STATUS_ACTIVE
+    end
+  else
+    puts "Owner #{owner.email} already exists: left untouched."
+  end
+
+  # --- Visitor with an account: only sees their invitations (mobile app) --
+  visitor_user, visitor_created = find_or_create_user.call(email: visitor_email, name: "Visitante Prueba", dni: "SEED-VIS-1", password: visitor_password)
+  if visitor_created
+    visitor_account_person = Accounts::ProvisionTenantIdentity.call(user: visitor_user, organization: organization, role: AvailableRoles::VISITOR)
+    visitor_account_person.contact_email = visitor_email
+    visitor_account_person.save!
+  else
+    puts "Visitor #{visitor_user.email} already exists: left untouched."
+  end
+
   # --- Concierge assigned to the demo building (mobile front desk) --------
   concierge, concierge_created = find_or_create_user.call(email: concierge_email, name: "Conserje Prueba", dni: "SEED-CON-1", password: concierge_password)
   if concierge_created
@@ -127,6 +158,10 @@ ActsAsTenant.with_tenant(organization) do
     person
   end
 
+  # The account's own person, so its invitations show up in the app.
+  main_visitor = visitor_user.person_for(organization) ||
+                 find_or_create_visitor.call(name: "Visitante Prueba", email: visitor_email)
+
   today = Time.zone.today
   created_visits = []
 
@@ -149,14 +184,14 @@ ActsAsTenant.with_tenant(organization) do
   end
 
   # Waiting for the resident's answer: approve / reject from the app.
-  seed_visit.call(key: "pending", visitor: find_or_create_visitor.call(name: "Visitante Prueba", email: visitor_email),
+  seed_visit.call(key: "pending", visitor: main_visitor,
                   status: VisitStatuses::PENDING, scheduled_at: 2.hours.from_now)
   seed_visit.call(key: "pending-2", visitor: find_or_create_visitor.call(name: "Paula Pendiente"),
                   status: VisitStatuses::PENDING, scheduled_at: 3.hours.from_now)
 
   # Inside its validity window: detail / resend / cancel for the resident,
   # "register entry" for the concierge.
-  seed_visit.call(key: "authorized-now", visitor: find_or_create_visitor.call(name: "Visitante Prueba", email: visitor_email),
+  seed_visit.call(key: "authorized-now", visitor: main_visitor,
                   status: VisitStatuses::AUTHORIZED, scheduled_at: 15.minutes.ago)
 
   # Not yet valid: the concierge sees it without the entry action.
@@ -181,7 +216,9 @@ ActsAsTenant.with_tenant(organization) do
       Organización: #{organization.name} (#{organization.subdomain})
       Admin web:    #{admin.email}#{admin_created ? " (created)" : ""}
       Residente:    #{resident.email}#{resident_created ? " (created)" : ""} — #{property.name}, unidad #{unit.identifier}
+      Dueño:        #{owner.email}#{owner_created ? " (created)" : ""} — #{property.name}, unidad #{unit.identifier}
       Conserje:     #{concierge.email}#{concierge_created ? " (created)" : ""} — #{property.name}
+      Visitante:    #{visitor_user.email}#{visitor_created ? " (created)" : ""} — solo ve sus invitaciones
       Visitas hoy:  #{created_visits.any? ? created_visits.join(", ") : "ya existían para #{today.iso8601}"}
       Invitaciones: los correos de autorizar/reenviar llegan a #{visitor_email}
     Passwords are the ones you provided; they are not printed.
