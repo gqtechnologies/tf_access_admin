@@ -10,6 +10,8 @@ module VisitEventTypes
   # Resident re-sent the visitor invitation; the visit status does not change.
   INVITATION_RESENT = "invitation_resent"
   REJECTED = "rejected"
+  # Concierge found the person at the door is not the invited visitor; status unchanged.
+  ENTRY_DENIED = "entry_denied"
 
   MVP = [
     CREATED,
@@ -19,5 +21,5 @@ module VisitEventTypes
     CANCELLED
   ].freeze
 
-  ALL = (MVP + [ INVITATION_RESENT, REJECTED ]).freeze
+  ALL = (MVP + [ INVITATION_RESENT, REJECTED, ENTRY_DENIED ]).freeze
 end

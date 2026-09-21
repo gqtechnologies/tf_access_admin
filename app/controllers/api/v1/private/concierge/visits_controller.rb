@@ -3,6 +3,7 @@
 # GET  /api/v1/private/concierge/visits?property_id=&tab=&q=&page=
 # POST /api/v1/private/concierge/visits/:id/check_in
 # POST /api/v1/private/concierge/visits/:id/check_out
+# POST /api/v1/private/concierge/visits/:id/deny_entry
 #
 # JSON counterpart of the Inertia Concierge::VisitsController. Every query starts
 # from VisitPolicy::Scope and the listing is pinned to one operated property;
@@ -15,12 +16,12 @@ class Api::V1::Private::Concierge::VisitsController < Api::V1::Private::BaseCont
   PER_PAGE = 25
 
   before_action :load_property!, only: :index
-  before_action :load_visit, only: %i[check_in check_out]
+  before_action :load_visit, only: %i[check_in check_out deny_entry]
 
   def index
     scoped = policy_scope(Visit).where(residential_property_id: @property.id)
     visits = apply_search(apply_tab(scoped))
-               .includes(:visitor_person, :unit, :authorized_by)
+               .includes(:unit, :authorized_by, visitor_person: { user: { avatar_attachment: :blob } })
                .page(params[:page])
                .per(PER_PAGE)
 
@@ -31,13 +32,14 @@ class Api::V1::Private::Concierge::VisitsController < Api::V1::Private::BaseCont
     }, status: :ok
   end
 
+  # The concierge only confirms "it is them": no operational fields. The
+  # visitor's photo is mandatory on this channel — it is what gets verified.
   def check_in
-    Visits::CheckIn.call(
-      visit: @visit,
-      actor: current_user,
-      vehicle_plate: check_in_params[:vehicle_plate],
-      notes: check_in_params[:notes]
-    )
+    if @visit.visitor_person&.user&.avatar_path.blank?
+      return render json: { error: I18n.t("api.concierge.photo_required") }, status: :unprocessable_entity
+    end
+
+    Visits::CheckIn.call(visit: @visit, actor: current_user)
 
     render json: { data: serialize(@visit) }, status: :ok
   rescue AASM::InvalidTransition
@@ -60,11 +62,25 @@ class Api::V1::Private::Concierge::VisitsController < Api::V1::Private::BaseCont
     render_not_authorized
   end
 
+  # "It is not them": the visit stays authorized and only the host is told.
+  def deny_entry
+    Visits::DenyEntry.call(visit: @visit, actor: current_user)
+
+    render json: { data: serialize(@visit) }, status: :ok
+  rescue Visits::DenyEntry::NotDeniableError
+    render_invalid_transition
+  rescue Visits::DenyEntry::CooldownError => e
+    response.set_header("Retry-After", e.retry_after.to_s)
+    render json: { error: I18n.t("api.concierge.deny_cooldown") }, status: :too_many_requests
+  rescue Pundit::NotAuthorizedError
+    render_not_authorized
+  end
+
   private
 
   # Out-of-scope visits (other property or tenant) raise RecordNotFound → 404.
   def load_visit
-    @visit = policy_scope(Visit).includes(:visitor_person, :unit, :authorized_by).find(params[:id])
+    @visit = policy_scope(Visit).includes(:unit, :authorized_by, visitor_person: { user: { avatar_attachment: :blob } }).find(params[:id])
   end
 
   def tab
@@ -104,10 +120,6 @@ class Api::V1::Private::Concierge::VisitsController < Api::V1::Private::BaseCont
     options[resource.respond_to?(:each) ? :each_serializer : :serializer] = Api::Private::ConciergeVisitSerializer
 
     ActiveModelSerializers::SerializableResource.new(resource, **options).as_json
-  end
-
-  def check_in_params
-    params.fetch(:check_in, {}).permit(:vehicle_plate, :notes)
   end
 
   def check_out_params

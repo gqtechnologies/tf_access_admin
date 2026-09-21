@@ -56,6 +56,9 @@ en:
     visit_invitation:
       title: "New invitation"
       body: "You were invited to %{property} on %{date}"
+    visit_entry_denied:
+      title: "Entry denied"
+      body: "Someone showed up at the front desk as %{visitor_name}, but does not match the person in your invitation"
   frontend:
     name: "Admin Base"
     description: "welcome again"
@@ -1255,6 +1258,7 @@ en:
           checked_out: "Checked out"
           cancelled: "Cancelled"
           invitation_resent: "Invitation resent"
+          entry_denied: "Entry denied"
           rejected: "Rejected"
         statuses:
           pending: "Pending"
@@ -2599,6 +2603,8 @@ en:
       not_pending: "The visit was already answered or is no longer pending"
     concierge:
       property_forbidden: "You do not operate this property as concierge"
+      photo_required: "The visitor must upload a profile photo in the app before entering"
+      deny_cooldown: "The host was notified recently. Try again in a few minutes"
       invalid_transition: "The visit does not allow this action in its current status"
       not_authorized: "You are not authorized to register entries or exits for this visit"
   activerecord:

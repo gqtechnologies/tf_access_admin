@@ -56,6 +56,9 @@ es:
     visit_invitation:
       title: "Nueva invitación"
       body: "Te invitaron a %{property} el %{date}"
+    visit_entry_denied:
+      title: "Ingreso denegado"
+      body: "En portería se presentó alguien como %{visitor_name}, pero no coincide con la persona de tu invitación"
   time:
     formats:
       long: "%d/%m/%Y %H:%M"
@@ -1187,6 +1190,7 @@ es:
           checked_out: "Salida registrada"
           cancelled: "Cancelada"
           invitation_resent: "Invitación reenviada"
+          entry_denied: "Ingreso denegado"
           rejected: "Rechazada"
         statuses:
           pending: "Pendiente"
@@ -2594,6 +2598,8 @@ es:
       not_pending: "La visita ya fue respondida o no está pendiente"
     concierge:
       property_forbidden: "No operas como conserje en esta propiedad"
+      photo_required: "El visitante debe subir su foto de perfil en la app para poder ingresar"
+      deny_cooldown: "Ya se avisó hace poco. Intenta de nuevo en unos minutos"
       invalid_transition: "La visita no admite esta acción en su estado actual"
       not_authorized: "No estás autorizado para registrar ingresos o salidas en esta visita"
   activerecord:

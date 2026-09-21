@@ -6,6 +6,7 @@ require "test_helper"
 class Api::V1::Private::Concierge::VisitsControllerTest < ActionDispatch::IntegrationTest
   include OperationalPolicyTestHelper
   include Devise::Test::IntegrationHelpers
+  include ActiveJob::TestHelper
 
   VISITOR_DOCUMENT = "DOC-CONCIERGE-445566"
   JSON_HEADERS = { "Accept" => "application/json" }.freeze
@@ -33,7 +34,7 @@ class Api::V1::Private::Concierge::VisitsControllerTest < ActionDispatch::Integr
       status: OccupancyStatuses::ACTIVE, can_authorize_visits: true
     )
 
-    @authorized = create_visit(@unit, "Ana Llegando", email: "ca-ana@example.test", document: VISITOR_DOCUMENT)
+    @authorized = create_visit(@unit, "Ana Llegando", email: "ca-ana@example.test", document: VISITOR_DOCUMENT, photo: true)
     @inside     = create_visit(@unit, "Beto Adentro", status: VisitStatuses::CHECKED_IN)
     @foreign    = create_visit(@unit_q, "Carla Otra Propiedad")
   end
@@ -81,6 +82,7 @@ class Api::V1::Private::Concierge::VisitsControllerTest < ActionDispatch::Integr
     assert_includes entry.dig("unit", "display_name").to_s, "CA-P-101"
     assert_equal true, entry["can_check_in"]
     assert_equal false, entry["can_check_out"]
+    assert entry.dig("visitor", "avatar_url").present?
     assert_not_includes response.body, "ca-ana@example.test"
     assert_not_includes response.body, VISITOR_DOCUMENT
   end
@@ -123,16 +125,16 @@ class Api::V1::Private::Concierge::VisitsControllerTest < ActionDispatch::Integr
 
   # ─── check_in / check_out ────────────────────────────────────────────────────
 
-  test "check_in registers the entry with the vehicle plate" do
+  test "check_in registers the entry and ignores operational fields" do
     request_as(@concierge) do
       post check_in_api_v1_private_concierge_visit_path(@authorized),
-           params: { check_in: { vehicle_plate: "ABCD12", notes: "Trae paquete" } }, headers: JSON_HEADERS
+           params: { check_in: { vehicle_plate: "ABCD12" } }, headers: JSON_HEADERS
     end
 
     assert_response :ok
     assert_equal VisitStatuses::CHECKED_IN, @authorized.reload.status
     assert_equal @concierge.id, @authorized.checked_in_by_id
-    assert_equal "ABCD12", @authorized.metadata.dig("check_in", "vehicle_plate")
+    assert_nil @authorized.metadata.dig("check_in", "vehicle_plate")
     assert_equal false, data["can_check_in"]
     assert_equal true, data["can_check_out"]
   end
@@ -154,6 +156,72 @@ class Api::V1::Private::Concierge::VisitsControllerTest < ActionDispatch::Integr
 
     request_as(@concierge) { post check_in_api_v1_private_concierge_visit_path(@authorized), headers: JSON_HEADERS }
     assert_response :unprocessable_entity
+  end
+
+  test "a visitor without photo cannot be checked in" do
+    no_photo = create_visit(@unit, "Nico Sin Foto")
+
+    list(@concierge, property_id: @property.id, q: "Nico")
+    assert_nil data.first.dig("visitor", "avatar_url")
+    assert_equal false, data.first["can_check_in"]
+
+    request_as(@concierge) { post check_in_api_v1_private_concierge_visit_path(no_photo), headers: JSON_HEADERS }
+    assert_response :unprocessable_entity
+    assert_equal VisitStatuses::AUTHORIZED, no_photo.reload.status
+  end
+
+  # ─── deny_entry ──────────────────────────────────────────────────────────────
+
+  test "deny_entry keeps the visit authorized, records the event and notifies only the host" do
+    other_resident = create_user_for_organization(
+      organization: @organization, email: "ca-other-resident@example.test", role: AvailableRoles::CLIENT
+    )
+    UnitOccupancy.create!(
+      organization: @organization, person: other_resident.person_for(@organization), unit: @unit,
+      occupancy_type: OccupancyTypes::TENANT, starts_at: 7.days.ago,
+      status: OccupancyStatuses::ACTIVE, can_authorize_visits: true
+    )
+
+    assert_enqueued_with(job: DeliverPushNotificationJob) do
+      request_as(@concierge) { post deny_entry_api_v1_private_concierge_visit_path(@authorized), headers: JSON_HEADERS }
+    end
+
+    assert_response :ok
+    assert_equal VisitStatuses::AUTHORIZED, @authorized.reload.status
+
+    event = @authorized.visit_status_histories.where(event_type: VisitEventTypes::ENTRY_DENIED).last
+    assert_equal @concierge.id, event.actor_user_id
+
+    denied = @authorized.notifications.where(notification_type: NotificationTypes::VISIT_ENTRY_DENIED)
+    assert_equal [ @resident.person_for(@organization).id ], denied.pluck(:recipient_person_id)
+  end
+
+  test "deny_entry is 429 with Retry-After inside the cooldown" do
+    request_as(@concierge) { post deny_entry_api_v1_private_concierge_visit_path(@authorized), headers: JSON_HEADERS }
+    assert_response :ok
+
+    assert_no_difference -> { Notification.count } do
+      request_as(@concierge) { post deny_entry_api_v1_private_concierge_visit_path(@authorized), headers: JSON_HEADERS }
+    end
+
+    assert_response :too_many_requests
+    assert_in_delta 300, response.headers["Retry-After"].to_i, 5
+  end
+
+  test "deny_entry is 422 for a visit already inside" do
+    request_as(@concierge) { post deny_entry_api_v1_private_concierge_visit_path(@inside), headers: JSON_HEADERS }
+
+    assert_response :unprocessable_entity
+    assert_empty @inside.visit_status_histories.where(event_type: VisitEventTypes::ENTRY_DENIED)
+  end
+
+  test "deny_entry is out of reach for another property and for a resident" do
+    request_as(@concierge) { post deny_entry_api_v1_private_concierge_visit_path(@foreign), headers: JSON_HEADERS }
+    assert_response :not_found
+
+    request_as(@resident) { post deny_entry_api_v1_private_concierge_visit_path(@authorized), headers: JSON_HEADERS }
+    assert_includes [ 403, 404 ], response.status
+    assert_empty @authorized.notifications.where(notification_type: NotificationTypes::VISIT_ENTRY_DENIED)
   end
 
   test "check_in is 404 for a visit of another property" do
@@ -209,11 +277,20 @@ class Api::V1::Private::Concierge::VisitsControllerTest < ActionDispatch::Integr
     sign_out user
   end
 
-  def create_visit(unit, name, status: VisitStatuses::AUTHORIZED, email: nil, document: nil)
-    person = Person.new(
-      organization: @organization, display_name: name,
-      person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
-    )
+  # photo: true gives the visitor an account with a profile photo — the only
+  # kind of visitor the mobile concierge can check in.
+  def create_visit(unit, name, status: VisitStatuses::AUTHORIZED, email: nil, document: nil, photo: false)
+    person =
+      if photo
+        user = create_user_for_organization(organization: @organization, email: email, role: AvailableRoles::VISITOR)
+        user.avatar.attach(io: file_fixture("avatar.png").open, filename: "avatar.png", content_type: "image/png")
+        user.person_for(@organization).tap { |linked| linked.update!(display_name: name) }
+      else
+        Person.new(
+          organization: @organization, display_name: name,
+          person_type: PersonTypes::NATURAL, status: PersonStatuses::ACTIVE
+        )
+      end
     person.contact_email = email if email
     person.document_number = document if document
     person.save!

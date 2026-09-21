@@ -44,6 +44,9 @@ owner_password     = ENV["SEED_OWNER_PASSWORD"].presence || (development ? "Duen
 # resend from the app): point it at an inbox you can read.
 visitor_email      = ENV.fetch("SEED_VISITOR_EMAIL", "visitante.prueba@gmail.com")
 visitor_password   = ENV["SEED_VISITOR_PASSWORD"].presence || (development ? "Visita1234@" : nil)
+# Optional path to an image. The mobile concierge can only let in visitors with a
+# profile photo; without this, upload one from the app's profile screen.
+visitor_photo      = ENV["SEED_VISITOR_PHOTO"].presence
 
 passwords = {
   "SEED_ADMIN_PASSWORD" => admin_password, "SEED_RESIDENT_PASSWORD" => resident_password,
@@ -126,6 +129,10 @@ ActsAsTenant.with_tenant(organization) do
     visitor_account_person = Accounts::ProvisionTenantIdentity.call(user: visitor_user, organization: organization, role: AvailableRoles::VISITOR)
     visitor_account_person.contact_email = visitor_email
     visitor_account_person.save!
+
+    if visitor_photo && File.file?(visitor_photo)
+      visitor_user.avatar.attach(io: File.open(visitor_photo), filename: File.basename(visitor_photo))
+    end
   else
     puts "Visitor #{visitor_user.email} already exists: left untouched."
   end
@@ -218,7 +225,7 @@ ActsAsTenant.with_tenant(organization) do
       Residente:    #{resident.email}#{resident_created ? " (created)" : ""} — #{property.name}, unidad #{unit.identifier}
       Dueño:        #{owner.email}#{owner_created ? " (created)" : ""} — #{property.name}, unidad #{unit.identifier}
       Conserje:     #{concierge.email}#{concierge_created ? " (created)" : ""} — #{property.name}
-      Visitante:    #{visitor_user.email}#{visitor_created ? " (created)" : ""} — solo ve sus invitaciones
+      Visitante:    #{visitor_user.email}#{visitor_created ? " (created)" : ""} — solo ve sus invitaciones#{visitor_user.avatar.attached? ? "" : " — SIN FOTO: súbela desde el perfil en la app para que el conserje pueda dejarlo pasar"}
       Visitas hoy:  #{created_visits.any? ? created_visits.join(", ") : "ya existían para #{today.iso8601}"}
       Invitaciones: los correos de autorizar/reenviar llegan a #{visitor_email}
     Passwords are the ones you provided; they are not printed.
