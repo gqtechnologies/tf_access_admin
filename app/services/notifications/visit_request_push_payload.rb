@@ -27,6 +27,9 @@ module Notifications
         data: {
           type: NotificationTypes::VISIT_REQUEST,
           visit_id: @visit.id,
+          # Lets the mobile client open that unit's visit management directly.
+          unit_id: @visit.unit_id,
+          residential_property_id: @visit.residential_property_id,
           residential_property_name: @notification.residential_property&.name,
           unit_identifier: @notification.unit&.identifier,
           visitor_name: @visit.visitor_person.display_name
