@@ -26,8 +26,8 @@
 
 `Api::Private::ConciergeVisitSerializer`: `id`, `status`, `effective_status`, `scheduled_at`, `checked_in_at`, `checked_out_at`, `visitor { name }`, `unit { display_name }`, `authorized_by_name`, `can_check_in`, `can_check_out`.
 
-- `can_check_in`: `VisitPolicy#check_in?` **y** estado `authorized` no vencido.
-- `can_check_out`: `VisitPolicy#check_out?` **y** estado `checked_in`.
+- `can_check_in`: `visit.may_check_in?` **y** `VisitPolicy#check_in?`. `may_check_in?` evalúa también el guard `within_validity_window?`: una visita que llega antes de `valid_from` (= hora agendada) o después de `valid_until` se lista sin acción de ingreso, y el POST responde 422.
+- `can_check_out`: `visit.may_check_out?` **y** `VisitPolicy#check_out?`.
 
 La policy recibe el `current_user` por `scope` del serializer, igual que `Concierge::VisitSerializer`.
 

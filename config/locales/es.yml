@@ -2590,6 +2590,10 @@ es:
       not_authorized: "No estás autorizado para realizar esta acción sobre la visita"
       not_resendable: "La invitación solo se puede reenviar para visitas autorizadas y vigentes"
       resend_cooldown: "La invitación se reenvió hace poco. Intenta de nuevo en unos minutos"
+    concierge:
+      property_forbidden: "No operas como conserje en esta propiedad"
+      invalid_transition: "La visita no admite esta acción en su estado actual"
+      not_authorized: "No estás autorizado para registrar ingresos o salidas en esta visita"
   activerecord:
     errors:
       models:

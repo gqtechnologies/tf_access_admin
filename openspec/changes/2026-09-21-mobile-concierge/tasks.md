@@ -4,26 +4,26 @@
 
 ## 1. Rol `concierge` (D1)
 
-- [ ] 1.1 `Api::RoleResolver`: rama conserje antes de `visitor`, con la definición de asignación activa que ya use `Authorization`.
-- [ ] 1.2 `test/services/api/role_resolver_test.rb`.
+- [x] 1.1 `Api::RoleResolver`: rama conserje antes de `visitor`, con la definición de asignación activa que ya use `Authorization`.
+- [x] 1.2 `test/services/api/role_resolver_concierge_test.rb`.
 
 ## 2. Propiedades (D2)
 
-- [ ] 2.1 Concern `PropertyContext` (`concierge_property_ids`, `load_property!`).
-- [ ] 2.2 `Concierge::PropertiesController#index`, ruta e i18n `api.concierge.property_forbidden`.
-- [ ] 2.3 Tests.
+- [x] 2.1 Concern `Api::ConciergePropertyContext` (en `app/controllers/concerns/api/`) (`concierge_property_ids`, `load_property!`).
+- [x] 2.2 `Concierge::PropertiesController#index`, ruta e i18n `api.concierge.property_forbidden`.
+- [x] 2.3 Tests (en `concierge/visits_controller_test.rb`, junto al resto del namespace).
 
 ## 3. Listado (D3, D4)
 
-- [ ] 3.1 `Api::Private::ConciergeVisitSerializer`.
-- [ ] 3.2 `Concierge::VisitsController#index`: pestañas, búsqueda, orden, contadores, paginación.
-- [ ] 3.3 Tests de listado.
+- [x] 3.1 `Api::Private::ConciergeVisitSerializer`.
+- [x] 3.2 `Concierge::VisitsController#index`: pestañas, búsqueda, orden, contadores, paginación.
+- [x] 3.3 Tests de listado.
 
 ## 4. Ingreso y salida (D5)
 
-- [ ] 4.1 `check_in` y `check_out` con rescates; i18n `api.concierge.invalid_transition`, `api.concierge.not_authorized`.
-- [ ] 4.2 Tests.
+- [x] 4.1 `check_in` y `check_out` con rescates; i18n `api.concierge.invalid_transition`, `api.concierge.not_authorized`.
+- [x] 4.2 Tests.
 
 ## 5. Cierre
 
-- [ ] 5.1 `bundle exec rubocop` sobre lo tocado y `bundle exec brakeman`.
+- [x] 5.1 `bundle exec rubocop` sobre lo tocado y `bundle exec brakeman`.

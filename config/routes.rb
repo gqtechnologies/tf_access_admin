@@ -78,6 +78,18 @@ Rails.application.routes.draw do
         # GET /invitations lists the current user's own upcoming visits as visitor (D2).
         get "invitations", to: "invitations#index"
 
+        # Concierge operation (front desk): properties the user operates, the
+        # operational visit listing of one property, and entry/exit registration.
+        namespace :concierge do
+          resources :properties, only: [ :index ]
+          resources :visits, only: [ :index ] do
+            member do
+              post :check_in
+              post :check_out
+            end
+          end
+        end
+
         # Singular resource: a User has at most one registered device token.
         resource :device_token, only: %i[create destroy]
       end
