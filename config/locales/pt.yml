@@ -1248,6 +1248,7 @@ pt:
           checked_out: "Saída registrada"
           cancelled: "Cancelada"
           invitation_resent: "Convite reenviado"
+          rejected: "Rejeitada"
         statuses:
           pending: "Pendente"
           authorized: "Autorizada"
@@ -2543,6 +2544,7 @@ pt:
       not_authorized: "Você não está autorizado a realizar esta ação sobre a visita"
       not_resendable: "O convite só pode ser reenviado para visitas autorizadas e vigentes"
       resend_cooldown: "O convite foi reenviado há pouco. Tente novamente em alguns minutos"
+      not_pending: "A visita já foi respondida ou não está mais pendente"
     concierge:
       property_forbidden: "Você não opera esta propriedade como porteiro"
       invalid_transition: "A visita não permite esta ação no estado atual"

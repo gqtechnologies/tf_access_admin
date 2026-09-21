@@ -1255,6 +1255,7 @@ en:
           checked_out: "Checked out"
           cancelled: "Cancelled"
           invitation_resent: "Invitation resent"
+          rejected: "Rejected"
         statuses:
           pending: "Pending"
           authorized: "Authorized"
@@ -2595,6 +2596,7 @@ en:
       not_authorized: "You are not authorized to perform this action on the visit"
       not_resendable: "The invitation can only be resent for authorized, non-expired visits"
       resend_cooldown: "The invitation was resent recently. Try again in a few minutes"
+      not_pending: "The visit was already answered or is no longer pending"
     concierge:
       property_forbidden: "You do not operate this property as concierge"
       invalid_transition: "The visit does not allow this action in its current status"

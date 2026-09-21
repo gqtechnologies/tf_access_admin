@@ -9,6 +9,7 @@ module VisitEventTypes
   CANCELLED = "cancelled"
   # Resident re-sent the visitor invitation; the visit status does not change.
   INVITATION_RESENT = "invitation_resent"
+  REJECTED = "rejected"
 
   MVP = [
     CREATED,
@@ -18,5 +19,5 @@ module VisitEventTypes
     CANCELLED
   ].freeze
 
-  ALL = (MVP + [ INVITATION_RESENT ]).freeze
+  ALL = (MVP + [ INVITATION_RESENT, REJECTED ]).freeze
 end

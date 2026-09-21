@@ -39,6 +39,11 @@ module Visit::StateMachine
       event :cancel do
         transitions from: %i[pending authorized], to: :cancelled
       end
+
+      # A unit authorizer declines a pending request (distinct from cancel).
+      event :reject do
+        transitions from: :pending, to: :rejected
+      end
     end
   end
 

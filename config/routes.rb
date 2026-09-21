@@ -65,6 +65,8 @@ Rails.application.routes.draw do
           resources :visits, only: [ :index, :create, :show, :destroy ], module: :units do
             member do
               post :resend_invitation
+              post :authorize, action: :authorize_visit
+              post :reject
             end
           end
         end

@@ -5,6 +5,8 @@
 # GET    /api/v1/private/units/:unit_id/visits/:id
 # DELETE /api/v1/private/units/:unit_id/visits/:id
 # POST   /api/v1/private/units/:unit_id/visits/:id/resend_invitation
+# POST   /api/v1/private/units/:unit_id/visits/:id/authorize
+# POST   /api/v1/private/units/:unit_id/visits/:id/reject
 #
 # Private authenticated endpoints for resident visit listing and registration.
 # +index+ returns the unit's visits whose scheduled_at falls on +day+ in the
@@ -30,7 +32,8 @@
 class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseController
   before_action :load_unit
   before_action :authorize_resident!
-  before_action :load_visit, only: %i[show destroy resend_invitation]
+  before_action :load_visit, only: %i[show destroy resend_invitation authorize_visit reject]
+  before_action :ensure_pending!, only: %i[authorize_visit reject]
   before_action :validate_visitor!, only: :create
 
   def index
@@ -92,7 +95,50 @@ class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseControll
     render json: { error: I18n.t("api.visits.resend_cooldown") }, status: :too_many_requests
   end
 
+  # POST .../authorize — named authorize_visit so it doesn't shadow Pundit#authorize.
+  # The visitor of a web-created pending visit was never notified: do it now.
+  def authorize_visit
+    Visits::Authorize.call(visit: @visit, actor: current_user)
+    notify_visitor
+
+    render_resource(@visit, serializer: Api::Private::VisitDetailSerializer)
+  rescue AASM::InvalidTransition
+    render_not_pending
+  rescue Pundit::NotAuthorizedError
+    render json: { error: I18n.t("api.visits.not_authorized") }, status: :forbidden
+  end
+
+  # Rejection is silent for the visitor.
+  def reject
+    Visits::Reject.call(visit: @visit, actor: current_user)
+
+    render_resource(@visit, serializer: Api::Private::VisitDetailSerializer)
+  rescue AASM::InvalidTransition
+    render_not_pending
+  rescue Pundit::NotAuthorizedError
+    render json: { error: I18n.t("api.visits.not_authorized") }, status: :forbidden
+  end
+
   private
+
+  # Checked before the service so 403 stays reserved for a missing capability;
+  # also covers two authorizers of the same unit answering at once.
+  def ensure_pending!
+    render_not_pending unless @visit.status == VisitStatuses::PENDING
+  end
+
+  def render_not_pending
+    render json: { error: I18n.t("api.visits.not_pending") }, status: :unprocessable_entity
+  end
+
+  # NotifyVisitor never raises; skipped when there is no way to reach the visitor.
+  def notify_visitor
+    person = @visit.visitor_person
+    return if person.blank?
+    return if person.user.blank? && person.contact_email.blank?
+
+    Visits::NotifyVisitor.call(visit: @visit, actor: current_user)
+  end
 
   # 2.2 — Unit is loaded through ActsAsTenant scope: any unit_id outside the
   # current organization raises RecordNotFound (rescued as 404 in BaseController).

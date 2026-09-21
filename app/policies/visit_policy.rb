@@ -116,6 +116,14 @@ class VisitPolicy < ApplicationPolicy
     allowed?(:authorize_visits) || allowed?(:manage_visits)
   end
 
+  # Reject a pending request: same actors as authorize, only while pending.
+  def reject?
+    return false unless same_organization?
+    return false unless record.respond_to?(:status) && record.status == VisitStatuses::PENDING
+
+    allowed?(:authorize_visits) || allowed?(:manage_visits)
+  end
+
   # Check-in (register entry): concierge or property_admin on the visit's property
   def check_in?
     return false unless same_organization?
