@@ -58,8 +58,15 @@ Rails.application.routes.draw do
 
         # GET /units lists units with an active occupancy/ownership for the current person.
         # GET /units/:unit_id/visits?day=YYYY-MM-DD lists that day's visits (property time zone).
+        # GET /units/:unit_id/visits/:id returns the visit detail with can_cancel/can_resend.
+        # DELETE /units/:unit_id/visits/:id cancels the visit.
+        # POST /units/:unit_id/visits/:id/resend_invitation re-notifies the visitor (5-minute cooldown).
         resources :units, only: [ :index ] do
-          resources :visits, only: [ :index, :create ], module: :units
+          resources :visits, only: [ :index, :create, :show, :destroy ], module: :units do
+            member do
+              post :resend_invitation
+            end
+          end
         end
 
         # Organization detail restricted to the current tenant and the resident's relationships.

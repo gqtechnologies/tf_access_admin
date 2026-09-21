@@ -1186,6 +1186,7 @@ es:
           checked_in: "Ingresada"
           checked_out: "Salida registrada"
           cancelled: "Cancelada"
+          invitation_resent: "Invitación reenviada"
         statuses:
           pending: "Pendiente"
           authorized: "Autorizada"
@@ -2585,6 +2586,10 @@ es:
       invalid_visitor: "Los datos del visitante son inválidos"
       invalid_scheduled_at: "La fecha y hora de la visita no son válidas"
       identity_conflict: "Los datos del visitante no coinciden con una persona ya registrada (documento y correo distintos)"
+      not_cancellable: "La visita ya no se puede cancelar"
+      not_authorized: "No estás autorizado para realizar esta acción sobre la visita"
+      not_resendable: "La invitación solo se puede reenviar para visitas autorizadas y vigentes"
+      resend_cooldown: "La invitación se reenvió hace poco. Intenta de nuevo en unos minutos"
   activerecord:
     errors:
       models:

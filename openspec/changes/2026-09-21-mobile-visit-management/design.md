@@ -38,7 +38,7 @@ Visits::ResendVisitorInvitation.call(visit:, actor:)
 
 - `NotResendableError` si `status != authorized` o `authorization_expired?` → 422 `api.visits.not_resendable`.
 - `CooldownError` si `metadata["visitor_invitation_resent_at"]` es posterior a `COOLDOWN.ago` (`COOLDOWN = 5.minutes`) → 429 `api.visits.resend_cooldown`, con cabecera `Retry-After` en segundos.
-- Si pasa: actualiza `metadata` con la marca de tiempo (merge, sin pisar otras claves), llama `Visits::NotifyVisitor.call(visit:, actor:)` y registra `RecordEvent` con `event_type: VisitEventTypes::INVITATION_RESENT` y `from_status == to_status`.
+- Si pasa: actualiza `metadata` con la marca de tiempo (merge, sin pisar otras claves; con `update_column`, porque `Visit.sanitize_metadata` descarta claves raíz no operacionales en guardados validados — un guardado validado posterior borra la marca, lo que solo ocurre al cambiar de estado o editar la visita), llama `Visits::NotifyVisitor.call(visit:, actor:)` y registra `RecordEvent` con `event_type: VisitEventTypes::INVITATION_RESENT` y `from_status == to_status`.
 - La marca se escribe antes de notificar: un fallo de entrega (que `NotifyVisitor` absorbe) no habilita reintentos inmediatos.
 - No pasa por `VisitPolicy`: la autorización es la de la unidad (`authorize_resident!`), igual que `create`. El servicio es de uso exclusivo de la API privada.
 
@@ -58,6 +58,6 @@ Claves nuevas en `api.visits`: `not_cancellable`, `not_resendable`, `resend_cool
 
 Solo los archivos nuevos o modificados, con `PARALLEL_WORKERS=1`:
 
-- `test/controllers/api/v1/private/units/visits_controller_test.rb`: `show` (feliz, 401, 403, 404 de otra unidad y de otro tenant, flags), `destroy` (feliz desde `authorized` y `pending`, 422 desde `checked_in`, 403, 404), `resend_invitation` (feliz, 422 cancelada, 422 vencida, 429 con `Retry-After`, 404).
+- `test/controllers/api/v1/private/units/visits_member_controller_test.rb`: `show` (feliz, 401, 403, 404 de otra unidad y de otro tenant, flags), `destroy` (feliz desde `authorized` y `pending`, 422 desde `checked_in`, 403, 404), `resend_invitation` (feliz, 422 cancelada, 422 vencida, 429 con `Retry-After`, 404).
 - `test/services/visits/resend_visitor_invitation_test.rb`: marca en metadata sin pisar claves, evento registrado, delega en `NotifyVisitor`, errores.
-- `test/serializers/api/private/visit_detail_serializer_test.rb`: no expone documento; flags por estado.
+- El serializer se cubre desde los tests de `show` (no expone documento; flags por estado).

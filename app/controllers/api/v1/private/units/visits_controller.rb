@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
-# GET  /api/v1/private/units/:unit_id/visits?day=YYYY-MM-DD
-# POST /api/v1/private/units/:unit_id/visits
+# GET    /api/v1/private/units/:unit_id/visits?day=YYYY-MM-DD
+# POST   /api/v1/private/units/:unit_id/visits
+# GET    /api/v1/private/units/:unit_id/visits/:id
+# DELETE /api/v1/private/units/:unit_id/visits/:id
+# POST   /api/v1/private/units/:unit_id/visits/:id/resend_invitation
 #
 # Private authenticated endpoints for resident visit listing and registration.
 # +index+ returns the unit's visits whose scheduled_at falls on +day+ in the
@@ -27,6 +30,7 @@
 class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseController
   before_action :load_unit
   before_action :authorize_resident!
+  before_action :load_visit, only: %i[show destroy resend_invitation]
   before_action :validate_visitor!, only: :create
 
   def index
@@ -56,12 +60,50 @@ class Api::V1::Private::Units::VisitsController < Api::V1::Private::BaseControll
     render json: { error: e.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
   end
 
+  def show
+    render_resource(@visit, serializer: Api::Private::VisitDetailSerializer)
+  end
+
+  # Cancels through Visits::Cancel. The state is checked first so 403 stays
+  # reserved for a missing capability (VisitPolicy#cancel? mixes both).
+  def destroy
+    unless @visit.status.in?([ VisitStatuses::PENDING, VisitStatuses::AUTHORIZED ])
+      return render json: { error: I18n.t("api.visits.not_cancellable") }, status: :unprocessable_entity
+    end
+
+    Visits::Cancel.call(visit: @visit, actor: current_user)
+
+    render json: { data: { id: @visit.id, status: @visit.status } }, status: :ok
+  rescue AASM::InvalidTransition
+    render json: { error: I18n.t("api.visits.not_cancellable") }, status: :unprocessable_entity
+  rescue Pundit::NotAuthorizedError
+    render json: { error: I18n.t("api.visits.not_authorized") }, status: :forbidden
+  end
+
+  # Re-notifies the visitor (not the residents — see Visits::ResendNotification).
+  def resend_invitation
+    Visits::ResendVisitorInvitation.call(visit: @visit, actor: current_user)
+
+    render_resource(@visit, serializer: Api::Private::VisitDetailSerializer)
+  rescue Visits::ResendVisitorInvitation::NotResendableError
+    render json: { error: I18n.t("api.visits.not_resendable") }, status: :unprocessable_entity
+  rescue Visits::ResendVisitorInvitation::CooldownError => e
+    response.set_header("Retry-After", e.retry_after.to_s)
+    render json: { error: I18n.t("api.visits.resend_cooldown") }, status: :too_many_requests
+  end
+
   private
 
   # 2.2 — Unit is loaded through ActsAsTenant scope: any unit_id outside the
   # current organization raises RecordNotFound (rescued as 404 in BaseController).
   def load_unit
     @unit = Unit.find(params[:unit_id])
+  end
+
+  # Resolved through @unit: a visit of another unit or tenant raises
+  # RecordNotFound (404).
+  def load_visit
+    @visit = @unit.visits.includes(:visitor_person).find(params[:id])
   end
 
   # 2.1 / 2.3–2.7 — Resolves User → Person → unit capabilities and enforces
