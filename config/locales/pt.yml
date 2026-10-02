@@ -2613,6 +2613,11 @@ pt:
       wrong_current: "A senha atual não está correta"
       same_as_current: "A nova senha deve ser diferente da atual"
       weak: "A senha deve ter pelo menos 8 caracteres e incluir minúscula, maiúscula, número e um símbolo ($ % @ . - _)"
+    social:
+      invalid_token: "Não foi possível validar sua conta Apple ou Google. Tente novamente"
+      not_configured: "Este método de acesso ainda não está disponível"
+      email_required: "Sua conta Apple ou Google não fornece um e-mail verificado"
+      profile_required: "Complete seus dados para criar a conta"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"

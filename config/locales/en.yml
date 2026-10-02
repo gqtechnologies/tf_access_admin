@@ -2665,6 +2665,11 @@ en:
       wrong_current: "The current password is not correct"
       same_as_current: "The new password must be different from the current one"
       weak: "The password must be at least 8 characters and include a lowercase letter, an uppercase letter, a number and a symbol ($ % @ . - _)"
+    social:
+      invalid_token: "We couldn't validate your Apple or Google account. Try again"
+      not_configured: "This sign-in method is not available yet"
+      email_required: "Your Apple or Google account does not provide a verified email"
+      profile_required: "Complete your details to create the account"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

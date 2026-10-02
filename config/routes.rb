@@ -30,6 +30,8 @@ Rails.application.routes.draw do
         delete :logout, to: "sessions#destroy"
         # Always 202: sends the Devise reset email only to active members of the tenant.
         post :password, to: "passwords#create"
+        # Sign in or sign up with an Apple / Google identity token.
+        post :social, to: "social_sessions#create"
       end
 
       namespace :mobile do
