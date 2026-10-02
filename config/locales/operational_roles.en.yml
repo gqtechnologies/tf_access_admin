@@ -35,6 +35,7 @@ en:
       ownerships: "Owners"
       occupancies: "Residents"
       visits: "Visits"
+      parcels: "Parcels"
       staff: "Staff"
       own_unit: "Own unit"
     capability_labels:
@@ -60,6 +61,7 @@ en:
       view_minimal_access_control_data: "View access control data"
       view_own_unit_context: "View own unit context"
       manage_staff_assignments: "Manage staff assignments"
+      manage_parcels: "Manage parcels"
     capability_descriptions:
       manage_organization: "Configure global organization settings."
       manage_users: "Create and manage organization users."
@@ -83,3 +85,4 @@ en:
       view_minimal_access_control_data: "View minimal data required for access control."
       view_own_unit_context: "View context for owned or occupied units."
       manage_staff_assignments: "Assign and revoke operational staff roles."
+      manage_parcels: "Registers parcel arrivals and withdrawals."

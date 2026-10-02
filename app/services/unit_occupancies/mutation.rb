@@ -2,7 +2,7 @@
 
 module UnitOccupancies
   module Mutation
-    OCCUPANCY_ASSIGNMENT_KEYS = %i[occupancy_type can_authorize_visits starts_at ends_at status].freeze
+    OCCUPANCY_ASSIGNMENT_KEYS = %i[occupancy_type can_authorize_visits can_withdraw_parcels starts_at ends_at status].freeze
 
     module_function
 
@@ -21,6 +21,7 @@ module UnitOccupancies
         person: person,
         occupancy_type: occupancy_params[:occupancy_type],
         can_authorize_visits: cast_boolean(occupancy_params[:can_authorize_visits]),
+        can_withdraw_parcels: cast_boolean(occupancy_params[:can_withdraw_parcels]),
         starts_at: normalize_starts_at(occupancy_params[:starts_at], unit),
         ends_at: normalize_ends_at(occupancy_params[:ends_at], unit),
         status: occupancy_params[:status].presence || OccupancyStatuses::ACTIVE

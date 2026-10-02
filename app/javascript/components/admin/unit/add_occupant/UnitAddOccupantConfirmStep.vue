@@ -46,6 +46,13 @@
 
       <div class="px-4 py-3">
         <p class="text-xs font-medium text-muted-foreground">
+          {{ t('admin.units.show.occupants.add_occupant.confirm.can_withdraw_parcels') }}
+        </p>
+        <p class="mt-1 text-sm font-semibold">{{ parcelWithdrawalLabel }}</p>
+      </div>
+
+      <div class="px-4 py-3">
+        <p class="text-xs font-medium text-muted-foreground">
           {{ t('admin.units.show.occupants.add_occupant.confirm.validity') }}
         </p>
         <p class="mt-1 text-sm font-semibold">{{ validityLabel }}</p>
@@ -83,6 +90,12 @@ const occupancyTypeLabel = computed(
 
 const authorizationLabel = computed(() =>
   props.occupancyForm.can_authorize_visits
+    ? t('admin.units.show.occupants.authorization.yes')
+    : t('admin.units.show.occupants.authorization.no'),
+)
+
+const parcelWithdrawalLabel = computed(() =>
+  props.occupancyForm.can_withdraw_parcels
     ? t('admin.units.show.occupants.authorization.yes')
     : t('admin.units.show.occupants.authorization.no'),
 )

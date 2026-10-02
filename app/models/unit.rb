@@ -81,6 +81,7 @@ class Unit < ApplicationRecord
   has_many :unit_occupancies
   has_many :authorized_residents
   has_many :visits
+  has_many :parcel_deliveries
 
   # Units where +person+ holds an active, currently-valid occupancy or ownership
   # in +organization+. Relationship validity is delegated to

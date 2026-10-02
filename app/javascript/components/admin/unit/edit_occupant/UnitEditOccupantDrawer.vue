@@ -121,6 +121,7 @@ const clientFieldErrors = ref<Record<string, string | undefined>>({})
 const occupancyForm = ref<UnitOccupancyEditForm>({
   occupancy_type: 'tenant',
   can_authorize_visits: false,
+  can_withdraw_parcels: false,
   starts_at: '',
   ends_at: '',
   status: 'active',
@@ -206,6 +207,7 @@ function submit() {
       unit_occupancy: {
         occupancy_type: occupancyForm.value.occupancy_type,
         can_authorize_visits: occupancyForm.value.can_authorize_visits,
+        can_withdraw_parcels: occupancyForm.value.can_withdraw_parcels,
         status: occupancyForm.value.status,
         starts_at: occupancyForm.value.starts_at,
         ...(occupancyForm.value.ends_at

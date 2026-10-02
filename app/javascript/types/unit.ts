@@ -39,6 +39,7 @@ export type UnitOccupancy = {
   occupancy_type: string
   occupancy_type_label: string
   can_authorize_visits: boolean
+  can_withdraw_parcels: boolean
   starts_at: string
   ends_at: string | null
   status: string

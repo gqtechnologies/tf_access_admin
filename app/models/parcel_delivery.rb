@@ -53,6 +53,7 @@
 #
 class ParcelDelivery < ApplicationRecord
   include DeliveryTypes
+  include ParcelStatuses
   include TenantScopedAssociations
 
   acts_as_tenant :organization
@@ -65,7 +66,14 @@ class ParcelDelivery < ApplicationRecord
   belongs_to :withdrawn_by_person, class_name: "Person", optional: true
   belongs_to :staff_shift, optional: true
 
+  # Withdrawn parcels stay visible this long in the listings (resident and front desk).
+  RECENT_WITHDRAWAL_WINDOW = 30.days
+
   validates :delivery_type, presence: true, inclusion: { in: DeliveryTypes::ALL }
+  validates :status, presence: true, inclusion: { in: ParcelStatuses::ALL }
+  validates :received_at, presence: true
+  validates :courier_company, :tracking_code, length: { maximum: 120 }
+  validates :notes, length: { maximum: 500 }
 
   validates_same_tenant :residential_property, :unit, :recipient_person, :received_by_person,
                         :withdrawn_by_person, :staff_shift
@@ -73,6 +81,18 @@ class ParcelDelivery < ApplicationRecord
   validate :withdrawn_on_or_after_received
 
   has_many :parcel_delivery_status_histories, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+  normalizes :courier_company, :tracking_code, :notes, with: ->(value) { value.to_s.strip.presence }
+
+  scope :waiting, -> { where(status: ParcelStatuses::RECEIVED) }
+  scope :recently_withdrawn, lambda {
+    where(status: ParcelStatuses::WITHDRAWN).where(withdrawn_at: RECENT_WITHDRAWAL_WINDOW.ago..)
+  }
+
+  def waiting?
+    status == ParcelStatuses::RECEIVED
+  end
 
   private
 

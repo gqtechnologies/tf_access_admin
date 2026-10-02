@@ -16,6 +16,30 @@ module Api::ConciergePropertyContext
       .keys
   end
 
+  # Properties where the user may register parcel arrivals and withdrawals.
+  # Organization-wide holders of manage_parcels operate every property.
+  def parcel_property_ids
+    @parcel_property_ids ||= begin
+      resolver = Authorization::Resolver.new(user: current_user, organization: ActsAsTenant.current_tenant)
+
+      if resolver.profile.organization_capabilities.include?(Authorization::Capabilities::MANAGE_PARCELS)
+        ResidentialProperty.pluck(:id)
+      else
+        resolver.profile.property_capabilities
+                .select { |_, caps| caps.include?(Authorization::Capabilities::MANAGE_PARCELS) }
+                .keys
+      end
+    end
+  end
+
+  def load_parcel_property!
+    property_id = params[:property_id].to_s
+    @property = ResidentialProperty.find_by(id: property_id) if parcel_property_ids.map(&:to_s).include?(property_id)
+    return if @property
+
+    render json: { error: I18n.t("api.concierge.property_forbidden") }, status: :forbidden
+  end
+
   # Missing property_id and a property outside the assignment are both 403:
   # the caller must always name a property it operates.
   def load_property!

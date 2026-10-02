@@ -65,7 +65,8 @@ class DeliverPushNotificationJob < ApplicationJob
   # every other type keeps the resident-facing visit request payload.
   PAYLOAD_BUILDERS = {
     NotificationTypes::VISIT_INVITATION => "Notifications::VisitInvitationPushPayload",
-    NotificationTypes::VISIT_ENTRY_DENIED => "Notifications::VisitEntryDeniedPushPayload"
+    NotificationTypes::VISIT_ENTRY_DENIED => "Notifications::VisitEntryDeniedPushPayload",
+    NotificationTypes::PARCEL => "Notifications::ParcelPushPayload"
   }.freeze
 
   def payload_builder_for(notification)

@@ -29,11 +29,15 @@ module UnitOccupancies
       unit = @occupancy.unit
 
       @occupancy.assign_attributes(
-        attrs.except(:starts_at, :ends_at, :can_authorize_visits)
+        attrs.except(:starts_at, :ends_at, :can_authorize_visits, :can_withdraw_parcels)
       )
 
       if attrs.key?(:can_authorize_visits)
         @occupancy.can_authorize_visits = Mutation.cast_boolean(attrs[:can_authorize_visits])
+      end
+
+      if attrs.key?(:can_withdraw_parcels)
+        @occupancy.can_withdraw_parcels = Mutation.cast_boolean(attrs[:can_withdraw_parcels])
       end
 
       if attrs.key?(:starts_at)

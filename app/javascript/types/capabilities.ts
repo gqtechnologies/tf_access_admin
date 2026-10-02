@@ -27,6 +27,7 @@ export type CapabilityKey =
   | 'view_minimal_access_control_data'
   | 'view_own_unit_context'
   | 'manage_staff_assignments'
+  | 'manage_parcels'
 
 /**
  * Flat map of every capability key to a boolean indicating whether the
