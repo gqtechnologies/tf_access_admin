@@ -2661,6 +2661,10 @@ en:
       not_authorized: "You are not authorized to register parcels on this property"
       not_waiting: "The parcel was already withdrawn"
       not_eligible: "This person is not allowed to withdraw parcels for this unit"
+    password:
+      wrong_current: "The current password is not correct"
+      same_as_current: "The new password must be different from the current one"
+      weak: "The password must be at least 8 characters and include a lowercase letter, an uppercase letter, a number and a symbol ($ % @ . - _)"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

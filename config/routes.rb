@@ -57,6 +57,8 @@ Rails.application.routes.draw do
         # Authenticated profile of the current user (mobile-private-api "Profile endpoint").
         get "me", to: "profiles#show"
         patch "me", to: "profiles#update"
+        # PATCH /me/password changes the signed-in user's password (needs the current one).
+        patch "me/password", to: "passwords#update"
 
         # GET /units lists units with an active occupancy/ownership for the current person.
         # GET /units/:unit_id/visits?day=YYYY-MM-DD lists that day's visits (property time zone).

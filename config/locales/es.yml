@@ -2656,6 +2656,10 @@ es:
       not_authorized: "No estás autorizado para registrar encomiendas en esta propiedad"
       not_waiting: "La encomienda ya fue retirada"
       not_eligible: "La persona no tiene permiso para retirar encomiendas de esta unidad"
+    password:
+      wrong_current: "La contraseña actual no es correcta"
+      same_as_current: "La nueva contraseña debe ser distinta de la actual"
+      weak: "La contraseña debe tener al menos 8 caracteres e incluir minúscula, mayúscula, número y un símbolo ($ % @ . - _)"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"
