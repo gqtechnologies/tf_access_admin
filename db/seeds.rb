@@ -105,6 +105,7 @@ ActsAsTenant.with_tenant(organization) do
       o.starts_at            = 1.day.ago
       o.status               = OccupancyStatuses::ACTIVE
       o.can_authorize_visits = true
+      o.can_withdraw_parcels = true
     end
   else
     puts "Resident #{resident.email} already exists: left untouched."
