@@ -53,6 +53,15 @@ es:
       cta: "Crear mi cuenta"
       expiration: "Este enlace es de un solo uso y caduca en 14 días."
   notifications:
+    parcel:
+      title: "Llegó una entrega"
+      body: "Hay %{delivery_type} para %{unit} en conserjería"
+      delivery_types:
+        parcel: "una encomienda"
+        food: "un pedido de comida"
+        document: "un documento"
+        groceries: "un pedido de supermercado"
+        other: "una entrega"
     visit_invitation:
       title: "Nueva invitación"
       body: "Te invitaron a %{property} el %{date}"
@@ -2584,6 +2593,10 @@ es:
       token_expired: "Token expirado"
       token_invalid: "Token inválido"
       invalid_day: "El parámetro day debe tener formato YYYY-MM-DD"
+    parcels:
+      not_authorized: "No estás autorizado para registrar encomiendas en esta propiedad"
+      not_waiting: "La encomienda ya fue retirada"
+      not_eligible: "La persona no tiene permiso para retirar encomiendas de esta unidad"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"

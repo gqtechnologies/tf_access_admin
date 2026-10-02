@@ -53,6 +53,15 @@ en:
       cta: "Create my account"
       expiration: "This link is single-use and expires in 14 days."
   notifications:
+    parcel:
+      title: "A delivery arrived"
+      body: "There is %{delivery_type} for %{unit} at the front desk"
+      delivery_types:
+        parcel: "a parcel"
+        food: "a food order"
+        document: "a document"
+        groceries: "a grocery order"
+        other: "a delivery"
     visit_invitation:
       title: "New invitation"
       body: "You were invited to %{property} on %{date}"
@@ -2589,6 +2598,10 @@ en:
       token_expired: "Token expired"
       token_invalid: "Token invalid"
       invalid_day: "The day parameter must be a valid YYYY-MM-DD date"
+    parcels:
+      not_authorized: "You are not authorized to register parcels on this property"
+      not_waiting: "The parcel was already withdrawn"
+      not_eligible: "This person is not allowed to withdraw parcels for this unit"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

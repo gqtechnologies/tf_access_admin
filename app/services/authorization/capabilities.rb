@@ -24,6 +24,8 @@ module Authorization
     VIEW_MINIMAL_ACCESS_CONTROL_DATA = :view_minimal_access_control_data
     VIEW_OWN_UNIT_CONTEXT = :view_own_unit_context
     MANAGE_STAFF_ASSIGNMENTS = :manage_staff_assignments
+    # Front desk: register parcel arrivals and withdrawals on a property.
+    MANAGE_PARCELS = :manage_parcels
     # Visitor (D5): read the visits where the user is the visitor_person.
     VIEW_OWN_VISITS = :view_own_visits
     # Global identity-conflict resolution. Deliberately super-admin-only by
@@ -54,6 +56,7 @@ module Authorization
       VIEW_MINIMAL_ACCESS_CONTROL_DATA,
       VIEW_OWN_UNIT_CONTEXT,
       MANAGE_STAFF_ASSIGNMENTS,
+      MANAGE_PARCELS,
       VIEW_OWN_VISITS,
       RESOLVE_IDENTITY_CONFLICTS
     ].freeze
@@ -92,7 +95,8 @@ module Authorization
       MANAGE_OCCUPANCIES,
       VIEW_VISITS,
       MANAGE_VISITS,
-      MANAGE_STAFF_ASSIGNMENTS
+      MANAGE_STAFF_ASSIGNMENTS,
+      MANAGE_PARCELS
     ].freeze
 
     CONCIERGE = [
@@ -100,7 +104,8 @@ module Authorization
       VIEW_AUTHORIZED_VISITS,
       REGISTER_VISIT_ENTRY,
       REGISTER_VISIT_EXIT,
-      VIEW_MINIMAL_ACCESS_CONTROL_DATA
+      VIEW_MINIMAL_ACCESS_CONTROL_DATA,
+      MANAGE_PARCELS
     ].freeze
 
     CLEANING_STAFF = [].freeze
