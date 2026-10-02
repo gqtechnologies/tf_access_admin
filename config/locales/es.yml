@@ -2577,6 +2577,8 @@ es:
       not_found: "Recurso no encontrado"
       unauthorized: "No tienes permisos para acceder a este recurso"
       unauthorized_tenant: "No tienes permisos para acceder a este recurso"
+      email_required: "Ingresa un correo electrónico"
+      too_many_requests: "Demasiadas solicitudes. Intenta de nuevo más tarde"
       token_dispatch_failed: "Error al generar el token"
       invalid_credentials: "Credenciales inválidas"
       unconfirmed_account: "Cuenta no confirmada"

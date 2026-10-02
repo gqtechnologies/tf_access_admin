@@ -28,6 +28,8 @@ Rails.application.routes.draw do
       namespace :auth do
         post :login, to: "sessions#create"
         delete :logout, to: "sessions#destroy"
+        # Always 202: sends the Devise reset email only to active members of the tenant.
+        post :password, to: "passwords#create"
       end
 
       namespace :mobile do

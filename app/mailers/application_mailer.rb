@@ -28,10 +28,11 @@ class ApplicationMailer < ActionMailer::Base
     base_port = mailer_defaults[:port]
     protocol = Rails.env.production? ? "https" : "http"
 
-    subdomain =
-      if resource.respond_to?(:organization)
-        resource.organization&.subdomain
-      end
+    # A User belongs to several organizations, so it has no `organization`:
+    # Devise mails (password reset) fall back to the tenant they were sent under.
+    organization = resource.organization if resource.respond_to?(:organization)
+    organization ||= ActsAsTenant.current_tenant
+    subdomain = organization&.subdomain
 
     host = subdomain.present? ? "#{subdomain}.#{base_host}" : base_host
 
