@@ -53,6 +53,15 @@ es:
       cta: "Crear mi cuenta"
       expiration: "Este enlace es de un solo uso y caduca en 14 días."
   notifications:
+    parcel:
+      title: "Llegó una entrega"
+      body: "Hay %{delivery_type} para %{unit} en conserjería"
+      delivery_types:
+        parcel: "una encomienda"
+        food: "un pedido de comida"
+        document: "un documento"
+        groceries: "un pedido de supermercado"
+        other: "una entrega"
     visit_invitation:
       title: "Nueva invitación"
       body: "Te invitaron a %{property} el %{date}"
@@ -166,6 +175,58 @@ es:
       contact_support: "Contactar soporte"
       go_to_home: "Ir a la página de inicio"
     concierge:
+      parcels:
+        index:
+          title: "Encomiendas"
+          description: "Registra lo que llega a conserjería y quién lo retira. Al registrar una llegada se avisa a los residentes de la unidad."
+          property: "Propiedad"
+          register: "Registrar llegada"
+          no_property: "No tienes una propiedad asignada para operar encomiendas."
+          tabs:
+            received: "Por retirar"
+            withdrawn: "Retiradas"
+          search:
+            placeholder: "Buscar por unidad, courier o código"
+          empty:
+            received: "No hay encomiendas por retirar."
+            withdrawn: "No hay retiros en los últimos 30 días."
+            search: "Ninguna encomienda coincide con la búsqueda."
+          table:
+            unit: "Unidad"
+            delivery_type: "Tipo"
+            courier: "Courier / código"
+            received_at: "Llegada"
+            withdrawn: "Retiro"
+            notes: "Nota"
+            withdraw: "Registrar retiro"
+        delivery_types:
+          parcel: "Encomienda"
+          food: "Comida"
+          document: "Documento"
+          groceries: "Supermercado"
+          other: "Otra entrega"
+        receive:
+          title: "Registrar llegada"
+          description: "Los residentes de la unidad recibirán una notificación."
+          unit: "Unidad"
+          unit_placeholder: "Selecciona una unidad"
+          delivery_type: "Qué llegó"
+          courier_company: "Empresa o repartidor"
+          tracking_code: "Código de seguimiento"
+          notes: "Nota"
+          optional: "Opcional"
+          confirm: "Registrar y avisar"
+          success: "Llegada registrada. Se avisó a los residentes."
+        withdraw:
+          title: "Registrar retiro"
+          description: "Elige al residente que retira. Solo aparecen quienes tienen el permiso de retiro."
+          who: "Quién retira"
+          none: "Ningún residente de esta unidad tiene permiso para retirar encomiendas. Actívalo en la ficha del ocupante de la unidad."
+          confirm: "Registrar retiro"
+          success: "Retiro registrado."
+        errors:
+          unit_required: "Selecciona una unidad de la propiedad"
+          not_found: "La encomienda ya no está disponible"
       visits:
         actions:
           open_menu: "Abrir acciones de visita"
@@ -978,6 +1039,7 @@ es:
               document: "Documento"
               occupancy_type: "Tipo de ocupación"
               can_authorize_visits: "Autoriza visitas"
+              can_withdraw_parcels: "Retira encomiendas"
               validity: "Vigencia"
               status: "Estado"
               empty: "No hay ocupantes activos en esta unidad."
@@ -1045,7 +1107,9 @@ es:
                   occupancy_type: "Tipo de ocupación"
                   occupancy_type_placeholder: "Selecciona un tipo"
                   can_authorize_visits: "Puede autorizar visitas"
+                  can_withdraw_parcels: "Puede retirar encomiendas"
                   can_authorize_visits_help: "Solo ocupantes activos con este permiso pueden autorizar visitas."
+                  can_withdraw_parcels_help: "Solo ocupantes activos con este permiso pueden retirar encomiendas en conserjería."
                   starts_at: "Fecha de inicio"
                   starts_at_placeholder: "Selecciona una fecha"
                   ends_at: "Fecha de término"
@@ -1062,6 +1126,7 @@ es:
                 unit: "Unidad"
                 occupancy_type: "Tipo de ocupación"
                 can_authorize_visits: "Autoriza visitas"
+                can_withdraw_parcels: "Retira encomiendas"
                 validity: "Vigencia"
                 actions:
                   submit: "Confirmar y agregar"
@@ -2445,6 +2510,7 @@ es:
         operational_roles: "Roles operativos"
         concierge: "Conserjería"
         authorized_visits: "Visitas autorizadas"
+        parcels: "Encomiendas"
         visits: "Visitas"
         manage_visits: "Gestión de visitas"
         footer:
@@ -2577,6 +2643,8 @@ es:
       not_found: "Recurso no encontrado"
       unauthorized: "No tienes permisos para acceder a este recurso"
       unauthorized_tenant: "No tienes permisos para acceder a este recurso"
+      email_required: "Ingresa un correo electrónico"
+      too_many_requests: "Demasiadas solicitudes. Intenta de nuevo más tarde"
       token_dispatch_failed: "Error al generar el token"
       invalid_credentials: "Credenciales inválidas"
       unconfirmed_account: "Cuenta no confirmada"
@@ -2584,6 +2652,10 @@ es:
       token_expired: "Token expirado"
       token_invalid: "Token inválido"
       invalid_day: "El parámetro day debe tener formato YYYY-MM-DD"
+    parcels:
+      not_authorized: "No estás autorizado para registrar encomiendas en esta propiedad"
+      not_waiting: "La encomienda ya fue retirada"
+      not_eligible: "La persona no tiene permiso para retirar encomiendas de esta unidad"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"

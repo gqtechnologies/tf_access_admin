@@ -35,6 +35,7 @@ pt:
       ownerships: "Proprietários"
       occupancies: "Residentes"
       visits: "Visitas"
+      parcels: "Encomendas"
       staff: "Pessoal"
       own_unit: "Unidade própria"
     capability_labels:
@@ -60,6 +61,7 @@ pt:
       view_minimal_access_control_data: "Ver dados de controle de acesso"
       view_own_unit_context: "Ver contexto da unidade própria"
       manage_staff_assignments: "Gerenciar atribuições de pessoal"
+      manage_parcels: "Gerenciar encomendas"
     capability_descriptions:
       manage_organization: "Configura ajustes globais da organização."
       manage_users: "Cria e gerencia usuários da organização."
@@ -83,3 +85,4 @@ pt:
       view_minimal_access_control_data: "Consulta dados mínimos para controle de acesso."
       view_own_unit_context: "Consulta contexto de unidades próprias ou ocupadas."
       manage_staff_assignments: "Atribui e revoga funções operacionais de pessoal."
+      manage_parcels: "Registra chegadas e retiradas de encomendas."

@@ -30,6 +30,7 @@ function isOccupancyDrawerError(errors) {
     'first_name',
     'last_name',
     'can_authorize_visits',
+    'can_withdraw_parcels',
   ]
 
   return Object.keys(errors).some((key) => keys.includes(key))

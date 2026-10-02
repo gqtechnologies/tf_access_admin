@@ -36,5 +36,28 @@ module Authorization
         .where("starts_at <= ?", day_end)
         .where("ends_at IS NULL OR ends_at >= ?", day_start)
     end
+
+    # Unit-side counterparts of the per-person queries above: every currently
+    # valid ownership / occupancy of +unit+, with the same status and date rules.
+    def active_ownerships_of_unit(unit, at: Date.current)
+      return UnitOwnership.none if unit.blank?
+
+      UnitOwnership
+        .where(organization_id: unit.organization_id, unit_id: unit.id, status: UnitOwnership::STATUS_ACTIVE)
+        .where("starts_at <= ?", at)
+        .where("ends_at IS NULL OR ends_at >= ?", at)
+    end
+
+    def active_occupancies_of_unit(unit, at: Time.zone.now)
+      return UnitOccupancy.none if unit.blank?
+
+      day_start = at.in_time_zone.beginning_of_day
+      day_end = at.in_time_zone.end_of_day
+
+      UnitOccupancy
+        .where(organization_id: unit.organization_id, unit_id: unit.id, status: OccupancyStatuses::ACTIVE)
+        .where("starts_at <= ?", day_end)
+        .where("ends_at IS NULL OR ends_at >= ?", day_start)
+    end
   end
 end

@@ -53,6 +53,15 @@ en:
       cta: "Create my account"
       expiration: "This link is single-use and expires in 14 days."
   notifications:
+    parcel:
+      title: "A delivery arrived"
+      body: "There is %{delivery_type} for %{unit} at the front desk"
+      delivery_types:
+        parcel: "a parcel"
+        food: "a food order"
+        document: "a document"
+        groceries: "a grocery order"
+        other: "a delivery"
     visit_invitation:
       title: "New invitation"
       body: "You were invited to %{property} on %{date}"
@@ -166,6 +175,58 @@ en:
       contact_support: "Contact support"
       go_to_home: "Go to home"
     concierge:
+      parcels:
+        index:
+          title: "Parcels"
+          description: "Register what arrives at the front desk and who picks it up. Registering an arrival notifies the unit's residents."
+          property: "Property"
+          register: "Register arrival"
+          no_property: "You have no property assigned to handle parcels."
+          tabs:
+            received: "Waiting"
+            withdrawn: "Picked up"
+          search:
+            placeholder: "Search by unit, courier or code"
+          empty:
+            received: "No parcels waiting."
+            withdrawn: "No pickups in the last 30 days."
+            search: "No parcel matches the search."
+          table:
+            unit: "Unit"
+            delivery_type: "Type"
+            courier: "Courier / code"
+            received_at: "Arrival"
+            withdrawn: "Pickup"
+            notes: "Note"
+            withdraw: "Register pickup"
+        delivery_types:
+          parcel: "Parcel"
+          food: "Food"
+          document: "Document"
+          groceries: "Groceries"
+          other: "Other delivery"
+        receive:
+          title: "Register arrival"
+          description: "The unit's residents will get a notification."
+          unit: "Unit"
+          unit_placeholder: "Select a unit"
+          delivery_type: "What arrived"
+          courier_company: "Company or courier"
+          tracking_code: "Tracking code"
+          notes: "Note"
+          optional: "Optional"
+          confirm: "Register and notify"
+          success: "Arrival registered. Residents were notified."
+        withdraw:
+          title: "Register pickup"
+          description: "Choose the resident picking it up. Only those with the withdrawal permission are listed."
+          who: "Who picks it up"
+          none: "No resident of this unit is allowed to pick up parcels. Enable it on the unit's occupant record."
+          confirm: "Register pickup"
+          success: "Pickup registered."
+        errors:
+          unit_required: "Select a unit of the property"
+          not_found: "The parcel is no longer available"
       visits:
         actions:
           open_menu: "Open visit actions"
@@ -1046,6 +1107,7 @@ en:
               document: "Document"
               occupancy_type: "Occupancy type"
               can_authorize_visits: "Can authorize visits"
+              can_withdraw_parcels: "Can withdraw parcels"
               validity: "Validity"
               status: "Status"
               empty: "There are no active occupants on this unit."
@@ -1113,7 +1175,9 @@ en:
                   occupancy_type: "Occupancy type"
                   occupancy_type_placeholder: "Select a type"
                   can_authorize_visits: "Can authorize visits"
+                  can_withdraw_parcels: "Can withdraw parcels"
                   can_authorize_visits_help: "Only active occupants with this permission can authorize visits."
+                  can_withdraw_parcels_help: "Only active occupants with this permission can pick up parcels at the front desk."
                   starts_at: "Start date"
                   starts_at_placeholder: "Select a date"
                   ends_at: "End date"
@@ -1130,6 +1194,7 @@ en:
                 unit: "Unit"
                 occupancy_type: "Occupancy type"
                 can_authorize_visits: "Can authorize visits"
+                can_withdraw_parcels: "Can withdraw parcels"
                 validity: "Validity"
                 actions:
                   submit: "Confirm and add"
@@ -2446,6 +2511,7 @@ en:
         operational_roles: "Operational Roles"
         concierge: "Concierge"
         authorized_visits: "Authorized visits"
+        parcels: "Parcels"
         visits: "Visits"
         manage_visits: "Visit management"
         categories: "Categories"
@@ -2582,6 +2648,8 @@ en:
       not_found: "Resource not found"
       unauthorized: "You are not authorized to access this resource"
       unauthorized_tenant: "You are not authorized to access this resource"
+      email_required: "Enter an email address"
+      too_many_requests: "Too many requests. Try again later"
       token_dispatch_failed: "Failed to dispatch token"
       invalid_credentials: "Invalid credentials"
       unconfirmed_account: "Account not confirmed"
@@ -2589,6 +2657,10 @@ en:
       token_expired: "Token expired"
       token_invalid: "Token invalid"
       invalid_day: "The day parameter must be a valid YYYY-MM-DD date"
+    parcels:
+      not_authorized: "You are not authorized to register parcels on this property"
+      not_waiting: "The parcel was already withdrawn"
+      not_eligible: "This person is not allowed to withdraw parcels for this unit"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

@@ -49,7 +49,7 @@ class UnitOccupancy < ApplicationRecord
   acts_as_paranoid
 
   audited associated_with: :unit,
-          only: %i[occupancy_type can_authorize_visits starts_at ends_at status person_id]
+          only: %i[occupancy_type can_authorize_visits can_withdraw_parcels starts_at ends_at status person_id]
 
   belongs_to :organization
   belongs_to :unit
