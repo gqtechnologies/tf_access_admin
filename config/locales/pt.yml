@@ -170,6 +170,58 @@ pt:
       contact_support: "Contatar suporte"
       go_to_home: "Ir para a página inicial"
     concierge:
+      parcels:
+        index:
+          title: "Encomendas"
+          description: "Registre o que chega à portaria e quem retira. Ao registrar uma chegada, os moradores da unidade são avisados."
+          property: "Propriedade"
+          register: "Registrar chegada"
+          no_property: "Você não tem uma propriedade atribuída para operar encomendas."
+          tabs:
+            received: "A retirar"
+            withdrawn: "Retiradas"
+          search:
+            placeholder: "Buscar por unidade, transportadora ou código"
+          empty:
+            received: "Não há encomendas a retirar."
+            withdrawn: "Não há retiradas nos últimos 30 dias."
+            search: "Nenhuma encomenda corresponde à busca."
+          table:
+            unit: "Unidade"
+            delivery_type: "Tipo"
+            courier: "Transportadora / código"
+            received_at: "Chegada"
+            withdrawn: "Retirada"
+            notes: "Nota"
+            withdraw: "Registrar retirada"
+        delivery_types:
+          parcel: "Encomenda"
+          food: "Comida"
+          document: "Documento"
+          groceries: "Supermercado"
+          other: "Outra entrega"
+        receive:
+          title: "Registrar chegada"
+          description: "Os moradores da unidade receberão uma notificação."
+          unit: "Unidade"
+          unit_placeholder: "Selecione uma unidade"
+          delivery_type: "O que chegou"
+          courier_company: "Empresa ou entregador"
+          tracking_code: "Código de rastreio"
+          notes: "Nota"
+          optional: "Opcional"
+          confirm: "Registrar e avisar"
+          success: "Chegada registrada. Os moradores foram avisados."
+        withdraw:
+          title: "Registrar retirada"
+          description: "Escolha o morador que retira. Só aparecem os que têm a permissão de retirada."
+          who: "Quem retira"
+          none: "Nenhum morador desta unidade tem permissão para retirar encomendas. Ative na ficha do ocupante da unidade."
+          confirm: "Registrar retirada"
+          success: "Retirada registrada."
+        errors:
+          unit_required: "Selecione uma unidade da propriedade"
+          not_found: "A encomenda não está mais disponível"
       visits:
         actions:
           open_menu: "Abrir ações da visita"
@@ -1048,6 +1100,7 @@ pt:
               document: "Documento"
               occupancy_type: "Tipo de ocupação"
               can_authorize_visits: "Autoriza visitas"
+              can_withdraw_parcels: "Retira encomendas"
               validity: "Vigência"
               status: "Estado"
               empty: "Não há ocupantes ativos nesta unidade."
@@ -1115,7 +1168,9 @@ pt:
                   occupancy_type: "Tipo de ocupação"
                   occupancy_type_placeholder: "Selecione um tipo"
                   can_authorize_visits: "Pode autorizar visitas"
+                  can_withdraw_parcels: "Pode retirar encomendas"
                   can_authorize_visits_help: "Somente ocupantes ativos com esta permissão podem autorizar visitas."
+                  can_withdraw_parcels_help: "Somente ocupantes ativos com esta permissão podem retirar encomendas na portaria."
                   starts_at: "Data de início"
                   starts_at_placeholder: "Selecione uma data"
                   ends_at: "Data de término"
@@ -1132,6 +1187,7 @@ pt:
                 unit: "Unidade"
                 occupancy_type: "Tipo de ocupação"
                 can_authorize_visits: "Autoriza visitas"
+                can_withdraw_parcels: "Retira encomendas"
                 validity: "Vigência"
                 actions:
                   submit: "Confirmar e adicionar"
@@ -2410,6 +2466,7 @@ pt:
         operational_roles: "Funções operacionais"
         concierge: "Portaria"
         authorized_visits: "Visitas autorizadas"
+        parcels: "Encomendas"
         visits: "Visitas"
         manage_visits: "Gestão de visitas"
         categories: "Categorias"

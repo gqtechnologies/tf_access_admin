@@ -13,6 +13,7 @@ export const unitOccupancyValidationKeys = {
 export const unitOccupancyAssignSchema = z.object({
   occupancy_type: z.string().trim().min(1, unitOccupancyValidationKeys.occupancy_type_required),
   can_authorize_visits: z.boolean(),
+  can_withdraw_parcels: z.boolean(),
   starts_at: z.string().trim().min(1, unitOccupancyValidationKeys.starts_at_required),
   ends_at: z.string().optional(),
 })
@@ -40,6 +41,7 @@ export function createEmptyOccupancyForm(defaultType = 'tenant'): UnitOccupancyA
   return {
     occupancy_type: defaultType,
     can_authorize_visits: false,
+    can_withdraw_parcels: false,
     starts_at: todayIsoDate(),
     ends_at: '',
   }

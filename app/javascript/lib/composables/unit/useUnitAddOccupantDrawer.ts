@@ -53,6 +53,7 @@ const OCCUPANCY_DRAWER_ERROR_KEYS = [
   'first_name',
   'last_name',
   'can_authorize_visits',
+  'can_withdraw_parcels',
   'status',
 ] as const
 
@@ -244,6 +245,7 @@ export function useUnitAddOccupantDrawer(defaultOccupancyType = 'tenant') {
     const occupancy = {
       occupancy_type: occupancyForm.value.occupancy_type,
       can_authorize_visits: occupancyForm.value.can_authorize_visits,
+      can_withdraw_parcels: occupancyForm.value.can_withdraw_parcels,
       starts_at: occupancyForm.value.starts_at,
       ...(occupancyForm.value.ends_at ? { ends_at: occupancyForm.value.ends_at } : {}),
     }

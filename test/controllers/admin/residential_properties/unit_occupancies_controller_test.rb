@@ -200,6 +200,19 @@ class Admin::ResidentialProperties::UnitOccupanciesControllerTest < ActionDispat
     assert_equal OccupancyTypes::FAMILY_MEMBER, @occupancy.occupancy_type
   end
 
+  test "tenant admin grants and revokes the parcel withdrawal permission" do
+    sign_in_as(@tenant_admin)
+
+    patch @occupancy_path, params: { unit_occupancy: { can_withdraw_parcels: true } }
+
+    assert_redirected_to @unit_show_path
+    assert @occupancy.reload.can_withdraw_parcels
+
+    patch @occupancy_path, params: { unit_occupancy: { can_withdraw_parcels: false } }
+
+    assert_not @occupancy.reload.can_withdraw_parcels
+  end
+
   test "update with invalid dates redirects with inertia errors" do
     sign_in_as(@tenant_admin)
 
