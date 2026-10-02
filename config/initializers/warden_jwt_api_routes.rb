@@ -15,6 +15,7 @@ Rails.application.config.after_initialize do
   Warden::JWTAuth.configure do |config|
     config.dispatch_requests = [
       [ "POST", %r{\A/api/v1/auth/login(\.json)?\z} ],
+      [ "POST", %r{\A/api/v1/auth/social(\.json)?\z} ],
       [ "POST", %r{\A/api/v1/mobile/auth/login(\.json)?\z} ]
     ]
     config.revocation_requests = [

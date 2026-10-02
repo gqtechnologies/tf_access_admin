@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::Auth::SessionsController < Api::V1::BaseController
+  include Api::JwtSessionResponse
+
   skip_before_action :set_current_organization, only: [ :create ]
 
   before_action :authenticate_user!, only: [ :destroy ]
@@ -29,31 +31,7 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
       return render json: { error: I18n.t("api.errors.account_deactivated") }, status: :unauthorized
     end
 
-    Current.organization = organization
-    ActsAsTenant.with_tenant(organization) do
-      sign_in(user, store: false)
-    end
-
-    token = request.env[Warden::JWTAuth::Hooks::PREPARED_TOKEN_ENV_KEY]
-    unless token
-      return render json: { error: I18n.t("api.errors.token_dispatch_failed") }, status: :internal_server_error
-    end
-
-    Current.reset
-
-    render json: {
-      data: {
-        token: token,
-        token_type: "Bearer",
-        expires_in: Warden::JWTAuth.config.expiration_time,
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: api_role_for(user, organization)
-        }
-      }
-    }, status: :ok
+    render_jwt_session(user, organization)
   end
 
   def destroy
@@ -62,13 +40,6 @@ class Api::V1::Auth::SessionsController < Api::V1::BaseController
   end
 
   private
-
-  # Membership in the tenant is already guaranteed by User.find_for_authentication.
-  # Any confirmed member may log in: organizational roles win, otherwise the user
-  # is a resident (owner/occupant) of the organization.
-  def api_role_for(user, organization)
-    Api::RoleResolver.call(user, organization)
-  end
 
   def ensure_destroy_tenant_access!
     return if current_user.super_admin?

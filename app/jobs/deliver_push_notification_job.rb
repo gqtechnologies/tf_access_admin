@@ -37,7 +37,7 @@ class DeliverPushNotificationJob < ApplicationJob
       return
     end
 
-    payload = payload_builder_for(notification).build(notification)
+    payload = Notifications::PushPayload.build(notification)
     result = Notifications::PushTransport.for(device_token.token).send_notification(
       token: device_token.token,
       title: payload[:title],
@@ -59,18 +59,6 @@ class DeliverPushNotificationJob < ApplicationJob
     # The transport told us the device is gone: drop the token so no further
     # deliveries target it (spec: "Unregistered device tokens are invalidated").
     device_token.destroy! if result.device_not_registered?
-  end
-
-  # visit_invitation targets the visitor (D4) and visit_entry_denied the host;
-  # every other type keeps the resident-facing visit request payload.
-  PAYLOAD_BUILDERS = {
-    NotificationTypes::VISIT_INVITATION => "Notifications::VisitInvitationPushPayload",
-    NotificationTypes::VISIT_ENTRY_DENIED => "Notifications::VisitEntryDeniedPushPayload",
-    NotificationTypes::PARCEL => "Notifications::ParcelPushPayload"
-  }.freeze
-
-  def payload_builder_for(notification)
-    PAYLOAD_BUILDERS.fetch(notification.notification_type, "Notifications::VisitRequestPushPayload").constantize
   end
 
   # Because this project only uses open-source Sidekiq (no Batch API), each

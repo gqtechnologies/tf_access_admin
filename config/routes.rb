@@ -30,6 +30,8 @@ Rails.application.routes.draw do
         delete :logout, to: "sessions#destroy"
         # Always 202: sends the Devise reset email only to active members of the tenant.
         post :password, to: "passwords#create"
+        # Sign in or sign up with an Apple / Google identity token.
+        post :social, to: "social_sessions#create"
       end
 
       namespace :mobile do
@@ -57,6 +59,8 @@ Rails.application.routes.draw do
         # Authenticated profile of the current user (mobile-private-api "Profile endpoint").
         get "me", to: "profiles#show"
         patch "me", to: "profiles#update"
+        # PATCH /me/password changes the signed-in user's password (needs the current one).
+        patch "me/password", to: "passwords#update"
 
         # GET /units lists units with an active occupancy/ownership for the current person.
         # GET /units/:unit_id/visits?day=YYYY-MM-DD lists that day's visits (property time zone).
@@ -104,6 +108,12 @@ Rails.application.routes.draw do
               post :deny_entry
             end
           end
+        end
+
+        # In-app inbox: the current user's own notifications, newest first.
+        resources :notifications, only: [ :index ] do
+          collection { post :read_all }
+          member { post :read }
         end
 
         # Singular resource: a User has at most one registered device token.
