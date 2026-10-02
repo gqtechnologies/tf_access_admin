@@ -108,6 +108,12 @@ Rails.application.routes.draw do
           end
         end
 
+        # In-app inbox: the current user's own notifications, newest first.
+        resources :notifications, only: [ :index ] do
+          collection { post :read_all }
+          member { post :read }
+        end
+
         # Singular resource: a User has at most one registered device token.
         resource :device_token, only: %i[create destroy]
       end
