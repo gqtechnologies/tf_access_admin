@@ -61,7 +61,9 @@ Rails.application.routes.draw do
         # GET /units/:unit_id/visits/:id returns the visit detail with can_cancel/can_resend.
         # DELETE /units/:unit_id/visits/:id cancels the visit.
         # POST /units/:unit_id/visits/:id/resend_invitation re-notifies the visitor (5-minute cooldown).
+        # GET /units/:unit_id/residents lists the people with an active occupancy/ownership of the unit.
         resources :units, only: [ :index ] do
+          resources :residents, only: [ :index ], module: :units
           resources :visits, only: [ :index, :create, :show, :destroy ], module: :units do
             member do
               post :resend_invitation
