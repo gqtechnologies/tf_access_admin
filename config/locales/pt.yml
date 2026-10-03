@@ -384,6 +384,23 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      staff_shifts:
+        index:
+          title: "Turnos da portaria"
+          description: "Quem esteve de turno cada dia, quanto durou, a nota de passagem e quantas encomendas recebeu. Os porteiros abrem e fecham o turno pelo app."
+          property: "Propriedade"
+          day: "Dia"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar pessoal."
+          empty: "Não houve turnos neste dia."
+          duration: "{hours} h {minutes} min"
+        table:
+          person: "Porteiro"
+          on_duty: "De turno"
+          start: "Início"
+          end: "Fim"
+          duration: "Duração"
+          parcels: "Encomendas"
+          notes: "Nota de passagem"
       vehicles:
         index:
           title: "Veículos"
@@ -2833,6 +2850,7 @@ pt:
         parcels: "Encomendas"
         communication: "Comunicação"
         announcements: "Avisos"
+        staff_shifts: "Turnos"
         residents_group: "Moradores"
         authorized_residents: "Pessoas autorizadas"
         vehicles: "Veículos"
@@ -3017,6 +3035,10 @@ pt:
     vehicles:
       not_allowed: "Você não tem uma relação ativa com esta unidade"
       not_found: "Esse veículo não é desta unidade"
+    shifts:
+      not_assigned: "Você não tem uma atribuição vigente nesta propriedade"
+      already_open: "Você já tem um turno aberto"
+      not_open: "Você não tem um turno aberto nesta propriedade"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"

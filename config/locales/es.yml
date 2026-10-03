@@ -389,6 +389,23 @@ es:
         title: "Nueva visita"
         body: "%{visitor_name} llegará a la unidad %{unit_identifier}"
     admin:
+      staff_shifts:
+        index:
+          title: "Turnos de conserjería"
+          description: "Quién estuvo de turno cada día, cuánto duró, la nota de entrega y cuántas encomiendas recibió. Los conserjes abren y cierran su turno desde la app."
+          property: "Propiedad"
+          day: "Día"
+          no_property: "No tienes una propiedad asignada para gestionar personal."
+          empty: "No hubo turnos este día."
+          duration: "{hours} h {minutes} min"
+        table:
+          person: "Conserje"
+          on_duty: "De turno"
+          start: "Inicio"
+          end: "Término"
+          duration: "Duración"
+          parcels: "Encomiendas"
+          notes: "Nota de entrega"
       vehicles:
         index:
           title: "Vehículos"
@@ -2877,6 +2894,7 @@ es:
         parcels: "Encomiendas"
         communication: "Comunicación"
         announcements: "Avisos"
+        staff_shifts: "Turnos"
         residents_group: "Residentes"
         authorized_residents: "Personas autorizadas"
         vehicles: "Vehículos"
@@ -3064,6 +3082,10 @@ es:
     vehicles:
       not_allowed: "No tienes una relación activa con esta unidad"
       not_found: "Ese vehículo no es de esta unidad"
+    shifts:
+      not_assigned: "No tienes una asignación vigente en esta propiedad"
+      already_open: "Ya tienes un turno abierto"
+      not_open: "No tienes un turno abierto en esta propiedad"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"

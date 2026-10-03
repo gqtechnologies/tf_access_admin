@@ -389,6 +389,23 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      staff_shifts:
+        index:
+          title: "Front-desk shifts"
+          description: "Who was on duty each day, for how long, the handover note and how many parcels they received. Concierges open and close their shift from the app."
+          property: "Property"
+          day: "Day"
+          no_property: "You have no property assigned to manage staff."
+          empty: "No shifts on this day."
+          duration: "{hours} h {minutes} min"
+        table:
+          person: "Concierge"
+          on_duty: "On duty"
+          start: "Start"
+          end: "End"
+          duration: "Duration"
+          parcels: "Parcels"
+          notes: "Handover note"
       vehicles:
         index:
           title: "Vehicles"
@@ -2878,6 +2895,7 @@ en:
         parcels: "Parcels"
         communication: "Communication"
         announcements: "Announcements"
+        staff_shifts: "Shifts"
         residents_group: "Residents"
         authorized_residents: "Authorized people"
         vehicles: "Vehicles"
@@ -3069,6 +3087,10 @@ en:
     vehicles:
       not_allowed: "You have no active relationship with this unit"
       not_found: "That vehicle does not belong to this unit"
+    shifts:
+      not_assigned: "You have no current assignment on this property"
+      already_open: "You already have an open shift"
+      not_open: "You have no open shift on this property"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

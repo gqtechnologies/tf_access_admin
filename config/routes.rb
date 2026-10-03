@@ -101,6 +101,10 @@ Rails.application.routes.draw do
         namespace :concierge do
           resources :properties, only: [ :index ]
           resources :authorized_people, only: [ :index ]
+          # The worker's own front-desk shift on the property.
+          resource :shift, only: [ :show, :create ] do
+            post :close
+          end
           # Plate lookup at the gate.
           resources :vehicles, only: [ :index ]
           # Parcel front desk: unit picker, listing, arrival and withdrawal.
@@ -159,6 +163,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :incidents, only: [ :index, :update ]
     resources :vehicles, only: [ :index, :destroy ]
+    resources :staff_shifts, only: [ :index ]
     resources :authorized_residents, only: [ :index ] do
       member do
         post :approve
