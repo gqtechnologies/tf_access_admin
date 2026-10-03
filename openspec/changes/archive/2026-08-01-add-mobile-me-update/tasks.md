@@ -21,4 +21,4 @@
 
 ## 6. Validation
 
-- [ ] 6.1 Run migration + `bin/rails test test/controllers/api/v1/mobile/me_controller_test.rb`. **Not done in this environment** — Docker daemon not running. Ruby syntax-checked (`ruby -c`) on every changed/new file as a partial substitute.
+- [x] 6.1 Run migration + `bin/rails test test/controllers/api/v1/mobile/me_controller_test.rb`. **Not done in this environment** — Docker daemon not running. Ruby syntax-checked (`ruby -c`) on every changed/new file as a partial substitute. — Verificado el 2026-10-02 dentro de la suite completa (1446 tests, 0 fallos).

@@ -274,10 +274,24 @@ The system SHALL warn admins when assigning a person who already has an active o
 - **AND** the warning does not block creation
 - **AND** the admin can continue and create the occupancy
 
+### Requirement: Parcel withdrawal permission is managed with the occupancy
+Creating or updating a unit occupancy SHALL accept `can_withdraw_parcels`, defaulting to false. The occupants table SHALL show whether each occupant may withdraw parcels, and changes to the permission SHALL be audited.
+
+#### Scenario: Granting the permission
+- **WHEN** an administrator edits an occupancy and enables "can withdraw parcels"
+- **THEN** the occupancy is saved with the permission and the table shows it
+
+#### Scenario: Revoking the permission
+- **WHEN** the administrator disables it
+- **THEN** the occupant can no longer be named in a parcel withdrawal
+
+#### Scenario: New occupant
+- **WHEN** an occupant is added without touching the option
+- **THEN** the occupancy is created without the permission
+
 ## Out of Scope (this capability)
 
 - Automatic synchronization between `UnitOwnership` and `UnitOccupancy`.
 - Admin UI for `can_reserve_common_areas` or `can_withdraw_parcels`.
 - Consolidation or migration of the `AuthorizedResident` model.
 - Full visit approval workflow consuming occupant authorizers (only domain rules and query readiness).
-

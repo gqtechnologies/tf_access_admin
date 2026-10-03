@@ -1,7 +1,9 @@
 # organization-membership Specification
 
 ## Purpose
-TBD - created by archiving change normalize-user-identity-and-property-onboarding. Update Purpose after archive.
+
+Models a person's membership in each organization independently, so it can be accepted, declined or revoked per organization without affecting the others.
+
 ## Requirements
 ### Requirement: Independent membership per organization
 

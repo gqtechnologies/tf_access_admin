@@ -1,20 +1,29 @@
 # residential-visit-management Specification
 
 ## Purpose
-TBD - created by archiving change residential-visit-management. Update Purpose after archive.
+
+Lets residents register, answer and manage the visits of their own units through the private API, with the visitor kept as a canonical person and authorization tied to the unit relationship.
+
 ## Requirements
+
 ### Requirement: Resident registers a visit through a private authenticated API
 
-The system SHALL provide a private authenticated API contract, distinct from the administrative visit flow, through which a resident submits a unit, visitor name, visitor document, visitor phone, and visit date/time.
+The system SHALL provide a private authenticated API contract, distinct from the administrative visit flow, through which a resident submits a unit, visitor name, visitor email, optional visitor document, optional visitor phone, and visit date/time.
 
 #### Scenario: Authenticated resident submits a valid private request
 
 - **GIVEN** a `User` is authenticated in organization O
 - **AND** the user's `Person` has an active relationship with unit U in O
 - **AND** the user is allowed to create and authorize visits for U
-- **WHEN** the user submits valid visitor identity data and a visit date/time through the private API
+- **WHEN** the user submits a visitor name, a valid visitor email and a visit date/time through the private API
 - **THEN** the system creates a visit for U
 - **AND** the operation does not use an admin visit screen or admin Inertia flow
+
+#### Scenario: Missing or invalid visitor email is rejected
+
+- **WHEN** the resident submits a visitor without email, or with a malformed email
+- **THEN** the system returns `422` with a localized error
+- **AND** no `Person` or `Visit` is persisted
 
 #### Scenario: Unauthenticated request is rejected
 
@@ -240,3 +249,132 @@ The system MUST continue deriving `property_admin` and `concierge` from active p
 - **THEN** `property_admin` and `concierge` capabilities remain scoped to their assigned properties
 - **AND** no organization-wide operational role is created as a side effect
 
+### Requirement: Visitor person is resolved by email within the organization
+
+The system SHALL resolve the visitor `Person` inside the current organization by document when provided, otherwise by normalized email (lower-cased, trimmed), and SHALL create a new `Person` when no match exists. The system MUST NOT merge existing persons.
+
+#### Scenario: Existing person by email is reused
+
+- **GIVEN** a `Person` in O with email `ana@example.com`
+- **WHEN** a resident invites `Ana@Example.com`
+- **THEN** the visit points to that existing `Person` and no new `Person` is created
+
+#### Scenario: New person is created
+
+- **GIVEN** no `Person` in O with the submitted email or document
+- **WHEN** the resident submits the invitation
+- **THEN** the system creates a `Person` in O with the display name, email, phone and document provided
+
+#### Scenario: Same email in another organization is not reused
+
+- **GIVEN** a `Person` with the same email exists only in organization P
+- **WHEN** a resident of O invites that email
+- **THEN** the system creates a separate `Person` in O
+
+#### Scenario: Conflicting identity is rejected
+
+- **GIVEN** a `Person` in O with document D and email `x@example.com`
+- **WHEN** a resident submits document D with email `y@example.com`
+- **THEN** the system returns `422` with a localized conflict error and persists nothing
+
+### Requirement: Visitor is notified after the visit is created
+
+After a resident visit is persisted, the system SHALL notify the visitor outside the creation transaction: by push and email when the visitor `Person` has a linked account, by linking and then notifying when a confirmed account with that email exists, or by issuing an onboarding invitation email when no account exists. Notification failures MUST NOT fail visit creation.
+
+#### Scenario: Visitor with linked account gets push and email
+
+- **GIVEN** the visitor `Person` is linked to a `User` with a registered device token
+- **WHEN** the visit is created
+- **THEN** a `Notification` of type `visit_invitation` and channel `push` is enqueued for that person
+- **AND** an invitation email with the visit details is enqueued
+
+#### Scenario: Existing confirmed account is linked
+
+- **GIVEN** the visitor `Person` has no `user_id` and a confirmed `User` exists with the same email
+- **WHEN** the visit is created
+- **THEN** the `User` is linked to the `Person`, a `visitor` membership in O is created if the user had none
+- **AND** the visitor is notified as in the linked-account scenario
+
+#### Scenario: Visitor without account receives account invitation
+
+- **GIVEN** no `User` exists with the visitor email
+- **WHEN** the visit is created
+- **THEN** an `OnboardingRequest` with relationship `visitor` is issued for the `Person`
+- **AND** an email with the visit details and a single-use acceptance link is enqueued
+
+#### Scenario: Pending invitation is not duplicated
+
+- **GIVEN** the visitor `Person` already has a pending `OnboardingRequest`
+- **WHEN** another visit is created for the same visitor
+- **THEN** no new token is issued
+- **AND** an email with the visit details, without acceptance link, is enqueued
+
+#### Scenario: Notification error does not block creation
+
+- **WHEN** issuing the invitation raises an unexpected error
+- **THEN** the visit remains created with status `authorized`
+- **AND** the error is recorded on the visit metadata
+
+### Requirement: Resident resends the visitor invitation
+
+The system SHALL let a resident with `authorize_visits` on the visit's unit resend the visitor invitation through `Visits::ResendVisitorInvitation`. The service SHALL deliver through `Visits::NotifyVisitor` (same branches as on creation), SHALL require the visit to be `authorized` and not expired, and SHALL enforce a 5-minute cooldown per visit tracked in `visit.metadata["visitor_invitation_resent_at"]`.
+
+#### Scenario: Resend records history
+
+- **WHEN** the invitation is resent
+- **THEN** an `invitation_resent` event is added to the visit history with the resident as actor and the visit `status` unchanged
+
+#### Scenario: Metadata is merged
+
+- **GIVEN** a visit whose `metadata` already holds other keys
+- **WHEN** the invitation is resent
+- **THEN** `visitor_invitation_resent_at` is set and the other keys are preserved
+
+#### Scenario: Delivery failure still starts the cooldown
+
+- **GIVEN** `Visits::NotifyVisitor` fails internally and records its error
+- **WHEN** the invitation is resent
+- **THEN** the call succeeds, the timestamp is stored and a new attempt within 5 minutes is rejected
+
+#### Scenario: Resend does not touch resident notifications
+
+- **WHEN** the invitation is resent
+- **THEN** no `visit_request` notification is created or retried and `notification_status` is unchanged
+
+### Requirement: Pending visits can be rejected
+
+The system SHALL support rejecting a `pending` visit through `Visits::Reject`, moving it to `rejected` and recording a `rejected` history event with the actor. Rejection SHALL require the same capability as authorization (`authorize_visits` or `manage_visits`) and MUST NOT be possible from any status other than `pending`.
+
+#### Scenario: Rejection records history
+
+- **WHEN** a resident rejects a pending visit
+- **THEN** the visit is `rejected` and its history gains a `rejected` event from `pending` with the resident as actor
+
+#### Scenario: Non-pending visit
+
+- **WHEN** rejection is attempted on an `authorized` visit
+- **THEN** it fails and the visit is unchanged
+
+#### Scenario: Rejected visits are not operational
+
+- **WHEN** a visit is `rejected`
+- **THEN** it does not appear in concierge operational listings and cannot be checked in
+
+### Requirement: Visitor is notified when a resident authorizes from the app
+
+When a pending visit is authorized through the private API, the system SHALL notify the visitor through `Visits::NotifyVisitor` if the visitor person has a linked user or a contact email. A notification failure MUST NOT affect the authorization. Rejection MUST NOT notify the visitor.
+
+#### Scenario: Visitor with email
+
+- **WHEN** a resident authorizes a pending visit whose visitor has a contact email
+- **THEN** the invitation email is enqueued
+
+#### Scenario: Visitor without contact data
+
+- **WHEN** the visitor has neither a linked user nor an email
+- **THEN** the visit is authorized and nothing is sent
+
+#### Scenario: Rejection is silent
+
+- **WHEN** a resident rejects a pending visit
+- **THEN** nothing is sent to the visitor

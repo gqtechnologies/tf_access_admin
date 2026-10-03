@@ -1,8 +1,11 @@
 # property-onboarding Specification
 
 ## Purpose
-TBD - created by archiving change normalize-user-identity-and-property-onboarding. Update Purpose after archive.
+
+Brings people into a property through onboarding requests, keeping the holder in control of their memberships and roles and the manager in control of role assignment.
+
 ## Requirements
+
 ### Requirement: Join-activation rule
 
 The system SHALL determine membership activation by the sensitivity of what the join grants. A join that grants only client-level, self-scoped capabilities SHALL be created active immediately, visible to the holder, and declinable by the holder. A join that grants operational roles or access to sensitive data SHALL be created pending and MUST require the holder's explicit acceptance before it becomes active.
@@ -250,3 +253,35 @@ A manager with `manage_people` SHALL be able to see the invitation status (linke
 - **WHEN** a different actor with `manage_people` revokes it
 - **THEN** the system revokes the request
 
+### Requirement: Visitor onboarding relationship
+
+The system SHALL support `visitor` as a requested relationship on an `OnboardingRequest`. A `visitor` request MUST NOT reference a unit or residential property, and accepting it SHALL create an active `OrganizationMembership` with role `visitor` in the inviting organization.
+
+#### Scenario: Visitor accepts and gets a visitor membership
+
+- **GIVEN** a pending `visitor` onboarding request for person P in organization O
+- **WHEN** the holder accepts the single-use link and sets a password
+- **THEN** a confirmed `User` is created and linked to P
+- **AND** P's user holds an active `visitor` membership in O
+- **AND** the user can authenticate through the private API for O
+
+#### Scenario: Visitor request rejects unit scope
+
+- **WHEN** a `visitor` onboarding request is issued with a `unit_id`
+- **THEN** the request is invalid
+
+### Requirement: Visit invitation email delivers the acceptance link
+
+When a visit is created for a visitor without account, the system SHALL send an email that names the inviting organization, the host's display name, the property, the unit and the scheduled date/time, plus the single-use acceptance link. The email MUST NOT include documents, phone numbers or the raw token outside the link.
+
+#### Scenario: Email content
+
+- **WHEN** the visit invitation email is rendered
+- **THEN** it contains organization name, host name, property, unit, date/time and the acceptance link
+- **AND** contains no document number, phone number or token outside the link
+
+#### Scenario: Email is localized
+
+- **GIVEN** the inviting organization's default locale is `pt`
+- **WHEN** the email is rendered
+- **THEN** all texts use the `pt` locale

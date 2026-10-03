@@ -34,5 +34,5 @@
 
 ## 6. Validation
 
-- [ ] 6.1 Run `bin/rails test test/controllers/api/v1/mobile/units_controller_test.rb test/controllers/api/v1/mobile/units/visits_controller_test.rb`. (Blocked locally — Docker daemon not running in this environment; run before merging.)
-- [ ] 6.2 Run `graphify update app`. (Blocked locally — same reason.)
+- [x] 6.1 Run `bin/rails test test/controllers/api/v1/mobile/units_controller_test.rb test/controllers/api/v1/mobile/units/visits_controller_test.rb`. (Blocked locally — Docker daemon not running in this environment; run before merging.) — Verificado el 2026-10-02 dentro de la suite completa (1446 tests, 0 fallos).
+- [x] 6.2 Run `graphify update app`. (Blocked locally — same reason.) — No aplica: graphify no se usa en este repo.

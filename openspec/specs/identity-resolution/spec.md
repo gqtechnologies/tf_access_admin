@@ -1,7 +1,9 @@
 # identity-resolution Specification
 
 ## Purpose
-TBD - created by archiving change normalize-user-identity-and-property-onboarding. Update Purpose after archive.
+
+Decides when two records are the same person: the confirmed email is the only identity key, weaker signals never merge identities, and conflicts are recorded for a dedicated resolution.
+
 ## Requirements
 ### Requirement: Email is the transversal identity key
 

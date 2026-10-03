@@ -1,7 +1,9 @@
 # concierge-visit-access-flow Specification
 
 ## Purpose
-TBD - created by archiving change concierge-visit-access-flow. Update Purpose after archive.
+
+Lets front-desk staff find the visits expected at the properties they operate and register entries and exits, only for authorized visits within their validity window.
+
 ## Requirements
 ### Requirement: Concierge operates only assigned properties
 

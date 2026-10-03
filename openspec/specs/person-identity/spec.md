@@ -1,7 +1,9 @@
 # person-identity Specification
 
 ## Purpose
-TBD - created by archiving change normalize-user-identity-and-property-onboarding. Update Purpose after archive.
+
+Separates the global user account from the per-organization person, and defines which data belongs to each and how a person's identities are grouped across organizations.
+
 ## Requirements
 ### Requirement: Two-level identity model
 

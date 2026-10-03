@@ -1,7 +1,9 @@
 # residential-property Specification
 
 ## Purpose
-TBD - created by archiving change improve-property-foundation. Update Purpose after archive.
+
+Defines the residential property (building or complex) of an organization: its required data, uniqueness, and archiving instead of deletion once it has dependencies.
+
 ## Requirements
 ### Requirement: Residential property belongs to organization
 

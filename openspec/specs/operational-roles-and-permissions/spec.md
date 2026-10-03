@@ -446,3 +446,59 @@ The system SHALL include automated tests for `Authorization::Resolver`, `Authori
 
 - **WHEN** any role from organization A accesses organization B records in policy specs
 - **THEN** tests expect authorization failure
+
+### Requirement: Organization-level Visitor role
+
+The system SHALL define an organizational role `visitor` whose only capability is `view_own_visits`. A `visitor` MUST NOT receive any capability over units, properties, people or visit management. The `view_own_visits` capability SHALL also be granted to any user who is the `visitor_person` of a visit in the organization.
+
+#### Scenario: Visitor capabilities are minimal
+
+- **GIVEN** a user whose only relationship with O is a `visitor` membership
+- **WHEN** the authorization resolver computes effective capabilities
+- **THEN** the result is exactly `[view_own_visits]`
+
+#### Scenario: Resident invited elsewhere can see own invitations
+
+- **GIVEN** a resident of unit U who is the `visitor_person` of a visit to unit W
+- **WHEN** the resolver computes capabilities
+- **THEN** the resident keeps the unit capabilities for U and also holds `view_own_visits`
+
+#### Scenario: Visitor cannot create visits
+
+- **GIVEN** a `visitor` user
+- **WHEN** the user calls `POST /api/v1/private/units/:unit_id/visits`
+- **THEN** the system returns `403`
+
+#### Scenario: Visitor cannot read another person's invitation
+
+- **GIVEN** visit A whose `visitor_person` belongs to user X
+- **WHEN** user Y (a `visitor`) requests A through the invitations endpoint
+- **THEN** A is not returned
+
+### Requirement: API role for concierge staff
+
+The role exposed by the mobile API (login and profile) SHALL be `concierge` when the user holds an active `concierge` staff assignment in the organization and holds none of `super_admin`, `tenant_admin`, `manager` or `content_manager`. The `visitor` organizational role MUST NOT take precedence over an active concierge assignment.
+
+#### Scenario: Concierge logs in
+
+- **GIVEN** a confirmed member with an active concierge assignment on property P
+- **WHEN** they log in through the API
+- **THEN** the returned role is `concierge`
+
+#### Scenario: Administrative role wins
+
+- **GIVEN** a `tenant_admin` who also holds a concierge assignment
+- **WHEN** their API role is resolved
+- **THEN** it is `tenant_admin`
+
+#### Scenario: Concierge previously invited as visitor
+
+- **GIVEN** a user with the `visitor` organizational role and an active concierge assignment
+- **WHEN** their API role is resolved
+- **THEN** it is `concierge`
+
+#### Scenario: Inactive assignment
+
+- **GIVEN** a user whose only concierge assignment is inactive or ended
+- **WHEN** their API role is resolved
+- **THEN** it is `resident`
