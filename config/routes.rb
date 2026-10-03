@@ -70,6 +70,10 @@ Rails.application.routes.draw do
         # GET /units/:unit_id/residents lists the people with an active occupancy/ownership of the unit.
         resources :units, only: [ :index ] do
           resources :residents, only: [ :index ], module: :units
+          # People the unit authorizes to come in without an invitation (approved by the administration).
+          resources :authorized_people, only: [ :index, :create ], module: :units do
+            member { post :withdraw }
+          end
           # GET /units/:unit_id/parcels lists the unit's waiting and recently withdrawn parcels.
           resources :parcels, only: [ :index ], module: :units
           resources :visits, only: [ :index, :create, :show, :destroy ], module: :units do
@@ -94,6 +98,7 @@ Rails.application.routes.draw do
         # operational visit listing of one property, and entry/exit registration.
         namespace :concierge do
           resources :properties, only: [ :index ]
+          resources :authorized_people, only: [ :index ]
           # Parcel front desk: unit picker, listing, arrival and withdrawal.
           resources :units, only: [ :index ]
           resources :parcels, only: [ :index, :show, :create ] do
@@ -149,6 +154,13 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :incidents, only: [ :index, :update ]
+    resources :authorized_residents, only: [ :index ] do
+      member do
+        post :approve
+        post :reject
+        post :revoke
+      end
+    end
     resources :common_areas, only: [ :index, :create, :update ]
     resources :reservations, only: [ :index ] do
       member do

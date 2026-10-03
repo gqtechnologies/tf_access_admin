@@ -53,6 +53,19 @@ es:
       cta: "Crear mi cuenta"
       expiration: "Este enlace es de un solo uso y caduca en 14 días."
   notifications:
+    authorized_person:
+      active:
+        title: "Persona autorizada"
+        body: "La administración aprobó a %{name} en %{unit}"
+      rejected:
+        title: "Autorización rechazada"
+        body: "La administración rechazó autorizar a %{name} en %{unit}"
+      revoked:
+        title: "Autorización revocada"
+        body: "La administración revocó la autorización de %{name} en %{unit}"
+      updated:
+        title: "Autorización actualizada"
+        body: "Cambió la autorización de %{name} en %{unit}"
     incident:
       categories:
         security: "seguridad"
@@ -376,6 +389,57 @@ es:
         title: "Nueva visita"
         body: "%{visitor_name} llegará a la unidad %{unit_identifier}"
     admin:
+      authorized_residents:
+        index:
+          title: "Personas autorizadas"
+          description: "Personas que no viven en la unidad (nanas, choferes, familiares) y que un residente propone para entrar sin invitación y, si lo indica, retirar encomiendas. Solo cuentan cuando las apruebas."
+          property: "Propiedad"
+          no_property: "No tienes una propiedad asignada para gestionar residentes."
+        tabs:
+          pending: "Por aprobar"
+          active: "Vigentes"
+          closed: "Historial"
+        empty:
+          pending: "No hay solicitudes por aprobar."
+          active: "No hay personas autorizadas vigentes."
+          closed: "Todavía no hay historial."
+        table:
+          person: "Persona"
+          unit: "Unidad"
+          proposed_by: "Propuso: {name}"
+          relationship: "Relación"
+          parcels: "Retira encomiendas"
+          validity: "Vigencia"
+          no_end: "Sin término"
+          status: "Estado"
+        actions:
+          approve: "Aprobar"
+          reject: "Rechazar"
+          revoke: "Revocar"
+        confirm:
+          approve_title: "¿Aprobar a esta persona?"
+          approve_body: "{name} podrá entrar sin invitación mientras esté vigente."
+          approve_done: "Persona aprobada."
+          reject_title: "¿Rechazar la solicitud?"
+          reject_body: "Se avisará al residente que propuso a {name}."
+          reject_done: "Solicitud rechazada."
+          revoke_title: "¿Revocar la autorización?"
+          revoke_body: "{name} dejará de poder entrar sin invitación desde ahora."
+          revoke_done: "Autorización revocada."
+        status:
+          pending: "Pendiente"
+          active: "Vigente"
+          rejected: "Rechazada"
+          revoked: "Revocada"
+        errors:
+          invalid: "Esa acción ya no se puede realizar sobre esta persona"
+        relationships:
+          spouse: "Cónyuge"
+          child: "Hijo/a"
+          parent: "Padre o madre"
+          roommate: "Compañero/a"
+          staff: "Personal (nana, chofer)"
+          other: "Otro"
       incidents:
         index:
           title: "Incidentes"
@@ -2785,6 +2849,8 @@ es:
         parcels: "Encomiendas"
         communication: "Comunicación"
         announcements: "Avisos"
+        residents_group: "Residentes"
+        authorized_residents: "Personas autorizadas"
         incidents: "Incidentes"
         common_areas_group: "Áreas comunes"
         reservations: "Reservas"
@@ -2961,6 +3027,11 @@ es:
         monthly_limit: "La unidad ya tiene %{count} reservas este mes en esta área"
     incidents:
       not_allowed: "No puedes reportar incidentes en esta propiedad"
+    authorized_people:
+      not_allowed: "Solo ocupantes que autorizan visitas y propietarios pueden gestionar personas autorizadas"
+      already_listed: "Esa persona ya está autorizada o tiene una solicitud pendiente en esta unidad"
+      invalid_person: "Revisa el nombre y el correo de la persona"
+      not_open: "Esta autorización ya no está vigente"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"

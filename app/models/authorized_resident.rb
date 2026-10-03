@@ -40,6 +40,7 @@
 #
 class AuthorizedResident < ApplicationRecord
   include RelationshipTypes
+  include AuthorizedResidentStatuses
   include TenantScopedAssociations
 
   acts_as_tenant :organization
@@ -51,7 +52,23 @@ class AuthorizedResident < ApplicationRecord
 
   validates :relationship_type, presence: true, inclusion: { in: RelationshipTypes::ALL }
   validates :starts_at, presence: true
-  validates :status, presence: true
+  validates :status, presence: true, inclusion: { in: AuthorizedResidentStatuses::ALL }
+  validates :notes, length: { maximum: 500 }
+
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+  # Approved and within its validity window: may enter without an invitation
+  # and, with can_withdraw_parcels, pick up the unit's parcels.
+  scope :currently_valid, lambda { |at: Time.zone.now|
+    where(status: AuthorizedResidentStatuses::ACTIVE)
+      .where("authorized_residents.starts_at <= ?", at)
+      .where("authorized_residents.ends_at IS NULL OR authorized_residents.ends_at >= ?", at)
+  }
+  scope :open_requests, -> { where(status: [ AuthorizedResidentStatuses::PENDING, AuthorizedResidentStatuses::ACTIVE ]) }
+
+  def pending?
+    status == AuthorizedResidentStatuses::PENDING
+  end
 
   validates_same_tenant :unit, :person, :authorized_by_person
 

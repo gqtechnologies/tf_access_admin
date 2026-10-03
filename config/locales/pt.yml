@@ -53,6 +53,19 @@ pt:
       cta: "Criar minha conta"
       expiration: "Este link é de uso único e expira em 14 dias."
   notifications:
+    authorized_person:
+      active:
+        title: "Pessoa autorizada"
+        body: "A administração aprovou %{name} em %{unit}"
+      rejected:
+        title: "Autorização rejeitada"
+        body: "A administração rejeitou autorizar %{name} em %{unit}"
+      revoked:
+        title: "Autorização revogada"
+        body: "A administração revogou a autorização de %{name} em %{unit}"
+      updated:
+        title: "Autorização atualizada"
+        body: "A autorização de %{name} em %{unit} mudou"
     incident:
       categories:
         security: "segurança"
@@ -371,6 +384,57 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      authorized_residents:
+        index:
+          title: "Pessoas autorizadas"
+          description: "Pessoas que não moram na unidade (babás, motoristas, familiares) que um morador propõe para entrar sem convite e, se indicado, retirar encomendas. Só valem quando você as aprova."
+          property: "Propriedade"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar moradores."
+        tabs:
+          pending: "A aprovar"
+          active: "Vigentes"
+          closed: "Histórico"
+        empty:
+          pending: "Não há solicitações a aprovar."
+          active: "Não há pessoas autorizadas vigentes."
+          closed: "Ainda não há histórico."
+        table:
+          person: "Pessoa"
+          unit: "Unidade"
+          proposed_by: "Propôs: {name}"
+          relationship: "Relação"
+          parcels: "Retira encomendas"
+          validity: "Vigência"
+          no_end: "Sem término"
+          status: "Status"
+        actions:
+          approve: "Aprovar"
+          reject: "Rejeitar"
+          revoke: "Revogar"
+        confirm:
+          approve_title: "Aprovar esta pessoa?"
+          approve_body: "{name} poderá entrar sem convite enquanto estiver vigente."
+          approve_done: "Pessoa aprovada."
+          reject_title: "Rejeitar a solicitação?"
+          reject_body: "O morador que propôs {name} será avisado."
+          reject_done: "Solicitação rejeitada."
+          revoke_title: "Revogar a autorização?"
+          revoke_body: "{name} deixará de poder entrar sem convite a partir de agora."
+          revoke_done: "Autorização revogada."
+        status:
+          pending: "Pendente"
+          active: "Vigente"
+          rejected: "Rejeitada"
+          revoked: "Revogada"
+        errors:
+          invalid: "Essa ação não pode mais ser feita sobre esta pessoa"
+        relationships:
+          spouse: "Cônjuge"
+          child: "Filho/a"
+          parent: "Pai ou mãe"
+          roommate: "Colega"
+          staff: "Funcionário (babá, motorista)"
+          other: "Outro"
       incidents:
         index:
           title: "Incidentes"
@@ -2741,6 +2805,8 @@ pt:
         parcels: "Encomendas"
         communication: "Comunicação"
         announcements: "Avisos"
+        residents_group: "Moradores"
+        authorized_residents: "Pessoas autorizadas"
         incidents: "Incidentes"
         common_areas_group: "Áreas comuns"
         reservations: "Reservas"
@@ -2914,6 +2980,11 @@ pt:
         monthly_limit: "A unidade já tem %{count} reservas este mês nesta área"
     incidents:
       not_allowed: "Você não pode reportar incidentes nesta propriedade"
+    authorized_people:
+      not_allowed: "Só ocupantes que autorizam visitas e proprietários podem gerenciar pessoas autorizadas"
+      already_listed: "Essa pessoa já está autorizada ou tem uma solicitação pendente nesta unidade"
+      invalid_person: "Revise o nome e o e-mail da pessoa"
+      not_open: "Esta autorização não está mais vigente"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"

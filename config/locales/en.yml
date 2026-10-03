@@ -53,6 +53,19 @@ en:
       cta: "Create my account"
       expiration: "This link is single-use and expires in 14 days."
   notifications:
+    authorized_person:
+      active:
+        title: "Person authorized"
+        body: "The administration approved %{name} for %{unit}"
+      rejected:
+        title: "Authorization rejected"
+        body: "The administration rejected authorizing %{name} for %{unit}"
+      revoked:
+        title: "Authorization revoked"
+        body: "The administration revoked %{name}'s authorization for %{unit}"
+      updated:
+        title: "Authorization updated"
+        body: "%{name}'s authorization for %{unit} changed"
     incident:
       categories:
         security: "security"
@@ -376,6 +389,57 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      authorized_residents:
+        index:
+          title: "Authorized people"
+          description: "People who don't live in the unit (nannies, drivers, relatives) that a resident proposes to come in without an invitation and, if stated, pick up parcels. They only count once you approve them."
+          property: "Property"
+          no_property: "You have no property assigned to manage residents."
+        tabs:
+          pending: "To approve"
+          active: "In force"
+          closed: "History"
+        empty:
+          pending: "No requests to approve."
+          active: "No authorized people in force."
+          closed: "No history yet."
+        table:
+          person: "Person"
+          unit: "Unit"
+          proposed_by: "Proposed by: {name}"
+          relationship: "Relationship"
+          parcels: "Picks up parcels"
+          validity: "Validity"
+          no_end: "No end"
+          status: "Status"
+        actions:
+          approve: "Approve"
+          reject: "Reject"
+          revoke: "Revoke"
+        confirm:
+          approve_title: "Approve this person?"
+          approve_body: "{name} will be able to come in without an invitation while in force."
+          approve_done: "Person approved."
+          reject_title: "Reject the request?"
+          reject_body: "The resident who proposed {name} will be told."
+          reject_done: "Request rejected."
+          revoke_title: "Revoke the authorization?"
+          revoke_body: "{name} will no longer be able to come in without an invitation."
+          revoke_done: "Authorization revoked."
+        status:
+          pending: "Pending"
+          active: "In force"
+          rejected: "Rejected"
+          revoked: "Revoked"
+        errors:
+          invalid: "That action can no longer be done on this person"
+        relationships:
+          spouse: "Spouse"
+          child: "Child"
+          parent: "Parent"
+          roommate: "Roommate"
+          staff: "Staff (nanny, driver)"
+          other: "Other"
       incidents:
         index:
           title: "Incidents"
@@ -2786,6 +2850,8 @@ en:
         parcels: "Parcels"
         communication: "Communication"
         announcements: "Announcements"
+        residents_group: "Residents"
+        authorized_residents: "Authorized people"
         incidents: "Incidents"
         common_areas_group: "Common areas"
         reservations: "Reservations"
@@ -2966,6 +3032,11 @@ en:
         monthly_limit: "The unit already has %{count} reservations this month in this area"
     incidents:
       not_allowed: "You cannot report incidents on this property"
+    authorized_people:
+      not_allowed: "Only occupants who authorize visits and owners can manage authorized people"
+      already_listed: "That person is already authorized or has a pending request for this unit"
+      invalid_person: "Check the person's name and email"
+      not_open: "This authorization is no longer in force"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

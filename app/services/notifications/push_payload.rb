@@ -14,7 +14,8 @@ module Notifications
       NotificationTypes::PARCEL => "Notifications::ParcelPushPayload",
       NotificationTypes::ANNOUNCEMENT => "Notifications::AnnouncementPushPayload",
       NotificationTypes::RESERVATION => "Notifications::ReservationPushPayload",
-      NotificationTypes::INCIDENT => "Notifications::IncidentPushPayload"
+      NotificationTypes::INCIDENT => "Notifications::IncidentPushPayload",
+      NotificationTypes::AUTHORIZED_PERSON => "Notifications::AuthorizedPersonPushPayload"
     }.freeze
 
     def self.build(notification)

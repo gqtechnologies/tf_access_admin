@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck, TriangleAlert } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck, TriangleAlert, UserCheck } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -144,6 +144,23 @@ const getFeatureIcon = (key: string) => {
                   <Link href="/admin/incidents">
                     <TriangleAlert class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.incidents') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Authorized people proposed by residents — manage_occupancies capability -->
+        <SidebarGroup v-if="capabilities?.manage_occupancies">
+          <SidebarGroupLabel>{{ t('admin.sidebar.residents_group') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/authorized_residents">
+                    <UserCheck class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.authorized_residents') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
