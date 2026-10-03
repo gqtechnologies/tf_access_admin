@@ -38,6 +38,7 @@ en:
       parcels: "Parcels"
       announcements: "Announcements"
       common_areas: "Common areas"
+      incidents: "Incidents"
       staff: "Staff"
       own_unit: "Own unit"
     capability_labels:
@@ -66,6 +67,8 @@ en:
       manage_parcels: "Manage parcels"
       manage_announcements: "Manage announcements"
       manage_common_areas: "Manage common areas"
+      report_incidents: "Report incidents"
+      manage_incidents: "Manage incidents"
     capability_descriptions:
       manage_organization: "Configure global organization settings."
       manage_users: "Create and manage organization users."
@@ -92,3 +95,5 @@ en:
       manage_parcels: "Registers parcel arrivals and withdrawals."
       manage_announcements: "Writes and publishes announcements to a property's residents."
       manage_common_areas: "Configures common areas and approves or rejects their reservations."
+      report_incidents: "Reports incidents on an operated property."
+      manage_incidents: "Assigns, follows up and closes a property's incidents."

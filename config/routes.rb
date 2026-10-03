@@ -123,6 +123,9 @@ Rails.application.routes.draw do
           member { post :cancel }
         end
 
+        # Incidents the current person reported, and reporting a new one.
+        resources :incidents, only: [ :index, :create ]
+
         # In-app inbox: the current user's own notifications, newest first.
         resources :notifications, only: [ :index ] do
           collection { post :read_all }
@@ -145,6 +148,7 @@ Rails.application.routes.draw do
   post "onboarding/accept/:token", to: "onboarding_acceptances#create"
 
   namespace :admin do
+    resources :incidents, only: [ :index, :update ]
     resources :common_areas, only: [ :index, :create, :update ]
     resources :reservations, only: [ :index ] do
       member do

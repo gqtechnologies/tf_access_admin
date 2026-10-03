@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck, TriangleAlert } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -126,16 +126,24 @@ const getFeatureIcon = (key: string) => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <!-- Announcements to residents — manage_announcements capability -->
-        <SidebarGroup v-if="capabilities?.manage_announcements">
+        <!-- Announcements (manage_announcements) and incidents (manage_incidents) -->
+        <SidebarGroup v-if="capabilities?.manage_announcements || capabilities?.manage_incidents">
           <SidebarGroupLabel>{{ t('admin.sidebar.communication') }}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
+              <SidebarMenuItem v-if="capabilities?.manage_announcements">
                 <SidebarMenuButton as-child>
                   <Link href="/admin/announcements">
                     <Megaphone class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.announcements') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem v-if="capabilities?.manage_incidents">
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/incidents">
+                    <TriangleAlert class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.incidents') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

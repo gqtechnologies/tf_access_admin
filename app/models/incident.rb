@@ -59,6 +59,7 @@
 class Incident < ApplicationRecord
   acts_as_paranoid
   include IncidentCategories
+  include IncidentStatuses
   include Priorities
   include TenantScopedAssociations
 
@@ -81,4 +82,25 @@ class Incident < ApplicationRecord
   validates :priority, presence: true, inclusion: { in: Priorities::ALL }
 
   has_many :incident_status_histories, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+  validates :status, presence: true, inclusion: { in: IncidentStatuses::ALL }
+  validates :description, presence: true, length: { maximum: 2000 }
+  validates :resolution, length: { maximum: 2000 }
+  validate :unit_and_area_belong_to_property
+
+  normalizes :description, :resolution, with: ->(value) { value.to_s.strip.presence }
+
+  scope :active, -> { where(status: IncidentStatuses::ACTIVE) }
+
+  def closed?
+    IncidentStatuses::CLOSED.include?(status)
+  end
+
+  private
+
+  def unit_and_area_belong_to_property
+    errors.add(:unit, :invalid) if unit && unit.residential_property_id != residential_property_id
+    errors.add(:common_area, :invalid) if common_area && common_area.residential_property_id != residential_property_id
+  end
 end

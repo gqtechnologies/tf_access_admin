@@ -30,6 +30,8 @@ export type CapabilityKey =
   | 'manage_parcels'
   | 'manage_announcements'
   | 'manage_common_areas'
+  | 'report_incidents'
+  | 'manage_incidents'
 
 /**
  * Flat map of every capability key to a boolean indicating whether the

@@ -13,7 +13,8 @@ module Notifications
       NotificationTypes::VISIT_ENTRY_DENIED => "Notifications::VisitEntryDeniedPushPayload",
       NotificationTypes::PARCEL => "Notifications::ParcelPushPayload",
       NotificationTypes::ANNOUNCEMENT => "Notifications::AnnouncementPushPayload",
-      NotificationTypes::RESERVATION => "Notifications::ReservationPushPayload"
+      NotificationTypes::RESERVATION => "Notifications::ReservationPushPayload",
+      NotificationTypes::INCIDENT => "Notifications::IncidentPushPayload"
     }.freeze
 
     def self.build(notification)

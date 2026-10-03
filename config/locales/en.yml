@@ -53,6 +53,30 @@ en:
       cta: "Create my account"
       expiration: "This link is single-use and expires in 14 days."
   notifications:
+    incident:
+      categories:
+        security: "security"
+        maintenance: "maintenance"
+        noise: "noise"
+        access: "access"
+        parcel: "parcels"
+        common_area: "common areas"
+        dispute: "neighbour dispute"
+        health: "health"
+        environment: "environment"
+        other: "other matter"
+      in_progress:
+        title: "Incident in progress"
+        body: "The administration is working on your %{category} report"
+      resolved:
+        title: "Incident resolved"
+        body: "Your %{category} report was resolved: %{resolution}"
+      dismissed:
+        title: "Incident closed"
+        body: "Your %{category} report was closed: %{resolution}"
+      updated:
+        title: "Incident updated"
+        body: "Your %{category} report changed"
     reservation:
       approved:
         title: "Reservation approved"
@@ -352,6 +376,61 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      incidents:
+        index:
+          title: "Incidents"
+          description: "What residents and the front desk report. Assign them, move their status and, when closing, write the resolution: the reporter gets it in a notification."
+          property: "Property"
+          no_property: "You have no property assigned to manage incidents."
+        tabs:
+          open: "Open"
+          in_progress: "In progress"
+          closed: "Closed"
+        empty:
+          open: "No open incidents."
+          in_progress: "No incidents in progress."
+          closed: "No closed incidents."
+        table:
+          incident: "Incident"
+          place: "Place"
+          reporter: "Reported by"
+          assignee: "Assignee"
+          manage: "Manage"
+        drawer:
+          title: "Manage incident"
+          description: "Status changes are notified to the reporter."
+          status: "Status"
+          priority: "Priority"
+          assignee: "Assignee"
+          unassigned: "Unassigned"
+          resolution: "Resolution"
+          resolution_help: "Required to mark it resolved or dismissed."
+          save: "Save"
+          saved: "Incident updated."
+        status:
+          open: "Open"
+          in_progress: "In progress"
+          resolved: "Resolved"
+          dismissed: "Dismissed"
+        priorities:
+          low: "Low"
+          normal: "Normal"
+          high: "High"
+          urgent: "Urgent"
+        errors:
+          resolution_required: "Write the resolution to close the incident"
+          not_found: "The incident is no longer available"
+        categories:
+          security: "Security"
+          maintenance: "Maintenance"
+          noise: "Noise"
+          access: "Access"
+          parcel: "Parcels"
+          common_area: "Common areas"
+          dispute: "Neighbour dispute"
+          health: "Health"
+          environment: "Environment"
+          other: "Other"
       common_areas:
         index:
           title: "Common areas"
@@ -2707,6 +2786,7 @@ en:
         parcels: "Parcels"
         communication: "Communication"
         announcements: "Announcements"
+        incidents: "Incidents"
         common_areas_group: "Common areas"
         reservations: "Reservations"
         common_areas: "Common areas"
@@ -2884,6 +2964,8 @@ en:
         max_duration: "A reservation cannot last more than %{count} minutes"
         opening_hours: "The area is open from %{opens} to %{closes}"
         monthly_limit: "The unit already has %{count} reservations this month in this area"
+    incidents:
+      not_allowed: "You cannot report incidents on this property"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

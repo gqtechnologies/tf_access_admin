@@ -53,6 +53,30 @@ es:
       cta: "Crear mi cuenta"
       expiration: "Este enlace es de un solo uso y caduca en 14 días."
   notifications:
+    incident:
+      categories:
+        security: "seguridad"
+        maintenance: "mantención"
+        noise: "ruidos molestos"
+        access: "acceso"
+        parcel: "encomiendas"
+        common_area: "áreas comunes"
+        dispute: "convivencia"
+        health: "salud"
+        environment: "medio ambiente"
+        other: "otro tema"
+      in_progress:
+        title: "Incidente en curso"
+        body: "La administración está atendiendo tu reporte de %{category}"
+      resolved:
+        title: "Incidente resuelto"
+        body: "Tu reporte de %{category} fue resuelto: %{resolution}"
+      dismissed:
+        title: "Incidente cerrado"
+        body: "Tu reporte de %{category} se cerró: %{resolution}"
+      updated:
+        title: "Incidente actualizado"
+        body: "Tu reporte de %{category} cambió de estado"
     reservation:
       approved:
         title: "Reserva aprobada"
@@ -352,6 +376,61 @@ es:
         title: "Nueva visita"
         body: "%{visitor_name} llegará a la unidad %{unit_identifier}"
     admin:
+      incidents:
+        index:
+          title: "Incidentes"
+          description: "Lo que reportan residentes y conserjería. Asígnalos, cambia su estado y, al cerrarlos, escribe la resolución: quien reportó la recibe en una notificación."
+          property: "Propiedad"
+          no_property: "No tienes una propiedad asignada para gestionar incidentes."
+        tabs:
+          open: "Abiertos"
+          in_progress: "En curso"
+          closed: "Cerrados"
+        empty:
+          open: "No hay incidentes abiertos."
+          in_progress: "No hay incidentes en curso."
+          closed: "No hay incidentes cerrados."
+        table:
+          incident: "Incidente"
+          place: "Lugar"
+          reporter: "Reportado por"
+          assignee: "Responsable"
+          manage: "Gestionar"
+        drawer:
+          title: "Gestionar incidente"
+          description: "Los cambios de estado se notifican a quien reportó."
+          status: "Estado"
+          priority: "Prioridad"
+          assignee: "Responsable"
+          unassigned: "Sin asignar"
+          resolution: "Resolución"
+          resolution_help: "Obligatoria para marcarlo como resuelto o descartado."
+          save: "Guardar"
+          saved: "Incidente actualizado."
+        status:
+          open: "Abierto"
+          in_progress: "En curso"
+          resolved: "Resuelto"
+          dismissed: "Descartado"
+        priorities:
+          low: "Baja"
+          normal: "Normal"
+          high: "Alta"
+          urgent: "Urgente"
+        errors:
+          resolution_required: "Escribe la resolución para cerrar el incidente"
+          not_found: "El incidente ya no está disponible"
+        categories:
+          security: "Seguridad"
+          maintenance: "Mantención"
+          noise: "Ruidos molestos"
+          access: "Acceso"
+          parcel: "Encomiendas"
+          common_area: "Áreas comunes"
+          dispute: "Convivencia"
+          health: "Salud"
+          environment: "Medio ambiente"
+          other: "Otro"
       common_areas:
         index:
           title: "Áreas comunes"
@@ -2706,6 +2785,7 @@ es:
         parcels: "Encomiendas"
         communication: "Comunicación"
         announcements: "Avisos"
+        incidents: "Incidentes"
         common_areas_group: "Áreas comunes"
         reservations: "Reservas"
         common_areas: "Áreas comunes"
@@ -2879,6 +2959,8 @@ es:
         max_duration: "La reserva no puede durar más de %{count} minutos"
         opening_hours: "El área funciona de %{opens} a %{closes}"
         monthly_limit: "La unidad ya tiene %{count} reservas este mes en esta área"
+    incidents:
+      not_allowed: "No puedes reportar incidentes en esta propiedad"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"

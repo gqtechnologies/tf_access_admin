@@ -53,6 +53,30 @@ pt:
       cta: "Criar minha conta"
       expiration: "Este link é de uso único e expira em 14 dias."
   notifications:
+    incident:
+      categories:
+        security: "segurança"
+        maintenance: "manutenção"
+        noise: "barulho"
+        access: "acesso"
+        parcel: "encomendas"
+        common_area: "áreas comuns"
+        dispute: "convivência"
+        health: "saúde"
+        environment: "meio ambiente"
+        other: "outro assunto"
+      in_progress:
+        title: "Incidente em andamento"
+        body: "A administração está atendendo seu relato de %{category}"
+      resolved:
+        title: "Incidente resolvido"
+        body: "Seu relato de %{category} foi resolvido: %{resolution}"
+      dismissed:
+        title: "Incidente encerrado"
+        body: "Seu relato de %{category} foi encerrado: %{resolution}"
+      updated:
+        title: "Incidente atualizado"
+        body: "Seu relato de %{category} mudou de status"
     reservation:
       approved:
         title: "Reserva aprovada"
@@ -347,6 +371,61 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      incidents:
+        index:
+          title: "Incidentes"
+          description: "O que moradores e portaria reportam. Atribua, mude o status e, ao encerrar, escreva a resolução: quem reportou a recebe em uma notificação."
+          property: "Propriedade"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar incidentes."
+        tabs:
+          open: "Abertos"
+          in_progress: "Em andamento"
+          closed: "Encerrados"
+        empty:
+          open: "Não há incidentes abertos."
+          in_progress: "Não há incidentes em andamento."
+          closed: "Não há incidentes encerrados."
+        table:
+          incident: "Incidente"
+          place: "Local"
+          reporter: "Reportado por"
+          assignee: "Responsável"
+          manage: "Gerenciar"
+        drawer:
+          title: "Gerenciar incidente"
+          description: "As mudanças de status são notificadas a quem reportou."
+          status: "Status"
+          priority: "Prioridade"
+          assignee: "Responsável"
+          unassigned: "Sem responsável"
+          resolution: "Resolução"
+          resolution_help: "Obrigatória para marcar como resolvido ou descartado."
+          save: "Salvar"
+          saved: "Incidente atualizado."
+        status:
+          open: "Aberto"
+          in_progress: "Em andamento"
+          resolved: "Resolvido"
+          dismissed: "Descartado"
+        priorities:
+          low: "Baixa"
+          normal: "Normal"
+          high: "Alta"
+          urgent: "Urgente"
+        errors:
+          resolution_required: "Escreva a resolução para encerrar o incidente"
+          not_found: "O incidente não está mais disponível"
+        categories:
+          security: "Segurança"
+          maintenance: "Manutenção"
+          noise: "Barulho"
+          access: "Acesso"
+          parcel: "Encomendas"
+          common_area: "Áreas comuns"
+          dispute: "Convivência"
+          health: "Saúde"
+          environment: "Meio ambiente"
+          other: "Outro"
       common_areas:
         index:
           title: "Áreas comuns"
@@ -2662,6 +2741,7 @@ pt:
         parcels: "Encomendas"
         communication: "Comunicação"
         announcements: "Avisos"
+        incidents: "Incidentes"
         common_areas_group: "Áreas comuns"
         reservations: "Reservas"
         common_areas: "Áreas comuns"
@@ -2832,6 +2912,8 @@ pt:
         max_duration: "A reserva não pode durar mais de %{count} minutos"
         opening_hours: "A área funciona das %{opens} às %{closes}"
         monthly_limit: "A unidade já tem %{count} reservas este mês nesta área"
+    incidents:
+      not_allowed: "Você não pode reportar incidentes nesta propriedade"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"
