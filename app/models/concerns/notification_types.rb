@@ -7,6 +7,7 @@ module NotificationTypes
   VISIT_REJECTED  = "visit_rejected"
   VISIT_INVITATION = "visit_invitation"
   VISIT_ENTRY_DENIED = "visit_entry_denied"
+  AUTHORIZED_PERSON = "authorized_person"
   ANNOUNCEMENT    = "announcement"
   PARCEL          = "parcel"
   INCIDENT        = "incident"
@@ -21,6 +22,7 @@ module NotificationTypes
     VISIT_REJECTED,
     VISIT_INVITATION,
     VISIT_ENTRY_DENIED,
+    AUTHORIZED_PERSON,
     ANNOUNCEMENT,
     PARCEL,
     INCIDENT,

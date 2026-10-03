@@ -61,6 +61,16 @@ class StaffShift < ApplicationRecord
   belongs_to :closed_by_person, class_name: "Person", optional: true
 
   validates :status, presence: true, inclusion: { in: StaffShiftStatuses::ALL }
+  validates :notes, length: { maximum: 2000 }
+
+  has_many :parcel_deliveries
+
+  scope :open_now, -> { where(status: StaffShiftStatuses::IN_PROGRESS) }
+  scope :completed, -> { where(status: StaffShiftStatuses::COMPLETED) }
+
+  def in_progress?
+    status == StaffShiftStatuses::IN_PROGRESS
+  end
 
   validates_same_tenant :residential_property, :staff_assignment, :person, :replaced_by_shift,
                         :opened_by_person, :closed_by_person

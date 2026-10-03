@@ -62,6 +62,7 @@ class ResidentialProperty < ApplicationRecord
   # not by this model/migration section.
   has_many :property_sections, dependent: :destroy
   has_many :units, dependent: :destroy
+  has_many :announcements
   has_many :visits, dependent: :destroy
   has_one :property_setting, dependent: :destroy
 

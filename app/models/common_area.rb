@@ -43,7 +43,42 @@ class CommonArea < ApplicationRecord
 
   validates_same_tenant :residential_property
 
+  STATUS_ACTIVE = "active"
+  STATUS_INACTIVE = "inactive"
+  STATUSES = [ STATUS_ACTIVE, STATUS_INACTIVE ].freeze
+
+  # The rules the reservation flow enforces (subset of CommonAreaRule::KNOWN_RULE_TYPES).
+  ENFORCED_RULES = [
+    CommonAreaRule::RULE_OPENS_AT,
+    CommonAreaRule::RULE_CLOSES_AT,
+    CommonAreaRule::RULE_MAX_DURATION_MINUTES,
+    CommonAreaRule::RULE_MIN_ADVANCE_HOURS,
+    CommonAreaRule::RULE_MAX_RESERVATIONS_MONTH,
+    CommonAreaRule::RULE_NOTES
+  ].freeze
+
   validates :area_type, presence: true, inclusion: { in: CommonAreaTypes::ALL }
+  validates :name, presence: true, length: { maximum: 100 }
+  validates :status, inclusion: { in: STATUSES }
+  validates :capacity, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+
+  normalizes :name, with: ->(value) { value.to_s.strip }
+
+  scope :active, -> { where(status: STATUS_ACTIVE) }
+
+  def active?
+    status == STATUS_ACTIVE
+  end
+
+  # { "opens_at" => "08:00", "max_duration_minutes" => 120, ... } for the enforced rules present.
+  def rules
+    common_area_rules.select { |rule| ENFORCED_RULES.include?(rule.rule_type) }
+                     .to_h { |rule| [ rule.rule_type, rule.value ] }
+  end
+
+  def time_zone
+    ActiveSupport::TimeZone[residential_property.timezone.to_s] || Time.zone
+  end
 
   has_many :common_area_reservations, dependent: :restrict_with_error
   has_many :incidents, dependent: :nullify

@@ -1,7 +1,9 @@
 # bulk-import-people Specification
 
 ## Purpose
-TBD - created by archiving change normalize-user-identity-and-property-onboarding. Update Purpose after archive.
+
+Lets a manager load people into an organization from a file, classifying each row against existing identities and acting on it without silently merging people or granting operational roles.
+
 ## Requirements
 ### Requirement: Row classification
 

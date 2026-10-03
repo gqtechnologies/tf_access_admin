@@ -36,6 +36,8 @@ module Parcels
       person = actor_person
       ActiveRecord::Base.transaction do
         parcel.received_by_person = person
+        # Received during an open front-desk shift: keep the link for the shift report.
+        parcel.staff_shift = StaffShift.open_now.find_by(person: person, residential_property: parcel.residential_property) if person
         parcel.save!
         parcel.parcel_delivery_status_histories.create!(
           organization: parcel.organization,

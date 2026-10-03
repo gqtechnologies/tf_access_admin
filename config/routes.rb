@@ -70,6 +70,12 @@ Rails.application.routes.draw do
         # GET /units/:unit_id/residents lists the people with an active occupancy/ownership of the unit.
         resources :units, only: [ :index ] do
           resources :residents, only: [ :index ], module: :units
+          # Vehicles registered for the unit by its residents.
+          resources :vehicles, only: [ :index, :create, :destroy ], module: :units
+          # People the unit authorizes to come in without an invitation (approved by the administration).
+          resources :authorized_people, only: [ :index, :create ], module: :units do
+            member { post :withdraw }
+          end
           # GET /units/:unit_id/parcels lists the unit's waiting and recently withdrawn parcels.
           resources :parcels, only: [ :index ], module: :units
           resources :visits, only: [ :index, :create, :show, :destroy ], module: :units do
@@ -94,6 +100,13 @@ Rails.application.routes.draw do
         # operational visit listing of one property, and entry/exit registration.
         namespace :concierge do
           resources :properties, only: [ :index ]
+          resources :authorized_people, only: [ :index ]
+          # The worker's own front-desk shift on the property.
+          resource :shift, only: [ :show, :create ] do
+            post :close
+          end
+          # Plate lookup at the gate.
+          resources :vehicles, only: [ :index ]
           # Parcel front desk: unit picker, listing, arrival and withdrawal.
           resources :units, only: [ :index ]
           resources :parcels, only: [ :index, :show, :create ] do
@@ -109,6 +122,22 @@ Rails.application.routes.draw do
             end
           end
         end
+
+        # The administration's announcements for the properties the person lives in.
+        resources :announcements, only: [ :index, :show ] do
+          member { post :acknowledge }
+        end
+
+        # Common areas of a unit's property, their taken slots, and the unit's reservations.
+        resources :common_areas, only: [ :index ] do
+          member { get :availability }
+        end
+        resources :reservations, only: [ :index, :create ] do
+          member { post :cancel }
+        end
+
+        # Incidents the current person reported, and reporting a new one.
+        resources :incidents, only: [ :index, :create ]
 
         # In-app inbox: the current user's own notifications, newest first.
         resources :notifications, only: [ :index ] do
@@ -132,6 +161,36 @@ Rails.application.routes.draw do
   post "onboarding/accept/:token", to: "onboarding_acceptances#create"
 
   namespace :admin do
+    resources :incidents, only: [ :index, :update ]
+    resources :vehicles, only: [ :index, :destroy ]
+    resources :staff_shifts, only: [ :index ]
+    resources :lease_contracts, only: [ :index, :create ] do
+      member do
+        post :activate
+        post :terminate
+      end
+    end
+    resources :authorized_residents, only: [ :index ] do
+      member do
+        post :approve
+        post :reject
+        post :revoke
+      end
+    end
+    resources :common_areas, only: [ :index, :create, :update ]
+    resources :reservations, only: [ :index ] do
+      member do
+        post :approve
+        post :reject
+        post :cancel
+      end
+    end
+    resources :announcements, only: [ :index, :create, :update ] do
+      member do
+        post :publish
+        post :archive
+      end
+    end
     resources :users, only: [ :index, :new, :create, :edit, :update, :destroy ]
     resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
       member do

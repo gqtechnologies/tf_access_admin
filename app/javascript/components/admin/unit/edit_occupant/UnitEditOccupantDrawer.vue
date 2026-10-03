@@ -122,6 +122,7 @@ const occupancyForm = ref<UnitOccupancyEditForm>({
   occupancy_type: 'tenant',
   can_authorize_visits: false,
   can_withdraw_parcels: false,
+  can_reserve_common_areas: false,
   starts_at: '',
   ends_at: '',
   status: 'active',
@@ -208,6 +209,7 @@ function submit() {
         occupancy_type: occupancyForm.value.occupancy_type,
         can_authorize_visits: occupancyForm.value.can_authorize_visits,
         can_withdraw_parcels: occupancyForm.value.can_withdraw_parcels,
+        can_reserve_common_areas: occupancyForm.value.can_reserve_common_areas,
         status: occupancyForm.value.status,
         starts_at: occupancyForm.value.starts_at,
         ...(occupancyForm.value.ends_at

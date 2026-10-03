@@ -1,7 +1,9 @@
 # user-account-linking Specification
 
 ## Purpose
-TBD - created by archiving change normalize-user-identity-and-property-onboarding. Update Purpose after archive.
+
+Links user accounts to people by confirmed email, never creating a second account for the same email and keeping linking and unlinking traceable and tenant-safe.
+
 ## Requirements
 ### Requirement: No second account for an existing confirmed email
 

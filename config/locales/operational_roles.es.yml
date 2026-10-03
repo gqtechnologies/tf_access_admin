@@ -36,6 +36,9 @@ es:
       occupancies: "Residentes"
       visits: "Visitas"
       parcels: "Encomiendas"
+      announcements: "Avisos"
+      common_areas: "Áreas comunes"
+      incidents: "Incidentes"
       staff: "Personal"
       own_unit: "Unidad propia"
     capability_labels:
@@ -62,6 +65,10 @@ es:
       view_own_unit_context: "Ver contexto de unidad propia"
       manage_staff_assignments: "Gestionar asignaciones de personal"
       manage_parcels: "Gestionar encomiendas"
+      manage_announcements: "Gestionar avisos"
+      manage_common_areas: "Gestionar áreas comunes"
+      report_incidents: "Reportar incidentes"
+      manage_incidents: "Gestionar incidentes"
     capability_descriptions:
       manage_organization: "Configura ajustes globales de la organización."
       manage_users: "Crea y gestiona usuarios de la organización."
@@ -86,3 +93,7 @@ es:
       view_own_unit_context: "Consulta contexto de unidades propias u ocupadas."
       manage_staff_assignments: "Asigna y revoca roles operativos de personal."
       manage_parcels: "Registra llegadas y retiros de encomiendas."
+      manage_announcements: "Redacta y publica avisos para los residentes de una propiedad."
+      manage_common_areas: "Configura áreas comunes y aprueba o rechaza sus reservas."
+      report_incidents: "Reporta incidentes en una propiedad operada."
+      manage_incidents: "Asigna, sigue y cierra los incidentes de una propiedad."

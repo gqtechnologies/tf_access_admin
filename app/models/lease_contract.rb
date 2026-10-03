@@ -45,6 +45,7 @@
 #  fk_rails_...  (unit_id => units.id)
 #
 class LeaseContract < ApplicationRecord
+  include LeaseStatuses
   include TenantScopedAssociations
 
   acts_as_tenant :organization
@@ -57,7 +58,10 @@ class LeaseContract < ApplicationRecord
   belongs_to :terminated_by_person, class_name: "Person", optional: true
 
   validates :starts_at, presence: true
-  validates :status, presence: true
+  validates :status, presence: true, inclusion: { in: LeaseStatuses::ALL }
+
+  # The tenant's occupancy created when the lease was activated.
+  has_one :occupancy, class_name: "UnitOccupancy", as: :source, dependent: :nullify
 
   validates_same_tenant :unit, :lessee_person, :lessor_person, :created_by_person, :terminated_by_person
 

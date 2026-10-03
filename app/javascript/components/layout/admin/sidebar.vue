@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck, TriangleAlert, UserCheck, Car, Clock, FileSignature } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -97,6 +97,14 @@ const getFeatureIcon = (key: string) => {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/staff_shifts">
+                    <Clock class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.staff_shifts') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -119,6 +127,89 @@ const getFeatureIcon = (key: string) => {
                   <Link href="/concierge/parcels">
                     <Package class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.parcels') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Announcements (manage_announcements) and incidents (manage_incidents) -->
+        <SidebarGroup v-if="capabilities?.manage_announcements || capabilities?.manage_incidents">
+          <SidebarGroupLabel>{{ t('admin.sidebar.communication') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem v-if="capabilities?.manage_announcements">
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/announcements">
+                    <Megaphone class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.announcements') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem v-if="capabilities?.manage_incidents">
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/incidents">
+                    <TriangleAlert class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.incidents') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Authorized people proposed by residents — manage_occupancies capability -->
+        <SidebarGroup v-if="capabilities?.manage_occupancies">
+          <SidebarGroupLabel>{{ t('admin.sidebar.residents_group') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/authorized_residents">
+                    <UserCheck class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.authorized_residents') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/vehicles">
+                    <Car class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.vehicles') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/lease_contracts">
+                    <FileSignature class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.lease_contracts') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Common areas and their reservations — manage_common_areas capability -->
+        <SidebarGroup v-if="capabilities?.manage_common_areas">
+          <SidebarGroupLabel>{{ t('admin.sidebar.common_areas_group') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/reservations">
+                    <CalendarCheck class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.reservations') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/common_areas">
+                    <Trees class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.common_areas') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

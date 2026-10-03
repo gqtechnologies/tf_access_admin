@@ -6,6 +6,7 @@ class Admin::UnitOccupancySerializer < ActiveModel::Serializer
     :occupancy_type_label,
     :can_authorize_visits,
     :can_withdraw_parcels,
+    :can_reserve_common_areas,
     :starts_at,
     :ends_at,
     :status,

@@ -66,6 +66,24 @@
         />
       </Field>
 
+      <Field orientation="horizontal" class="items-center justify-between rounded-lg border px-4 py-3">
+        <div class="space-y-0.5">
+          <FieldLabel :for="`${idPrefix}-can-reserve-common-areas`" class="text-sm font-medium">
+            {{ t('admin.units.show.occupants.add_occupant.assign.fields.can_reserve_common_areas') }}
+          </FieldLabel>
+          <p class="text-xs text-muted-foreground">
+            {{ t('admin.units.show.occupants.add_occupant.assign.fields.can_reserve_common_areas_help') }}
+          </p>
+        </div>
+        <Checkbox
+          :id="`${idPrefix}-can-reserve-common-areas`"
+          :model-value="occupancyForm.can_reserve_common_areas"
+          @update:model-value="(value: boolean | 'indeterminate') => {
+            occupancyForm.can_reserve_common_areas = value === true
+          }"
+        />
+      </Field>
+
       <Field v-if="showStatus">
         <FieldLabel :for="`${idPrefix}-status`">
           {{ t('admin.units.show.occupants.edit_occupant.fields.status') }}

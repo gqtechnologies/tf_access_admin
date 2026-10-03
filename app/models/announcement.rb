@@ -41,6 +41,7 @@
 class Announcement < ApplicationRecord
   acts_as_paranoid
   include AnnouncementCategories
+  include AnnouncementStatuses
   include Priorities
   include TenantScopedAssociations
 
@@ -52,9 +53,40 @@ class Announcement < ApplicationRecord
 
   has_many :announcement_targets, dependent: :destroy
   has_many :announcement_reads, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+  normalizes :title, :content, with: ->(value) { value.to_s.strip }
+
+  # What residents see: published and not yet expired.
+  scope :visible, lambda { |at: Time.zone.now|
+    where(status: AnnouncementStatuses::PUBLISHED)
+      .where(published_at: ..at)
+      .where("announcements.expires_at IS NULL OR announcements.expires_at > ?", at)
+  }
+
+  def draft?
+    status == AnnouncementStatuses::DRAFT
+  end
+
+  def published?
+    status == AnnouncementStatuses::PUBLISHED
+  end
 
   validates :priority, presence: true, inclusion: { in: Priorities::ALL }
+  validates :status, presence: true, inclusion: { in: AnnouncementStatuses::ALL }
+  validates :title, presence: true, length: { maximum: 150 }
+  validates :content, presence: true, length: { maximum: 5000 }
+  validate :expires_after_publication
   validates :category, inclusion: { in: AnnouncementCategories::ALL }, allow_nil: true, if: -> { category.present? }
 
   validates_same_tenant :residential_property, :author_person
+
+  private
+
+  def expires_after_publication
+    return if expires_at.blank?
+    return if expires_at > (published_at || Time.zone.now)
+
+    errors.add(:expires_at, :invalid)
+  end
 end

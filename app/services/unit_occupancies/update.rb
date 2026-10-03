@@ -29,7 +29,7 @@ module UnitOccupancies
       unit = @occupancy.unit
 
       @occupancy.assign_attributes(
-        attrs.except(:starts_at, :ends_at, :can_authorize_visits, :can_withdraw_parcels)
+        attrs.except(:starts_at, :ends_at, :can_authorize_visits, :can_withdraw_parcels, :can_reserve_common_areas)
       )
 
       if attrs.key?(:can_authorize_visits)
@@ -38,6 +38,10 @@ module UnitOccupancies
 
       if attrs.key?(:can_withdraw_parcels)
         @occupancy.can_withdraw_parcels = Mutation.cast_boolean(attrs[:can_withdraw_parcels])
+      end
+
+      if attrs.key?(:can_reserve_common_areas)
+        @occupancy.can_reserve_common_areas = Mutation.cast_boolean(attrs[:can_reserve_common_areas])
       end
 
       if attrs.key?(:starts_at)

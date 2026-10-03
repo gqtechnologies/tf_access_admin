@@ -26,6 +26,14 @@ module Authorization
     MANAGE_STAFF_ASSIGNMENTS = :manage_staff_assignments
     # Front desk: register parcel arrivals and withdrawals on a property.
     MANAGE_PARCELS = :manage_parcels
+    # Write and publish announcements to a property's residents.
+    MANAGE_ANNOUNCEMENTS = :manage_announcements
+    # Configure a property's common areas and approve or reject their reservations.
+    MANAGE_COMMON_AREAS = :manage_common_areas
+    # Front desk: report incidents on an operated property.
+    REPORT_INCIDENTS = :report_incidents
+    # Assign, follow up and close a property's incidents.
+    MANAGE_INCIDENTS = :manage_incidents
     # Visitor (D5): read the visits where the user is the visitor_person.
     VIEW_OWN_VISITS = :view_own_visits
     # Global identity-conflict resolution. Deliberately super-admin-only by
@@ -57,6 +65,10 @@ module Authorization
       VIEW_OWN_UNIT_CONTEXT,
       MANAGE_STAFF_ASSIGNMENTS,
       MANAGE_PARCELS,
+      MANAGE_ANNOUNCEMENTS,
+      MANAGE_COMMON_AREAS,
+      REPORT_INCIDENTS,
+      MANAGE_INCIDENTS,
       VIEW_OWN_VISITS,
       RESOLVE_IDENTITY_CONFLICTS
     ].freeze
@@ -96,7 +108,11 @@ module Authorization
       VIEW_VISITS,
       MANAGE_VISITS,
       MANAGE_STAFF_ASSIGNMENTS,
-      MANAGE_PARCELS
+      MANAGE_PARCELS,
+      MANAGE_ANNOUNCEMENTS,
+      MANAGE_COMMON_AREAS,
+      REPORT_INCIDENTS,
+      MANAGE_INCIDENTS
     ].freeze
 
     CONCIERGE = [
@@ -105,7 +121,8 @@ module Authorization
       REGISTER_VISIT_ENTRY,
       REGISTER_VISIT_EXIT,
       VIEW_MINIMAL_ACCESS_CONTROL_DATA,
-      MANAGE_PARCELS
+      MANAGE_PARCELS,
+      REPORT_INCIDENTS
     ].freeze
 
     CLEANING_STAFF = [].freeze
