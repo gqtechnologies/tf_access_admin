@@ -384,6 +384,34 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      vehicles:
+        index:
+          title: "Veículos"
+          description: "Os veículos que os moradores registram para suas unidades. A portaria os busca pela placa no app."
+          property: "Propriedade"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar moradores."
+          search: "Buscar por placa"
+          empty: "Nenhum morador registrou veículos."
+          no_match: "Nenhuma placa corresponde."
+        table:
+          plate: "Placa"
+          vehicle: "Veículo"
+          unit: "Unidade"
+        remove:
+          title: "Dar baixa neste veículo?"
+          body: "A placa {plate} deixará de aparecer na portaria."
+          confirm: "Dar baixa"
+          done: "Veículo removido."
+        errors:
+          not_found: "O veículo não está mais disponível"
+        types:
+          car: "Carro"
+          motorcycle: "Moto"
+          bicycle: "Bicicleta"
+          van: "Van"
+          truck: "Caminhão"
+          scooter: "Patinete"
+          other: "Outro"
       authorized_residents:
         index:
           title: "Pessoas autorizadas"
@@ -2807,6 +2835,7 @@ pt:
         announcements: "Avisos"
         residents_group: "Moradores"
         authorized_residents: "Pessoas autorizadas"
+        vehicles: "Veículos"
         incidents: "Incidentes"
         common_areas_group: "Áreas comuns"
         reservations: "Reservas"
@@ -2985,6 +3014,9 @@ pt:
       already_listed: "Essa pessoa já está autorizada ou tem uma solicitação pendente nesta unidade"
       invalid_person: "Revise o nome e o e-mail da pessoa"
       not_open: "Esta autorização não está mais vigente"
+    vehicles:
+      not_allowed: "Você não tem uma relação ativa com esta unidade"
+      not_found: "Esse veículo não é desta unidade"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"

@@ -389,6 +389,34 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      vehicles:
+        index:
+          title: "Vehicles"
+          description: "The vehicles residents register for their units. The front desk looks them up by plate from the app."
+          property: "Property"
+          no_property: "You have no property assigned to manage residents."
+          search: "Search by plate"
+          empty: "No resident has registered vehicles."
+          no_match: "No plate matches."
+        table:
+          plate: "Plate"
+          vehicle: "Vehicle"
+          unit: "Unit"
+        remove:
+          title: "Remove this vehicle?"
+          body: "Plate {plate} will no longer show at the front desk."
+          confirm: "Remove"
+          done: "Vehicle removed."
+        errors:
+          not_found: "The vehicle is no longer available"
+        types:
+          car: "Car"
+          motorcycle: "Motorcycle"
+          bicycle: "Bicycle"
+          van: "Van"
+          truck: "Truck"
+          scooter: "Scooter"
+          other: "Other"
       authorized_residents:
         index:
           title: "Authorized people"
@@ -2852,6 +2880,7 @@ en:
         announcements: "Announcements"
         residents_group: "Residents"
         authorized_residents: "Authorized people"
+        vehicles: "Vehicles"
         incidents: "Incidents"
         common_areas_group: "Common areas"
         reservations: "Reservations"
@@ -3037,6 +3066,9 @@ en:
       already_listed: "That person is already authorized or has a pending request for this unit"
       invalid_person: "Check the person's name and email"
       not_open: "This authorization is no longer in force"
+    vehicles:
+      not_allowed: "You have no active relationship with this unit"
+      not_found: "That vehicle does not belong to this unit"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

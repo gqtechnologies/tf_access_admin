@@ -70,6 +70,8 @@ Rails.application.routes.draw do
         # GET /units/:unit_id/residents lists the people with an active occupancy/ownership of the unit.
         resources :units, only: [ :index ] do
           resources :residents, only: [ :index ], module: :units
+          # Vehicles registered for the unit by its residents.
+          resources :vehicles, only: [ :index, :create, :destroy ], module: :units
           # People the unit authorizes to come in without an invitation (approved by the administration).
           resources :authorized_people, only: [ :index, :create ], module: :units do
             member { post :withdraw }
@@ -99,6 +101,8 @@ Rails.application.routes.draw do
         namespace :concierge do
           resources :properties, only: [ :index ]
           resources :authorized_people, only: [ :index ]
+          # Plate lookup at the gate.
+          resources :vehicles, only: [ :index ]
           # Parcel front desk: unit picker, listing, arrival and withdrawal.
           resources :units, only: [ :index ]
           resources :parcels, only: [ :index, :show, :create ] do
@@ -154,6 +158,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :incidents, only: [ :index, :update ]
+    resources :vehicles, only: [ :index, :destroy ]
     resources :authorized_residents, only: [ :index ] do
       member do
         post :approve

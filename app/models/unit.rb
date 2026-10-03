@@ -83,6 +83,7 @@ class Unit < ApplicationRecord
   has_many :visits
   has_many :parcel_deliveries
   has_many :common_area_reservations
+  has_many :vehicles
 
   # Units where +person+ holds an active, currently-valid occupancy or ownership
   # in +organization+. Relationship validity is delegated to

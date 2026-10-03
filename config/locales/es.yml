@@ -389,6 +389,34 @@ es:
         title: "Nueva visita"
         body: "%{visitor_name} llegará a la unidad %{unit_identifier}"
     admin:
+      vehicles:
+        index:
+          title: "Vehículos"
+          description: "Los vehículos que los residentes registran para sus unidades. Conserjería los busca por patente desde la app."
+          property: "Propiedad"
+          no_property: "No tienes una propiedad asignada para gestionar residentes."
+          search: "Buscar por patente"
+          empty: "Ningún residente ha registrado vehículos."
+          no_match: "Ninguna patente coincide."
+        table:
+          plate: "Patente"
+          vehicle: "Vehículo"
+          unit: "Unidad"
+        remove:
+          title: "¿Dar de baja este vehículo?"
+          body: "La patente {plate} dejará de aparecer en conserjería."
+          confirm: "Dar de baja"
+          done: "Vehículo dado de baja."
+        errors:
+          not_found: "El vehículo ya no está disponible"
+        types:
+          car: "Auto"
+          motorcycle: "Moto"
+          bicycle: "Bicicleta"
+          van: "Furgón"
+          truck: "Camión"
+          scooter: "Scooter"
+          other: "Otro"
       authorized_residents:
         index:
           title: "Personas autorizadas"
@@ -2851,6 +2879,7 @@ es:
         announcements: "Avisos"
         residents_group: "Residentes"
         authorized_residents: "Personas autorizadas"
+        vehicles: "Vehículos"
         incidents: "Incidentes"
         common_areas_group: "Áreas comunes"
         reservations: "Reservas"
@@ -3032,6 +3061,9 @@ es:
       already_listed: "Esa persona ya está autorizada o tiene una solicitud pendiente en esta unidad"
       invalid_person: "Revisa el nombre y el correo de la persona"
       not_open: "Esta autorización ya no está vigente"
+    vehicles:
+      not_allowed: "No tienes una relación activa con esta unidad"
+      not_found: "Ese vehículo no es de esta unidad"
     visits:
       unit_not_found: "Unidad no encontrada o no accesible"
       no_active_relationship: "No tienes una relación activa con esta unidad"
