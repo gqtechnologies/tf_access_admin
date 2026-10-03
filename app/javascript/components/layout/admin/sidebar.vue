@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck, TriangleAlert, UserCheck, Car, Clock } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck, TriangleAlert, UserCheck, Car, Clock, FileSignature } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -177,6 +177,14 @@ const getFeatureIcon = (key: string) => {
                   <Link href="/admin/vehicles">
                     <Car class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.vehicles') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/lease_contracts">
+                    <FileSignature class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.lease_contracts') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

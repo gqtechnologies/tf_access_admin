@@ -384,6 +384,68 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      lease_contracts:
+        index:
+          title: "Contratos de locação"
+          description: "Registre as locações das unidades. Ao ativar um contrato, o locatário passa a ocupante com as permissões indicadas; ao encerrá-lo, a ocupação é fechada."
+          property: "Propriedade"
+          new: "Novo contrato"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar moradores."
+        tabs:
+          active: "Vigentes"
+          draft: "Rascunhos"
+          terminated: "Encerrados"
+        empty:
+          active: "Não há contratos vigentes."
+          draft: "Não há rascunhos."
+          terminated: "Não há contratos encerrados."
+        table:
+          unit: "Unidade"
+          parties: "Locatário"
+          lessor: "Proprietário: {name}"
+          term: "Vigência"
+          no_end: "Sem término"
+          permissions: "Permissões"
+        permissions:
+          can_authorize_visits: "Autoriza visitas"
+          can_reserve_common_areas: "Reserva áreas comuns"
+          can_withdraw_parcels: "Retira encomendas"
+        actions:
+          activate: "Ativar"
+          terminate: "Encerrar"
+        form:
+          title: "Novo contrato"
+          description: "É salvo como rascunho. A ocupação do locatário é criada ao ativá-lo."
+          unit: "Unidade"
+          unit_placeholder: "Selecione uma unidade"
+          lessee: "Locatário"
+          name: "Nome completo"
+          email: "E-mail"
+          document: "Documento (opcional)"
+          phone: "Telefone (opcional)"
+          lessor: "Proprietário que aluga"
+          no_lessor: "Não informado"
+          starts_at: "Início"
+          ends_at: "Término (opcional)"
+          permissions: "Permissões do locatário"
+          save: "Salvar rascunho"
+          saved: "Contrato salvo como rascunho."
+        confirm:
+          activate_title: "Ativar o contrato?"
+          activate_body: "{name} passará a ocupante de {unit} com as permissões do contrato."
+          activate_done: "Contrato ativado."
+          terminate_title: "Encerrar o contrato?"
+          terminate_body: "A ocupação de {name} em {unit} será fechada ao fim do dia indicado."
+          terminate_on: "Data de término"
+          terminate_done: "Contrato encerrado."
+        errors:
+          unit_required: "Selecione uma unidade da propriedade"
+          lessee_required: "Informe o nome e o e-mail do locatário"
+          invalid_lessor: "O proprietário indicado não é dono vigente da unidade"
+          not_draft: "Só rascunhos podem ser ativados"
+          not_active: "Só contratos vigentes podem ser encerrados"
+          invalid_date: "A data de término não é válida"
+          not_found: "O contrato não está mais disponível"
       staff_shifts:
         index:
           title: "Turnos da portaria"
@@ -2854,6 +2916,7 @@ pt:
         residents_group: "Moradores"
         authorized_residents: "Pessoas autorizadas"
         vehicles: "Veículos"
+        lease_contracts: "Locações"
         incidents: "Incidentes"
         common_areas_group: "Áreas comuns"
         reservations: "Reservas"

@@ -389,6 +389,68 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      lease_contracts:
+        index:
+          title: "Lease contracts"
+          description: "Register the units' leases. Activating a lease makes the tenant an occupant with the stated permissions; terminating it closes that occupancy."
+          property: "Property"
+          new: "New lease"
+          no_property: "You have no property assigned to manage residents."
+        tabs:
+          active: "In force"
+          draft: "Drafts"
+          terminated: "Terminated"
+        empty:
+          active: "No leases in force."
+          draft: "No drafts."
+          terminated: "No terminated leases."
+        table:
+          unit: "Unit"
+          parties: "Tenant"
+          lessor: "Landlord: {name}"
+          term: "Term"
+          no_end: "No end"
+          permissions: "Permissions"
+        permissions:
+          can_authorize_visits: "Authorizes visits"
+          can_reserve_common_areas: "Reserves common areas"
+          can_withdraw_parcels: "Picks up parcels"
+        actions:
+          activate: "Activate"
+          terminate: "Terminate"
+        form:
+          title: "New lease"
+          description: "Saved as a draft. The tenant's occupancy is created when it is activated."
+          unit: "Unit"
+          unit_placeholder: "Select a unit"
+          lessee: "Tenant"
+          name: "Full name"
+          email: "Email"
+          document: "ID document (optional)"
+          phone: "Phone (optional)"
+          lessor: "Landlord"
+          no_lessor: "Not stated"
+          starts_at: "Start"
+          ends_at: "End (optional)"
+          permissions: "Tenant permissions"
+          save: "Save draft"
+          saved: "Lease saved as a draft."
+        confirm:
+          activate_title: "Activate the lease?"
+          activate_body: "{name} will become an occupant of {unit} with the lease's permissions."
+          activate_done: "Lease activated."
+          terminate_title: "Terminate the lease?"
+          terminate_body: "{name}'s occupancy of {unit} will close at the end of the chosen day."
+          terminate_on: "Termination date"
+          terminate_done: "Lease terminated."
+        errors:
+          unit_required: "Select a unit of the property"
+          lessee_required: "Enter the tenant's name and email"
+          invalid_lessor: "The landlord is not a current owner of the unit"
+          not_draft: "Only drafts can be activated"
+          not_active: "Only leases in force can be terminated"
+          invalid_date: "The termination date is not valid"
+          not_found: "The lease is no longer available"
       staff_shifts:
         index:
           title: "Front-desk shifts"
@@ -2899,6 +2961,7 @@ en:
         residents_group: "Residents"
         authorized_residents: "Authorized people"
         vehicles: "Vehicles"
+        lease_contracts: "Leases"
         incidents: "Incidents"
         common_areas_group: "Common areas"
         reservations: "Reservations"

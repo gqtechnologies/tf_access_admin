@@ -389,6 +389,68 @@ es:
         title: "Nueva visita"
         body: "%{visitor_name} llegará a la unidad %{unit_identifier}"
     admin:
+      lease_contracts:
+        index:
+          title: "Contratos de arriendo"
+          description: "Registra los arriendos de las unidades. Al activar un contrato, el arrendatario queda como ocupante con los permisos indicados; al terminarlo, su ocupación se cierra."
+          property: "Propiedad"
+          new: "Nuevo contrato"
+          no_property: "No tienes una propiedad asignada para gestionar residentes."
+        tabs:
+          active: "Vigentes"
+          draft: "Borradores"
+          terminated: "Terminados"
+        empty:
+          active: "No hay contratos vigentes."
+          draft: "No hay borradores."
+          terminated: "No hay contratos terminados."
+        table:
+          unit: "Unidad"
+          parties: "Arrendatario"
+          lessor: "Propietario: {name}"
+          term: "Vigencia"
+          no_end: "Sin término"
+          permissions: "Permisos"
+        permissions:
+          can_authorize_visits: "Autoriza visitas"
+          can_reserve_common_areas: "Reserva áreas comunes"
+          can_withdraw_parcels: "Retira encomiendas"
+        actions:
+          activate: "Activar"
+          terminate: "Terminar"
+        form:
+          title: "Nuevo contrato"
+          description: "Se guarda como borrador. La ocupación del arrendatario se crea al activarlo."
+          unit: "Unidad"
+          unit_placeholder: "Selecciona una unidad"
+          lessee: "Arrendatario"
+          name: "Nombre y apellido"
+          email: "Correo electrónico"
+          document: "Documento (opcional)"
+          phone: "Teléfono (opcional)"
+          lessor: "Propietario que arrienda"
+          no_lessor: "Sin indicar"
+          starts_at: "Inicio"
+          ends_at: "Término (opcional)"
+          permissions: "Permisos del arrendatario"
+          save: "Guardar borrador"
+          saved: "Contrato guardado como borrador."
+        confirm:
+          activate_title: "¿Activar el contrato?"
+          activate_body: "{name} quedará como ocupante de {unit} con los permisos del contrato."
+          activate_done: "Contrato activado."
+          terminate_title: "¿Terminar el contrato?"
+          terminate_body: "La ocupación de {name} en {unit} se cerrará al final del día indicado."
+          terminate_on: "Fecha de término"
+          terminate_done: "Contrato terminado."
+        errors:
+          unit_required: "Selecciona una unidad de la propiedad"
+          lessee_required: "Indica el nombre y el correo del arrendatario"
+          invalid_lessor: "El propietario indicado no es dueño vigente de la unidad"
+          not_draft: "Solo se pueden activar borradores"
+          not_active: "Solo se pueden terminar contratos vigentes"
+          invalid_date: "La fecha de término no es válida"
+          not_found: "El contrato ya no está disponible"
       staff_shifts:
         index:
           title: "Turnos de conserjería"
@@ -2898,6 +2960,7 @@ es:
         residents_group: "Residentes"
         authorized_residents: "Personas autorizadas"
         vehicles: "Vehículos"
+        lease_contracts: "Arriendos"
         incidents: "Incidentes"
         common_areas_group: "Áreas comunes"
         reservations: "Reservas"

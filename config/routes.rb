@@ -164,6 +164,12 @@ Rails.application.routes.draw do
     resources :incidents, only: [ :index, :update ]
     resources :vehicles, only: [ :index, :destroy ]
     resources :staff_shifts, only: [ :index ]
+    resources :lease_contracts, only: [ :index, :create ] do
+      member do
+        post :activate
+        post :terminate
+      end
+    end
     resources :authorized_residents, only: [ :index ] do
       member do
         post :approve
