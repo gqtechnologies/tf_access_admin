@@ -117,7 +117,12 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { useTranslateErrors } from '@/lib/composables/i18n/translate_errors'
 import { fileMatchesAccept } from '@/lib/utils/file_accept'
 import { cn } from '@/lib/utils'
-import { ProductPhotoRef } from '@/types/product'
+
+/** An already-uploaded file: its Active Storage signed id and, when available, a URL to preview it. */
+type ExistingFileRef = {
+  signed_id: string
+  url?: string | null
+}
 
 const props = withDefaults(
   defineProps<{
@@ -131,7 +136,7 @@ const props = withDefaults(
     description?: string
     inputId?: string
     /** Imágenes ya guardadas en servidor; al quitar se añade signed_id a `removeFieldName`. */
-    existingPhotos?: ProductPhotoRef[]
+    existingPhotos?: ExistingFileRef[]
     /** Campo vee-validate (array de string) donde acumular signed_id a purgar en el backend. */
     removeFieldName?: string
   }>(),
@@ -204,7 +209,7 @@ const browseLabel = computed(() =>
   t('common.multi_file_upload.browse_aria', { max: props.maxFiles }),
 )
 
-function existingAlt(ex: ProductPhotoRef): string {
+function existingAlt(ex: ExistingFileRef): string {
   return ex.url ? 'image' : ex.signed_id.slice(0, 8)
 }
 

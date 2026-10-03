@@ -80,7 +80,8 @@ export function useUnitAddOwnerDrawer() {
   })
 
   const stepIndex = computed(() => {
-    const index = visibleSteps.value.indexOf(currentStep.value as (typeof visibleSteps.value)[number])
+    // Widened to the step type: indexOf on a union of tuples only accepts their common member.
+    const index = (visibleSteps.value as readonly UnitAddOwnerStep[]).indexOf(currentStep.value)
     return index >= 0 ? index : 0
   })
 
