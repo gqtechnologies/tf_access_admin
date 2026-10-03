@@ -35,6 +35,7 @@ module OperationalRoles
         Authorization::Capabilities::VIEW_MINIMAL_ACCESS_CONTROL_DATA
       ] },
       { module_key: :parcels, capabilities: [ Authorization::Capabilities::MANAGE_PARCELS ] },
+      { module_key: :announcements, capabilities: [ Authorization::Capabilities::MANAGE_ANNOUNCEMENTS ] },
       { module_key: :staff, capabilities: [ Authorization::Capabilities::MANAGE_STAFF_ASSIGNMENTS ] },
       { module_key: :own_unit, capabilities: [ Authorization::Capabilities::VIEW_OWN_UNIT_CONTEXT ] }
     ].freeze

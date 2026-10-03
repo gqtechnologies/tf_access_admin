@@ -334,6 +334,72 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      announcements:
+        index:
+          title: "Avisos"
+          description: "Escreva avisos para os moradores de uma propriedade. Ao publicar, todos os ocupantes e proprietários vigentes recebem uma notificação e o aviso fica no app."
+          property: "Propriedade"
+          audience: "Chega a {count} pessoa | Chega a {count} pessoas"
+          new: "Novo aviso"
+          no_property: "Você não tem uma propriedade atribuída para publicar avisos."
+        tabs:
+          published: "Publicados"
+          draft: "Rascunhos"
+          archived: "Arquivados"
+        empty:
+          published: "Não há avisos publicados."
+          draft: "Não há rascunhos."
+          archived: "Não há avisos arquivados."
+        table:
+          title: "Aviso"
+          category: "Categoria"
+          created_at: "Criado"
+          published_at: "Publicado"
+          reads: "Leituras"
+          read_count: "{count} leu | {count} leram"
+          acknowledged_count: "{count} confirmou | {count} confirmaram"
+        actions:
+          edit: "Editar"
+          publish: "Publicar"
+          archive: "Arquivar"
+        form:
+          new_title: "Novo aviso"
+          edit_title: "Editar rascunho"
+          description: "É salvo como rascunho. Ninguém vê até você publicar."
+          title: "Título"
+          content: "Mensagem"
+          category: "Categoria"
+          priority: "Prioridade"
+          expires_at: "Visível até"
+          expires_at_help: "Opcional. Depois dessa data deixa de aparecer no app."
+          requires_acknowledgement: "Pedir confirmação de leitura"
+          requires_acknowledgement_help: "Os moradores veem um botão \"Lido\" e aqui você vê quantos confirmaram."
+          save: "Salvar rascunho"
+          saved: "Rascunho salvo."
+        confirm:
+          publish_title: "Publicar este aviso?"
+          publish_body: "Uma notificação será enviada a {count} pessoa. Depois de publicado não pode ser editado. | Uma notificação será enviada a {count} pessoas. Depois de publicado não pode ser editado."
+          archive_title: "Arquivar este aviso?"
+          archive_body: "Deixa de aparecer no app dos moradores."
+          published: "Aviso publicado."
+          archived: "Aviso arquivado."
+        categories:
+          general: "Geral"
+          maintenance: "Manutenção"
+          security: "Segurança"
+          community: "Comunidade"
+          emergency: "Emergência"
+          other: "Outro"
+        priorities:
+          low: "Baixa"
+          normal: "Normal"
+          high: "Alta"
+          urgent: "Urgente"
+        errors:
+          no_property: "Você não tem uma propriedade para publicar avisos"
+          not_found: "O aviso não está mais disponível"
+          not_publishable: "Só rascunhos podem ser publicados"
+          not_archivable: "Só avisos publicados podem ser arquivados"
       validations:
         alphanumeric_hyphen_code_invalid: "Apenas letras, números e hífens são permitidos"
         identifier_format_invalid: "Apenas letras, números, espaços e hífens são permitidos"
@@ -2467,6 +2533,8 @@ pt:
         concierge: "Portaria"
         authorized_visits: "Visitas autorizadas"
         parcels: "Encomendas"
+        communication: "Comunicação"
+        announcements: "Avisos"
         visits: "Visitas"
         manage_visits: "Gestão de visitas"
         categories: "Categorias"
@@ -2618,6 +2686,8 @@ pt:
       not_configured: "Este método de acesso ainda não está disponível"
       email_required: "Sua conta Apple ou Google não fornece um e-mail verificado"
       profile_required: "Complete seus dados para criar a conta"
+    announcements:
+      no_acknowledgement: "Este aviso não requer confirmação"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"

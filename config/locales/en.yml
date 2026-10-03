@@ -339,6 +339,72 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      announcements:
+        index:
+          title: "Announcements"
+          description: "Write announcements for a property's residents. When published, every current occupant and owner gets a notification and finds it in the app."
+          property: "Property"
+          audience: "Reaches {count} person | Reaches {count} people"
+          new: "New announcement"
+          no_property: "You have no property assigned to publish announcements."
+        tabs:
+          published: "Published"
+          draft: "Drafts"
+          archived: "Archived"
+        empty:
+          published: "No published announcements."
+          draft: "No drafts."
+          archived: "No archived announcements."
+        table:
+          title: "Announcement"
+          category: "Category"
+          created_at: "Created"
+          published_at: "Published"
+          reads: "Reads"
+          read_count: "{count} read it | {count} read it"
+          acknowledged_count: "{count} acknowledged | {count} acknowledged"
+        actions:
+          edit: "Edit"
+          publish: "Publish"
+          archive: "Archive"
+        form:
+          new_title: "New announcement"
+          edit_title: "Edit draft"
+          description: "Saved as a draft. Nobody sees it until you publish it."
+          title: "Title"
+          content: "Message"
+          category: "Category"
+          priority: "Priority"
+          expires_at: "Visible until"
+          expires_at_help: "Optional. After that date it is no longer shown in the app."
+          requires_acknowledgement: "Ask for read confirmation"
+          requires_acknowledgement_help: "Residents see a \"Got it\" button and you see how many confirmed."
+          save: "Save draft"
+          saved: "Draft saved."
+        confirm:
+          publish_title: "Publish this announcement?"
+          publish_body: "A notification will be sent to {count} person. It cannot be edited once published. | A notification will be sent to {count} people. It cannot be edited once published."
+          archive_title: "Archive this announcement?"
+          archive_body: "It will no longer be shown in the residents' app."
+          published: "Announcement published."
+          archived: "Announcement archived."
+        categories:
+          general: "General"
+          maintenance: "Maintenance"
+          security: "Security"
+          community: "Community"
+          emergency: "Emergency"
+          other: "Other"
+        priorities:
+          low: "Low"
+          normal: "Normal"
+          high: "High"
+          urgent: "Urgent"
+        errors:
+          no_property: "You have no property to publish announcements"
+          not_found: "The announcement is no longer available"
+          not_publishable: "Only drafts can be published"
+          not_archivable: "Only published announcements can be archived"
       validations:
         alphanumeric_hyphen_code_invalid: "Only letters, numbers, and hyphens are allowed"
         identifier_format_invalid: "Only letters, numbers, spaces, and hyphens are allowed"
@@ -2512,6 +2578,8 @@ en:
         concierge: "Concierge"
         authorized_visits: "Authorized visits"
         parcels: "Parcels"
+        communication: "Communication"
+        announcements: "Announcements"
         visits: "Visits"
         manage_visits: "Visit management"
         categories: "Categories"
@@ -2670,6 +2738,8 @@ en:
       not_configured: "This sign-in method is not available yet"
       email_required: "Your Apple or Google account does not provide a verified email"
       profile_required: "Complete your details to create the account"
+    announcements:
+      no_acknowledgement: "This announcement does not require acknowledgement"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

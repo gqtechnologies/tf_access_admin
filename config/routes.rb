@@ -110,6 +110,11 @@ Rails.application.routes.draw do
           end
         end
 
+        # The administration's announcements for the properties the person lives in.
+        resources :announcements, only: [ :index, :show ] do
+          member { post :acknowledge }
+        end
+
         # In-app inbox: the current user's own notifications, newest first.
         resources :notifications, only: [ :index ] do
           collection { post :read_all }
@@ -132,6 +137,12 @@ Rails.application.routes.draw do
   post "onboarding/accept/:token", to: "onboarding_acceptances#create"
 
   namespace :admin do
+    resources :announcements, only: [ :index, :create, :update ] do
+      member do
+        post :publish
+        post :archive
+      end
+    end
     resources :users, only: [ :index, :new, :create, :edit, :update, :destroy ]
     resources :people, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
       member do

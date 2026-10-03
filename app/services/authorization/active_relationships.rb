@@ -48,6 +48,26 @@ module Authorization
         .where("ends_at IS NULL OR ends_at >= ?", at)
     end
 
+    # People with a currently valid occupancy or ownership of any unit of
+    # +property+ — the audience of property-wide communications.
+    def active_person_ids_of_property(property)
+      unit_ids = Unit.where(residential_property_id: property.id).select(:id)
+      occupancies = active_occupancies_of_units(property.organization_id, unit_ids)
+      ownerships = UnitOwnership
+                   .where(organization_id: property.organization_id, unit_id: unit_ids, status: UnitOwnership::STATUS_ACTIVE)
+                   .where("starts_at <= ?", Date.current)
+                   .where("ends_at IS NULL OR ends_at >= ?", Date.current)
+
+      (occupancies.pluck(:person_id) | ownerships.pluck(:person_id))
+    end
+
+    def active_occupancies_of_units(organization_id, unit_ids, at: Time.zone.now)
+      UnitOccupancy
+        .where(organization_id: organization_id, unit_id: unit_ids, status: OccupancyStatuses::ACTIVE)
+        .where("starts_at <= ?", at.in_time_zone.end_of_day)
+        .where("ends_at IS NULL OR ends_at >= ?", at.in_time_zone.beginning_of_day)
+    end
+
     def active_occupancies_of_unit(unit, at: Time.zone.now)
       return UnitOccupancy.none if unit.blank?
 
