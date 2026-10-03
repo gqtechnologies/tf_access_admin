@@ -16,6 +16,7 @@ export function occupancyToEditForm(occupancy: UnitOccupancy): UnitOccupancyEdit
     occupancy_type: occupancy.occupancy_type,
     can_authorize_visits: occupancy.can_authorize_visits,
     can_withdraw_parcels: occupancy.can_withdraw_parcels,
+    can_reserve_common_areas: occupancy.can_reserve_common_areas,
     starts_at: dateInputFromIso(occupancy.starts_at),
     ends_at: dateInputFromIso(occupancy.ends_at),
     status: occupancy.status === 'inactive' ? 'inactive' : 'active',

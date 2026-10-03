@@ -37,6 +37,7 @@ en:
       visits: "Visits"
       parcels: "Parcels"
       announcements: "Announcements"
+      common_areas: "Common areas"
       staff: "Staff"
       own_unit: "Own unit"
     capability_labels:
@@ -64,6 +65,7 @@ en:
       manage_staff_assignments: "Manage staff assignments"
       manage_parcels: "Manage parcels"
       manage_announcements: "Manage announcements"
+      manage_common_areas: "Manage common areas"
     capability_descriptions:
       manage_organization: "Configure global organization settings."
       manage_users: "Create and manage organization users."
@@ -89,3 +91,4 @@ en:
       manage_staff_assignments: "Assign and revoke operational staff roles."
       manage_parcels: "Registers parcel arrivals and withdrawals."
       manage_announcements: "Writes and publishes announcements to a property's residents."
+      manage_common_areas: "Configures common areas and approves or rejects their reservations."

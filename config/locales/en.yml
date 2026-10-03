@@ -53,6 +53,19 @@ en:
       cta: "Create my account"
       expiration: "This link is single-use and expires in 14 days."
   notifications:
+    reservation:
+      approved:
+        title: "Reservation approved"
+        body: "Your %{area} reservation for %{date} was approved"
+      rejected:
+        title: "Reservation rejected"
+        body: "Your %{area} reservation for %{date} was rejected. %{reason}"
+      cancelled:
+        title: "Reservation cancelled"
+        body: "The administration cancelled your %{area} reservation for %{date}"
+      updated:
+        title: "Reservation updated"
+        body: "Your %{area} reservation changed"
     parcel:
       title: "A delivery arrived"
       body: "There is %{delivery_type} for %{unit} at the front desk"
@@ -339,6 +352,116 @@ en:
         title: "New visit"
         body: "%{visitor_name} will arrive at unit %{unit_identifier}"
     admin:
+      common_areas:
+        index:
+          title: "Common areas"
+          description: "Configure the areas residents can reserve from the app and their rules. Only occupants with \"Can reserve common areas\" can book."
+          property: "Property"
+          new: "New area"
+          no_property: "You have no property assigned to manage common areas."
+          empty: "This property has no common areas."
+        form:
+          new_title: "New common area"
+          edit_title: "Edit common area"
+          description: "The rules apply when booking from the app."
+          name: "Name"
+          area_type: "Type"
+          capacity: "Capacity (people)"
+          optional: "Optional"
+          requires_approval: "Requires approval"
+          requires_approval_help: "Bookings stay pending until you approve them. Otherwise they are confirmed at once."
+          active: "Available for booking"
+          active_help: "Turn it off to close it temporarily without deleting it."
+          rules_title: "Booking rules"
+          rules_help: "All optional. Leave blank the ones that don't apply."
+          save: "Save"
+          saved: "Area saved."
+        rules:
+          opens_at: "Opens at"
+          closes_at: "Closes at"
+          max_duration_minutes: "Maximum duration (minutes)"
+          min_advance_hours: "Minimum notice (hours)"
+          max_reservations_per_month: "Maximum bookings per unit per month"
+          notes: "Instructions for residents"
+        summary:
+          hours: "{opens}–{closes}"
+          duration: "max {minutes} min"
+          advance: "{hours} h notice"
+          monthly: "{count} per month"
+        table:
+          name: "Area"
+          capacity: "Capacity"
+          approval: "Confirmation"
+          requires_approval: "Needs approval"
+          instant: "Instant"
+          rules: "Rules"
+          status: "Status"
+          upcoming: "Upcoming bookings"
+          edit: "Edit"
+        status:
+          active: "Available"
+          inactive: "Closed"
+        types:
+          pool: "Pool"
+          gym: "Gym"
+          bbq: "BBQ area"
+          multipurpose_hall: "Multipurpose hall"
+          meeting_room: "Meeting room"
+          coworking: "Coworking"
+          terrace: "Terrace"
+          sauna: "Sauna"
+          court: "Court"
+          playground: "Playground"
+          game_room: "Game room"
+          laundry: "Laundry"
+          other: "Other"
+        errors:
+          no_property: "You have no property to manage common areas"
+          not_found: "The area is no longer available"
+          invalid_rules: "Check the rules: times must be HH:MM and open before closing, and numbers must be whole"
+      reservations:
+        index:
+          title: "Reservations"
+          description: "Approve or reject common area bookings. The resident is notified of the answer."
+          property: "Property"
+          no_property: "You have no property assigned to manage reservations."
+        tabs:
+          pending: "To approve"
+          upcoming: "Upcoming"
+          history: "History"
+        empty:
+          pending: "No bookings to approve."
+          upcoming: "No upcoming bookings."
+          history: "No history yet."
+        table:
+          area: "Area"
+          slot: "Date and time"
+          unit: "Unit"
+          guests: "Guests"
+          status: "Status"
+        actions:
+          approve: "Approve"
+          reject: "Reject"
+          cancel: "Cancel booking"
+        status:
+          pending: "Pending"
+          approved: "Approved"
+          rejected: "Rejected"
+          cancelled: "Cancelled"
+        reject:
+          title: "Reject booking"
+          description: "The resident will get the reason in the notification."
+        cancel:
+          title: "Cancel booking"
+          description: "The slot is freed and the resident is notified."
+        reason: "Reason (optional)"
+        approved: "Booking approved."
+        rejected: "Booking rejected."
+        cancelled: "Booking cancelled."
+        errors:
+          not_pending: "The booking is no longer pending"
+          not_cancellable: "The booking can no longer be cancelled"
+          not_found: "The booking is no longer available"
       announcements:
         index:
           title: "Announcements"
@@ -1174,6 +1297,7 @@ en:
               occupancy_type: "Occupancy type"
               can_authorize_visits: "Can authorize visits"
               can_withdraw_parcels: "Can withdraw parcels"
+              can_reserve_common_areas: "Can reserve common areas"
               validity: "Validity"
               status: "Status"
               empty: "There are no active occupants on this unit."
@@ -1242,8 +1366,10 @@ en:
                   occupancy_type_placeholder: "Select a type"
                   can_authorize_visits: "Can authorize visits"
                   can_withdraw_parcels: "Can withdraw parcels"
+                  can_reserve_common_areas: "Can reserve common areas"
                   can_authorize_visits_help: "Only active occupants with this permission can authorize visits."
                   can_withdraw_parcels_help: "Only active occupants with this permission can pick up parcels at the front desk."
+                  can_reserve_common_areas_help: "Only active occupants with this permission can reserve common areas from the app."
                   starts_at: "Start date"
                   starts_at_placeholder: "Select a date"
                   ends_at: "End date"
@@ -1261,6 +1387,7 @@ en:
                 occupancy_type: "Occupancy type"
                 can_authorize_visits: "Can authorize visits"
                 can_withdraw_parcels: "Can withdraw parcels"
+                can_reserve_common_areas: "Can reserve common areas"
                 validity: "Validity"
                 actions:
                   submit: "Confirm and add"
@@ -2580,6 +2707,9 @@ en:
         parcels: "Parcels"
         communication: "Communication"
         announcements: "Announcements"
+        common_areas_group: "Common areas"
+        reservations: "Reservations"
+        common_areas: "Common areas"
         visits: "Visits"
         manage_visits: "Visit management"
         categories: "Categories"
@@ -2740,6 +2870,20 @@ en:
       profile_required: "Complete your details to create the account"
     announcements:
       no_acknowledgement: "This announcement does not require acknowledgement"
+    reservations:
+      not_eligible: "You are not allowed to reserve common areas for this unit"
+      slot_taken: "That time is already reserved"
+      not_cancellable: "This reservation can no longer be cancelled"
+      not_requester: "Only whoever made the reservation can cancel it"
+      rules:
+        inactive_area: "This area is not available for reservations"
+        invalid_range: "The end time must be after the start time"
+        in_the_past: "You cannot reserve in the past"
+        capacity: "This area holds up to %{count} people"
+        min_advance: "Reserve at least %{count} hours in advance"
+        max_duration: "A reservation cannot last more than %{count} minutes"
+        opening_hours: "The area is open from %{opens} to %{closes}"
+        monthly_limit: "The unit already has %{count} reservations this month in this area"
     visits:
       unit_not_found: "Unit not found or not accessible"
       no_active_relationship: "You do not have an active relationship with this unit"

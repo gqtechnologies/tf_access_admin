@@ -12,7 +12,8 @@ module Notifications
       NotificationTypes::VISIT_INVITATION => "Notifications::VisitInvitationPushPayload",
       NotificationTypes::VISIT_ENTRY_DENIED => "Notifications::VisitEntryDeniedPushPayload",
       NotificationTypes::PARCEL => "Notifications::ParcelPushPayload",
-      NotificationTypes::ANNOUNCEMENT => "Notifications::AnnouncementPushPayload"
+      NotificationTypes::ANNOUNCEMENT => "Notifications::AnnouncementPushPayload",
+      NotificationTypes::RESERVATION => "Notifications::ReservationPushPayload"
     }.freeze
 
     def self.build(notification)

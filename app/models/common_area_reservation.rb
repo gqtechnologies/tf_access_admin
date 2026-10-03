@@ -47,6 +47,7 @@
 #  fk_rails_...  (unit_id => units.id)
 #
 class CommonAreaReservation < ApplicationRecord
+  include ReservationStatuses
   include TenantScopedAssociations
 
   acts_as_tenant :organization
@@ -61,4 +62,21 @@ class CommonAreaReservation < ApplicationRecord
   validates_same_tenant :common_area, :residential_property, :unit, :requested_by_person, :approved_by_person
 
   has_many :common_area_reservation_status_histories, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+  validates :status, presence: true, inclusion: { in: ReservationStatuses::ALL }
+  validates :starts_at, :ends_at, presence: true
+  validates :guest_count, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :rejection_reason, length: { maximum: 500 }
+
+  scope :holding_slot, -> { where(status: ReservationStatuses::ACTIVE) }
+  scope :upcoming, -> { where(ends_at: Time.zone.now..) }
+
+  def pending?
+    status == PENDING
+  end
+
+  def holds_slot?
+    ACTIVE.include?(status)
+  end
 end

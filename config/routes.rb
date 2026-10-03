@@ -115,6 +115,14 @@ Rails.application.routes.draw do
           member { post :acknowledge }
         end
 
+        # Common areas of a unit's property, their taken slots, and the unit's reservations.
+        resources :common_areas, only: [ :index ] do
+          member { get :availability }
+        end
+        resources :reservations, only: [ :index, :create ] do
+          member { post :cancel }
+        end
+
         # In-app inbox: the current user's own notifications, newest first.
         resources :notifications, only: [ :index ] do
           collection { post :read_all }
@@ -137,6 +145,14 @@ Rails.application.routes.draw do
   post "onboarding/accept/:token", to: "onboarding_acceptances#create"
 
   namespace :admin do
+    resources :common_areas, only: [ :index, :create, :update ]
+    resources :reservations, only: [ :index ] do
+      member do
+        post :approve
+        post :reject
+        post :cancel
+      end
+    end
     resources :announcements, only: [ :index, :create, :update ] do
       member do
         post :publish

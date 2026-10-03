@@ -37,6 +37,7 @@ es:
       visits: "Visitas"
       parcels: "Encomiendas"
       announcements: "Avisos"
+      common_areas: "Áreas comunes"
       staff: "Personal"
       own_unit: "Unidad propia"
     capability_labels:
@@ -64,6 +65,7 @@ es:
       manage_staff_assignments: "Gestionar asignaciones de personal"
       manage_parcels: "Gestionar encomiendas"
       manage_announcements: "Gestionar avisos"
+      manage_common_areas: "Gestionar áreas comunes"
     capability_descriptions:
       manage_organization: "Configura ajustes globales de la organización."
       manage_users: "Crea y gestiona usuarios de la organización."
@@ -89,3 +91,4 @@ es:
       manage_staff_assignments: "Asigna y revoca roles operativos de personal."
       manage_parcels: "Registra llegadas y retiros de encomiendas."
       manage_announcements: "Redacta y publica avisos para los residentes de una propiedad."
+      manage_common_areas: "Configura áreas comunes y aprueba o rechaza sus reservas."

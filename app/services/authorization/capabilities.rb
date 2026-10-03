@@ -28,6 +28,8 @@ module Authorization
     MANAGE_PARCELS = :manage_parcels
     # Write and publish announcements to a property's residents.
     MANAGE_ANNOUNCEMENTS = :manage_announcements
+    # Configure a property's common areas and approve or reject their reservations.
+    MANAGE_COMMON_AREAS = :manage_common_areas
     # Visitor (D5): read the visits where the user is the visitor_person.
     VIEW_OWN_VISITS = :view_own_visits
     # Global identity-conflict resolution. Deliberately super-admin-only by
@@ -60,6 +62,7 @@ module Authorization
       MANAGE_STAFF_ASSIGNMENTS,
       MANAGE_PARCELS,
       MANAGE_ANNOUNCEMENTS,
+      MANAGE_COMMON_AREAS,
       VIEW_OWN_VISITS,
       RESOLVE_IDENTITY_CONFLICTS
     ].freeze
@@ -100,7 +103,8 @@ module Authorization
       MANAGE_VISITS,
       MANAGE_STAFF_ASSIGNMENTS,
       MANAGE_PARCELS,
-      MANAGE_ANNOUNCEMENTS
+      MANAGE_ANNOUNCEMENTS,
+      MANAGE_COMMON_AREAS
     ].freeze
 
     CONCIERGE = [

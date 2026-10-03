@@ -53,6 +53,19 @@ pt:
       cta: "Criar minha conta"
       expiration: "Este link é de uso único e expira em 14 dias."
   notifications:
+    reservation:
+      approved:
+        title: "Reserva aprovada"
+        body: "Sua reserva de %{area} para %{date} foi aprovada"
+      rejected:
+        title: "Reserva rejeitada"
+        body: "Sua reserva de %{area} para %{date} foi rejeitada. %{reason}"
+      cancelled:
+        title: "Reserva cancelada"
+        body: "A administração cancelou sua reserva de %{area} de %{date}"
+      updated:
+        title: "Reserva atualizada"
+        body: "Sua reserva de %{area} mudou de status"
     parcel:
       title: "Chegou uma entrega"
       body: "Há %{delivery_type} para %{unit} na portaria"
@@ -334,6 +347,116 @@ pt:
         title: "Nova visita"
         body: "%{visitor_name} chegará à unidade %{unit_identifier}"
     admin:
+      common_areas:
+        index:
+          title: "Áreas comuns"
+          description: "Configure as áreas que os moradores podem reservar pelo app e suas regras. Só reservam os ocupantes com \"Pode reservar áreas comuns\"."
+          property: "Propriedade"
+          new: "Nova área"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar áreas comuns."
+          empty: "Esta propriedade não tem áreas comuns."
+        form:
+          new_title: "Nova área comum"
+          edit_title: "Editar área comum"
+          description: "As regras se aplicam ao reservar pelo app."
+          name: "Nome"
+          area_type: "Tipo"
+          capacity: "Capacidade (pessoas)"
+          optional: "Opcional"
+          requires_approval: "Requer aprovação"
+          requires_approval_help: "As reservas ficam pendentes até você aprovar. Se não, são confirmadas na hora."
+          active: "Disponível para reserva"
+          active_help: "Desative para fechá-la temporariamente sem apagá-la."
+          rules_title: "Regras de reserva"
+          rules_help: "Todas opcionais. Deixe em branco as que não se aplicam."
+          save: "Salvar"
+          saved: "Área salva."
+        rules:
+          opens_at: "Abre às"
+          closes_at: "Fecha às"
+          max_duration_minutes: "Duração máxima (minutos)"
+          min_advance_hours: "Antecedência mínima (horas)"
+          max_reservations_per_month: "Máximo de reservas por unidade ao mês"
+          notes: "Instruções para os moradores"
+        summary:
+          hours: "{opens}–{closes}"
+          duration: "máx. {minutes} min"
+          advance: "{hours} h de antecedência"
+          monthly: "{count} por mês"
+        table:
+          name: "Área"
+          capacity: "Capacidade"
+          approval: "Confirmação"
+          requires_approval: "Com aprovação"
+          instant: "Imediata"
+          rules: "Regras"
+          status: "Status"
+          upcoming: "Próximas reservas"
+          edit: "Editar"
+        status:
+          active: "Disponível"
+          inactive: "Fechada"
+        types:
+          pool: "Piscina"
+          gym: "Academia"
+          bbq: "Churrasqueira"
+          multipurpose_hall: "Salão multiuso"
+          meeting_room: "Sala de reuniões"
+          coworking: "Coworking"
+          terrace: "Terraço"
+          sauna: "Sauna"
+          court: "Quadra"
+          playground: "Parquinho"
+          game_room: "Sala de jogos"
+          laundry: "Lavanderia"
+          other: "Outra"
+        errors:
+          no_property: "Você não tem uma propriedade para gerenciar áreas comuns"
+          not_found: "A área não está mais disponível"
+          invalid_rules: "Revise as regras: os horários devem ter formato HH:MM e abrir antes de fechar, e os números devem ser inteiros"
+      reservations:
+        index:
+          title: "Reservas"
+          description: "Aprove ou rejeite as reservas de áreas comuns. O morador recebe uma notificação com a resposta."
+          property: "Propriedade"
+          no_property: "Você não tem uma propriedade atribuída para gerenciar reservas."
+        tabs:
+          pending: "A aprovar"
+          upcoming: "Próximas"
+          history: "Histórico"
+        empty:
+          pending: "Não há reservas a aprovar."
+          upcoming: "Não há reservas próximas."
+          history: "Ainda não há histórico."
+        table:
+          area: "Área"
+          slot: "Data e hora"
+          unit: "Unidade"
+          guests: "Convidados"
+          status: "Status"
+        actions:
+          approve: "Aprovar"
+          reject: "Rejeitar"
+          cancel: "Cancelar reserva"
+        status:
+          pending: "Pendente"
+          approved: "Aprovada"
+          rejected: "Rejeitada"
+          cancelled: "Cancelada"
+        reject:
+          title: "Rejeitar reserva"
+          description: "O morador receberá o motivo na notificação."
+        cancel:
+          title: "Cancelar reserva"
+          description: "O horário é liberado e o morador é avisado."
+        reason: "Motivo (opcional)"
+        approved: "Reserva aprovada."
+        rejected: "Reserva rejeitada."
+        cancelled: "Reserva cancelada."
+        errors:
+          not_pending: "A reserva não está mais pendente"
+          not_cancellable: "A reserva não pode mais ser cancelada"
+          not_found: "A reserva não está mais disponível"
       announcements:
         index:
           title: "Avisos"
@@ -1167,6 +1290,7 @@ pt:
               occupancy_type: "Tipo de ocupação"
               can_authorize_visits: "Autoriza visitas"
               can_withdraw_parcels: "Retira encomendas"
+              can_reserve_common_areas: "Reserva áreas comuns"
               validity: "Vigência"
               status: "Estado"
               empty: "Não há ocupantes ativos nesta unidade."
@@ -1235,8 +1359,10 @@ pt:
                   occupancy_type_placeholder: "Selecione um tipo"
                   can_authorize_visits: "Pode autorizar visitas"
                   can_withdraw_parcels: "Pode retirar encomendas"
+                  can_reserve_common_areas: "Pode reservar áreas comuns"
                   can_authorize_visits_help: "Somente ocupantes ativos com esta permissão podem autorizar visitas."
                   can_withdraw_parcels_help: "Somente ocupantes ativos com esta permissão podem retirar encomendas na portaria."
+                  can_reserve_common_areas_help: "Somente ocupantes ativos com esta permissão podem reservar áreas comuns pelo app."
                   starts_at: "Data de início"
                   starts_at_placeholder: "Selecione uma data"
                   ends_at: "Data de término"
@@ -1254,6 +1380,7 @@ pt:
                 occupancy_type: "Tipo de ocupação"
                 can_authorize_visits: "Autoriza visitas"
                 can_withdraw_parcels: "Retira encomendas"
+                can_reserve_common_areas: "Reserva áreas comuns"
                 validity: "Vigência"
                 actions:
                   submit: "Confirmar e adicionar"
@@ -2535,6 +2662,9 @@ pt:
         parcels: "Encomendas"
         communication: "Comunicação"
         announcements: "Avisos"
+        common_areas_group: "Áreas comuns"
+        reservations: "Reservas"
+        common_areas: "Áreas comuns"
         visits: "Visitas"
         manage_visits: "Gestão de visitas"
         categories: "Categorias"
@@ -2688,6 +2818,20 @@ pt:
       profile_required: "Complete seus dados para criar a conta"
     announcements:
       no_acknowledgement: "Este aviso não requer confirmação"
+    reservations:
+      not_eligible: "Você não tem permissão para reservar áreas comuns para esta unidade"
+      slot_taken: "Esse horário já está reservado"
+      not_cancellable: "Esta reserva não pode mais ser cancelada"
+      not_requester: "Só quem fez a reserva pode cancelá-la"
+      rules:
+        inactive_area: "Esta área não está disponível para reservas"
+        invalid_range: "O horário de término deve ser posterior ao de início"
+        in_the_past: "Não é possível reservar no passado"
+        capacity: "Esta área comporta até %{count} pessoas"
+        min_advance: "Reserve com pelo menos %{count} horas de antecedência"
+        max_duration: "A reserva não pode durar mais de %{count} minutos"
+        opening_hours: "A área funciona das %{opens} às %{closes}"
+        monthly_limit: "A unidade já tem %{count} reservas este mês nesta área"
     visits:
       unit_not_found: "Unidade não encontrada ou inacessível"
       no_active_relationship: "Você não tem uma relação ativa com esta unidade"

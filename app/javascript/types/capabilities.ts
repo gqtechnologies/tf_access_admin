@@ -29,6 +29,7 @@ export type CapabilityKey =
   | 'manage_staff_assignments'
   | 'manage_parcels'
   | 'manage_announcements'
+  | 'manage_common_areas'
 
 /**
  * Flat map of every capability key to a boolean indicating whether the

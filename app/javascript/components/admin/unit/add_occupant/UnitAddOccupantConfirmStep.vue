@@ -53,6 +53,13 @@
 
       <div class="px-4 py-3">
         <p class="text-xs font-medium text-muted-foreground">
+          {{ t('admin.units.show.occupants.add_occupant.confirm.can_reserve_common_areas') }}
+        </p>
+        <p class="mt-1 text-sm font-semibold">{{ reservationLabel }}</p>
+      </div>
+
+      <div class="px-4 py-3">
+        <p class="text-xs font-medium text-muted-foreground">
           {{ t('admin.units.show.occupants.add_occupant.confirm.validity') }}
         </p>
         <p class="mt-1 text-sm font-semibold">{{ validityLabel }}</p>
@@ -96,6 +103,12 @@ const authorizationLabel = computed(() =>
 
 const parcelWithdrawalLabel = computed(() =>
   props.occupancyForm.can_withdraw_parcels
+    ? t('admin.units.show.occupants.authorization.yes')
+    : t('admin.units.show.occupants.authorization.no'),
+)
+
+const reservationLabel = computed(() =>
+  props.occupancyForm.can_reserve_common_areas
     ? t('admin.units.show.occupants.authorization.yes')
     : t('admin.units.show.occupants.authorization.no'),
 )

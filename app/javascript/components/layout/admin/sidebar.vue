@@ -15,7 +15,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone } from 'lucide-vue-next';
+import { Home, GalleryVerticalEnd, Users, UserRound, Settings, Building, Building2, ClipboardList, CalendarDays, Package, Megaphone, Trees, CalendarCheck } from 'lucide-vue-next';
 import { Link } from '@inertiajs/vue3';
 import NavUser from '@/components/admin/user/nav/NavUser.vue'
 import { useI18n } from 'vue-i18n'
@@ -136,6 +136,31 @@ const getFeatureIcon = (key: string) => {
                   <Link href="/admin/announcements">
                     <Megaphone class="h-4 w-4" />
                     <span>{{ t('admin.sidebar.announcements') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <!-- Common areas and their reservations — manage_common_areas capability -->
+        <SidebarGroup v-if="capabilities?.manage_common_areas">
+          <SidebarGroupLabel>{{ t('admin.sidebar.common_areas_group') }}</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/reservations">
+                    <CalendarCheck class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.reservations') }}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton as-child>
+                  <Link href="/admin/common_areas">
+                    <Trees class="h-4 w-4" />
+                    <span>{{ t('admin.sidebar.common_areas') }}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

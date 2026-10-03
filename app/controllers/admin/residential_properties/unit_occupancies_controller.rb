@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Admin::ResidentialProperties::UnitOccupanciesController < AdminController
-  OCCUPANCY_ASSIGNMENT_PARAMS = %i[occupancy_type can_authorize_visits can_withdraw_parcels starts_at ends_at status].freeze
+  OCCUPANCY_ASSIGNMENT_PARAMS = %i[occupancy_type can_authorize_visits can_withdraw_parcels can_reserve_common_areas starts_at ends_at status].freeze
   OCCUPANCY_CREATE_PARAMS = (%i[person_id] + OCCUPANCY_ASSIGNMENT_PARAMS).freeze
   MINIMAL_PERSON_PARAMS = %i[first_name last_name display_name email document_number person_type].freeze
 

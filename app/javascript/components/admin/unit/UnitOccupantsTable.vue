@@ -22,6 +22,7 @@
             <TableHead>{{ t('admin.units.show.occupants.table.occupancy_type') }}</TableHead>
             <TableHead>{{ t('admin.units.show.occupants.table.can_authorize_visits') }}</TableHead>
             <TableHead>{{ t('admin.units.show.occupants.table.can_withdraw_parcels') }}</TableHead>
+            <TableHead>{{ t('admin.units.show.occupants.table.can_reserve_common_areas') }}</TableHead>
             <TableHead>{{ t('admin.units.show.occupants.table.validity') }}</TableHead>
             <TableHead>{{ t('admin.units.show.occupants.table.status') }}</TableHead>
             <TableHead v-if="showActionsColumn" class="w-[4rem] text-right">
@@ -32,7 +33,7 @@
         <TableBody>
           <TableRow v-if="occupancies.length === 0">
             <TableCell
-              :colspan="showActionsColumn ? 8 : 7"
+              :colspan="showActionsColumn ? 9 : 8"
               class="h-24 text-center text-muted-foreground"
             >
               {{ emptyMessage }}
@@ -70,6 +71,12 @@
               <StatusDotBadge
                 :label="authorizationLabel(occupancy.can_withdraw_parcels)"
                 :tone="occupancy.can_withdraw_parcels ? 'success' : 'muted'"
+              />
+            </TableCell>
+            <TableCell>
+              <StatusDotBadge
+                :label="authorizationLabel(occupancy.can_reserve_common_areas)"
+                :tone="occupancy.can_reserve_common_areas ? 'success' : 'muted'"
               />
             </TableCell>
             <TableCell>
