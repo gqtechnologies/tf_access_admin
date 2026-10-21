@@ -56,7 +56,7 @@
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{{ t('common.actions.cancel') }}</AlertDialogCancel>
-            <AlertDialogAction @click="remove">{{ t('admin.vehicles.remove.confirm') }}</AlertDialogAction>
+            <Button @click="remove">{{ t('admin.vehicles.remove.confirm') }}</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -75,7 +75,6 @@ import AdminDataTable from '@/components/admin/table/index.vue'
 import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,

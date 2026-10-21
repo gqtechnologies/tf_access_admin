@@ -67,9 +67,9 @@
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{{ t('common.actions.cancel') }}</AlertDialogCancel>
-            <AlertDialogAction :disabled="submitting" @click="runConfirmed">
+            <Button :disabled="submitting" @click="runConfirmed">
               {{ confirming ? t(`admin.authorized_residents.actions.${confirming.action}`) : '' }}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -88,7 +88,6 @@ import AdminDataTable from '@/components/admin/table/index.vue'
 import DataTablePagination from '@/components/admin/table/DataTablePagination.vue'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
