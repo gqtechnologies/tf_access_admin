@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# GET/PATCH /api/v1/private/me — authenticated user's profile.
+# GET/PATCH/DELETE /api/v1/private/me — authenticated user's profile.
 # +name+ and +avatar+ live on User; +phone+ and +dateOfBirth+ on the Person of
 # the current organization. +gender+ is accepted but ignored (not modelled).
 class Api::V1::Private::ProfilesController < Api::V1::Private::BaseController
@@ -20,6 +20,16 @@ class Api::V1::Private::ProfilesController < Api::V1::Private::BaseController
     render json: { error: e.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
   rescue Date::Error
     render json: { error: I18n.t("api.errors.invalid_day") }, status: :unprocessable_entity
+  end
+
+  # The user deletes their own account. It is anonymized, not destroyed (see
+  # Accounts::DeleteAccount); every later request with the same token is
+  # rejected because the user is deactivated.
+  def destroy
+    Accounts::DeleteAccount.call(user: current_user)
+    head :no_content
+  rescue Accounts::DeleteAccount::NotAllowed
+    render json: { error: I18n.t("api.errors.forbidden") }, status: :forbidden
   end
 
   private

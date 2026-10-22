@@ -28,6 +28,9 @@
 #       enabled: "ON"
 
 es:
+  accounts:
+    deletion:
+      anonymous_name: "Persona eliminada"
   onboarding:
     accept:
       success: "Invitación aceptada. Inicia sesión para continuar."

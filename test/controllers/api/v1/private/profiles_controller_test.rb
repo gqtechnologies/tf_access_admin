@@ -148,6 +148,31 @@ class Api::V1::Private::ProfilesControllerTest < ActionDispatch::IntegrationTest
 
   private
 
+  test "DELETE /me anonymizes the account and later requests with it are rejected" do
+    host! "#{@organization.subdomain}.example.com"
+    sign_in @resident
+    delete api_v1_private_me_path, headers: { "Accept" => "application/json" }
+
+    assert_response :no_content
+    assert @resident.reload.deactivated_at.present?
+    assert_equal Accounts::DeleteAccount.anonymous_name, @person.reload.display_name
+
+    get api_v1_private_me_path, headers: { "Accept" => "application/json" }
+    assert_response :unauthorized
+  end
+
+  test "DELETE /me is forbidden for a super admin" do
+    admin = create_user_for_organization(
+      organization: @organization, email: "profile-api-super@example.test", role: AvailableRoles::SUPER_ADMIN
+    )
+    host! "#{@organization.subdomain}.example.com"
+    sign_in admin
+    delete api_v1_private_me_path, headers: { "Accept" => "application/json" }
+
+    assert_response :forbidden
+    assert_nil admin.reload.deactivated_at
+  end
+
   def get_me(user)
     host! "#{@organization.subdomain}.example.com"
     sign_in user

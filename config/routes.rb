@@ -59,6 +59,8 @@ Rails.application.routes.draw do
         # Authenticated profile of the current user (mobile-private-api "Profile endpoint").
         get "me", to: "profiles#show"
         patch "me", to: "profiles#update"
+        # DELETE /me deletes the signed-in user's account by anonymizing it (Accounts::DeleteAccount).
+        delete "me", to: "profiles#destroy"
         # PATCH /me/password changes the signed-in user's password (needs the current one).
         patch "me/password", to: "passwords#update"
 
