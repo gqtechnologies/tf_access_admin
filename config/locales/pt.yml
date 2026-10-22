@@ -28,6 +28,9 @@
 #       enabled: "ON"
 
 pt:
+  accounts:
+    deletion:
+      anonymous_name: "Pessoa excluída"
   onboarding:
     accept:
       success: "Convite aceito. Faça login para continuar."
