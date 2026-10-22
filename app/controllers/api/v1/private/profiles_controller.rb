@@ -24,9 +24,11 @@ class Api::V1::Private::ProfilesController < Api::V1::Private::BaseController
 
   # The user deletes their own account. It is anonymized, not destroyed (see
   # Accounts::DeleteAccount); every later request with the same token is
-  # rejected because the user is deactivated.
+  # rejected because the user is deactivated. An account that signs in with
+  # Apple also sends +appleAuthorizationCode+, used to revoke that sign-in.
   def destroy
     Accounts::DeleteAccount.call(user: current_user)
+    SocialAuth::AppleTokenRevocation.call(authorization_code: params[:appleAuthorizationCode]) if params[:appleAuthorizationCode].present?
     head :no_content
   rescue Accounts::DeleteAccount::NotAllowed
     render json: { error: I18n.t("api.errors.forbidden") }, status: :forbidden

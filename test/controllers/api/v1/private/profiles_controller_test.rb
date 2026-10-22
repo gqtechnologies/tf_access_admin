@@ -2,10 +2,11 @@
 
 require "test_helper"
 
-# GET/PATCH /api/v1/private/me — mobile-private-api "Profile endpoint".
+# GET/PATCH/DELETE /api/v1/private/me — mobile-private-api "Profile endpoint".
 class Api::V1::Private::ProfilesControllerTest < ActionDispatch::IntegrationTest
   include OperationalPolicyTestHelper
   include Devise::Test::IntegrationHelpers
+  include SocialTokenTestHelper
 
   setup do
     @organization = organizations(:one)
@@ -146,8 +147,6 @@ class Api::V1::Private::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  private
-
   test "DELETE /me anonymizes the account and later requests with it are rejected" do
     host! "#{@organization.subdomain}.example.com"
     sign_in @resident
@@ -172,6 +171,34 @@ class Api::V1::Private::ProfilesControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_nil admin.reload.deactivated_at
   end
+
+  test "DELETE /me revokes the Apple sign-in when the app sends a code" do
+    host! "#{@organization.subdomain}.example.com"
+    sign_in @resident
+    stubs = stub_apple_revocation
+
+    with_apple_revocation_configured do
+      delete api_v1_private_me_path, params: { appleAuthorizationCode: "code-1" }, headers: { "Accept" => "application/json" }
+    end
+
+    assert_response :no_content
+    assert_requested(stubs[:revoke])
+  end
+
+  test "DELETE /me still deletes the account when Apple rejects the code" do
+    host! "#{@organization.subdomain}.example.com"
+    sign_in @resident
+    stub_apple_revocation(token_status: 400)
+
+    with_apple_revocation_configured do
+      delete api_v1_private_me_path, params: { appleAuthorizationCode: "expired" }, headers: { "Accept" => "application/json" }
+    end
+
+    assert_response :no_content
+    assert @resident.reload.deactivated_at.present?
+  end
+
+  private
 
   def get_me(user)
     host! "#{@organization.subdomain}.example.com"
