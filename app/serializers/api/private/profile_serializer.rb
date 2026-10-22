@@ -6,6 +6,7 @@ class Api::Private::ProfileSerializer < ActiveModel::Serializer
   attributes :email, :name, :dni, :phone, :gender, :role, :organizations
   attribute :date_of_birth, key: :dateOfBirth
   attribute :avatar_url, key: :avatarUrl
+  attribute :sign_in_with_apple, key: :signInWithApple
 
   def phone
     Api::Private::PhoneNumber.split(person&.contact_phone)
@@ -22,6 +23,12 @@ class Api::Private::ProfileSerializer < ActiveModel::Serializer
 
   def avatar_url
     object.avatar_path
+  end
+
+  # Set by Accounts::SocialSignIn; the app asks Apple for a fresh code before
+  # deleting such an account so the sign-in can be revoked.
+  def sign_in_with_apple
+    object.metadata["apple_sub"].present?
   end
 
   def role

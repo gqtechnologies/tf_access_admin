@@ -41,4 +41,29 @@ module SocialTokenTestHelper
     SocialAuth::Jwks.define_singleton_method(:fetch, original) if original
     ENV["GOOGLE_SIGN_IN_CLIENT_IDS"] = previous
   end
+
+  APPLE_REVOCATION_TEST_KEY = OpenSSL::PKey::EC.generate("prime256v1")
+
+  # Runs the block with SocialAuth::AppleTokenRevocation configured with a
+  # throwaway key; the caller stubs Apple's endpoints with WebMock.
+  def with_apple_revocation_configured(&block)
+    values = {
+      "APPLE_SIGN_IN_TEAM_ID" => "TEAM123456",
+      "APPLE_SIGN_IN_KEY_ID" => "KEY1234567",
+      "APPLE_SIGN_IN_PRIVATE_KEY" => APPLE_REVOCATION_TEST_KEY.to_pem.gsub("\n", "\\n")
+    }
+    previous = values.keys.index_with { |key| ENV[key] }
+    ENV.update(values)
+    block.call
+  ensure
+    previous.each { |key, value| ENV[key] = value }
+  end
+
+  def stub_apple_revocation(token_status: 200)
+    token_body = token_status == 200 ? { access_token: "at", refresh_token: "rt-123", token_type: "Bearer" }.to_json : { error: "invalid_grant" }.to_json
+    {
+      token: stub_request(:post, "https://appleid.apple.com/auth/token").to_return(status: token_status, body: token_body),
+      revoke: stub_request(:post, "https://appleid.apple.com/auth/revoke").with(body: hash_including("token" => "rt-123", "token_type_hint" => "refresh_token")).to_return(status: 200, body: "")
+    }
+  end
 end

@@ -12,4 +12,5 @@
 
 - [x] 3.1 Tests de `test/controllers/api`, `test/services/accounts` y `test/integration` en verde; `rubocop` sin novedades.
 - [ ] 3.2 Prueba manual: eliminar una cuenta desde la app y ver la ficha "Persona eliminada" en la web. (Usuario)
-- [ ] 3.3 Revocar el token de Sign in with Apple al eliminar la cuenta (requiere la clave privada de Sign in with Apple en el servidor).
+- [x] 3.3 Revocar el token de Sign in with Apple al eliminar la cuenta: `SocialAuth::AppleTokenRevocation` con el `appleAuthorizationCode` que manda la app; `signInWithApple` en `/me`; verificado con `test/services/social_auth/apple_token_revocation_test.rb` y los tests de `DELETE /me`.
+- [ ] 3.4 Cargar `APPLE_SIGN_IN_TEAM_ID`, `APPLE_SIGN_IN_KEY_ID` y `APPLE_SIGN_IN_PRIVATE_KEY` en Dokploy; hasta entonces la revocación se omite y queda en el log. (Usuario)

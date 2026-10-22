@@ -57,6 +57,17 @@ class Api::V1::Auth::SocialSessionsControllerTest < ActionDispatch::IntegrationT
     assert user.member_of_tenant?(@organization)
   end
 
+  test "signing in with Apple marks the account so the app can revoke it on deletion" do
+    sign_in_with("apple", { email: "apple-mark@example.com" }, name: "Ana Apple", dni: "11.111.111-1")
+    assert_response :ok
+    token = response.parsed_body.dig("data", "token")
+
+    assert_equal "sub-apple-mark@example.com", User.find_by!(email: "apple-mark@example.com").metadata["apple_sub"]
+
+    get api_v1_private_me_path, headers: { "Authorization" => "Bearer #{token}", "Accept" => "application/json" }
+    assert_equal true, response.parsed_body.dig("data", "signInWithApple")
+  end
+
   test "the new session works on the private API" do
     sign_in_with("google", { email: "session-check@example.com", name: "Sesión Ok" }, dni: "22.222.222-2")
     token = response.parsed_body.dig("data", "token")

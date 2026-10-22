@@ -10,6 +10,7 @@ El App Store exige que una app que permite crear cuentas también permita elimin
   - Cada `Person` del usuario, en todas las organizaciones: "Persona eliminada", sin documento, contacto ni fecha de nacimiento, `inactive`, desvinculada del usuario y con la membresía revocada. Sus propiedades y ocupaciones se mantienen hasta que la administración las termine.
   - `VisitorProfile`, `VisitParticipant` y la auditoría de `Person` pierden los nombres y documentos que copiaron.
 - La API privada rechaza con `401` cualquier token de un usuario desactivado, así que la sesión deja de servir en el acto.
+- Sign in with Apple (guía 5.1.1(v) de App Store): al entrar con Apple se guarda `apple_sub` en el usuario y `/me` expone `signInWithApple`; antes de eliminar, la app pide a Apple un `authorization_code` y lo manda como `appleAuthorizationCode`; el backend lo canjea y revoca el token sin guardarlo. Se activa con `APPLE_SIGN_IN_TEAM_ID`, `APPLE_SIGN_IN_KEY_ID` y `APPLE_SIGN_IN_PRIVATE_KEY`.
 - Sin migraciones.
 
 ## Capabilities
@@ -21,5 +22,4 @@ El App Store exige que una app que permite crear cuentas también permita elimin
 
 ## Impact
 
-- `Accounts::DeleteAccount`, `Api::V1::Private::ProfilesController#destroy`, `Api::V1::Private::BaseController`, rutas, locales `es`/`en`/`pt`.
-- Pendiente fuera de este cambio: revocar el token de Sign in with Apple (requiere la clave privada de Sign in with Apple en el servidor).
+- `Accounts::DeleteAccount`, `SocialAuth::AppleTokenRevocation`, `Accounts::SocialSignIn`, `Api::Private::ProfileSerializer`, `Api::V1::Private::ProfilesController#destroy`, `Api::V1::Private::BaseController`, rutas, locales `es`/`en`/`pt`.

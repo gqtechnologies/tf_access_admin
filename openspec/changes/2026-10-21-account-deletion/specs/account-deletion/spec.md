@@ -49,3 +49,14 @@ The private API SHALL reject with `401` any request authenticated as a deactivat
 #### Scenario: Token used after deletion
 - **WHEN** a token issued before the account was deleted calls the private API
 - **THEN** the response is `401`
+
+### Requirement: Sign in with Apple is revoked
+When the account signs in with Apple, the profile SHALL report `signInWithApple: true`, and `DELETE /api/v1/private/me` SHALL accept an `appleAuthorizationCode` that the backend exchanges with Apple and revokes, without storing any Apple token. A failed or unconfigured revocation SHALL NOT prevent the deletion.
+
+#### Scenario: Apple user deletes the account
+- **WHEN** an Apple user sends `DELETE /api/v1/private/me` with a fresh `appleAuthorizationCode`
+- **THEN** the account is anonymized and the Apple token is revoked
+
+#### Scenario: Apple rejects the code
+- **WHEN** Apple rejects the authorization code
+- **THEN** the response is still `204` and the failure is logged

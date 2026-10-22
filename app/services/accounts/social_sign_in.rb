@@ -53,6 +53,7 @@ module Accounts
 
           # The provider vouches for the email, same as opening an emailed link.
           user.update!(confirmed_at: Time.current) if user.confirmed_at.blank?
+          remember_apple_subject(user)
           join_organization(user) unless user.super_admin? || user.member_of_tenant?(@organization)
         end
       end
@@ -102,6 +103,15 @@ module Accounts
       else
         Accounts::ProvisionTenantIdentity.call(user: user, organization: @organization, role: AvailableRoles::VISITOR)
       end
+    end
+
+    # Lets the app know this account uses Sign in with Apple, which must be
+    # revoked when the account is deleted (SocialAuth::AppleTokenRevocation).
+    def remember_apple_subject(user)
+      return unless @claims.provider == "apple" && @claims.subject.present?
+      return if user.metadata["apple_sub"] == @claims.subject
+
+      user.update_columns(metadata: user.metadata.merge("apple_sub" => @claims.subject))
     end
 
     def unlinked_person_for(email)
