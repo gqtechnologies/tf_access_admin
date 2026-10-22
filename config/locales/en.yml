@@ -1415,9 +1415,9 @@ en:
           summary:
             type: "Type"
             area: "Area"
-            area_value: "%{value} m²"
+            area_value: "{value} m²"
             owners: "Owners"
-            owners_value: "%{count} active"
+            owners_value: "{count} active"
             assigned_percentage: "Assigned share"
           tabs:
             aria_label: "Unit sections"

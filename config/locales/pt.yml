@@ -1408,9 +1408,9 @@ pt:
           summary:
             type: "Tipo"
             area: "Área"
-            area_value: "%{value} m²"
+            area_value: "{value} m²"
             owners: "Proprietários"
-            owners_value: "%{count} ativos"
+            owners_value: "{count} ativo | {count} ativos"
             assigned_percentage: "Percentual atribuído"
           tabs:
             aria_label: "Seções da unidade"
