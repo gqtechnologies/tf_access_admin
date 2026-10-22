@@ -14,4 +14,4 @@
 ## 3. Validación
 
 - [x] 3.1 Tests afectados en verde (278); `rubocop` y `brakeman` sin novedades.
-- [ ] 3.2 Prueba manual: crear un área con reglas, reservar desde la app, aprobar y rechazar en la web. (Usuario)
+- [x] 3.2 Prueba manual: crear un área con reglas, reservar desde la app, aprobar y rechazar en la web. (Usuario) Probado el 2026-10-21 en simuladores iOS contra producción.

@@ -13,4 +13,4 @@
 ## 3. Validación
 
 - [x] 3.1 Tests afectados en verde; `rubocop` y `brakeman` sin novedades.
-- [ ] 3.2 Prueba manual: reportar desde la app, gestionar y cerrar en la web, recibir el push. (Usuario)
+- [x] 3.2 Prueba manual: reportar desde la app, gestionar y cerrar en la web, recibir el push. (Usuario) Probado el 2026-10-21 en simuladores iOS contra producción; la notificación llega a la bandeja y el push se encola, pero falta verlo en un dispositivo físico.
