@@ -46,7 +46,7 @@ class Api::V1::Private::PasswordsControllerTest < ActionDispatch::IntegrationTes
 
     assert_response :unprocessable_entity
     assert_equal "current_password", response.parsed_body["field"]
-    assert_equal I18n.t("api.password.wrong_current"), response.parsed_body["error"]
+    assert_equal I18n.t("api.password.wrong_current", locale: :es), response.parsed_body["error"]
     assert @user.reload.valid_password?(CURRENT)
   end
 
@@ -63,7 +63,7 @@ class Api::V1::Private::PasswordsControllerTest < ActionDispatch::IntegrationTes
 
       assert_response :unprocessable_entity, weak
       assert_equal "password", response.parsed_body["field"]
-      assert_equal I18n.t("api.password.weak"), response.parsed_body["error"]
+      assert_equal I18n.t("api.password.weak", locale: :es), response.parsed_body["error"]
     end
 
     assert @user.reload.valid_password?(CURRENT)
@@ -74,7 +74,7 @@ class Api::V1::Private::PasswordsControllerTest < ActionDispatch::IntegrationTes
 
     assert_response :unprocessable_entity
     assert_equal "password", response.parsed_body["field"]
-    assert_equal I18n.t("api.password.same_as_current"), response.parsed_body["error"]
+    assert_equal I18n.t("api.password.same_as_current", locale: :es), response.parsed_body["error"]
   end
 
   test "requires authentication" do

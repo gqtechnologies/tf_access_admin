@@ -388,7 +388,7 @@ class Api::V1::Private::Units::VisitsControllerTest < ActionDispatch::Integratio
       post_visit(user: @resident, unit: @unit, visitor: { name: "Y", email: "y@example.com", document: doc })
     end
     assert_response :unprocessable_entity
-    assert_equal I18n.t("api.visits.identity_conflict"), JSON.parse(response.body)["error"]
+    assert_equal I18n.t("api.visits.identity_conflict", locale: :es), JSON.parse(response.body)["error"]
   end
 
   test "missing visitor email returns 422 and persists nothing (3.5)" do
@@ -396,7 +396,7 @@ class Api::V1::Private::Units::VisitsControllerTest < ActionDispatch::Integratio
       post_visit(user: @resident, unit: @unit, visitor: { name: "No Email", document: "DOC-NOEMAIL" })
     end
     assert_response :unprocessable_entity
-    assert_equal I18n.t("api.visits.invalid_visitor"), JSON.parse(response.body)["error"]
+    assert_equal I18n.t("api.visits.invalid_visitor", locale: :es), JSON.parse(response.body)["error"]
   end
 
   test "malformed visitor email returns 422 and persists nothing (3.5)" do
@@ -404,7 +404,7 @@ class Api::V1::Private::Units::VisitsControllerTest < ActionDispatch::Integratio
       post_visit(user: @resident, unit: @unit, visitor: { name: "Bad Email", email: "not-an-email" })
     end
     assert_response :unprocessable_entity
-    assert_equal I18n.t("api.visits.invalid_visitor"), JSON.parse(response.body)["error"]
+    assert_equal I18n.t("api.visits.invalid_visitor", locale: :es), JSON.parse(response.body)["error"]
   end
 
   test "missing visitor name returns 422 (3.5)" do

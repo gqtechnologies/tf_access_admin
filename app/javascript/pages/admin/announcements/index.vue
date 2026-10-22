@@ -105,9 +105,9 @@
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{{ t('common.actions.cancel') }}</AlertDialogCancel>
-            <AlertDialogAction :disabled="submitting" @click="runConfirmed">
+            <Button :disabled="submitting" @click="runConfirmed">
               {{ confirming?.action === 'publish' ? t('admin.announcements.actions.publish') : t('admin.announcements.actions.archive') }}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -127,7 +127,6 @@ import DataTablePagination from '@/components/admin/table/DataTablePagination.vu
 import AnnouncementFormDrawer from '@/components/admin/announcements/AnnouncementFormDrawer.vue'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,

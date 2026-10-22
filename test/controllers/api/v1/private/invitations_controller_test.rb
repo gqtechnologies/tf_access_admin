@@ -89,7 +89,7 @@ class Api::V1::Private::InvitationsControllerTest < ActionDispatch::IntegrationT
     get_invitations(@member)
 
     assert_response :forbidden
-    assert_equal I18n.t("api.errors.forbidden"), JSON.parse(response.body)["error"]
+    assert_equal I18n.t("api.errors.forbidden", locale: :es), JSON.parse(response.body)["error"]
   end
 
   test "without session returns 401" do
