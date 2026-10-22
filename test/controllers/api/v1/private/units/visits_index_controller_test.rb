@@ -76,7 +76,7 @@ class Api::V1::Private::Units::VisitsIndexControllerTest < ActionDispatch::Integ
     get_visits(@resident, @unit, day: "2026-13-40")
 
     assert_response :unprocessable_entity
-    assert_equal I18n.t("api.errors.invalid_day"), JSON.parse(response.body)["error"]
+    assert_equal I18n.t("api.errors.invalid_day", locale: :es), JSON.parse(response.body)["error"]
   end
 
   test "missing day returns 422" do
@@ -96,7 +96,7 @@ class Api::V1::Private::Units::VisitsIndexControllerTest < ActionDispatch::Integ
     get_visits(@stranger, @unit, day: "2026-09-20")
 
     assert_response :forbidden
-    assert_equal I18n.t("api.visits.authorization_denied"), JSON.parse(response.body)["error"]
+    assert_equal I18n.t("api.visits.authorization_denied", locale: :es), JSON.parse(response.body)["error"]
   end
 
   test "unit from another organization returns 404" do

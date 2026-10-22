@@ -153,7 +153,7 @@ class Api::V1::Private::Concierge::ParcelsControllerTest < ActionDispatch::Integ
     end
 
     assert_response :unprocessable_entity
-    assert_equal I18n.t("api.parcels.not_eligible"), response.parsed_body["error"]
+    assert_equal I18n.t("api.parcels.not_eligible", locale: :es), response.parsed_body["error"]
     assert_equal ParcelStatuses::RECEIVED, @waiting.reload.status
   end
 
@@ -163,7 +163,7 @@ class Api::V1::Private::Concierge::ParcelsControllerTest < ActionDispatch::Integ
     end
 
     assert_response :unprocessable_entity
-    assert_equal I18n.t("api.parcels.not_waiting"), response.parsed_body["error"]
+    assert_equal I18n.t("api.parcels.not_waiting", locale: :es), response.parsed_body["error"]
   end
 
   test "resident cannot reach a parcel through the concierge routes" do
