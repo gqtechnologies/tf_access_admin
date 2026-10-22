@@ -54,7 +54,7 @@ const cards = computed(() => {
       key: 'owners',
       icon: Users,
       label: t('admin.units.show.summary.owners'),
-      value: t('admin.units.show.summary.owners_value', { count: stats.active_owners_count }),
+      value: t('admin.units.show.summary.owners_value', stats.active_owners_count),
       iconClass: 'text-green-600',
       iconWrapperClass: 'bg-green-500/10',
     },
