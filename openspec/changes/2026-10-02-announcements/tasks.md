@@ -13,4 +13,4 @@
 ## 3. Validación
 
 - [x] 3.1 Tests existentes afectados (autorización, roles, job de push, encomiendas) en verde; `rubocop` y `brakeman` sin novedades.
-- [ ] 3.2 Prueba manual: publicar un aviso en la web y verlo llegar al teléfono. (Usuario)
+- [x] 3.2 Prueba manual: publicar un aviso en la web y verlo llegar al teléfono. (Usuario) Probado el 2026-10-21 en simuladores iOS contra producción; la notificación llega a la bandeja y el push se encola, pero falta verlo en un dispositivo físico.

@@ -13,4 +13,4 @@
 ## 3. Validación
 
 - [x] 3.1 Tests afectados en verde (374); `rubocop` y `brakeman` sin novedades.
-- [ ] 3.2 Prueba manual: proponer desde la app, aprobar en la web, verla en conserjería y retirar una encomienda a su nombre. (Usuario)
+- [x] 3.2 Prueba manual: proponer desde la app, aprobar en la web, verla en conserjería y retirar una encomienda a su nombre. (Usuario) Probado el 2026-10-21 en simuladores iOS contra producción.
